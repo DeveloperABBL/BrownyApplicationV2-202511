@@ -1,0 +1,47 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class AppDims {
+  AppDims._();
+
+  static final double size_2 = 2.0;
+  static final double size_4 = 4.0;
+  static final double size_8 = 8.0;
+  static final double size_12 = 12.0;
+  static final double size_16 = 16.0;
+  static final double size_20 = 20.0;
+  static final double size_24 = 24.0;
+  static final double size_28 = 28.0;
+  static final double size_32 = 32.0;
+  static final double size_40 = 40.0;
+  static final double size_48 = 48.0;
+  static final double size_56 = 56.0;
+  static final double size_64 = 64.0;
+
+  static SizedBox get vericalPadding_8 => SizedBox(
+    height: 8.h,
+  );
+  static SizedBox get horizonPadding_8 => SizedBox(
+    width: 8.w,
+  );
+  static SizedBox get vericalPadding_10 => SizedBox(
+    height: 10.h,
+  );
+  static SizedBox get horizonPadding_10 => SizedBox(
+    width: 10.w,
+  );
+  static SizedBox get vericalPadding_24 => SizedBox(
+    height: 24.h,
+  );
+  static SizedBox get horizonPadding_24 => SizedBox(
+    width: 24.w,
+  );
+  static SizedBox get vericalPadding_32 => SizedBox(
+    height: 32.h,
+  );
+  static SizedBox get horizonPadding_32 => SizedBox(
+    width: 32.w,
+  );
+
+  static final double primaryRadius = 32.0;
+}

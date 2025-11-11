@@ -1,0 +1,51 @@
+import 'package:browny_applications_new/core/res/colors/app_colors.dart';
+import 'package:browny_applications_new/core/res/dims/app_dims.dart';
+import 'package:flutter/material.dart';
+
+/// วิดเจ็ตคอนเทนเนอร์ที่มีมุมโค้งแบบกำหนดเอง
+///
+/// วิดเจ็ตนี้สร้างคอนเทนเนอร์ที่มีความสูง ความกว้าง สี และมุมโค้งที่สามารถปรับแต่งได้
+/// หากไม่ได้กำหนดค่า จะใช้ค่าเริ่มต้นดังนี้:
+/// - ความกว้าง: double.infinity (เต็มความกว้างที่มี)
+/// - สี: AppColors.background
+/// - มุมโค้ง: โค้งเฉพาะมุมบนซ้ายและบนขวาด้วยรัศมี AppDims.primaryRadius
+///
+/// พารามิเตอร์:
+/// - [height]: ความสูงของคอนเทนเนอร์ (ไม่บังคับ)
+/// - [width]: ความกว้างของคอนเทนเนอร์ (ไม่บังคับ)
+/// - [color]: สีพื้นหลังของคอนเทนเนอร์ (ไม่บังคับ)
+/// - [borderRadius]: รัศมีมุมโค้งแบบกำหนดเอง (ไม่บังคับ)
+class AppContainerRadius extends StatelessWidget {
+  const AppContainerRadius({
+    super.key,
+    this.height,
+    this.width,
+    this.color,
+    this.borderRadius,
+    this.child,
+  });
+
+  final double? height;
+  final double? width;
+  final Color? color;
+  final BorderRadius? borderRadius;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width ?? double.infinity,
+      decoration: BoxDecoration(
+        color: color ?? AppColors.background,
+        borderRadius:
+            borderRadius ??
+            BorderRadius.only(
+              topLeft: Radius.circular(AppDims.primaryRadius),
+              topRight: Radius.circular(AppDims.primaryRadius),
+            ),
+      ),
+      child: child,
+    );
+  }
+}
