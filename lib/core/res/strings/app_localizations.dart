@@ -100,11 +100,53 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @signUpWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up with'**
+  String get signUpWith;
+
+  /// No description provided for @signUpDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a member with Browny and enjoy many exclusive privileges.'**
+  String get signUpDescription;
+
+  /// No description provided for @signUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Browny ID account'**
+  String get signUpTitle;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// No description provided for @emailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Email / Phone number'**
+  String get emailOrPhone;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
   /// No description provided for @shop.
   ///
   /// In en, this message translates to:
   /// **'Shop'**
   String get shop;
+
+  /// No description provided for @coin.
+  ///
+  /// In en, this message translates to:
+  /// **'Coin'**
+  String get coin;
 
   /// No description provided for @brownyClub.
   ///
@@ -1329,6 +1371,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discount'**
   String get discount;
+
+  /// No description provided for @pleaseEnterEmailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email or phone number'**
+  String get pleaseEnterEmailOrPhone;
+
+  /// No description provided for @pleaseEnterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get pleaseEnterValidEmail;
+
+  /// No description provided for @pleaseEnterValidPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid phone number'**
+  String get pleaseEnterValidPhoneNumber;
+
+  /// No description provided for @pleaseEnterValidEmailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email or phone number'**
+  String get pleaseEnterValidEmailOrPhone;
+
+  /// No description provided for @pleaseEnterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get pleaseEnterPassword;
+
+  /// No description provided for @passwordMustBeAtLeast8Characters.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters long'**
+  String get passwordMustBeAtLeast8Characters;
+
+  /// No description provided for @passwordMustContainUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Contain at least one uppercase letter'**
+  String get passwordMustContainUppercase;
+
+  /// No description provided for @passwordMustContainLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Contain at least one lowercase letter'**
+  String get passwordMustContainLowercase;
+
+  /// No description provided for @passwordMustContainNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Contain at least one number'**
+  String get passwordMustContainNumber;
+
+  /// No description provided for @loginWelcomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny welcomes you, let\'s do laundry together'**
+  String get loginWelcomeDescription;
+
+  /// No description provided for @loginWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with'**
+  String get loginWith;
+
+  /// No description provided for @forgotPasswordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email/phone number'**
+  String get forgotPasswordDescription;
+
+  /// No description provided for @dontHaveAccountYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account yet?'**
+  String get dontHaveAccountYet;
+
+  /// No description provided for @signUpNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up now!'**
+  String get signUpNow;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get forgotPassword;
 }
 
 class _AppLocalizationsDelegate

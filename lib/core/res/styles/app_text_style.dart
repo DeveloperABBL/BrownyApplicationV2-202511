@@ -1,166 +1,266 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../colors/app_colors.dart';
 
-/// App text styles based on Manrope font family from Google Fonts
+/// App text styles based on Mitr font family from Google Fonts
 class AppTextStyles {
   AppTextStyles._();
 
-  static final TextStyle _getTextStyleByFontFamily = GoogleFonts.mitr();
-
-  // Display styles (for large headings)
-  static TextStyle displayLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 57,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -0.25,
-    height: 1.12,
-  );
-
-  static TextStyle displayMedium = _getTextStyleByFontFamily.copyWith(
-    fontSize: 45,
-    fontWeight: FontWeight.w800,
-    letterSpacing: 0,
-    height: 1.16,
-  );
-
-  static TextStyle displaySmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 36,
-    fontWeight: FontWeight.w800,
-    letterSpacing: 0,
-    height: 1.22,
-  );
-
-  // Headline styles (for section headings)
-  static TextStyle headlineLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 32,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -1.056,
-    height: 1.25,
-  );
-
-  static TextStyle headlineMedium = _getTextStyleByFontFamily.copyWith(
-    fontSize: 28,
+  // Display styles
+  static TextStyle displayLarge = GoogleFonts.mitr(
+    fontSize: 32.sp,
     fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.29,
+    color: AppColors.textPrimary,
   );
 
-  static TextStyle headlineSmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 24,
+  static TextStyle displayMedium = GoogleFonts.mitr(
+    fontSize: 28.sp,
     fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.33,
+    color: AppColors.textPrimary,
   );
 
-  // Title styles (for card headers, dialog titles)
-  static TextStyle titleLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 22,
+  static TextStyle displaySmall = GoogleFonts.mitr(
+    fontSize: 24.sp,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0,
-    height: 1.27,
+    color: AppColors.textPrimary,
   );
 
-  static TextStyle titleMedium = _getTextStyleByFontFamily.copyWith(
-    fontSize: 16,
+  // Headline styles
+  static TextStyle headlineLarge = GoogleFonts.mitr(
+    fontSize: 22.sp,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.15,
-    height: 1.50,
+    color: AppColors.textPrimary,
   );
 
-  static TextStyle titleSmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 14,
+  static TextStyle headlineMedium = GoogleFonts.mitr(
+    fontSize: 20.sp,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.1,
-    height: 1.43,
+    color: AppColors.textPrimary,
   );
 
-  // Body styles (for body text)
-  static TextStyle bodyLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 16,
+  static TextStyle headlineSmall = GoogleFonts.mitr(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  // Title styles
+  static TextStyle titleLarge = GoogleFonts.mitr(
+    fontSize: 24.sp,
     fontWeight: FontWeight.w400,
-    letterSpacing: 0.5,
-    height: 1.50,
+    color: AppColors.textPrimary,
   );
 
-  static TextStyle bodyMedium = _getTextStyleByFontFamily.copyWith(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.25,
-    height: 1.43,
-  );
-
-  static TextStyle bodySmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.4,
-    height: 1.33,
-  );
-
-  // Label styles (for labels, buttons)
-  static TextStyle labelLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 14,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0.1,
-    height: 1.43,
-  );
-
-  static TextStyle labelMedium = _getTextStyleByFontFamily.copyWith(
-    fontSize: 12,
+  static TextStyle titleMedium = GoogleFonts.mitr(
+    fontSize: 14.sp,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
-    height: 1.33,
+    color: AppColors.textPrimary,
   );
 
-  static TextStyle labelSmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 11,
+  static TextStyle titleSmall = GoogleFonts.mitr(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  // Body styles
+  static TextStyle bodyLarge = GoogleFonts.mitr(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle bodyMedium = GoogleFonts.mitr(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w300,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle bodySmall = GoogleFonts.mitr(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+  );
+
+  // Label styles
+  static TextStyle labelLarge = GoogleFonts.mitr(
+    fontSize: 14.sp,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
-    height: 1.45,
+    color: AppColors.textPrimary,
   );
 
-  // Button text style
-  static TextStyle button = _getTextStyleByFontFamily.copyWith(
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0.5,
-    height: 1.50,
-  );
-
-  // Input text style
-  static TextStyle input = _getTextStyleByFontFamily.copyWith(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.15,
-    height: 1.50,
-  );
-
-  // Caption style (for helper text, captions)
-  static TextStyle caption = _getTextStyleByFontFamily.copyWith(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.4,
-    height: 1.33,
-  );
-
-  // Overline style (for overline text)
-  static TextStyle overline = _getTextStyleByFontFamily.copyWith(
-    fontSize: 10,
+  static TextStyle labelMedium = GoogleFonts.mitr(
+    fontSize: 12.sp,
     fontWeight: FontWeight.w500,
-    letterSpacing: 1.5,
-    height: 1.60,
+    color: AppColors.textPrimary,
   );
 
-  // Additional button styles
-  static TextStyle buttonSmall = _getTextStyleByFontFamily.copyWith(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.4,
-    height: 1.43,
+  static TextStyle labelSmall = GoogleFonts.mitr(
+    fontSize: 10.sp,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
   );
+}
 
-  static TextStyle buttonLarge = _getTextStyleByFontFamily.copyWith(
-    fontSize: 18,
+/// App text number styles based on Prompt font family from Google Fonts
+/// ใช้สำหรับตัวเลข เพื่อให้อ่านง่ายและชัดเจน
+class AppTextNumberStyles {
+  AppTextNumberStyles._();
+
+  // Display styles
+  static TextStyle displayLarge = GoogleFonts.prompt(
+    fontSize: 32.sp,
     fontWeight: FontWeight.w700,
-    letterSpacing: 0.5,
-    height: 1.56,
+    color: AppColors.textPrimary,
   );
+
+  static TextStyle displayMedium = GoogleFonts.prompt(
+    fontSize: 28.sp,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle displaySmall = GoogleFonts.prompt(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  // Headline styles
+  static TextStyle headlineLarge = GoogleFonts.prompt(
+    fontSize: 22.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle headlineMedium = GoogleFonts.prompt(
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle headlineSmall = GoogleFonts.prompt(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  // Title styles
+  static TextStyle titleLarge = GoogleFonts.prompt(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle titleMedium = GoogleFonts.prompt(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle titleSmall = GoogleFonts.prompt(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  // Body styles
+  static TextStyle bodyLarge = GoogleFonts.prompt(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle bodyMedium = GoogleFonts.prompt(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w300,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle bodySmall = GoogleFonts.prompt(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+  );
+
+  // Label styles
+  static TextStyle labelLarge = GoogleFonts.prompt(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle labelMedium = GoogleFonts.prompt(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle labelSmall = GoogleFonts.prompt(
+    fontSize: 10.sp,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
+  );
+}
+
+class AppElevatedButtonStyle {
+  static ButtonStyle defaultStyle =
+      ElevatedButton.styleFrom(
+        backgroundColor: AppColors.ctaPrimaryDefault,
+        foregroundColor: AppColors.white,
+        disabledBackgroundColor: AppColors.ctaPrimaryDisable,
+        disabledForegroundColor: AppColors.white,
+        elevation: 0,
+        shadowColor: AppColors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        textStyle: GoogleFonts.mitr(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.hovered)) {
+              return AppColors.ctaPrimaryHover.withValues(alpha: 0.1);
+            }
+            if (states.contains(WidgetState.pressed)) {
+              return AppColors.ctaPrimaryClicked.withValues(alpha: 0.7);
+            }
+            return null;
+          },
+        ),
+      );
+
+  static ButtonStyle buttomBackStyle =
+      ElevatedButton.styleFrom(
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
+        disabledBackgroundColor: AppColors.ctaPrimaryDisable,
+        disabledForegroundColor: AppColors.white,
+        elevation: 0,
+        shadowColor: AppColors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32),
+        ),
+        textStyle: GoogleFonts.mitr(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+        ),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.hovered)) {
+              return AppColors.gradientStart.withValues(alpha: 0.1);
+            }
+            if (states.contains(WidgetState.pressed)) {
+              return AppColors.gradientStart.withValues(alpha: 0.7);
+            }
+            return null;
+          },
+        ),
+      );
 }

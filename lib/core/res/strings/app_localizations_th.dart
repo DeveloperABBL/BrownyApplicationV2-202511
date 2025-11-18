@@ -9,7 +9,29 @@ class AppLocalizationsTh extends AppLocalizations {
   AppLocalizationsTh([String locale = 'th']) : super(locale);
 
   @override
+  String get signUpWith => 'สมัครด้วย';
+
+  @override
+  String get signUpDescription =>
+      'มาเป็นสมาชิกกับน้องบราวนี่ พร้อมรับสิทธิพิเศษอีกเพียบ';
+
+  @override
+  String get signUpTitle => 'สร้างบัญชี Browny ID';
+
+  @override
+  String get signUp => 'สมัคร';
+
+  @override
+  String get emailOrPhone => 'อีเมล / เบอร์มือถือ';
+
+  @override
+  String get back => 'ย้อนกลับ';
+
+  @override
   String get shop => 'ช็อป';
+
+  @override
+  String get coin => 'คอยน์';
 
   @override
   String get brownyClub => 'ภารกิจพิชิตรางวัล';
@@ -631,4 +653,53 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get discount => 'ส่วนลด';
+
+  @override
+  String get pleaseEnterEmailOrPhone => 'กรุณากรอกอีเมลหรือเบอร์โทรศัพท์';
+
+  @override
+  String get pleaseEnterValidEmail => 'กรุณากรอกอีเมลที่ถูกต้อง';
+
+  @override
+  String get pleaseEnterValidPhoneNumber => 'กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง';
+
+  @override
+  String get pleaseEnterValidEmailOrPhone =>
+      'กรุณากรอกอีเมลหรือเบอร์โทรศัพท์ที่ถูกต้อง';
+
+  @override
+  String get pleaseEnterPassword => 'กรุณากรอกรหัสผ่าน';
+
+  @override
+  String get passwordMustBeAtLeast8Characters =>
+      'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
+
+  @override
+  String get passwordMustContainUppercase =>
+      'ต้องมีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว';
+
+  @override
+  String get passwordMustContainLowercase =>
+      'ต้องมีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว';
+
+  @override
+  String get passwordMustContainNumber => 'ต้องมีตัวเลขอย่างน้อย 1 ตัว';
+
+  @override
+  String get loginWelcomeDescription => 'Browny ยินดีตอนรับ มาซักผ้ากัน';
+
+  @override
+  String get loginWith => 'เข้าสู่ระบบด้วย';
+
+  @override
+  String get forgotPasswordDescription => 'กรุณากรอกอีเมล/เบอร์โทรศัพท์ของคุณ';
+
+  @override
+  String get dontHaveAccountYet => 'ยังไม่มีบัญชีหรอ?';
+
+  @override
+  String get signUpNow => 'สมัครเลย!';
+
+  @override
+  String get forgotPassword => 'ลืมรหัสผ่าน';
 }

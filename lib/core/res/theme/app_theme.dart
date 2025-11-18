@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../colors/app_colors.dart';
+import '../styles/app_text_style.dart';
 
 /// AppTheme - จัดการ ThemeData สำหรับแอป Browny
 class AppTheme {
@@ -51,7 +52,7 @@ class AppTheme {
           color: AppColors.textPrimary,
         ),
         iconTheme: const IconThemeData(
-          color: AppColors.textPrimary,
+          color: AppColors.white,
           size: 24,
         ),
       ),
@@ -61,89 +62,29 @@ class AppTheme {
       // ============================================================================
       textTheme: TextTheme(
         // Display styles
-        displayLarge: GoogleFonts.mitr(
-          fontSize: 32.sp,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-        ),
-        displayMedium: GoogleFonts.mitr(
-          fontSize: 28.sp,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-        ),
-        displaySmall: GoogleFonts.mitr(
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
+        displayLarge: AppTextStyles.displayLarge,
+        displayMedium: AppTextStyles.displayMedium,
+        displaySmall: AppTextStyles.displaySmall,
 
         // Headline styles
-        headlineLarge: GoogleFonts.mitr(
-          fontSize: 22.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-        headlineMedium: GoogleFonts.mitr(
-          fontSize: 20.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-        headlineSmall: GoogleFonts.mitr(
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
+        headlineLarge: AppTextStyles.headlineLarge,
+        headlineMedium: AppTextStyles.headlineMedium,
+        headlineSmall: AppTextStyles.headlineSmall,
 
         // Title styles
-        titleLarge: GoogleFonts.mitr(
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textPrimary,
-        ),
-        titleMedium: GoogleFonts.mitr(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-        titleSmall: GoogleFonts.mitr(
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
+        titleLarge: AppTextStyles.titleLarge,
+        titleMedium: AppTextStyles.titleMedium,
+        titleSmall: AppTextStyles.titleSmall,
 
         // Body styles
-        bodyLarge: GoogleFonts.mitr(
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textPrimary,
-        ),
-        bodyMedium: GoogleFonts.mitr(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w300,
-          color: AppColors.textPrimary,
-        ),
-        bodySmall: GoogleFonts.mitr(
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
-        ),
+        bodyLarge: AppTextStyles.bodyLarge,
+        bodyMedium: AppTextStyles.bodyMedium,
+        bodySmall: AppTextStyles.bodySmall,
 
         // Label styles
-        labelLarge: GoogleFonts.mitr(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
-        ),
-        labelMedium: GoogleFonts.mitr(
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
-        ),
-        labelSmall: GoogleFonts.mitr(
-          fontSize: 10.sp,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textSecondary,
-        ),
+        labelLarge: AppTextStyles.labelLarge,
+        labelMedium: AppTextStyles.labelMedium,
+        labelSmall: AppTextStyles.labelSmall,
       ),
 
       // ============================================================================
@@ -220,45 +161,21 @@ class AppTheme {
         suffixIconColor: AppColors.inputFieldDefaultIcon,
 
         // Content padding
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
+        prefixIconConstraints: BoxConstraints.tight(
+          Size(10.w, 45.h),
         ),
+        // prefixIcon: Container(
+        //   width: 0,
+        // ),
+        contentPadding: EdgeInsets.zero,
+        errorMaxLines: 3,
       ),
 
       // ============================================================================
       // Elevated Button Theme
       // ============================================================================
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style:
-            ElevatedButton.styleFrom(
-              backgroundColor: AppColors.ctaPrimaryDefault,
-              foregroundColor: AppColors.white,
-              disabledBackgroundColor: AppColors.ctaPrimaryDisable,
-              disabledForegroundColor: AppColors.white,
-              elevation: 0,
-              shadowColor: Colors.transparent,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              textStyle: GoogleFonts.mitr(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ).copyWith(
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.hovered)) {
-                    return AppColors.ctaPrimaryHover.withOpacity(0.1);
-                  }
-                  if (states.contains(WidgetState.pressed)) {
-                    return AppColors.ctaPrimaryClicked.withOpacity(0.2);
-                  }
-                  return null;
-                },
-              ),
-            ),
+        style: AppElevatedButtonStyle.defaultStyle,
       ),
 
       // ============================================================================
@@ -271,6 +188,9 @@ class AppTheme {
           textStyle: GoogleFonts.mitr(
             fontSize: 14,
             fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
@@ -433,7 +353,7 @@ class AppTheme {
       // Snackbar Theme
       // ============================================================================
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.primary,
         contentTextStyle: GoogleFonts.mitr(
           fontSize: 14,
           fontWeight: FontWeight.w400,

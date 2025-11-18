@@ -6,14 +6,12 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/custom_page_indicator.dart';
-import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/models/introduction_model.dart';
 import 'package:browny_applications_new/feature/onboarding/repository/onboard_repo.dart';
 import 'package:browny_applications_new/feature/onboarding/viewmodel/onboarding_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class OnBoardingPage extends StatelessWidget {
@@ -29,25 +27,27 @@ class OnBoardingPage extends StatelessWidget {
         context: context,
         onboardDataSource: OnboardRepo(),
       ),
-      child: OnboardingWdiget(),
+      child: OnboardingWidget(),
     );
   }
 }
 
-class OnboardingWdiget extends StatefulWidget {
-  const OnboardingWdiget({super.key});
+class OnboardingWidget extends StatefulWidget {
+  const OnboardingWidget({super.key});
 
   @override
-  State<OnboardingWdiget> createState() => _OnboardingWidgetState();
+  State<OnboardingWidget> createState() => _OnboardingWidgetState();
 }
 
-class _OnboardingWidgetState extends State<OnboardingWdiget> {
+class _OnboardingWidgetState extends State<OnboardingWidget> {
   OnboardingViewmodel get _viewmodel => context.read<OnboardingViewmodel>();
 
   @override
   void initState() {
     super.initState();
+    // attach Context ใหม่ตอนสร้าง Page เสร็จ
     _viewmodel.attachContext(context);
+    // รอให้ Widget สร้างหน้าเสร็จแล้วค่อยสั่ง fetch
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewmodel.fetchIntroductions();
     });
@@ -56,7 +56,7 @@ class _OnboardingWidgetState extends State<OnboardingWdiget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       body: LayoutBuilder(
         builder: (context, boxConstraints) {
           return Stack(
@@ -117,7 +117,7 @@ class _OnboardingWidgetState extends State<OnboardingWdiget> {
                       child: Center(
                         child: CustomPageIndicator(
                           controller: _viewmodel.pageController,
-                          count: _viewmodel.contentSize,
+                          count: _viewmodel.content.data?.length ?? 0,
                         ),
                       ),
                     ),
@@ -143,7 +143,7 @@ class _OnboardingWidgetState extends State<OnboardingWdiget> {
                           return !isLastPage
                               // ถ้าไม่ใช่หน้าสุดท้าย จะแสดงปุ่ม ข้าม
                               ? GestureDetector(
-                                  onTap: () => context.go(HomePage.pagePath),
+                                  onTap: _viewmodel.goToHomePage,
                                   child: Text(
                                     context.wording.skip,
                                     style: context.textTheme.titleLarge!

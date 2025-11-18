@@ -175,6 +175,8 @@ class AppColors {
   // Filter/Category Colors
   // ============================================================================
 
+  static const Color transparent = Colors.transparent;
+
   /// White
   static const Color white = Color(0xFFFFFFFF); // #FFFFFF
 

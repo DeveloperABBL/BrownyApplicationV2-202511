@@ -9,7 +9,29 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get signUpWith => 'Sign up with';
+
+  @override
+  String get signUpDescription =>
+      'Become a member with Browny and enjoy many exclusive privileges.';
+
+  @override
+  String get signUpTitle => 'Create Browny ID account';
+
+  @override
+  String get signUp => 'Sign Up';
+
+  @override
+  String get emailOrPhone => 'Email / Phone number';
+
+  @override
+  String get back => 'Back';
+
+  @override
   String get shop => 'Shop';
+
+  @override
+  String get coin => 'Coin';
 
   @override
   String get brownyClub => 'Browny Club';
@@ -630,4 +652,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discount => 'Discount';
+
+  @override
+  String get pleaseEnterEmailOrPhone =>
+      'Please enter your email or phone number';
+
+  @override
+  String get pleaseEnterValidEmail => 'Please enter a valid email';
+
+  @override
+  String get pleaseEnterValidPhoneNumber => 'Please enter a valid phone number';
+
+  @override
+  String get pleaseEnterValidEmailOrPhone =>
+      'Please enter a valid email or phone number';
+
+  @override
+  String get pleaseEnterPassword => 'Please enter your password';
+
+  @override
+  String get passwordMustBeAtLeast8Characters =>
+      'Password must be at least 8 characters long';
+
+  @override
+  String get passwordMustContainUppercase =>
+      'Contain at least one uppercase letter';
+
+  @override
+  String get passwordMustContainLowercase =>
+      'Contain at least one lowercase letter';
+
+  @override
+  String get passwordMustContainNumber => 'Contain at least one number';
+
+  @override
+  String get loginWelcomeDescription =>
+      'Browny welcomes you, let\'s do laundry together';
+
+  @override
+  String get loginWith => 'Login with';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Please enter your email/phone number';
+
+  @override
+  String get dontHaveAccountYet => 'Don\'t have an account yet?';
+
+  @override
+  String get signUpNow => 'Sign up now!';
+
+  @override
+  String get forgotPassword => 'Forgot password';
 }

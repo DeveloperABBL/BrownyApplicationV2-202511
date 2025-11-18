@@ -1,4 +1,6 @@
+import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/register_response.dart';
 import 'package:dio/dio.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
@@ -34,6 +36,14 @@ abstract class AppClient {
       );
   }
 
+  /// DONG 2025-11-17
+  ///
+  /// API register new customer
+  @POST('/customer/register')
+  Future<HttpResponse<LoginCustomerResponse>> register(
+    @Body() CustomerCredential credential,
+  );
+
   /// DONG 2025-11-10
   ///
   /// API Login Customer
@@ -44,9 +54,15 @@ abstract class AppClient {
     @Body() CustomerCredential credential,
   );
 
+  /// DONG 2025-11-13
+  ///
+  /// API Fetch รูป Banners
+  @GET('/banners')
+  Future<HttpResponse<List<BannerResponse>?>> fetchBanners();
+
   /// DONG 2025-11-10
   ///
   /// API fetch Content OnBoarding
   @GET('/introductions')
-  Future<HttpResponse<List<IntroductionsResponse>?>> introductions();
+  Future<HttpResponse<List<IntroductionsResponse>?>> fetchIntroductions();
 }

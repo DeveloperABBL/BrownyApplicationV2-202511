@@ -1,5 +1,13 @@
 {
+    
+    "signUpWith": "Sign up with",
+    "signUpDescription": "Become a member with Browny and enjoy many exclusive privileges.",
+    "signUpTitle": "Create Browny ID account",
+    "signUp": "Sign Up",
+    "emailOrPhone": "Email / Phone number",
+    "back": "Back",
     "shop": "Shop",
+    "coin": "Coin",
     "brownyClub" : "Browny Club",
     "validUntil" : "Valid until",
     "evouchersAndPromotions" : "E-vouchers and Promotions",
@@ -204,5 +212,20 @@
     "streetAddress" : "Street address",
     "messageToDeliveryPerson" : "Message to a delivery person.",
     "fromPrice" : "From",
-    "discount" : "Discount"
+    "discount" : "Discount",
+    "pleaseEnterEmailOrPhone" : "Please enter your email or phone number",
+    "pleaseEnterValidEmail" : "Please enter a valid email",
+    "pleaseEnterValidPhoneNumber" : "Please enter a valid phone number",
+    "pleaseEnterValidEmailOrPhone" : "Please enter a valid email or phone number",
+    "pleaseEnterPassword" : "Please enter your password",
+    "passwordMustBeAtLeast8Characters" : "Password must be at least 8 characters long",
+    "passwordMustContainUppercase" : "Contain at least one uppercase letter",
+    "passwordMustContainLowercase" : "Contain at least one lowercase letter",
+    "passwordMustContainNumber" : "Contain at least one number",
+    "loginWelcomeDescription" : "Browny welcomes you, let's do laundry together",
+    "loginWith" : "Login with",
+    "forgotPasswordDescription" : "Please enter your email/phone number",
+    "dontHaveAccountYet" : "Don't have an account yet?",
+    "signUpNow" : "Sign up now!",
+    "forgotPassword" : "Forgot password"
 }

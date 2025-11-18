@@ -14,6 +14,61 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart' as _svg;
 import 'package:vector_graphics/vector_graphics.dart' as _vg;
 
+class $AssetsPngGen {
+  const $AssetsPngGen();
+
+  /// File path: assets/png/browny_coin.png
+  AssetGenImage get brownyCoin =>
+      const AssetGenImage('assets/png/browny_coin.png');
+
+  /// File path: assets/png/browny_horizaontal.png
+  AssetGenImage get brownyHorizaontal =>
+      const AssetGenImage('assets/png/browny_horizaontal.png');
+
+  /// File path: assets/png/browny_logo.png
+  AssetGenImage get brownyLogo =>
+      const AssetGenImage('assets/png/browny_logo.png');
+
+  /// File path: assets/png/browny_logo_android.png
+  AssetGenImage get brownyLogoAndroid =>
+      const AssetGenImage('assets/png/browny_logo_android.png');
+
+  /// File path: assets/png/ic_apple.png
+  AssetGenImage get icApple => const AssetGenImage('assets/png/ic_apple.png');
+
+  /// File path: assets/png/ic_facebook.png
+  AssetGenImage get icFacebook =>
+      const AssetGenImage('assets/png/ic_facebook.png');
+
+  /// File path: assets/png/ic_google.png
+  AssetGenImage get icGoogle => const AssetGenImage('assets/png/ic_google.png');
+
+  /// File path: assets/png/ic_line.png
+  AssetGenImage get icLine => const AssetGenImage('assets/png/ic_line.png');
+
+  /// File path: assets/png/launcher_icon.png
+  AssetGenImage get launcherIcon =>
+      const AssetGenImage('assets/png/launcher_icon.png');
+
+  /// File path: assets/png/splash_background.png
+  AssetGenImage get splashBackground =>
+      const AssetGenImage('assets/png/splash_background.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [
+    brownyCoin,
+    brownyHorizaontal,
+    brownyLogo,
+    brownyLogoAndroid,
+    icApple,
+    icFacebook,
+    icGoogle,
+    icLine,
+    launcherIcon,
+    splashBackground,
+  ];
+}
+
 class $AssetsSvgGen {
   const $AssetsSvgGen();
 
@@ -34,6 +89,21 @@ class $AssetsSvgGen {
   SvgGenImage get icHomeActive =>
       const SvgGenImage('assets/svg/ic_home_active.svg');
 
+  /// File path: assets/svg/ic_login.svg
+  SvgGenImage get icLogin => const SvgGenImage('assets/svg/ic_login.svg');
+
+  /// File path: assets/svg/ic_notification.svg
+  SvgGenImage get icNotification =>
+      const SvgGenImage('assets/svg/ic_notification.svg');
+
+  /// File path: assets/svg/ic_obscure_off.svg
+  SvgGenImage get icObscureOff =>
+      const SvgGenImage('assets/svg/ic_obscure_off.svg');
+
+  /// File path: assets/svg/ic_obscure_on.svg
+  SvgGenImage get icObscureOn =>
+      const SvgGenImage('assets/svg/ic_obscure_on.svg');
+
   /// File path: assets/svg/ic_onboard_first.svg
   SvgGenImage get icOnboardFirst =>
       const SvgGenImage('assets/svg/ic_onboard_first.svg');
@@ -45,6 +115,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_onboard_third.svg
   SvgGenImage get icOnboardThird =>
       const SvgGenImage('assets/svg/ic_onboard_third.svg');
+
+  /// File path: assets/svg/ic_person.svg
+  SvgGenImage get icPerson => const SvgGenImage('assets/svg/ic_person.svg');
 
   /// File path: assets/svg/ic_shop.svg
   SvgGenImage get icShop => const SvgGenImage('assets/svg/ic_shop.svg');
@@ -60,6 +133,10 @@ class $AssetsSvgGen {
   SvgGenImage get icTicketActive =>
       const SvgGenImage('assets/svg/ic_ticket_active.svg');
 
+  /// File path: assets/svg/ic_tp_wallet.svg
+  SvgGenImage get icTpWallet =>
+      const SvgGenImage('assets/svg/ic_tp_wallet.svg');
+
   /// File path: assets/svg/scan_icon.svg
   SvgGenImage get scanIcon => const SvgGenImage('assets/svg/scan_icon.svg');
 
@@ -70,13 +147,19 @@ class $AssetsSvgGen {
     icBranchActive,
     icHome,
     icHomeActive,
+    icLogin,
+    icNotification,
+    icObscureOff,
+    icObscureOn,
     icOnboardFirst,
     icOnboardSecond,
     icOnboardThird,
+    icPerson,
     icShop,
     icShopActive,
     icTicket,
     icTicketActive,
+    icTpWallet,
     scanIcon,
   ];
 }
@@ -84,7 +167,96 @@ class $AssetsSvgGen {
 class Assets {
   const Assets._();
 
+  static const $AssetsPngGen png = $AssetsPngGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
+}
+
+class AssetGenImage {
+  const AssetGenImage(
+    this._assetName, {
+    this.size,
+    this.flavors = const {},
+    this.animation,
+  });
+
+  final String _assetName;
+
+  final Size? size;
+  final Set<String> flavors;
+  final AssetGenImageAnimation? animation;
+
+  Image image({
+    Key? key,
+    AssetBundle? bundle,
+    ImageFrameBuilder? frameBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+    double? scale,
+    double? width,
+    double? height,
+    Color? color,
+    Animation<double>? opacity,
+    BlendMode? colorBlendMode,
+    BoxFit? fit,
+    AlignmentGeometry alignment = Alignment.center,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+    Rect? centerSlice,
+    bool matchTextDirection = false,
+    bool gaplessPlayback = true,
+    bool isAntiAlias = false,
+    String? package,
+    FilterQuality filterQuality = FilterQuality.medium,
+    int? cacheWidth,
+    int? cacheHeight,
+  }) {
+    return Image.asset(
+      _assetName,
+      key: key,
+      bundle: bundle,
+      frameBuilder: frameBuilder,
+      errorBuilder: errorBuilder,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      scale: scale,
+      width: width,
+      height: height,
+      color: color,
+      opacity: opacity,
+      colorBlendMode: colorBlendMode,
+      fit: fit,
+      alignment: alignment,
+      repeat: repeat,
+      centerSlice: centerSlice,
+      matchTextDirection: matchTextDirection,
+      gaplessPlayback: gaplessPlayback,
+      isAntiAlias: isAntiAlias,
+      package: package,
+      filterQuality: filterQuality,
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
+    );
+  }
+
+  ImageProvider provider({AssetBundle? bundle, String? package}) {
+    return AssetImage(_assetName, bundle: bundle, package: package);
+  }
+
+  String get path => _assetName;
+
+  String get keyName => _assetName;
+}
+
+class AssetGenImageAnimation {
+  const AssetGenImageAnimation({
+    required this.isAnimation,
+    required this.duration,
+    required this.frames,
+  });
+
+  final bool isAnimation;
+  final Duration duration;
+  final int frames;
 }
 
 class SvgGenImage {

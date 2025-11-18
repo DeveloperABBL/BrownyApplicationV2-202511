@@ -9,7 +9,28 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get signUpWith => '注册方式';
+
+  @override
+  String get signUpDescription => '成为布朗尼会员，享受众多专属特权。';
+
+  @override
+  String get signUpTitle => '创建布朗尼ID账户';
+
+  @override
+  String get signUp => '注册';
+
+  @override
+  String get emailOrPhone => '电子邮件/手机号';
+
+  @override
+  String get back => '返回';
+
+  @override
   String get shop => '店铺';
+
+  @override
+  String get coin => '积分';
 
   @override
   String get brownyClub => '布朗尼俱乐部';
@@ -622,4 +643,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discount => '折扣';
+
+  @override
+  String get pleaseEnterEmailOrPhone => '请输入您的电子邮件或手机号';
+
+  @override
+  String get pleaseEnterValidEmail => '请输入有效的电子邮件';
+
+  @override
+  String get pleaseEnterValidPhoneNumber => '请输入有效的手机号';
+
+  @override
+  String get pleaseEnterValidEmailOrPhone => '请输入有效的电子邮件或手机号';
+
+  @override
+  String get pleaseEnterPassword => '请输入您的密码';
+
+  @override
+  String get passwordMustBeAtLeast8Characters => '密码必须至少包含8个字符';
+
+  @override
+  String get passwordMustContainUppercase => '至少包含一个大写字母';
+
+  @override
+  String get passwordMustContainLowercase => '至少包含一个小写字母';
+
+  @override
+  String get passwordMustContainNumber => '至少包含一个数字';
+
+  @override
+  String get loginWelcomeDescription => 'Browny欢迎您，让我们一起洗衣吧';
+
+  @override
+  String get loginWith => '登录方式';
+
+  @override
+  String get forgotPasswordDescription => '请输入您的电子邮件/手机号';
+
+  @override
+  String get dontHaveAccountYet => '还没有账户吗？';
+
+  @override
+  String get signUpNow => '立即注册！';
+
+  @override
+  String get forgotPassword => '忘记密码';
 }

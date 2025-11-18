@@ -15,7 +15,7 @@ class OnboardRepo extends AppRepository with OnboardDataSource {
   @override
   Future<List<IntroductionsResponse>?> fetchIntroductions() async {
     try {
-      final response = await requireRemote.introductions();
+      final response = await requireRemote.fetchIntroductions();
       if (response.isSuccessful && response.data?.isNotEmpty == true) {
         return response.data;
       }

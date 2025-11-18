@@ -38,6 +38,15 @@ class OnboardingViewmodel extends AppViewModel {
       return;
     }
 
+    goToHomePage();
+  }
+
+  /// DONG 2025-11-12
+  ///
+  /// สั่งไปหน้า [HomePage] และ flag isFirstLaunch ด้วย
+  void goToHomePage() {
+    // flage ว่าผ่านหน้า Onboarding มาแล้ว
+    appPreferences.flagFirstLaunch();
     context.go(HomePage.pagePath);
   }
 
@@ -54,6 +63,9 @@ class OnboardingViewmodel extends AppViewModel {
     super.dispose();
   }
 
+  /// DONG 2025-11-12
+  ///
+  /// fetch Content Introductions ครั้งแรกที่เข้าใช้งาน Application
   Future<void> fetchIntroductions() async {
     if (!_content.isLoading) {
       _content = UiResult.loading();

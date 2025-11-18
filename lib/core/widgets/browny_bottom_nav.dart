@@ -252,7 +252,7 @@ class _NavItem extends StatelessWidget {
         );
 
         return Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(32),
             onTap: onTap,

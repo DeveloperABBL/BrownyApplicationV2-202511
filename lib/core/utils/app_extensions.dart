@@ -201,3 +201,7 @@ extension IterableExtensions<E> on List<E>? {
     return list;
   }
 }
+
+extension StringExtension on String? {
+  String get orEmpty => this ?? '';
+}
