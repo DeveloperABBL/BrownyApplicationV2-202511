@@ -227,5 +227,6 @@
     "forgotPasswordDescription" : "Please enter your email/phone number",
     "dontHaveAccountYet" : "Don't have an account yet?",
     "signUpNow" : "Sign up now!",
-    "forgotPassword" : "Forgot password"
+    "forgotPassword" : "Forgot password",
+    "topup": "Top up"
 }

@@ -702,4 +702,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get forgotPassword => 'ลืมรหัสผ่าน';
+
+  @override
+  String get topup => 'เติมเงิน';
 }

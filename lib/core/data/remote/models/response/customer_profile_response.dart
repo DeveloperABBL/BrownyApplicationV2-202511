@@ -1,0 +1,104 @@
+import 'package:json_annotation/json_annotation.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+
+part 'customer_profile_response.g.dart';
+
+// **************************************************************************
+// เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal
+// dart run build_runner build --delete-conflicting-outputs
+// **************************************************************************
+
+@JsonSerializable(explicitToJson: true)
+class CustomerProfileResponse extends BaseModelResponse {
+  CustomerProfileResponse({
+    required this.data,
+    super.success,
+    super.errorType,
+    super.message,
+  });
+
+  @JsonKey(name: 'data')
+  final CustomerProfileData data;
+
+  factory CustomerProfileResponse.fromJson(Map<String, dynamic> json) =>
+      _$CustomerProfileResponseFromJson(json);
+  Map<String, dynamic> toJson() =>
+      baseToJson(_$CustomerProfileResponseToJson(this));
+}
+
+@JsonSerializable()
+class CustomerProfileData {
+  CustomerProfileData({
+    this.id,
+    this.name,
+    this.email,
+    this.phone,
+    this.gender,
+    this.birthday,
+    this.image,
+    this.creditBalance,
+    this.brownyCoin,
+    this.avatars,
+  });
+
+  @JsonKey(name: 'id')
+  final String? id;
+
+  @JsonKey(name: 'name')
+  final String? name;
+
+  @JsonKey(name: 'email')
+  final String? email;
+
+  @JsonKey(name: 'phone')
+  final String? phone;
+
+  @JsonKey(name: 'gender')
+  final String? gender;
+
+  @JsonKey(name: 'birthday')
+  final String? birthday;
+
+  @JsonKey(name: 'profile_image')
+  final String? image;
+
+  @JsonKey(name: 'credit_balance')
+  final String? creditBalance;
+
+  @JsonKey(name: 'browny_coin')
+  final String? brownyCoin;
+
+  @JsonKey(name: 'avatars')
+  final List<String>? avatars;
+
+  CustomerProfileData copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? phone,
+    String? gender,
+    String? birthday,
+    String? image,
+    String? creditBalance,
+    String? brownyCoin,
+    List<String>? avatars,
+  }) {
+    return CustomerProfileData(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      gender: gender ?? this.gender,
+      birthday: birthday ?? this.birthday,
+      image: image ?? this.image,
+      creditBalance: creditBalance ?? this.creditBalance,
+      brownyCoin: brownyCoin ?? this.brownyCoin,
+      avatars: avatars ?? this.avatars,
+    );
+  }
+
+  factory CustomerProfileData.fromJson(Map<String, dynamic> json) =>
+      _$CustomerProfileDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CustomerProfileDataToJson(this);
+}

@@ -21,6 +21,14 @@ class $AssetsPngGen {
   AssetGenImage get brownyCoin =>
       const AssetGenImage('assets/png/browny_coin.png');
 
+  /// File path: assets/png/browny_error_1.png
+  AssetGenImage get brownyError1 =>
+      const AssetGenImage('assets/png/browny_error_1.png');
+
+  /// File path: assets/png/browny_error_2.png
+  AssetGenImage get brownyError2 =>
+      const AssetGenImage('assets/png/browny_error_2.png');
+
   /// File path: assets/png/browny_horizaontal.png
   AssetGenImage get brownyHorizaontal =>
       const AssetGenImage('assets/png/browny_horizaontal.png');
@@ -57,6 +65,8 @@ class $AssetsPngGen {
   /// List of all assets
   List<AssetGenImage> get values => [
     brownyCoin,
+    brownyError1,
+    brownyError2,
     brownyHorizaontal,
     brownyLogo,
     brownyLogoAndroid,
@@ -119,6 +129,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_person.svg
   SvgGenImage get icPerson => const SvgGenImage('assets/svg/ic_person.svg');
 
+  /// File path: assets/svg/ic_plus.svg
+  SvgGenImage get icPlus => const SvgGenImage('assets/svg/ic_plus.svg');
+
   /// File path: assets/svg/ic_shop.svg
   SvgGenImage get icShop => const SvgGenImage('assets/svg/ic_shop.svg');
 
@@ -155,6 +168,7 @@ class $AssetsSvgGen {
     icOnboardSecond,
     icOnboardThird,
     icPerson,
+    icPlus,
     icShop,
     icShopActive,
     icTicket,

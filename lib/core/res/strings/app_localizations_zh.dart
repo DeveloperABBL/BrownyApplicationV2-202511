@@ -688,4 +688,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forgotPassword => '忘记密码';
+
+  @override
+  String get topup => '充值';
 }

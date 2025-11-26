@@ -5,7 +5,10 @@ import 'package:browny_applications_new/core/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/res/styles/app_text_style.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
+import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +33,7 @@ class AuthenticationPage extends StatelessWidget {
       create: (context) => AuthenticationViewModel(
         context: context,
         authenProcess: _authenProcess,
+        customerDataRepo: CustomerDataRepo(),
       ),
       child: _AuthenticationWidget(),
     );
@@ -279,6 +283,7 @@ class _SignUpWidget extends StatelessWidget {
       valueListenable: viewmodel.isObscure,
       builder: (context, value, _) {
         return TextFormField(
+          controller: viewmodel.passwordController,
           textInputAction: TextInputAction.done,
           obscureText: value,
           decoration: InputDecoration(
@@ -303,7 +308,7 @@ class _SignUpWidget extends StatelessWidget {
                     ),
             ),
           ),
-          validator: viewmodel.validatorPassword,
+          validator: (value) => getValidatorPassword(context, value),
           onChanged: (value) {
             viewmodel.validatorPassword(value);
           },
@@ -312,11 +317,17 @@ class _SignUpWidget extends StatelessWidget {
     );
   }
 
+  String? getValidatorPassword(
+    BuildContext context,
+    String? value,
+  ) => viewmodel.validatorPassword(value);
+
   /// สร้างช่องกรอกอีเมลหรือเบอร์โทรศัพท์
   /// มีการ validate ข้อมูลและเปลี่ยนสีข้อความ hint
   @protected
   TextFormField textFormFieldEmailOrPhon(BuildContext context) {
     return TextFormField(
+      controller: viewmodel.usernameController,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
@@ -329,12 +340,18 @@ class _SignUpWidget extends StatelessWidget {
         ),
         prefixIcon: SizedBox.shrink(),
       ),
-      validator: viewmodel.validatorEmailOrPhone,
+      autovalidateMode: AutovalidateMode.onUnfocus,
+      validator: (value) => getValidatorEmailOrPhone(context, value),
       onChanged: (value) {
         viewmodel.validatorEmailOrPhone(value);
       },
     );
   }
+
+  String? getValidatorEmailOrPhone(
+    BuildContext context,
+    String? value,
+  ) => viewmodel.validatorEmailOrPhone(value);
 
   /// สร้างแถวที่มีเส้นคั่นแนวนอน ซ้าย-ขวา และข้อความ "สมัครด้วย..." ตรงกลาง
   /// ใช้สำหรับคั่นระหว่างฟอร์มสมัครสมาชิกกับปุ่ม Social Login
@@ -528,6 +545,34 @@ class _LoginWidget extends _SignUpWidget {
     );
   }
 
+  /// หน้า Login จะเช็คค่า value ว่างกับ Null
+  ///
+  /// [AuthenProcess.login]
+  @override
+  String? getValidatorEmailOrPhone(
+    BuildContext context,
+    String? value,
+  ) {
+    if (value == null || value.isEmpty) {
+      return context.wording.pleaseEnterPassword;
+    }
+    return null;
+  }
+
+  /// หน้า Login จะเช็คค่า value ว่างกับ Null
+  ///
+  /// [AuthenProcess.login]
+  @override
+  String? getValidatorPassword(
+    BuildContext context,
+    String? value,
+  ) {
+    if (value == null || value.isEmpty) {
+      return context.wording.pleaseEnterEmailOrPhone;
+    }
+    return null;
+  }
+
   /// แสดงปุ่มสำหรับ ลืมรหัสผ่าน
   ///
   /// [AuthenProcess.login]
@@ -644,7 +689,43 @@ class _LoginWidget extends _SignUpWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: viewmodel.onLogin,
+        onPressed: () async {
+          AppOverlays.showLoading(context);
+          final result = await viewmodel.onLogin();
+          if (!context.mounted) return;
+
+          if (result.hasError) {
+            if (result.error is UserNotFound) {
+              AppOverlays.showBrownyDialog(
+                context,
+                message: (result.error as UserNotFound).toUiMessage(context),
+                imageAsset: Assets.png.brownyError1.path,
+                confirmText: context.wording.tryAgain,
+              );
+            } else if (result.error is UserUnauthorized) {
+              AppOverlays.showBrownyDialog(
+                context,
+                message: (result.error as UserUnauthorized).toUiMessage(
+                  context,
+                ),
+                imageAsset: Assets.png.brownyError1.path,
+                confirmText: context.wording.tryAgain,
+              );
+            } else {
+              AppOverlays.showBrownyDialog(
+                context,
+                message: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+                imageAsset: Assets.png.brownyError2.path,
+                confirmText: context.wording.tryAgain,
+              );
+            }
+          }
+
+          if (result.isSuccess) {
+            context.pop();
+          }
+          AppOverlays.hideLoading();
+        },
         child: Text(
           context.wording.login,
         ),

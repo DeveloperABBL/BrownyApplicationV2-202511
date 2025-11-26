@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
+import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/viewmodels/app_preferences.dart';
 import 'package:browny_applications_new/core/widgets/app_router.dart';
 import 'package:flutter/material.dart';
@@ -28,4 +29,6 @@ abstract class AppEvnironment extends ChangeNotifier {
   AppRouter get appRouter => _appRouter!;
 
   Future<void> loadEnv();
+
+  CustomerProvider get currentUser;
 }

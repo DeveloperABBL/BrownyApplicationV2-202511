@@ -226,5 +226,6 @@
   "forgotPasswordDescription": "请输入您的电子邮件/手机号",
   "dontHaveAccountYet": "还没有账户吗？",
   "signUpNow": "立即注册！",
-  "forgotPassword": "忘记密码"
+  "forgotPassword": "忘记密码",
+  "topup": "充值"
 }

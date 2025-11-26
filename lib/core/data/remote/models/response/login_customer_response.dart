@@ -39,11 +39,20 @@ class LoginCustomerResponse extends BaseModelResponse {
 
 @JsonSerializable()
 class LoginCustomerData {
-  @JsonKey(name: 'id')
-  final String? id;
+  LoginCustomerData({
+    required this.customerId,
+    required this.loginPlatform,
+    required this.email,
+    required this.phone,
+    required this.name,
+    required this.profileImage,
+  });
 
-  @JsonKey(name: 'name')
-  final String? name;
+  @JsonKey(name: 'id')
+  final String? customerId;
+
+  @JsonKey(name: 'loginPlatform')
+  final String? loginPlatform;
 
   @JsonKey(name: 'email')
   final String? email;
@@ -51,16 +60,11 @@ class LoginCustomerData {
   @JsonKey(name: 'phone')
   final String? phone;
 
+  @JsonKey(name: 'name')
+  final String? name;
+
   @JsonKey(name: 'profile_image')
   final String? profileImage;
-
-  LoginCustomerData({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.profileImage,
-  });
 
   factory LoginCustomerData.fromJson(Map<String, dynamic> json) =>
       _$LoginCustomerDataFromJson(json);

@@ -1,6 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/register_response.dart';
 import 'package:dio/dio.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
@@ -36,11 +36,24 @@ abstract class AppClient {
       );
   }
 
+  @GET('/customer/{uuid}/credit')
+  Future<HttpResponse<CustomerProfileData>> fetchCustomerCredit(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2025-11-24
+  ///
+  /// API fech profile ของ User ที่ login เข้ามาใช้งาน
+  @POST('/customer/profile')
+  Future<HttpResponse<CustomerProfileResponse?>> fetchCustomerProfile(
+    @Body() Map<String, dynamic> body,
+  );
+
   /// DONG 2025-11-17
   ///
   /// API register new customer
   @POST('/customer/register')
-  Future<HttpResponse<LoginCustomerResponse>> register(
+  Future<HttpResponse<LoginCustomerResponse?>> register(
     @Body() CustomerCredential credential,
   );
 

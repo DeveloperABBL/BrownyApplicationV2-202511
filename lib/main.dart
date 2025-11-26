@@ -1,9 +1,8 @@
-import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
-import 'package:browny_applications_new/core/data/remote/app_client.dart';
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/env/dev_environment.dart';
 import 'package:browny_applications_new/core/res/strings/app_localizations.dart';
 import 'package:browny_applications_new/core/res/theme/app_theme.dart';
+import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -14,17 +13,9 @@ void main() async {
   // }
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize AppLocalStorage
-  await AppLocalStorage.instance().init();
-
-  // 2. Initialize AppEnvironment (สร้างครั้งเดียว)
-  final appEnvironment = ValueNotifier(DevEnvironment());
-  await appEnvironment.value.loadEnv();
-
-  // 3. Initialize HTTP AppClient
-  AppClient.init(
-    appEnvironment.value.apiConfig,
-  );
+  // Initialize AppEnvironment (สร้างครั้งเดียว)
+  final appEnvironment = DevEnvironment();
+  await appEnvironment.loadEnv();
 
   runApp(BrownyApp(appEnvironment: appEnvironment));
 }
@@ -35,17 +26,19 @@ class BrownyApp extends StatelessWidget {
     required this.appEnvironment,
   });
 
-  final ValueNotifier<AppEvnironment> appEnvironment;
+  final AppEvnironment appEnvironment;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // top model
+        ChangeNotifierProvider.value(value: appEnvironment.currentUser),
         ChangeNotifierProvider.value(value: appEnvironment),
       ],
-      child: Consumer<ValueNotifier<AppEvnironment>>(
+      child: Consumer<AppEvnironment>(
         builder: (context, envNotifier, child) {
-          final env = envNotifier.value;
+          final env = envNotifier;
 
           return ScreenUtilInit(
             // From Team design screen sizing

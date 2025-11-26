@@ -1461,6 +1461,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forgot password'**
   String get forgotPassword;
+
+  /// No description provided for @topup.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up'**
+  String get topup;
 }
 
 class _AppLocalizationsDelegate

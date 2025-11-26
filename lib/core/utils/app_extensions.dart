@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:retrofit/dio.dart';
 
@@ -42,6 +43,21 @@ extension HttpResponseExtension on HttpResponse {
       response.statusCode != null &&
       response.statusCode! >= 200 &&
       response.statusCode! < 300;
+
+  bool get isNotFound =>
+      response.statusCode != null && response.statusCode! == 404;
+
+  bool get isUnauthorized =>
+      response.statusCode != null && response.statusCode! == 401;
+}
+
+extension ResponseExtension on Response {
+  bool get isSuccessful =>
+      statusCode != null && statusCode! >= 200 && statusCode! < 300;
+
+  bool get isNotFound => statusCode != null && statusCode! == 404;
+
+  bool get isUnauthorized => statusCode != null && statusCode! == 401;
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย

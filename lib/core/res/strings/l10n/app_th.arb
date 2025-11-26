@@ -226,5 +226,6 @@
     "forgotPasswordDescription" : "กรุณากรอกอีเมล/เบอร์โทรศัพท์ของคุณ",
     "dontHaveAccountYet" : "ยังไม่มีบัญชีหรอ?",
     "signUpNow" : "สมัครเลย!",
-    "forgotPassword" : "ลืมรหัสผ่าน"
+    "forgotPassword" : "ลืมรหัสผ่าน",
+    "topup": "เติมเงิน"
 }

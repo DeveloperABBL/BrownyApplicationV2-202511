@@ -1,6 +1,14 @@
+import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
+import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/authentication/models/login_model.dart';
+import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum SignUpRequiredState {
   valideEmalOrPhone,
@@ -22,11 +30,16 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
   AuthenticationViewModel({
     required super.context,
     required this.authenProcess,
+    required this.customerDataRepo,
   });
+
+  final CustomerDataSoureMixin customerDataRepo;
 
   final AuthenProcess authenProcess;
 
   final GlobalKey<FormState> formKey = GlobalKey();
+  late final TextEditingController usernameController = TextEditingController();
+  late final TextEditingController passwordController = TextEditingController();
   final Set<SignUpRequiredState> _validations = SignUpRequiredState.values
       .toSet();
   late final ValueNotifier<bool> _validatorTriggle = ValueNotifier(false);
@@ -140,11 +153,42 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
     if (formKey.currentState?.validate() == true && _validations.isEmpty) {}
   }
 
-  void onLogin() {}
+  Future<UiResult<LoginCustomerData>> onLogin() async {
+    if (formKey.currentState?.validate() == true) {
+      final loginResult = await customerDataRepo.login(
+        username: usernameController.text,
+        password: passwordController.text,
+      );
+
+      if (loginResult.isEmpty) {
+        return UiResult.empty(error: loginResult.error);
+      }
+
+      if (loginResult.hasError) {
+        return UiResult.error(error: loginResult.error);
+      }
+
+      if (!context.mounted) return UiResult.empty();
+
+      final profileResult = await customerDataRepo.fetchProfile('');
+      context
+          .read<CustomerProvider>()
+          .newUser = UserModel.fromCustomerProfileData(
+        profileResult.data.data,
+      );
+
+      return UiResult.success(
+        data: loginResult.data.data!,
+      );
+    }
+    return UiResult.empty();
+  }
 
   @override
   void dispose() {
     _validatorTriggle.dispose();
+    usernameController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 }

@@ -1,14 +1,14 @@
+import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/res/colors/app_colors.dart';
 import 'package:browny_applications_new/core/res/dims/app_dims.dart';
 import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/res/styles/app_text_style.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
-import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
@@ -233,53 +233,77 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           ),
                         ),
                         AppDims.horizonPadding_8,
-                        ElevatedButton.icon(
-                          icon: Assets.svg.icLogin.svg(
-                            width: 12.w,
-                            height: 12.h,
-                          ),
-                          // icon: Icon(Icons.login),
-                          iconAlignment: IconAlignment.end,
-                          onPressed: () => context.pushNamed(
-                            AuthenticationPage.pageName,
-                            extra: {
-                              AuthenProcess: AuthenProcess.login,
-                            },
-                          ),
-                          style: context.appTheme.elevatedButtonTheme.style!
-                              .copyWith(
-                                shape: WidgetStatePropertyAll(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppDims.size_4,
+
+                        // สร้าง button TP+ Wallet
+                        Consumer<CustomerProvider>(
+                          builder: (context, provider, _) {
+                            final icon = provider.current.isGuest
+                                ? Assets.svg.icLogin.svg(
+                                    width: AppDims.size_12.w,
+                                    height: AppDims.size_12.h,
+                                  )
+                                : Assets.svg.icPlus.svg(
+                                    width: AppDims.size_12.w,
+                                    height: AppDims.size_12.h,
+                                  );
+
+                            final onPressed = provider.current.isGuest
+                                ? () => context.pushNamed(
+                                    AuthenticationPage.pageName,
+                                    extra: {
+                                      AuthenProcess: AuthenProcess.login,
+                                    },
+                                  )
+                                : () {};
+
+                            final label = provider.current.isGuest
+                                ? context.wording.login
+                                : context.wording.topup;
+
+                            return ElevatedButton.icon(
+                              icon: icon,
+                              // icon: Icon(Icons.login),
+                              iconAlignment: IconAlignment.end,
+                              onPressed: onPressed,
+                              style: context.appTheme.elevatedButtonTheme.style!
+                                  .copyWith(
+                                    shape: WidgetStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          AppDims.size_4,
+                                        ),
+                                      ),
+                                    ),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    padding: WidgetStatePropertyAll(
+                                      EdgeInsets.symmetric(
+                                        horizontal: AppDims.size_4,
+                                      ),
+                                    ),
+                                    minimumSize: WidgetStatePropertyAll(
+                                      Size(70.w, 22.h),
+                                    ), // Set this
+                                    textStyle: WidgetStatePropertyAll(
+                                      context.textTheme.bodySmall!.copyWith(
+                                        color: AppColors.white,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                padding: WidgetStatePropertyAll(
-                                  EdgeInsets.symmetric(
-                                    horizontal: AppDims.size_4,
-                                  ),
-                                ),
-                                minimumSize: WidgetStatePropertyAll(
-                                  Size(70.w, 22.h),
-                                ), // Set this
-                                textStyle: WidgetStatePropertyAll(
-                                  context.textTheme.bodySmall!.copyWith(
-                                    color: AppColors.white,
-                                  ),
-                                ),
-                              ),
-                          label: Text(
-                            context.wording.login,
-                          ),
+                              label: Text(label),
+                            );
+                          },
                         ),
                       ],
                     ),
-                    Text(
-                      '฿0000.00',
-                      style: AppTextNumberStyles.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w600,
+                    Selector<CustomerProvider, String>(
+                      selector: (context, provider) =>
+                          provider.current.creditBalance ?? '0.00',
+                      builder: (context, value, child) => Text(
+                        '฿${formatCurrency(string: value)}',
+                        style: AppTextNumberStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -327,10 +351,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                     ],
                   ),
-                  Text(
-                    '0.00 ${context.wording.coin}',
-                    style: AppTextNumberStyles.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w600,
+                  Selector<CustomerProvider, String>(
+                    selector: (context, provider) =>
+                        provider.current.brownyCoin ?? '0.00',
+                    builder: (context, value, child) => Text(
+                      '${formatCurrency(string: value)} ${context.wording.coin}',
+                      style: AppTextNumberStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

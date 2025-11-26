@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -7,5 +8,7 @@ import 'package:hive_ce/hive.dart';
 @GenerateAdapters([
   // ข้อมูล Customer ที่ Login
   AdapterSpec<LoginCustomerData>(),
+  // ข้อมูล Customer Profile ที่ Login
+  AdapterSpec<CustomerProfileData>(),
 ])
 part 'app_hive_adapters.g.dart';

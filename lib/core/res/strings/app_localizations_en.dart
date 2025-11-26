@@ -704,4 +704,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgotPassword => 'Forgot password';
+
+  @override
+  String get topup => 'Top up';
 }

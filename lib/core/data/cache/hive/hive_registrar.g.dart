@@ -7,12 +7,14 @@ import 'package:browny_applications_new/core/data/cache/hive/app_hive_adapters.d
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
+    registerAdapter(CustomerProfileDataAdapter());
     registerAdapter(LoginCustomerDataAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
+    registerAdapter(CustomerProfileDataAdapter());
     registerAdapter(LoginCustomerDataAdapter());
   }
 }

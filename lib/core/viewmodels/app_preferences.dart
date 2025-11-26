@@ -20,6 +20,10 @@ class AppPreferences {
     key: _keyIsFirstLaunch,
     value: false,
   );
+  void reFlagFirstLaunch() => _appLocalStorage.write(
+    key: _keyIsFirstLaunch,
+    value: true,
+  );
 
   /// Get language code (th, en, etc.)
   String getLanguage() {

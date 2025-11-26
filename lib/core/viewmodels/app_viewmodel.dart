@@ -11,10 +11,7 @@ abstract class AppViewModel extends ChangeNotifier {
   late final AppPreferences appPreferences;
 
   AppViewModel({required this.context}) {
-    appPreferences = context
-        .read<ValueNotifier<AppEvnironment>>()
-        .value
-        .appPreferences;
+    appPreferences = context.read<AppEvnironment>().appPreferences;
   }
 
   void attachContext(BuildContext newContext) {

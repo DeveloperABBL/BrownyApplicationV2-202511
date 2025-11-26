@@ -29,52 +29,32 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  cupertino_icons: ^1.0.8
+  dio: ^5.9.0
   flutter:
     sdk: flutter
-  # L10n
+  flutter_facebook_auth: ^7.1.2
+  flutter_html: ^3.0.0
   flutter_localizations:
     sdk: flutter
-  # formating, Localization
-  intl: ^0.20.2
-
-  ####### UI #######
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  # Google Fonts for easy font integration
-  google_fonts: ^6.2.1
-  # SVG rendering
-  flutter_svg: ^2.0.10+1
-  smooth_page_indicator: ^1.2.0
-  # Utils convert size by ScreenSize
-  flutter_screenutil: ^5.9.3
-  flutter_html: ^3.0.0
-  # For Native splash Screen
   flutter_native_splash: ^2.4.7
-  # For App Icons
-  icons_launcher: ^3.0.3
-  
-  # State Management
-  provider: ^6.1.2
-  
-  # Routing
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.0.10+1
   go_router: ^14.6.2
-
-  # Storage
+  google_fonts: ^6.2.1
   hive_ce: ^2.2.3
   hive_ce_flutter: ^1.1.0
-  path_provider: ^2.1.5
-
-  # HTTP Client Request (ใช้ version ที่ตรงกับ retrofit_generator ^8.2.1)
-  retrofit: ^4.9.0
-  dio: ^5.9.0  # Required by retrofit
-  # Model JSON Parser
+  icons_launcher: ^3.0.3
+  intl: ^0.20.2
   json_annotation: ^4.9.0
-
+  package_info_plus: ^9.0.0
+  path_provider: ^2.1.5
+  provider: ^6.1.2
+  retrofit: ^4.9.0
+  smooth_page_indicator: ^1.2.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  build_runner: ^2.10.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -82,23 +62,22 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
 
   hive_ce_generator: ^1.10.0
-  # Code Generation
-  build_runner: ^2.10.1
-  # - HTTP Client Request (downgrade เพื่อ compatible กับ hive_generator)
-  retrofit_generator: ^10.1.3
   # - Model JSON Parser (ใช้ version ที่ compatible)
   json_serializable: ^6.11.1
+  # - HTTP Client Request (downgrade เพื่อ compatible กับ hive_generator)
+  retrofit_generator: ^10.1.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # Assets Generater
 # command : fluttergen
 flutter_gen:
   output: lib/core/res/icons # Optional (default: lib/gen/)
-  
+
   # Optional
   integrations:
     flutter_svg: true
@@ -108,7 +87,7 @@ flutter:
   # localized messages
   # command : flutter pub get
   generate: true
-  
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -118,13 +97,10 @@ flutter:
   assets:
     - assets/svg/
     - assets/png/
-
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
-
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
-
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

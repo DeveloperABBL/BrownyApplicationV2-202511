@@ -28,18 +28,20 @@ Map<String, dynamic> _$LoginCustomerResponseToJson(
 
 LoginCustomerData _$LoginCustomerDataFromJson(Map<String, dynamic> json) =>
     LoginCustomerData(
-      id: json['id'] as String?,
-      name: json['name'] as String?,
+      customerId: json['id'] as String?,
+      loginPlatform: json['loginPlatform'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
+      name: json['name'] as String?,
       profileImage: json['profile_image'] as String?,
     );
 
 Map<String, dynamic> _$LoginCustomerDataToJson(LoginCustomerData instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
+      'id': instance.customerId,
+      'loginPlatform': instance.loginPlatform,
       'email': instance.email,
       'phone': instance.phone,
+      'name': instance.name,
       'profile_image': instance.profileImage,
     };
