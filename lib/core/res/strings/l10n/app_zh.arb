@@ -227,5 +227,11 @@
   "dontHaveAccountYet": "还没有账户吗？",
   "signUpNow": "立即注册！",
   "forgotPassword": "忘记密码",
-  "topup": "充值"
+  "errorUi": "发生错误，请重试。",
+  "topup": "充值",
+  "userNotFound": "未找到与此信息匹配的用户账户",
+  "userUnauthorized": "密码不正确",
+  "userDuplicated": "该用户已存在于系统中",
+  "confirmOTP": "确认一次性密码（OTP）",
+  "confirmOTPDescription": "请输入4位一次性密码以验证您的账户"
 }

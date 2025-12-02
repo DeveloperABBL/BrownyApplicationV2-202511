@@ -1462,11 +1462,47 @@ abstract class AppLocalizations {
   /// **'Forgot password'**
   String get forgotPassword;
 
+  /// No description provided for @errorUi.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred. Please try again.'**
+  String get errorUi;
+
   /// No description provided for @topup.
   ///
   /// In en, this message translates to:
   /// **'Top up'**
   String get topup;
+
+  /// No description provided for @userNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User account not found for this information.'**
+  String get userNotFound;
+
+  /// No description provided for @userUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password.'**
+  String get userUnauthorized;
+
+  /// No description provided for @userDuplicated.
+  ///
+  /// In en, this message translates to:
+  /// **'This user already exists.'**
+  String get userDuplicated;
+
+  /// No description provided for @confirmOTP.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm One-Time Password (OTP)'**
+  String get confirmOTP;
+
+  /// No description provided for @confirmOTPDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 4-digit one-time password to verify your account'**
+  String get confirmOTPDescription;
 }
 
 class _AppLocalizationsDelegate

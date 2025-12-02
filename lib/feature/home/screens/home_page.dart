@@ -12,6 +12,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
+import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -71,51 +72,52 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             child: Text(''),
           ),
 
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 90,
-                color: Colors.blue,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 134,
-                color: Colors.blue,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 205,
-                color: Colors.blue,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 140,
-                color: Colors.blue,
-              ),
-            ),
-          ),
+          SliverFillRemaining(),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16.0),
+          //     child: Container(
+          //       height: 90,
+          //       color: Colors.blue,
+          //     ),
+          //   ),
+          // ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16.0),
+          //     child: Container(
+          //       height: 134,
+          //       color: Colors.blue,
+          //     ),
+          //   ),
+          // ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16.0),
+          //     child: Container(
+          //       height: 205,
+          //       color: Colors.blue,
+          //     ),
+          //   ),
+          // ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16.0),
+          //     child: Container(
+          //       height: 140,
+          //       color: Colors.blue,
+          //     ),
+          //   ),
+          // ),
 
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                height: 100.h,
-              ),
-            ),
-          ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16.0),
+          //     child: SizedBox(
+          //       height: 100.h,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
       bottomNavigationBar: BrownyBottomNav(
@@ -133,7 +135,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   Widget _buildMyAppBar() {
     return SliverAppBar(
       pinned: false,
-      floating: false,
+      floating: true,
       surfaceTintColor: AppColors.transparent,
       stretch: true,
       expandedHeight: 200.h,
@@ -171,11 +173,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             AppDims.horizonPadding_10,
             CircleAvatar(
               backgroundColor: AppColors.background,
-              child: Assets.svg.icPerson.svg(
-                // เปลี่ยนสี svg
-                colorFilter: ColorFilter.mode(
-                  AppColors.primary,
-                  BlendMode.srcIn,
+              child: IconButton(
+                onPressed: () => context.pushNamed(ProfilePage.pageName),
+                icon: Assets.svg.icPerson.svg(
+                  // เปลี่ยนสี svg
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

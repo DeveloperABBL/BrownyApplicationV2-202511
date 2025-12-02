@@ -58,6 +58,8 @@ extension ResponseExtension on Response {
   bool get isNotFound => statusCode != null && statusCode! == 404;
 
   bool get isUnauthorized => statusCode != null && statusCode! == 401;
+
+  bool get isDuplicated => statusCode != null && statusCode! == 412;
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย

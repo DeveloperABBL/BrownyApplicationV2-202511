@@ -9,4 +9,10 @@ class CustomerProvider extends ChangeNotifier {
     _current = data;
     notifyListeners();
   }
+
+  UserModel logout() {
+    _current = UserModel.guest();
+    notifyListeners();
+    return _current;
+  }
 }

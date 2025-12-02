@@ -690,5 +690,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get forgotPassword => '忘记密码';
 
   @override
+  String get errorUi => '发生错误，请重试。';
+
+  @override
   String get topup => '充值';
+
+  @override
+  String get userNotFound => '未找到与此信息匹配的用户账户';
+
+  @override
+  String get userUnauthorized => '密码不正确';
+
+  @override
+  String get userDuplicated => '该用户已存在于系统中';
+
+  @override
+  String get confirmOTP => '确认一次性密码（OTP）';
+
+  @override
+  String get confirmOTPDescription => '请输入4位一次性密码以验证您的账户';
 }

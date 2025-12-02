@@ -30,7 +30,7 @@ android {
         applicationId = "com.brownywash.browny_applications_new"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 21  // Required by Facebook SDK 15.0.0+
+        minSdk = flutter.minSdkVersion  // Required by Facebook SDK 15.0.0+
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

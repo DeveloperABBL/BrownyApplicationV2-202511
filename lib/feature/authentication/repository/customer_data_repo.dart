@@ -30,6 +30,10 @@ mixin CustomerDataSoureMixin {
     required String username, // ชื่อผู้ใช้ที่ต้องการเข้าสู่ระบบ
     required String password, // รหัสผ่านของผู้ใช้
   });
+
+  Future<RepoResult<LoginCustomerResponse>> register(
+    CustomerCredential credential,
+  );
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
@@ -42,8 +46,8 @@ class CustomerDataRepo extends AppRepository with CustomerDataSoureMixin {
       );
 
       return RepoResult.dependOn(readResult);
-    } on Exception catch (e) {
-      return RepoResult.error(error: e);
+    } catch (e) {
+      return RepoResult.error(error: Exception(e.toString()));
     }
   }
 
@@ -167,6 +171,24 @@ class CustomerDataRepo extends AppRepository with CustomerDataSoureMixin {
       return RepoResult.error(
         error: Exception('Unknown error occurred'),
       );
+    }
+  }
+
+  @override
+  Future<RepoResult<LoginCustomerResponse>> register(
+    CustomerCredential credential,
+  ) async {
+    try {
+      final response = await requireRemote.register(credential);
+
+      return RepoResult.dependOn(response.data);
+    } on DioException catch (dioEx) {
+      if (dioEx.response!.isDuplicated) {
+        return RepoResult.empty(error: UserDuplicated());
+      }
+      return RepoResult.empty(error: dioEx);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
     }
   }
 

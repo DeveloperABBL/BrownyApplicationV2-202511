@@ -2,6 +2,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
+import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -34,6 +35,11 @@ class AppRouter {
           final authenProcess = extra?[AuthenProcess];
           return AuthenticationPage(authenProcess: authenProcess);
         },
+      ),
+      GoRoute(
+        path: ProfilePage.pagePath,
+        name: ProfilePage.pageName,
+        builder: (context, state) => const ProfilePage(),
       ),
     ],
   );

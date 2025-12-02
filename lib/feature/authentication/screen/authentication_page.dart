@@ -14,6 +14,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
 class AuthenticationPage extends StatelessWidget {
@@ -67,7 +68,12 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
 
       case AuthenProcess.signup:
         // แสดงหน้าสมัครสมาชิก
+        // return _PinningWidget(_viewmodel);
         return _SignUpWidget(_viewmodel);
+
+      case AuthenProcess.signupPinning:
+        // กรอก OTP ยืนยันการสมัคร
+        return _PinningWidget(_viewmodel);
 
       case AuthenProcess.forgotPassword:
         // แสดงหน้าลืมรหัสผ่าน
@@ -84,6 +90,83 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
   }
 }
 
+abstract class _AuthenStateWidget extends StatelessWidget {
+  const _AuthenStateWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constrainedBox) {
+          return Stack(
+            children: [
+              // Page background gradient
+              buildBackground(),
+
+              // AppBar Banner & button back
+              buildBanner(context),
+
+              // คำโปรย / TextFormFiled / Social Login
+              buildContent(constrainedBox, context),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// สร้างพื้นหลังแบบ Gradient สำหรับหน้า Sign Up
+  @protected
+  Widget buildBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+      ),
+    );
+  }
+
+  /// สร้าง Banner ด้านบนของหน้า พร้อมปุ่มย้อนกลับ (ถ้ามี stack ให้ pop ได้)
+  /// และแสดงโลโก้ Browny
+  @protected
+  Widget buildBanner(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            context.canPop()
+                // ถ้ามี stack ให้ pop ได้ จะมีปุ่มกลับ
+                ? ElevatedButton.icon(
+                    icon: Icon(Icons.arrow_back_ios_new),
+                    onPressed: () {
+                      // กดกลับออกจากหน้า
+                      if (context.canPop()) {
+                        context.pop();
+                      }
+                    },
+                    label: Text(context.wording.back),
+                    style: AppElevatedButtonStyle.buttomBackStyle,
+                  )
+                // ไม่มี stack ให้ pop จะไม่มีปุ่มกลับ
+                : SizedBox(),
+            Center(
+              child: Assets.png.brownyHorizaontal.image(
+                width: 278.w,
+                height: 122.h,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @protected
+  Widget buildContent(BoxConstraints constrainedBox, BuildContext context);
+}
+
 /// Widget สำหรับหน้าสมัครสมาชิก (Sign Up)
 ///
 /// - แสดงพื้นหลังแบบ Gradient
@@ -96,7 +179,7 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
 ///   - ตัวเลือกสมัครสมาชิกผ่าน Social Login (Facebook, Google, Apple, Line)
 ///
 /// ใช้ร่วมกับ [AuthenticationViewModel] เพื่อจัดการสถานะและการตรวจสอบข้อมูลฟอร์ม
-class _SignUpWidget extends StatelessWidget {
+class _SignUpWidget extends _AuthenStateWidget {
   const _SignUpWidget(this.viewmodel);
 
   @protected
@@ -121,6 +204,14 @@ class _SignUpWidget extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  @protected
+  Future<T?> goNextProcess<T>(BuildContext context, AuthenProcess next) {
+    return context.pushNamed(
+      AuthenticationPage.pageName,
+      extra: {AuthenProcess: next},
     );
   }
 
@@ -411,7 +502,36 @@ class _SignUpWidget extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: valid ? viewmodel.onSignUp : null,
+            onPressed: valid
+                ? () async {
+                    AppOverlays.showLoading(context);
+                    final result = await viewmodel.onSignUp();
+
+                    if (!context.mounted) return;
+                    AppOverlays.hideLoading();
+
+                    if (result.hasError) {
+                      if (result.error is AuthenExceptions) {
+                        AppOverlays.showBrownyDialog(
+                          context,
+                          message: (result.error as AuthenExceptions)
+                              .toUiMessage(context),
+                          confirmText: context.wording.tryAgain,
+                        );
+                        return;
+                      }
+
+                      AppOverlays.showBrownyDialog(
+                        context,
+                        message: context.wording.errorUi,
+                        confirmText: context.wording.tryAgain,
+                      );
+                      return;
+                    }
+                    // ไปหน้ากรอก Pin เพื่อยืนยัน
+                    goNextProcess(context, AuthenProcess.signupPinning);
+                  }
+                : null,
             child: Text(
               context.wording.signUp,
             ),
@@ -508,6 +628,244 @@ class _SignUpWidget extends StatelessWidget {
   }
 }
 
+class _PinningWidget extends _SignUpWidget {
+  const _PinningWidget(super.viewmodel);
+
+  @override
+  Widget build(BuildContext context) {
+    // เริ่มต้น Timer เมื่อเปิดหน้า OTP
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewmodel.startOtpTimer();
+    });
+
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constrainedBox) {
+          return Stack(
+            children: [
+              // พื้นหลังแบบ Gradient
+              buildBackground(),
+
+              // Banner และปุ่มย้อนกลับ
+              buildBanner(context),
+
+              // เนื้อหาหลัก: Title, Description, PIN Input
+              _buildContent(constrainedBox, context),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(BoxConstraints constrainedBox, BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: AppContainerRadius(
+        // 70% ของหน้าจอ
+        height: constrainedBox.maxHeight * 0.70,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDims.size_24.w,
+            vertical: AppDims.size_24.h,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text Title
+                AppText(
+                  context.wording.confirmOTP,
+                  style: context.textTheme.titleLarge,
+                ),
+                AppDims.vericalPadding_8,
+
+                // Text Description
+                AppText(
+                  '${context.wording.confirmOTPDescription} ${viewmodel.usernameObscure}',
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                AppDims.vericalPadding_32,
+
+                // PIN Input (OTP)
+                _PinputWidget(
+                  onCompleted: (pin) async {
+                    // TODO: Implement OTP verification
+                    print('OTP Entered: $pin');
+                  },
+                ),
+                AppDims.vericalPadding_24,
+
+                // Reference Code
+                Center(
+                  child: AppText(
+                    'รหัสอ้างอิง AR3WZJ',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                AppDims.vericalPadding_8,
+
+                // Resend OTP Timer
+                Center(
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: viewmodel.canResendOtp,
+                    builder: (context, canResend, _) {
+                      if (canResend) {
+                        return TextButton(
+                          onPressed: viewmodel.resendOtp,
+                          style: context.appTheme.textButtonTheme.style!
+                              .copyWith(
+                                foregroundColor: WidgetStatePropertyAll(
+                                  AppColors.primary,
+                                ),
+                                textStyle: WidgetStatePropertyAll(
+                                  context.textTheme.bodyMedium!.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          child: Text('ขอรหัสใหม่'),
+                        );
+                      }
+
+                      return ValueListenableBuilder<int>(
+                        valueListenable: viewmodel.remainingSeconds,
+                        builder: (context, seconds, _) {
+                          return AppText(
+                            'ขอรหัสใหม่ใน $seconds วินาที',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                AppDims.vericalPadding_32,
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: null, // Disabled จนกว่า PIN จะครบ
+                    child: Text(
+                      context.wording.next,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Widget สำหรับ PIN Input (OTP) ใช้ Pinput package
+class _PinputWidget extends StatefulWidget {
+  const _PinputWidget({
+    required this.onCompleted,
+  });
+
+  final ValueChanged<String> onCompleted;
+
+  @override
+  State<_PinputWidget> createState() => _PinputWidgetState();
+}
+
+class _PinputWidgetState extends State<_PinputWidget> {
+  final pinController = TextEditingController();
+  final focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    pinController.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Default theme
+    final defaultPinTheme = PinTheme(
+      width: 72.w,
+      height: 72.h,
+      textStyle: AppTextNumberStyles.headlineLarge.copyWith(
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w600,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.inputFieldDefaultBg,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.inputFieldDefaultBorder,
+          width: 1,
+        ),
+      ),
+    );
+
+    // Focused theme
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        color: AppColors.inputFieldDefaultBg,
+        border: Border.all(
+          color: AppColors.primary,
+          width: 1,
+        ),
+      ),
+    );
+
+    // Submitted theme (filled)
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        color: AppColors.primary.withValues(alpha: .05),
+        border: Border.all(
+          color: AppColors.primary,
+          width: 1,
+        ),
+      ),
+    );
+
+    // Error theme
+    final errorPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        color: AppColors.inputFieldDefaultBg,
+        border: Border.all(
+          color: AppColors.error,
+          width: 1,
+        ),
+      ),
+    );
+
+    return Pinput(
+      length: 4,
+      controller: pinController,
+      focusNode: focusNode,
+      defaultPinTheme: defaultPinTheme,
+      focusedPinTheme: focusedPinTheme,
+      submittedPinTheme: submittedPinTheme,
+      errorPinTheme: errorPinTheme,
+      showCursor: true,
+      cursor: Container(
+        width: 2,
+        height: 30.h,
+        color: AppColors.primary,
+      ),
+      onCompleted: widget.onCompleted,
+      autofocus: true,
+      hapticFeedbackType: HapticFeedbackType.lightImpact,
+      separatorBuilder: (index) => SizedBox(width: 12.w),
+    );
+  }
+}
+
 /// Widget สำหรับหน้าเข้าสู่ระบบ (Login)
 ///
 /// - สืบทอด (_extends_) มาจาก [_SignUpWidget] เพื่อใช้โครงสร้างและ UI หลักร่วมกัน
@@ -568,7 +926,7 @@ class _LoginWidget extends _SignUpWidget {
     String? value,
   ) {
     if (value == null || value.isEmpty) {
-      return context.wording.pleaseEnterEmailOrPhone;
+      return context.wording.pleaseEnterPassword;
     }
     return null;
   }
@@ -594,12 +952,8 @@ class _LoginWidget extends _SignUpWidget {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  context.pushNamed(
-                    AuthenticationPage.pageName,
-                    extra: {
-                      AuthenProcess: AuthenProcess.signup,
-                    },
-                  );
+                  // ไปหน้าลงทะเบียน
+                  goNextProcess(context, AuthenProcess.signup);
                 },
             ),
           ],

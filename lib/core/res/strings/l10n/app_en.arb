@@ -228,5 +228,11 @@
     "dontHaveAccountYet" : "Don't have an account yet?",
     "signUpNow" : "Sign up now!",
     "forgotPassword" : "Forgot password",
-    "topup": "Top up"
+    "errorUi": "An error occurred. Please try again.",
+    "topup": "Top up",
+    "userNotFound": "User account not found for this information.",
+    "userUnauthorized": "Incorrect password.",
+    "userDuplicated": "This user already exists.",
+    "confirmOTP": "Confirm One-Time Password (OTP)",
+    "confirmOTPDescription": "Enter the 4-digit one-time password to verify your account"
 }

@@ -704,5 +704,24 @@ class AppLocalizationsTh extends AppLocalizations {
   String get forgotPassword => 'ลืมรหัสผ่าน';
 
   @override
+  String get errorUi => 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+
+  @override
   String get topup => 'เติมเงิน';
+
+  @override
+  String get userNotFound => 'ไม่พบบัญชีผู้ใช้ที่ตรงกับข้อมูลนี้';
+
+  @override
+  String get userUnauthorized => 'รหัสผ่านไม่ถูกต้อง';
+
+  @override
+  String get userDuplicated => 'มีผู้ใช้งานอยู่ในระบบแล้ว';
+
+  @override
+  String get confirmOTP => 'ยืนยันรหัสใช้ครั้งเดียว (OTP)';
+
+  @override
+  String get confirmOTPDescription =>
+      'กรอกรหัสใช้ครั้งเดียว 4 หลักเพื่อยืนยันบัญชี';
 }

@@ -78,7 +78,12 @@ class AppLocalStorage with AppLocalStoreMixin {
 
   @override
   R? read<R>(String key, {R? defaultValue}) {
-    return Hive.box(_boxKey).get(key, defaultValue: defaultValue) as R;
+    try {
+      return Hive.box(_boxKey).get(key, defaultValue: defaultValue) as R;
+    } catch (e) {
+      if (defaultValue != null) return defaultValue as R;
+      return null;
+    }
   }
 
   @override

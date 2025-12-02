@@ -11,6 +11,8 @@ class AppOverlays {
   // เก็บ OverlayEntry สำหรับ loading indicator
   static OverlayEntry? _loadingOverlay;
 
+  static Future<dynamic>? _delayTimeout;
+
   /// แสดง Loading overlay แบบเต็มหน้าจอ
   ///
   /// [context] - BuildContext สำหรับการแสดงผล
@@ -20,6 +22,8 @@ class AppOverlays {
     BuildContext context, {
     String? message,
     bool barrierDismissible = false,
+    Duration? timeout,
+    VoidCallback? onTimeout,
   }) {
     // ถ้ามี loading อยู่แล้ว ไม่ต้องแสดงซ้ำ
     if (_loadingOverlay != null) return;
@@ -33,12 +37,18 @@ class AppOverlays {
     );
 
     Overlay.of(context).insert(_loadingOverlay!);
+
+    _delayTimeout = Future.delayed(timeout ?? const Duration(minutes: 1), () {
+      hideLoading();
+      onTimeout?.call();
+    });
   }
 
   /// ซ่อน Loading overlay
   static void hideLoading() {
     _loadingOverlay?.remove();
     _loadingOverlay = null;
+    _delayTimeout = null;
   }
 
   /// แสดง Custom overlay widget

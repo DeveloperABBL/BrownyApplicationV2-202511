@@ -1,3 +1,5 @@
+import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:flutter/widgets.dart';
 
 sealed class AuthenExceptions implements Exception {
@@ -6,7 +8,7 @@ sealed class AuthenExceptions implements Exception {
   AuthenExceptions([this.message]);
 
   String toUiMessage(BuildContext context) {
-    return '';
+    return message.orEmpty;
   }
 }
 
@@ -15,7 +17,7 @@ class UserNotFound extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return 'ไม่พบบัญชีผู้ใช้ที่ตรงกับข้อมูลนี้';
+    return context.wording.userNotFound;
   }
 }
 
@@ -24,6 +26,15 @@ class UserUnauthorized extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return 'รหัสผ่านไม่ถูกต้อง';
+    return context.wording.userUnauthorized;
+  }
+}
+
+class UserDuplicated extends AuthenExceptions {
+  UserDuplicated([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return context.wording.userDuplicated;
   }
 }

@@ -20,7 +20,7 @@ abstract class AppClient {
         contentType: 'application/json; charset=utf-8',
         connectTimeout: const Duration(minutes: 1),
         sendTimeout: const Duration(minutes: 1),
-        receiveTimeout: const Duration(minutes: 2),
+        receiveTimeout: const Duration(minutes: 1),
       ),
     ),
   );

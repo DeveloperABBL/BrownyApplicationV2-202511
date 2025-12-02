@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
+import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/viewmodels/app_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,9 @@ abstract class AppViewModel extends ChangeNotifier {
   AppViewModel({required this.context}) {
     appPreferences = context.read<AppEvnironment>().appPreferences;
   }
+
+  CustomerProvider get currentCustomerProvider =>
+      context.read<CustomerProvider>();
 
   void attachContext(BuildContext newContext) {
     context = newContext;

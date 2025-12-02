@@ -706,5 +706,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPassword => 'Forgot password';
 
   @override
+  String get errorUi => 'An error occurred. Please try again.';
+
+  @override
   String get topup => 'Top up';
+
+  @override
+  String get userNotFound => 'User account not found for this information.';
+
+  @override
+  String get userUnauthorized => 'Incorrect password.';
+
+  @override
+  String get userDuplicated => 'This user already exists.';
+
+  @override
+  String get confirmOTP => 'Confirm One-Time Password (OTP)';
+
+  @override
+  String get confirmOTPDescription =>
+      'Enter the 4-digit one-time password to verify your account';
 }
