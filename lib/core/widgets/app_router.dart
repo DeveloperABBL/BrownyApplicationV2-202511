@@ -1,8 +1,11 @@
+import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
+import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
+import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -39,7 +42,29 @@ class AppRouter {
       GoRoute(
         path: ProfilePage.pagePath,
         name: ProfilePage.pageName,
-        builder: (context, state) => const ProfilePage(),
+        builder: (context, state) {
+          bool isEditing = false;
+          try {
+            final extra = state.extra as Map<String, dynamic>?;
+            isEditing = extra?[ProfilePage.kEditing];
+          } catch (ignore) {}
+          return ProfilePage(isFirstSignup: isEditing);
+        },
+      ),
+      GoRoute(
+        path: CreateAppPinPage.pagePath,
+        name: CreateAppPinPage.pageName,
+        builder: (context, state) => const CreateAppPinPage(),
+      ),
+      GoRoute(
+        path: BiometricPage.pagePath,
+        name: BiometricPage.pageName,
+        builder: (context, state) => const BiometricPage(),
+      ),
+      GoRoute(
+        path: WalletPage.pagePath,
+        name: WalletPage.pageName,
+        builder: (context, state) => const WalletPage(),
       ),
     ],
   );

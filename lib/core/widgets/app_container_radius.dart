@@ -1,5 +1,5 @@
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
-import 'package:browny_applications_new/core/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:flutter/material.dart';
 
 /// วิดเจ็ตคอนเทนเนอร์ที่มีมุมโค้งแบบกำหนดเอง

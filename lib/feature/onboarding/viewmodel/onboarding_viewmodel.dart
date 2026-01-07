@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';

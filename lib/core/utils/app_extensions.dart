@@ -1,11 +1,35 @@
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:retrofit/dio.dart';
 
 extension AppBuildeContext on BuildContext {
   ThemeData get appTheme => Theme.of(this);
   TextTheme get textTheme => appTheme.textTheme;
+  TextStyle get inputTextStyle => appTheme.textTheme.bodyLarge!.merge(
+    GoogleFonts.prompt(
+      fontSize: 14.sp,
+    ),
+  );
+
+  void pushNamedAndClear(
+    String name, {
+    Map<String, String> pathParameters = const <String, String>{},
+    Map<String, dynamic> queryParameters = const <String, dynamic>{},
+    Object? extra,
+  }) {
+    final router = GoRouter.of(this);
+    // Pop until the target route is found or no more routes can be popped
+    while (router.canPop()) {
+      router.pop();
+    }
+    // Now push the new route
+    router.pushReplacementNamed(name);
+  }
 }
 
 extension LocalizedContentExtension on ContentLocalizeData {
@@ -59,7 +83,12 @@ extension ResponseExtension on Response {
 
   bool get isUnauthorized => statusCode != null && statusCode! == 401;
 
-  bool get isDuplicated => statusCode != null && statusCode! == 412;
+  bool get isDuplicated =>
+      statusCode != null && (statusCode! == 412 || statusCode! == 409);
+
+  bool get isNotFoundData => statusCode != null && (statusCode! == 410);
+
+  bool get isUnprocessable => statusCode != null && (statusCode! == 422);
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย
@@ -220,6 +249,60 @@ extension IterableExtensions<E> on List<E>? {
   }
 }
 
+/// Extension สำหรับจัดการ String ที่อาจเป็น null
+///
+/// ให้ฟังก์ชันช่วยในการจัดการกับ String? (nullable String)
+/// และการตรวจสอบค่าว่างได้อย่างสะดวก
+///
+/// ```dart
+/// String? title;
+/// print(title.ifNullOrEmpty('ไม่มีชื่อ')); // แสดงผล: 'ไม่มีชื่อ'
+///
+/// String? greeting = 'สวัสดี';
+/// print(greeting.ifNullOrEmpty('ไม่มีข้อความ')); // แสดงผล: 'สวัสดี'
+/// ```
 extension StringExtension on String? {
+  /// Example:
+  /// ```dart
+  /// String? name;
+  /// print(name.orEmpty); // แสดงผล: '' (empty string)
+  /// ```
   String get orEmpty => this ?? '';
+
+  /// Example:
+  /// ```dart
+  /// String? title;
+  /// print(title.ifNullOrEmpty('ไม่มีชื่อ')); // แสดงผล: 'ไม่มีชื่อ'
+  /// /// ```
+  String ifNullOrEmpty(String value) => orEmpty.isEmpty ? value : this!;
+}
+
+/// Extension สำหรับจัดรูปแบบวันที่ (DateTime)
+///
+/// ให้ฟังก์ชันในการแปลง DateTime เป็น String ตามรูปแบบที่กำหนด
+/// โดยมีรูปแบบเริ่มต้นสำหรับการแสดงผลและส่งข้อมูลไปยัง API
+extension DateTimeAppFormat on DateTime {
+  /// Example:
+  /// ```dart
+  /// DateTime now = DateTime.now(); // สมมติว่าเป็น 2024-03-15
+  ///
+  /// // แปลงเป็นรูปแบบสำหรับแสดงผล
+  /// print(now.formatForShow()); // แสดงผล: '15/03/2024'
+  /// print(now.formatForShow('dd-MM-yyyy')); // แสดงผล: '15-03-2024'
+  /// ```
+  String formatForShow([String format = 'dd/MM/yyyy']) =>
+      DateFormat(format).format(
+        this,
+      );
+
+  /// Example:
+  /// ```dart
+  /// // แปลงเป็นรูปแบบสำหรับส่ง API
+  /// print(now.formatForAPI()); // แสดงผล: '2024-03-15'
+  /// print(now.formatForAPI('yyyy/MM/dd')); // แสดงผล: '2024/03/15'
+  /// ```
+  String formatForAPI([String format = 'yyyy-MM-dd']) =>
+      DateFormat(format).format(
+        this,
+      );
 }

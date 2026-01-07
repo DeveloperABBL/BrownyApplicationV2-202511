@@ -1,13 +1,13 @@
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
-import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
+import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 
 mixin HomeDataSourceMixin {
   Future<RepoResult<List<BannerResponse>>> fetchBanner();
 }
 
-class HomeRepo extends AppRepository with HomeDataSourceMixin {
+class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   @override
   Future<RepoResult<List<BannerResponse>>> fetchBanner() async {
     try {

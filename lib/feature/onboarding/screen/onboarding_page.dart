@@ -1,10 +1,11 @@
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
-import 'package:browny_applications_new/core/res/dims/app_dims.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/custom_page_indicator.dart';
 import 'package:browny_applications_new/feature/onboarding/models/introduction_model.dart';
 import 'package:browny_applications_new/feature/onboarding/repository/onboard_repo.dart';
@@ -89,7 +90,9 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                   }
 
                   if (content.hasError) {
-                    return Center(child: Text(context.wording.somethingWrong));
+                    return Center(
+                      child: AppText(context.wording.somethingWrong),
+                    );
                   }
 
                   return PageView(
@@ -146,11 +149,10 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                                   onTap: _viewmodel.goToHomePage,
                                   child: Text(
                                     context.wording.skip,
-                                    style: context.textTheme.titleLarge!
+                                    style: context.textTheme.labelLarge!
                                         .copyWith(
-                                          fontSize: 16.sp,
+                                          fontSize: AppDims.size_16.sp,
                                           color: AppColors.primary,
-                                          fontWeight: FontWeight.w400,
                                         ),
                                   ),
                                 )
@@ -221,7 +223,8 @@ class _OnboardingContent extends StatelessWidget {
                       style: {
                         "body": Style(
                           fontSize: FontSize(
-                            context.appTheme.textTheme.titleLarge!.fontSize!,
+                            24.sp,
+                            // context.appTheme.textTheme.titleLarge!.fontSize!,
                           ),
                           padding: HtmlPaddings.zero,
                           textAlign: TextAlign.start,
@@ -230,7 +233,7 @@ class _OnboardingContent extends StatelessWidget {
                         ),
                       },
                     ),
-                    AppDims.vericalPadding_8,
+                    // AppDims.vericalPadding_8,
                     Html(
                       data: data.suptitleDisplay,
                       style: {

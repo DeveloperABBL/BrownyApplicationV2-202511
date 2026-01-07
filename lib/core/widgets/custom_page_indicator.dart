@@ -1,4 +1,4 @@
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 

@@ -101,8 +101,16 @@ class RepoResult<T> {
   bool get isEmpty => _state == RepoState.empty;
 
   /// Getter:
+  /// - `isError` คืนค่า true ถ้าสถานะเป็น error
+  bool get isError => _state == RepoState.error;
+
+  /// Getter:
   /// - `hasError` คืนค่า true ถ้าสถานะเป็น error
-  bool get hasError => _state == RepoState.error;
+  bool get hasError => _error != null;
+
+  /// Getter:
+  /// - `hasData` คืนค่า true ถ้า _data != null
+  bool get hasData => _data != null;
 
   /// Getter:
   /// - `state` คืนค่าสถานะปัจจุบัน

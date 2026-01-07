@@ -56,7 +56,7 @@ class CustomerProfileData {
   @JsonKey(name: 'gender')
   final String? gender;
 
-  @JsonKey(name: 'birthday')
+  @JsonKey(name: 'birthdate')
   final String? birthday;
 
   @JsonKey(name: 'profile_image')

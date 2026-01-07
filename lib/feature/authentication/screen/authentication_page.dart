@@ -1,14 +1,17 @@
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
-import 'package:browny_applications_new/core/res/dims/app_dims.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
-import 'package:browny_applications_new/core/res/styles/app_text_style.dart';
+// ignore_for_file: unused_element_parameter
+
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/styles/app_text_style.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +20,12 @@ import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
+/// หน้าหลักสำหรับการ Authentication (Login, Sign Up, Forgot Password, OTP)
+///
+/// ใช้ PageView เพื่อจัดการหลายหน้าภายใน widget เดียว
+/// - รักษา state ของ ViewModel ตลอดการทำงาน (SharedViewModel pattern)
+/// - ใช้ PageController ควบคุมการเปลี่ยนหน้าแทน navigation routing
+/// - Background, Logo, และปุ่ม Back ใช้ร่วมกันทุกหน้า
 class AuthenticationPage extends StatelessWidget {
   const AuthenticationPage({
     super.key,
@@ -30,13 +39,17 @@ class AuthenticationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // สร้าง ViewModel และ provide ให้ทั้ง widget tree
     return ChangeNotifierProvider(
       create: (context) => AuthenticationViewModel(
         context: context,
         authenProcess: _authenProcess,
         customerDataRepo: CustomerDataRepo(),
       ),
-      child: _AuthenticationWidget(),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: _AuthenticationWidget(),
+      ),
     );
   }
 }
@@ -56,58 +69,29 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
     super.initState();
     _viewmodel = context.read();
     _viewmodel.attachContext(context);
+    // เริ่มต้น PageController พร้อมกับกำหนดหน้าเริ่มต้นตาม authenProcess
+    _viewmodel.initializePageController();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    // แสดงหน้าตามประเภทของกระบวนการยืนยันตัวตน (login, signup, forgot password)
-    switch (_viewmodel.authenProcess) {
-      case AuthenProcess.login:
-        // แสดงหน้าเข้าสู่ระบบ
-        return _LoginWidget(_viewmodel);
-
-      case AuthenProcess.signup:
-        // แสดงหน้าสมัครสมาชิก
-        // return _PinningWidget(_viewmodel);
-        return _SignUpWidget(_viewmodel);
-
-      case AuthenProcess.signupPinning:
-        // กรอก OTP ยืนยันการสมัคร
-        return _PinningWidget(_viewmodel);
-
-      case AuthenProcess.forgotPassword:
-        // แสดงหน้าลืมรหัสผ่าน
-        return _ForgotPasswordWidget(_viewmodel);
-
-      case AuthenProcess.forgotPasswordPinning:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-
-      case AuthenProcess.forgotPasswordNewPassword:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-    }
-  }
-}
-
-abstract class _AuthenStateWidget extends StatelessWidget {
-  const _AuthenStateWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: LayoutBuilder(
-        builder: (context, constrainedBox) {
+        builder: (context, constraints) {
           return Stack(
             children: [
-              // Page background gradient
-              buildBackground(),
+              // Layer 1: พื้นหลัง Gradient
+              _buildGradientBackground(),
 
-              // AppBar Banner & button back
-              buildBanner(context),
+              // Layer 2: Container พื้นหลังสีขาวโค้งมน (ด้านล่าง 70%)
+              _buildWhiteContainer(constraints),
 
-              // คำโปรย / TextFormFiled / Social Login
-              buildContent(constrainedBox, context),
+              // Layer 3: PageView - เนื้อหาของแต่ละหน้า
+              _buildPageView(),
+
+              // Layer 4: ปุ่ม Back (บนสุด เพื่อให้กดได้)
+              _buildBackButton(),
             ],
           );
         },
@@ -115,9 +99,8 @@ abstract class _AuthenStateWidget extends StatelessWidget {
     );
   }
 
-  /// สร้างพื้นหลังแบบ Gradient สำหรับหน้า Sign Up
-  @protected
-  Widget buildBackground() {
+  /// สร้างพื้นหลัง Gradient ร่วมกันทุกหน้า
+  Widget _buildGradientBackground() {
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
@@ -125,150 +108,226 @@ abstract class _AuthenStateWidget extends StatelessWidget {
     );
   }
 
-  /// สร้าง Banner ด้านบนของหน้า พร้อมปุ่มย้อนกลับ (ถ้ามี stack ให้ pop ได้)
-  /// และแสดงโลโก้ Browny
-  @protected
-  Widget buildBanner(BuildContext context) {
+  /// สร้าง Container สีขาวโค้งมนด้านล่าง (70% ของหน้าจอ)
+  /// เป็น background สำหรับเนื้อหาของ PageView
+  Widget _buildWhiteContainer(BoxConstraints constraints) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ValueListenableBuilder<int>(
+            valueListenable: _viewmodel.currentPageIndex,
+            builder: (context, pageIndex, _) {
+              if (_viewmodel.currentProcess == AuthenProcess.referral) {
+                return Assets.png.logoReferral.image(
+                  width: 278.w,
+                  fit: BoxFit.cover,
+                );
+              }
+              return Padding(
+                padding: EdgeInsets.only(bottom: AppDims.size_20.h),
+                child: Assets.png.brownyHorizaontal.image(
+                  width: 278.w,
+                  height: 122.h,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          ),
+          AppContainerRadius(
+            height: constraints.maxHeight * 0.70,
+            child: SizedBox(), // ไม่ใส่เนื้อหา เพราะ PageView จะอยู่ด้านบน
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// สร้าง PageView สำหรับแสดงหน้าต่างๆ
+  /// - ห้าม swipe (ใช้ NeverScrollableScrollPhysics)
+  /// - เปลี่ยนหน้าผ่าน ViewModel เท่านั้น
+  Widget _buildPageView() {
+    return PageView(
+      controller: _viewmodel.pageController,
+      physics: NeverScrollableScrollPhysics(), // ปิดการ swipe
+      onPageChanged: (index) {
+        // อัพเดท currentPageIndex เมื่อหน้าเปลี่ยน
+        _viewmodel.currentPageIndex.value = index;
+      },
+      children: AuthenProcess.values.map<Widget>((e) {
+        switch (e) {
+          case AuthenProcess.login:
+            // หน้า 0
+            return _LoginWidget();
+
+          case AuthenProcess.signup:
+            // หน้า 1
+            return _SignUpWidget();
+
+          case AuthenProcess.signupOTP:
+            // หน้า 2 (OTP สำหรับ Sign Up)
+            return _OTPWidget();
+
+          case AuthenProcess.forgotPassword:
+            // หน้า 3
+            return _ForgotPasswordWidget();
+
+          case AuthenProcess.forgotPasswordPinning:
+          case AuthenProcess.forgotPasswordNewPassword:
+            // ยังไม่ implement
+            return SizedBox();
+
+          case AuthenProcess.referral:
+            return _ReferralWidget();
+          default:
+            return SizedBox();
+        }
+      }).toList(),
+    );
+  }
+
+  /// สร้างปุ่ม Back แบบ Smart
+  /// - ถ้าไม่ใช่หน้าแรกใน PageView → กดแล้วย้อนกลับหน้าก่อน (goBack)
+  /// - ถ้าเป็นหน้าแรก → กดแล้ว pop ออกจากหน้านี้ (context.pop)
+  Widget _buildBackButton() {
     return Align(
       alignment: Alignment.topLeft,
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            context.canPop()
-                // ถ้ามี stack ให้ pop ได้ จะมีปุ่มกลับ
-                ? ElevatedButton.icon(
-                    icon: Icon(Icons.arrow_back_ios_new),
-                    onPressed: () {
-                      // กดกลับออกจากหน้า
-                      if (context.canPop()) {
-                        context.pop();
-                      }
-                    },
-                    label: Text(context.wording.back),
-                    style: AppElevatedButtonStyle.buttomBackStyle,
-                  )
-                // ไม่มี stack ให้ pop จะไม่มีปุ่มกลับ
-                : SizedBox(),
-            Center(
-              child: Assets.png.brownyHorizaontal.image(
-                width: 278.w,
-                height: 122.h,
-                fit: BoxFit.cover,
+        child: ValueListenableBuilder<int>(
+          valueListenable: _viewmodel.currentPageIndex,
+          builder: (context, pageIndex, _) {
+            return ElevatedButton.icon(
+              icon: Icon(
+                Icons.arrow_back_ios_new,
               ),
-            ),
-          ],
+              onPressed: () {
+                if (_viewmodel.canGoBack) {
+                  // กรณีไม่ใช่หน้าแรก → ย้อนกลับหน้าก่อนใน PageView
+                  _viewmodel.goBack();
+                } else {
+                  // กรณีเป็นหน้าแรก → ออกจากหน้านี้
+                  if (context.canPop()) {
+                    context.pop();
+                  }
+                }
+              },
+              label: AppText(context.wording.back),
+              style: AppElevatedButtonStyle.buttomBackStyle.copyWith(
+                minimumSize: WidgetStatePropertyAll(Size(50.w, 40.h)),
+              ),
+            );
+          },
         ),
       ),
     );
   }
-
-  @protected
-  Widget buildContent(BoxConstraints constrainedBox, BuildContext context);
 }
 
-/// Widget สำหรับหน้าสมัครสมาชิก (Sign Up)
+/// Base Widget สำหรับหน้า Authentication ทั้งหมด (Sign Up, Login, Forgot Password)
 ///
-/// - แสดงพื้นหลังแบบ Gradient
-/// - แสดง Banner ด้านบนพร้อมปุ่มย้อนกลับ (ถ้ามี stack ให้ pop ได้)
-/// - ส่วนเนื้อหาหลักประกอบด้วย:
-///   - ข้อความโปรยและรายละเอียดการสมัครสมาชิก
-///   - ฟอร์มกรอกอีเมล/เบอร์โทรศัพท์ และรหัสผ่าน พร้อมตรวจสอบความถูกต้อง
-///   - Checkbox สำหรับยอมรับเงื่อนไขการใช้งาน
-///   - ปุ่มสมัครสมาชิก (Sign Up) ที่จะเปิดใช้งานเมื่อข้อมูลถูกต้อง
-///   - ตัวเลือกสมัครสมาชิกผ่าน Social Login (Facebook, Google, Apple, Line)
+/// **โครงสร้างของหน้า:**
+/// - เนื้อหาหลักแสดงในส่วนล่าง 70% ของหน้าจอ (ตรงกับ AppContainerRadius)
+/// - ปรับ padding ด้านล่างอัตโนมัติเมื่อ keyboard แสดง (MediaQuery.viewInsets.bottom)
+/// - ใช้ SingleChildScrollView เพื่อให้ scroll ได้เมื่อเนื้อหาเกิน
 ///
-/// ใช้ร่วมกับ [AuthenticationViewModel] เพื่อจัดการสถานะและการตรวจสอบข้อมูลฟอร์ม
-class _SignUpWidget extends _AuthenStateWidget {
-  const _SignUpWidget(this.viewmodel);
-
-  @protected
-  final AuthenticationViewModel viewmodel;
+/// **ส่วนประกอบเนื้อหา:**
+/// - Title และ Description (override ได้ใน subclass)
+/// - Form กรอกข้อมูล (Email/Phone, Password, Checkbox)
+/// - ปุ่ม Submit (เปิดใช้งานเมื่อ validation ผ่าน)
+/// - ปุ่มลืมรหัสผ่าน (แสดงเฉพาะบางหน้า - override ได้)
+/// - Social Login (Facebook, Google, Apple, Line)
+/// - ข้อความชวนสมัครสมาชิก (แสดงเฉพาะบางหน้า - override ได้)
+///
+/// **การใช้งาน:**
+/// - Extend class นี้สำหรับแต่ละหน้า (Login, Sign Up, Forgot Password)
+/// - Override methods ที่จำเป็น เช่น contentButtonSummit, listOfFormAuth
+/// - ใช้ helper methods: goToProcess(), viewmodel()
+class _SignUpWidget extends StatelessWidget {
+  const _SignUpWidget();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constrainedBox) {
-          return Stack(
-            children: [
-              // Page background gradient
-              buildBackground(),
-
-              // AppBar Banner & button back
-              buildBanner(context),
-
-              // คำโปรย / TextFormFiled / Social Login
-              buildContent(constrainedBox, context),
-            ],
-          );
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
     );
   }
 
+  /// Helper: Navigate ไปยัง Process ที่กำหนด (ควบคุมการเปลี่ยนหน้าใน PageView)
   @protected
-  Future<T?> goNextProcess<T>(BuildContext context, AuthenProcess next) {
-    return context.pushNamed(
-      AuthenticationPage.pageName,
-      extra: {AuthenProcess: next},
-    );
+  void goToProcess(BuildContext context, AuthenProcess process) {
+    context.read<AuthenticationViewModel>().goToProcess(process);
   }
 
+  /// Helper: เข้าถึง AuthenticationViewModel จาก context
+  @protected
+  AuthenticationViewModel viewmodel(BuildContext context) =>
+      context.read<AuthenticationViewModel>();
+
+  /// สร้างเนื้อหาหลักของหน้า (ด้านล่าง 70%)
+  /// - จัดการ keyboard padding อัตโนมัติ
+  /// - แสดง Title, Description, Form, Buttons ตามลำดับ
   @protected
   Widget buildContent(BoxConstraints constrainedBox, BuildContext context) {
+    final vm = viewmodel(context);
+    // ระยะที่ keyboard ดันขึ้นมา (เพื่อยก content ขึ้นให้เห็น TextField)
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Align(
       alignment: Alignment.bottomCenter,
-      child: AppContainerRadius(
-        // 70% ของหน้าจอ
-        height: constrainedBox.maxHeight * 0.70,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppDims.size_24.w,
-            vertical: AppDims.size_24.h,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Text Title จะแสดงตาม process
-                contentTitle(
-                  context,
-                  wording: context.wording.signUpTitle,
-                ),
-                // Text Description จะแสดงตาม process
-                contentDescription(
-                  context,
-                  wording: context.wording.signUpDescription,
-                ),
-                AppDims.vericalPadding_24,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SizedBox(
+          height: constrainedBox.maxHeight * 0.70, // 70% ของหน้าจอ
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDims.size_24.w,
+              vertical: AppDims.size_24.h,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // หัวเรื่อง (เช่น "สมัครสมาชิก")
+                  contentTitle(context, wording: context.wording.signUpTitle),
 
-                // สร้าง Form สำหรับกรอกข้อมูล
-                contentFormField(
-                  context,
-                  children: listOfFormAuth(context),
-                ),
-                AppDims.vericalPadding_10,
+                  // คำอธิบาย (เช่น "กรอกข้อมูลเพื่อสมัครสมาชิก")
+                  contentDescription(
+                    context,
+                    wording: context.wording.signUpDescription,
+                  ),
+                  AppDims.vericalPadding_24,
 
-                // ปุ่ม summit จะแสดงและมี event ตาม AuthenProcess ที่แตกต่างกัน
-                contentButtonSummit(context),
-                AppDims.vericalPadding_12,
+                  // ฟอร์มกรอกข้อมูล (Email/Phone, Password, Checkbox)
+                  contentFormField(
+                    context,
+                    vm,
+                    children: listOfFormAuth(context, vm),
+                  ),
+                  AppDims.vericalPadding_10,
 
-                // ปุ่มลืมรหัสผ่าน
-                contentButtonForgotPassword(context),
-                AppDims.vericalPadding_12,
+                  // ปุ่ม Submit (สมัครสมาชิก/เข้าสู่ระบบ/ส่งรหัส OTP)
+                  contentButtonSummit(context),
+                  AppDims.vericalPadding_12,
 
-                // Social Login ตัวแบ่งตาม design. เพื่อความสวยงาม
-                contentSocialLoginSeparator(context),
-                AppDims.vericalPadding_20,
+                  // ปุ่มลืมรหัสผ่าน (แสดงเฉพาะหน้า Login)
+                  contentButtonForgotPassword(context),
+                  AppDims.vericalPadding_12,
 
-                // Social Login Facebook, google, ...
-                contentSocialLogin(),
-                AppDims.vericalPadding_20,
+                  // เส้นคั่น + ข้อความ "สมัครด้วย..."
+                  contentSocialLoginSeparator(context),
+                  AppDims.vericalPadding_20,
 
-                // RichText: ยังไม่มีบัญชีหรอ? สมัครเลย
-                contentSignUpCheering(context),
-              ],
+                  // ปุ่ม Social Login (Facebook, Google, Apple, Line)
+                  contentSocialLogin(),
+                  AppDims.vericalPadding_20,
+
+                  // ข้อความชวนสมัครสมาชิก (แสดงเฉพาะหน้า Login)
+                  contentSignUpCheering(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -276,53 +335,53 @@ class _SignUpWidget extends _AuthenStateWidget {
     );
   }
 
-  /// DONG 2025-11-18
-  ///
-  /// ใช้สำหรับสร้าง content ถ้าเป็น [AuthenProcess.login] จะแสดงปุ่ม ลืมรหัสผ่าน
-  /// แต่ถ้าเป็น Process อื่น จะไม่แสดง
+  /// ปุ่มลืมรหัสผ่าน (แสดงเฉพาะหน้า Login)
+  /// - Default: ไม่แสดง
+  /// - Override ใน _LoginWidget เพื่อแสดง
   @protected
   Widget contentButtonForgotPassword(BuildContext context) {
     return SizedBox();
   }
 
-  /// DONG 2025-11-18
-  ///
-  /// ใช้สำหรับสร้าง content ถ้าเป็น [AuthenProcess.login] จะแสดงข้อความและปุ่มสำหรับ
-  /// สมัครสมาชิกใหม่ กรณีที่ยังไม่เคยใช้งาน
-  /// แต่ถ้าเป็น Process อื่น จะไม่แสดง
+  /// ข้อความชวนสมัครสมาชิก (แสดงเฉพาะหน้า Login)
+  /// - Default: ไม่แสดง
+  /// - Override ใน _LoginWidget เพื่อแสดงข้อความ "ยังไม่มีบัญชีหรอ? สมัครเลย"
   @protected
   Widget contentSignUpCheering(BuildContext context) {
     return SizedBox();
   }
 
+  /// ปุ่ม Social Login (Facebook, Google, Apple, Line)
+  /// - แสดงเป็นแถวเดียว 4 ปุ่ม
+  /// - กดแล้วยังไม่มีการทำงาน (TODO)
   @protected
   Widget contentSocialLogin() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {}, // TODO: Implement Facebook login
           icon: Assets.png.icFacebook.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {}, // TODO: Implement Google login
           icon: Assets.png.icGoogle.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {}, // TODO: Implement Apple login
           icon: Assets.png.icApple.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {}, // TODO: Implement Line login
           icon: Assets.png.icLine.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
@@ -332,15 +391,21 @@ class _SignUpWidget extends _AuthenStateWidget {
     );
   }
 
-  /// สร้าง Form สำหรับกรอกข้อมูล โดยรับ List ของ Widget (children) ที่จะนำมาแสดงใน Column
-  /// ใช้ร่วมกับ viewmodel.formKey เพื่อจัดการการ validate ฟอร์ม
+  @protected
+  Key getFormKey(BuildContext context) => viewmodel(context).formKeySignup;
+
+  /// สร้าง Form สำหรับกรอกข้อมูล
+  /// - รับ List ของ Widget (children) ที่จะแสดงใน Column
+  /// - ไม่ใช้ GlobalKey เพราะหลาย Widget อยู่ใน PageView พร้อมกัน (จะ Duplicate GlobalKey)
+  /// - แทนที่จะใช้ autovalidateMode และ validator ใน TextFormField แทน
   @protected
   Form contentFormField(
-    BuildContext context, {
+    BuildContext context,
+    AuthenticationViewModel vm, {
     required List<Widget> children,
   }) {
     return Form(
-      key: viewmodel.formKey,
+      key: getFormKey(context),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -350,116 +415,114 @@ class _SignUpWidget extends _AuthenStateWidget {
     );
   }
 
-  /// สร้าง List ของ Widget สำหรับใช้ในฟอร์มสมัครสมาชิก/เข้าสู่ระบบ
-  /// ประกอบด้วยช่องกรอกอีเมล/เบอร์โทรศัพท์, ช่องกรอกรหัสผ่าน และ Checkbox ยอมรับข้อตกลง
+  /// สร้าง List ของ Widget สำหรับใช้ในฟอร์ม
+  /// - ช่องกรอกอีเมล/เบอร์โทรศัพท์
+  /// - ช่องกรอกรหัสผ่าน (พร้อมปุ่มแสดง/ซ่อน)
+  /// - Checkbox ยอมรับข้อตกลง
+  ///
+  /// Override ใน subclass ถ้าต้องการเปลี่ยนแปลง field ที่แสดง
   @protected
-  List<Widget> listOfFormAuth(BuildContext context) => [
-    // Username input
-    textFormFieldEmailOrPhon(context),
-
+  List<Widget> listOfFormAuth(
+    BuildContext context,
+    AuthenticationViewModel vm,
+  ) => [
+    textFormFieldEmailOrPhone(context),
     AppDims.vericalPadding_12,
-
-    // Password input
-    textFormFieldPasswordWithObscure(),
-
-    // checkbox accept term of policy
-    contentCheckboxTermOfPolicy(),
+    textFormFieldPasswordWithObscure(context),
+    contentCheckboxTermOfPolicy(context),
   ];
 
-  /// สร้างช่องกรอกรหัสผ่าน พร้อมปุ่มกดเพื่อแสดง/ซ่อนรหัสผ่าน (Obscure)
-  /// ใช้ ValueListenableBuilder เพื่อสลับสถานะการแสดงรหัสผ่าน
+  /// ช่องกรอกรหัสผ่าน พร้อมปุ่มแสดง/ซ่อนรหัสผ่าน
+  /// - ใช้ Consumer + ValueListenableBuilder เพื่อ update UI เมื่อ obscure เปลี่ยน
+  /// - มี validator และ onChange callback
   @protected
-  ValueListenableBuilder<bool> textFormFieldPasswordWithObscure() {
-    return ValueListenableBuilder<bool>(
-      valueListenable: viewmodel.isObscure,
-      builder: (context, value, _) {
-        return TextFormField(
-          controller: viewmodel.passwordController,
-          textInputAction: TextInputAction.done,
-          obscureText: value,
-          decoration: InputDecoration(
-            hint: Text(
-              context.wording.password,
-              // ใช้ Default แต่เปลี่ยนสี Text
-              style: DefaultTextStyle.of(context).style.copyWith(
-                color: AppColors.textSecondary,
+  Widget textFormFieldPasswordWithObscure(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.isObscure,
+          builder: (context, isObscured, _) {
+            return AppTextFormField(
+              controller: vm.passwordController,
+              textInputAction: TextInputAction.done,
+              obscureText: isObscured,
+              decoration: InputDecoration(
+                hint: AppText(
+                  context.wording.password,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                prefixIcon: SizedBox.shrink(),
+                suffixIcon: IconButton(
+                  onPressed: vm.onObscureChange,
+                  icon: isObscured
+                      ? Assets.svg.icObscureOff.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        )
+                      : Assets.svg.icObscureOn.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        ),
+                ),
               ),
-            ),
-            prefixIcon: SizedBox.shrink(),
-            suffixIcon: IconButton(
-              onPressed: viewmodel.onObscureChange,
-              icon: value
-                  ? Assets.svg.icObscureOff.svg(
-                      width: AppDims.size_16.w,
-                      height: AppDims.size_16.h,
-                    )
-                  : Assets.svg.icObscureOn.svg(
-                      width: AppDims.size_16.w,
-                      height: AppDims.size_16.h,
-                    ),
-            ),
-          ),
-          validator: (value) => getValidatorPassword(context, value),
-          onChanged: (value) {
-            viewmodel.validatorPassword(value);
+              autovalidateMode: AutovalidateMode.onUnfocus,
+              validator: (value) => getValidatorPassword(context, value),
+              onChanged: vm.validatorPassword,
+            );
           },
         );
       },
     );
   }
 
-  String? getValidatorPassword(
-    BuildContext context,
-    String? value,
-  ) => viewmodel.validatorPassword(value);
+  /// Validator สำหรับรหัสผ่าน (เรียกผ่าน ViewModel)
+  String? getValidatorPassword(BuildContext context, String? value) =>
+      viewmodel(context).validatorPassword(value);
 
-  /// สร้างช่องกรอกอีเมลหรือเบอร์โทรศัพท์
-  /// มีการ validate ข้อมูลและเปลี่ยนสีข้อความ hint
+  /// ช่องกรอกอีเมลหรือเบอร์โทรศัพท์
+  /// - ใช้ Consumer เพื่อเข้าถึง ViewModel
+  /// - มี validator และ onChange callback
   @protected
-  TextFormField textFormFieldEmailOrPhon(BuildContext context) {
-    return TextFormField(
-      controller: viewmodel.usernameController,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-        hint: AppText(
-          context.wording.emailOrPhone,
-          // ใช้ Default แต่เปลี่ยนสี Text
-          style: DefaultTextStyle.of(context).style.copyWith(
-            color: AppColors.textSecondary,
+  Widget textFormFieldEmailOrPhone(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return AppTextFormField(
+          controller: vm.usernameController,
+          textInputAction: TextInputAction.next,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            hint: AppText(
+              context.wording.emailOrPhone,
+              style: DefaultTextStyle.of(context).style.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            prefixIcon: SizedBox.shrink(),
           ),
-        ),
-        prefixIcon: SizedBox.shrink(),
-      ),
-      autovalidateMode: AutovalidateMode.onUnfocus,
-      validator: (value) => getValidatorEmailOrPhone(context, value),
-      onChanged: (value) {
-        viewmodel.validatorEmailOrPhone(value);
+          autovalidateMode: AutovalidateMode.onUnfocus,
+          validator: (value) => getValidatorEmailOrPhone(context, value),
+          onChanged: vm.validatorEmailOrPhone,
+        );
       },
     );
   }
 
-  String? getValidatorEmailOrPhone(
-    BuildContext context,
-    String? value,
-  ) => viewmodel.validatorEmailOrPhone(value);
+  /// Validator สำหรับอีเมล/เบอร์โทร (เรียกผ่าน ViewModel)
+  String? getValidatorEmailOrPhone(BuildContext context, String? value) =>
+      viewmodel(context).validatorEmailOrPhone(value);
 
-  /// สร้างแถวที่มีเส้นคั่นแนวนอน ซ้าย-ขวา และข้อความ "สมัครด้วย..." ตรงกลาง
-  /// ใช้สำหรับคั่นระหว่างฟอร์มสมัครสมาชิกกับปุ่ม Social Login
-  ///
-  /// [context] ใช้สำหรับดึงข้อความที่เหมาะสมตามภาษา
+  /// เส้นคั่นแนวนอน + ข้อความตรงกลาง "สมัครด้วย..." หรือ "เข้าสู่ระบบด้วย..."
+  /// - ใช้แบ่งระหว่างฟอร์มกับ Social Login
   @protected
   Widget contentSocialLoginSeparator(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Divider(
-            color: AppColors.productStroke,
-          ),
-        ),
+        Expanded(child: Divider(color: AppColors.productStroke)),
         Expanded(
           child: Center(
-            child: Text(
+            child: AppText(
               wordingAlternateAuthen(context),
               style: DefaultTextStyle.of(context).style.copyWith(
                 color: AppColors.textSecondary,
@@ -467,110 +530,112 @@ class _SignUpWidget extends _AuthenStateWidget {
             ),
           ),
         ),
-        Expanded(
-          child: Divider(
-            color: AppColors.productStroke,
-          ),
-        ),
+        Expanded(child: Divider(color: AppColors.productStroke)),
       ],
     );
   }
 
-  /// DONG 2025-11-18
-  /// สำหรับสร้าง Wording ขั้นการเข้าสู่ระบบด้วยวิธีอื่นๆ
-  ///
-  /// - [AuthenProcess.login] เข้าสู่ระบบด้วย
-  /// - [AuthenProcess.signup] สมัครด้วย
-  /// - [AuthenProcess.forgotPassword] จะไม่แสดง alternate authen
+  /// ข้อความสำหรับ Social Login (เช่น "สมัครด้วย", "เข้าสู่ระบบด้วย")
+  /// - Override ใน subclass เพื่อเปลี่ยนข้อความตาม Process
   @protected
-  String wordingAlternateAuthen(
-    BuildContext context,
-  ) => context.wording.signUpWith;
+  String wordingAlternateAuthen(BuildContext context) =>
+      context.wording.signUpWith;
 
-  /// DONG 2025-11-18
+  /// ปุ่ม Submit สำหรับแต่ละ Process
+  /// - Login: เรียก vm.onLogin()
+  /// - Sign Up: เรียก vm.onSignUp()
+  /// - Forgot Password: เรียก vm.onForgotPassword()
   ///
-  /// Button สำหรับ Summit Event ในแต่ละ [AuthenProcess]
-  ///
-  /// - [AuthenProcess.login] จะเป็น Event ของการ เข้าสู่ระบบ
-  /// - [AuthenProcess.signup] จะเป็น Event ของการ สมัครสมาชิก
-  /// - [AuthenProcess.forgotPassword] จะเป็น Event ของการ ลืมรหัสผ่าน
+  /// เปิดใช้งานเมื่อ validation ผ่าน (vm.validatorTriggle)
+  /// Override ใน subclass เพื่อเปลี่ยน logic
   @protected
   Widget contentButtonSummit(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: viewmodel.validatorTriggle,
-      builder: (context, valid, _) {
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: valid
-                ? () async {
-                    AppOverlays.showLoading(context);
-                    final result = await viewmodel.onSignUp();
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.validatorTriggle, // Signup
+          builder: (context, isValid, _) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isValid
+                    ? () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        AppOverlays.showLoading(context);
+                        vm.onSummitForm().then((result) {
+                          if (!context.mounted) return;
+                          AppOverlays.hideLoading();
 
-                    if (!context.mounted) return;
-                    AppOverlays.hideLoading();
+                          if (result.hasError) {
+                            _showErrorDialog(
+                              context,
+                              result.error,
+                            );
+                            return;
+                          }
 
-                    if (result.hasError) {
-                      if (result.error is AuthenExceptions) {
-                        AppOverlays.showBrownyDialog(
-                          context,
-                          message: (result.error as AuthenExceptions)
-                              .toUiMessage(context),
-                          confirmText: context.wording.tryAgain,
-                        );
-                        return;
+                          if (result.isEmpty) {
+                            return;
+                          }
+                          // สำเร็จ → ไปหน้ากรอก OTP
+                          goToProcess(context, AuthenProcess.signupOTP);
+                        });
                       }
-
-                      AppOverlays.showBrownyDialog(
-                        context,
-                        message: context.wording.errorUi,
-                        confirmText: context.wording.tryAgain,
-                      );
-                      return;
-                    }
-                    // ไปหน้ากรอก Pin เพื่อยืนยัน
-                    goNextProcess(context, AuthenProcess.signupPinning);
-                  }
-                : null,
-            child: Text(
-              context.wording.signUp,
-            ),
-          ),
+                    : null,
+                child: AppText(context.wording.signUp),
+              ),
+            );
+          },
         );
       },
     );
   }
 
+  /// แสดง Error Dialog
+  /// - ถ้าเป็น AuthenExceptions → แสดงข้อความที่ถูกต้อง
+  /// - ถ้าไม่ใช่ → แสดงข้อความ error ทั่วไป
+  void _showErrorDialog(BuildContext context, dynamic error) {
+    final message = error is AuthenExceptions
+        ? error.toUiMessage(context)
+        : context.wording.errorUi;
+
+    AppOverlays.showBrownyDialog(
+      context,
+      title: context.wording.somethingWrong,
+      message: message,
+      confirmText: context.wording.tryAgain,
+    );
+  }
+
   /// Checkbox สำหรับยอมรับข้อตกลงและนโยบายความเป็นส่วนตัว
-  /// ใช้ในหน้าสมัครสมาชิกเท่านั้น
+  /// - แสดงเฉพาะหน้า Sign Up
   @protected
-  Widget contentCheckboxTermOfPolicy() {
-    return _CheckBoxTermOfPolicy(
-      onChanged: viewmodel.checkboxTermOfPolicyChanged,
+  Widget contentCheckboxTermOfPolicy(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return _CheckBoxTermOfPolicy(
+          initialValue: vm.checkBoxTermOfPolicy,
+          onChanged: vm.checkboxTermOfPolicyChanged,
+        );
+      },
     );
   }
 
-  /// สร้าง Title ของเนื้อหา (เช่น "สมัครสมาชิก" หรือ "เข้าสู่ระบบ")
-  /// รับข้อความ [wording] เพื่อแสดงผล
+  /// หัวเรื่อง (เช่น "สมัครสมาชิก", "เข้าสู่ระบบ")
   @protected
-  Widget contentTitle(
-    BuildContext context, {
-    required String wording,
-  }) {
-    return Text(
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return AppText(
       wording,
-      style: context.textTheme.titleLarge,
+      style: context.textTheme.titleLarge!.copyWith(
+        fontSize: AppDims.size_24.sp,
+      ),
     );
   }
 
-  /// สร้าง Description อธิบายรายละเอียดใต้ Title
-  /// รับข้อความ [wording] เพื่อแสดงผล
+  /// คำอธิบายใต้หัวเรื่อง
   @protected
-  Widget contentDescription(
-    BuildContext context, {
-    required String wording,
-  }) {
-    return Text(
+  Widget contentDescription(BuildContext context, {required String wording}) {
+    return AppText(
       wording,
       style: context.textTheme.bodyMedium!.copyWith(
         // ใช้ bodyMedium แต่เปลี่ยนสี Text
@@ -578,203 +643,310 @@ class _SignUpWidget extends _AuthenStateWidget {
       ),
     );
   }
-
-  /// สร้าง Banner ด้านบนของหน้า พร้อมปุ่มย้อนกลับ (ถ้ามี stack ให้ pop ได้)
-  /// และแสดงโลโก้ Browny
-  @protected
-  Widget buildBanner(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            context.canPop()
-                // ถ้ามี stack ให้ pop ได้ จะมีปุ่มกลับ
-                ? ElevatedButton.icon(
-                    icon: Icon(Icons.arrow_back_ios_new),
-                    onPressed: () {
-                      // กดกลับออกจากหน้า
-                      if (context.canPop()) {
-                        context.pop();
-                      }
-                    },
-                    label: Text(context.wording.back),
-                    style: AppElevatedButtonStyle.buttomBackStyle,
-                  )
-                // ไม่มี stack ให้ pop จะไม่มีปุ่มกลับ
-                : SizedBox(),
-            Center(
-              child: Assets.png.brownyHorizaontal.image(
-                width: 278.w,
-                height: 122.h,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// สร้างพื้นหลังแบบ Gradient สำหรับหน้า Sign Up
-  @protected
-  Widget buildBackground() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-      ),
-    );
-  }
 }
 
-class _PinningWidget extends _SignUpWidget {
-  const _PinningWidget(super.viewmodel);
+/// หน้ากรอก OTP (One-Time Password) สำหรับยืนยันตัวตน
+///
+/// **การทำงาน:**
+/// - แสดงหลังจากผู้ใช้สมัครสมาชิกหรือลืมรหัสผ่าน
+/// - เริ่ม OTP Timer ทันทีที่หน้าแสดง (WidgetsBinding.addPostFrameCallback)
+/// - ให้ผู้ใช้กรอก PIN 6 หลัก (ใช้ Pinput widget)
+/// - แสดง username ที่ปิดบัง (เช่น "09****1234")
+/// - มีปุ่มขอ OTP ใหม่ (เปิดใช้งานเมื่อ Timer หมด)
+/// - แสดงรหัสอ้างอิง (Reference Code) สำหรับติดต่อ Support
+///
+/// **ส่วนประกอบ:**
+/// - Title และ Description พร้อม username ที่ปิดบัง
+/// - PIN Input (6 หลัก)
+/// - Reference Code
+/// - ปุ่มขอ OTP ใหม่ / Timer นับถอยหลัง
+/// - ปุ่ม Submit (ยังไม่ทำงาน - TODO)
+class _OTPWidget extends StatefulWidget {
+  const _OTPWidget();
+
+  @override
+  State<_OTPWidget> createState() => _OTPWidgetState();
+}
+
+class _OTPWidgetState extends State<_OTPWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    // เริ่ม OTP Timer เมื่อหน้าแสดง (หลัง build เสร็จ)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      AppOverlays.showLoading(context);
+      await context.read<AuthenticationViewModel>().startOtpTimer();
+
+      AppOverlays.hideLoading();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // เริ่มต้น Timer เมื่อเปิดหน้า OTP
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewmodel.startOtpTimer();
-    });
+    return _OTPContent();
+  }
+}
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constrainedBox) {
-          return Stack(
-            children: [
-              // พื้นหลังแบบ Gradient
-              buildBackground(),
+/// DONG 2025-12-06
+///
+/// แยก Pin input Widget ออกมาอยู่เป็น child ของ [_OTPWidget] แก้ปัญหา
+/// เวลาคีย์บอร์ดแสดงขึ้นบนหน้าจอ [_OTPContent] จะถูก rebuild ส่งผลให้ call API
+/// OTP รัวๆ
+class _OTPContent extends _SignUpWidget {
+  const _OTPContent();
 
-              // Banner และปุ่มย้อนกลับ
-              buildBanner(context),
-
-              // เนื้อหาหลัก: Title, Description, PIN Input
-              _buildContent(constrainedBox, context),
-            ],
-          );
-        },
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return _buildContent(constrainedBox, context);
+      },
     );
   }
 
+  /// สร้างเนื้อหาหลักของหน้า OTP (ต่างจาก _SignUpWidget)
+  /// - ไม่ใช้ buildContent() เพราะโครงสร้างแตกต่างกัน
+  /// - Layout พิเศษสำหรับ PIN Input
   Widget _buildContent(BoxConstraints constrainedBox, BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Align(
       alignment: Alignment.bottomCenter,
-      child: AppContainerRadius(
-        // 70% ของหน้าจอ
-        height: constrainedBox.maxHeight * 0.70,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppDims.size_24.w,
-            vertical: AppDims.size_24.h,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Text Title
-                AppText(
-                  context.wording.confirmOTP,
-                  style: context.textTheme.titleLarge,
-                ),
-                AppDims.vericalPadding_8,
-
-                // Text Description
-                AppText(
-                  '${context.wording.confirmOTPDescription} ${viewmodel.usernameObscure}',
-                  style: context.textTheme.bodyMedium!.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                AppDims.vericalPadding_32,
-
-                // PIN Input (OTP)
-                _PinputWidget(
-                  onCompleted: (pin) async {
-                    // TODO: Implement OTP verification
-                    print('OTP Entered: $pin');
-                  },
-                ),
-                AppDims.vericalPadding_24,
-
-                // Reference Code
-                Center(
-                  child: AppText(
-                    'รหัสอ้างอิง AR3WZJ',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SizedBox(
+          height: constrainedBox.maxHeight * 0.70, // 70% ของหน้าจอ
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDims.size_24.w,
+              vertical: AppDims.size_24.h,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // หัวเรื่อง "ยืนยันรหัส OTP"
+                  AppText(
+                    context.wording.confirmOTP,
+                    style: context.textTheme.titleLarge!.copyWith(
+                      fontSize: AppDims.size_24.sp,
                     ),
                   ),
-                ),
-                AppDims.vericalPadding_8,
+                  AppDims.vericalPadding_8,
 
-                // Resend OTP Timer
-                Center(
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: viewmodel.canResendOtp,
-                    builder: (context, canResend, _) {
-                      if (canResend) {
-                        return TextButton(
-                          onPressed: viewmodel.resendOtp,
-                          style: context.appTheme.textButtonTheme.style!
-                              .copyWith(
-                                foregroundColor: WidgetStatePropertyAll(
-                                  AppColors.primary,
-                                ),
-                                textStyle: WidgetStatePropertyAll(
-                                  context.textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                          child: Text('ขอรหัสใหม่'),
-                        );
-                      }
+                  // คำอธิบาย + username ที่ปิดบัง
+                  Consumer<AuthenticationViewModel>(
+                    builder: (context, vm, _) {
+                      return AppText(
+                        '${context.wording.confirmOTPDescription} ${vm.usernameObscure}',
+                        style: context.textTheme.bodyMedium!.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      );
+                    },
+                  ),
+                  AppDims.vericalPadding_32,
 
-                      return ValueListenableBuilder<int>(
-                        valueListenable: viewmodel.remainingSeconds,
-                        builder: (context, seconds, _) {
-                          return AppText(
-                            'ขอรหัสใหม่ใน $seconds วินาที',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          );
+                  ValueListenableBuilder(
+                    valueListenable: viewmodel(
+                      context,
+                    ).verifyOTPMessageErrorNotifier,
+                    builder: (context, value, _) {
+                      // PIN Input (OTP 6 หลัก)
+                      return _PinputWidget(
+                        forceErrorState: value != null,
+                        onCompleted: (pin) async {
+                          AppOverlays.showLoading(context);
+                          final validateResult = await viewmodel(
+                            context,
+                          ).verifyOTP(pin);
+
+                          if (!context.mounted) return;
+
+                          if (validateResult.hasError) {
+                            AppOverlays.hideLoading();
+                            _showErrorDialog(context, validateResult.error!);
+                            return;
+                          }
+                          AppOverlays.hideLoading();
+                          // auto call ปุ่มต่อไป
+                          await _summitOtp(context);
                         },
                       );
                     },
                   ),
-                ),
-                AppDims.vericalPadding_32,
+                  AppDims.vericalPadding_24,
 
-                // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: null, // Disabled จนกว่า PIN จะครบ
-                    child: Text(
-                      context.wording.next,
-                    ),
+                  // ปุ่ม Submit
+                  ValueListenableBuilder(
+                    valueListenable: viewmodel(context).otpButtonNextNotifier,
+                    builder: (context, value, _) {
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: value
+                              ? () async {
+                                  await _summitOtp(context);
+                                }
+                              : null,
+                          child: AppText(context.wording.next),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ],
+                  AppDims.vericalPadding_24,
+
+                  // รหัสอ้างอิง (Reference Code)
+                  ValueListenableBuilder(
+                    valueListenable: viewmodel(context).requestOtpNotifier,
+                    builder: (context, value, _) {
+                      return Center(
+                        child: AppText(
+                          'รหัสอ้างอิง ${value.refCode}',
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  AppDims.vericalPadding_4,
+
+                  // ปุ่มขอ OTP ใหม่ / Timer นับถอยหลัง
+                  Center(child: _buildResendOtpButton(context)),
+                  AppDims.vericalPadding_4,
+
+                  // Text message ถ้า Error
+                  ValueListenableBuilder(
+                    valueListenable: viewmodel(
+                      context,
+                    ).verifyOTPMessageErrorNotifier,
+                    builder: (context, value, _) {
+                      if (value == null) return const SizedBox();
+
+                      return Center(
+                        child: AppText(
+                          value,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.error,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  AppDims.vericalPadding_32,
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
+  Future<void> _summitOtp(BuildContext context) async {
+    AppOverlays.showLoading(context);
+    viewmodel(context).onSummitForm().then((
+      result,
+    ) {
+      if (!context.mounted) return;
+      AppOverlays.hideLoading();
+
+      if (result.hasError) {
+        _showErrorDialog(context, result.error);
+        return;
+      }
+
+      if (result.isEmpty) {
+        return;
+      }
+      // สำเร็จ → ไปหน้ากรอกอ้างอิง
+      goToProcess(
+        context,
+        AuthenProcess.referral,
+      );
+    });
+  }
+
+  /// ปุ่มขอ OTP ใหม่ / แสดง Timer นับถอยหลัง
+  /// - ถ้า canResendOtp = true → แสดงปุ่ม "ขอรหัสใหม่"
+  /// - ถ้า canResendOtp = false → แสดง "ขอรหัสใหม่ใน X วินาที"
+  Widget _buildResendOtpButton(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.canResendOtp,
+          builder: (context, canResend, _) {
+            if (canResend) {
+              // แสดงปุ่มกด "ขอรหัสใหม่"
+              return TextButton(
+                onPressed: vm.resendOtp,
+                style: context.appTheme.textButtonTheme.style!.copyWith(
+                  foregroundColor: WidgetStatePropertyAll(AppColors.primary),
+                  textStyle: WidgetStatePropertyAll(
+                    context.textTheme.bodyMedium,
+                  ),
+                ),
+                child: AppText(
+                  'ขอรหัสใหม่',
+                  style: context.textTheme.labelLarge?.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              );
+            }
+
+            // แสดง Timer นับถอยหลัง
+            return ValueListenableBuilder<int>(
+              valueListenable: vm.remainingSeconds,
+              builder: (context, seconds, _) {
+                return Padding(
+                  padding: EdgeInsets.only(top: AppDims.size_8.h),
+                  child: AppText(
+                    'ขอรหัสใหม่ใน $seconds วินาที',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
-/// Widget สำหรับ PIN Input (OTP) ใช้ Pinput package
+/// Widget สำหรับ PIN Input (กรอกรหัส OTP 4 หลัก)
+///
+/// **ใช้ Pinput package:**
+/// - กรอกตัวเลข 4 หลัก (สามารถเปลี่ยนเป็น 6 หลักได้ที่ length property)
+/// - แสดง cursor กระพริบเมื่อ focus
+/// - มี haptic feedback เมื่อกรอก
+/// - มี 4 states: default, focused, submitted (filled), error
+///
+/// **Design:**
+/// - Default: พื้นหลังสีเทาอ่อน, border สีเทา
+/// - Focused: border สีหลัก (primary)
+/// - Submitted: พื้นหลังสีหลักจาง 5%, border สีหลัก
+/// - Error: border สีแดง
+///
+/// **Callback:**
+/// - onCompleted: เรียกเมื่อกรอกครบ 4 หลัก
 class _PinputWidget extends StatefulWidget {
   const _PinputWidget({
     required this.onCompleted,
+    this.validator,
+    this.forceErrorState = false,
   });
 
   final ValueChanged<String> onCompleted;
+  final FormFieldValidator<String>? validator;
+  final bool forceErrorState;
 
   @override
   State<_PinputWidget> createState() => _PinputWidgetState();
@@ -793,7 +965,9 @@ class _PinputWidgetState extends State<_PinputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Default theme
+    // Theme สำหรับแต่ละ state ของ PIN box
+
+    // Default: ยังไม่กรอก, ไม่ได้ focus
     final defaultPinTheme = PinTheme(
       width: 72.w,
       height: 72.h,
@@ -811,21 +985,21 @@ class _PinputWidgetState extends State<_PinputWidget> {
       ),
     );
 
-    // Focused theme
+    // Focused: กำลัง focus อยู่
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
         color: AppColors.inputFieldDefaultBg,
         border: Border.all(
-          color: AppColors.primary,
+          color: AppColors.primary, // Border เปลี่ยนเป็นสีหลัก
           width: 1,
         ),
       ),
     );
 
-    // Submitted theme (filled)
+    // Submitted: กรอกเสร็จแล้ว
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
-        color: AppColors.primary.withValues(alpha: .05),
+        color: AppColors.primary.withValues(alpha: .05), // พื้นหลังสีหลักจาง 5%
         border: Border.all(
           color: AppColors.primary,
           width: 1,
@@ -833,19 +1007,19 @@ class _PinputWidgetState extends State<_PinputWidget> {
       ),
     );
 
-    // Error theme
+    // Error: มี error
     final errorPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
-        color: AppColors.inputFieldDefaultBg,
+        color: AppColors.error.withValues(alpha: .05),
         border: Border.all(
-          color: AppColors.error,
+          color: AppColors.error, // Border สีแดง
           width: 1,
         ),
       ),
     );
 
     return Pinput(
-      length: 4,
+      length: 4, // จำนวนหลัก (เปลี่ยนเป็น 6 ถ้าต้องการ OTP 6 หลัก)
       controller: pinController,
       focusNode: focusNode,
       defaultPinTheme: defaultPinTheme,
@@ -858,82 +1032,67 @@ class _PinputWidgetState extends State<_PinputWidget> {
         height: 30.h,
         color: AppColors.primary,
       ),
-      onCompleted: widget.onCompleted,
-      autofocus: true,
-      hapticFeedbackType: HapticFeedbackType.lightImpact,
-      separatorBuilder: (index) => SizedBox(width: 12.w),
+      onCompleted: widget.onCompleted, // เรียก callback เมื่อกรอกครบ
+      autofocus: true, // Focus ทันทีเมื่อหน้าโหลด
+      forceErrorState: widget.forceErrorState,
+      validator: widget.validator,
+      hapticFeedbackType: HapticFeedbackType.lightImpact, // Vibrate เบาๆ
+      separatorBuilder: (index) => SizedBox(width: 12.w), // ระยะห่างระหว่าง box
     );
   }
 }
 
-/// Widget สำหรับหน้าเข้าสู่ระบบ (Login)
+/// หน้า Login (เข้าสู่ระบบ)
 ///
-/// - สืบทอด (_extends_) มาจาก [_SignUpWidget] เพื่อใช้โครงสร้างและ UI หลักร่วมกัน
-/// - ปรับเปลี่ยนเฉพาะส่วนที่แตกต่างจากหน้าสมัครสมาชิก เช่น:
-///   - เปลี่ยนข้อความ Title/Description ให้เหมาะกับการเข้าสู่ระบบ
-///   - เปลี่ยนข้อความของปุ่มและ Separator เป็นของ Login
-///   - ไม่แสดง Checkbox สำหรับยอมรับข้อตกลง (contentCheckboxTermOfPolicy)
-///   - ปุ่ม Summit จะเรียก Event สำหรับ Login
+/// **Extends จาก [_SignUpWidget]:**
+/// - ใช้โครงสร้างและ UI หลักร่วมกัน (Form, Social Login, etc.)
+/// - Override เฉพาะส่วนที่แตกต่าง
 ///
-/// ความแตกต่างหลักจาก [_SignUpWidget]:
-///   - [_SignUpWidget] จะมี Checkbox สำหรับยอมรับข้อตกลง, ปุ่มและข้อความสำหรับสมัครสมาชิก
-///   - [_LoginWidget] จะไม่มี Checkbox, เปลี่ยนข้อความและ Event ให้เหมาะกับการ Login
+/// **ความแตกต่างจาก Sign Up:**
+/// - ไม่มี Checkbox ยอมรับข้อตกลง
+/// - เปลี่ยน Title/Description เป็น "เข้าสู่ระบบ"
+/// - เปลี่ยน Separator เป็น "เข้าสู่ระบบด้วย..."
+/// - มีปุ่ม "ลืมรหัสผ่าน"
+/// - มีข้อความชวนสมัครสมาชิก "ยังไม่มีบัญชีหรอ? สมัครเลย"
+/// - ปุ่ม Submit เรียก vm.onLogin()
+/// - Validator แบบเรียบง่าย (เช็คเฉพาะ null/empty)
 class _LoginWidget extends _SignUpWidget {
-  const _LoginWidget(super.viewmodel);
+  const _LoginWidget();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constrainedBox) {
-          return Stack(
-            children: [
-              // พื้นหลังแบบ Gradient (เหมือน SignUp)
-              super.buildBackground(),
-
-              // Banner และปุ่มย้อนกลับ (เหมือน SignUp)
-              super.buildBanner(context),
-
-              // เนื้อหาหลัก: Title, Description, Form, Social Login
-              buildContent(constrainedBox, context),
-            ],
-          );
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
     );
   }
 
-  /// หน้า Login จะเช็คค่า value ว่างกับ Null
-  ///
-  /// [AuthenProcess.login]
   @override
-  String? getValidatorEmailOrPhone(
-    BuildContext context,
-    String? value,
-  ) {
+  Key getFormKey(BuildContext context) => viewmodel(context).formKeyLogin;
+
+  /// Validator แบบเรียบง่าย (เช็คเฉพาะ null/empty)
+  /// - ไม่ validate format อีเมล/เบอร์โทร
+  @override
+  String? getValidatorEmailOrPhone(BuildContext context, String? value) {
+    if (value == null || value.isEmpty) {
+      return context.wording.pleaseEnterEmailOrPhone;
+    }
+    return null;
+  }
+
+  /// Validator แบบเรียบง่าย (เช็คเฉพาะ null/empty)
+  /// - ไม่ validate ความซับซ้อนของรหัสผ่าน
+  @override
+  String? getValidatorPassword(BuildContext context, String? value) {
     if (value == null || value.isEmpty) {
       return context.wording.pleaseEnterPassword;
     }
     return null;
   }
 
-  /// หน้า Login จะเช็คค่า value ว่างกับ Null
-  ///
-  /// [AuthenProcess.login]
-  @override
-  String? getValidatorPassword(
-    BuildContext context,
-    String? value,
-  ) {
-    if (value == null || value.isEmpty) {
-      return context.wording.pleaseEnterPassword;
-    }
-    return null;
-  }
-
-  /// แสดงปุ่มสำหรับ ลืมรหัสผ่าน
-  ///
-  /// [AuthenProcess.login]
+  /// ข้อความชวนสมัครสมาชิก "ยังไม่มีบัญชีหรอ? สมัครเลย"
+  /// - กดแล้วไปหน้า Sign Up (AuthenProcess.signup)
   @override
   Widget contentSignUpCheering(BuildContext context) {
     return Center(
@@ -952,8 +1111,7 @@ class _LoginWidget extends _SignUpWidget {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  // ไปหน้าลงทะเบียน
-                  goNextProcess(context, AuthenProcess.signup);
+                  goToProcess(context, AuthenProcess.signup);
                 },
             ),
           ],
@@ -962,241 +1120,341 @@ class _LoginWidget extends _SignUpWidget {
     );
   }
 
-  /// แสดงปุ่มสำหรับ ลืมรหัสผ่าน
-  ///
-  /// [AuthenProcess.login]
+  /// ปุ่ม "ลืมรหัสผ่าน"
+  /// - กดแล้วไปหน้า Forgot Password (TODO: implement navigation)
   @override
   Widget contentButtonForgotPassword(BuildContext context) {
     return Center(
       child: TextButton(
         style: context.appTheme.textButtonTheme.style!.copyWith(
-          foregroundColor: WidgetStatePropertyAll(
-            AppColors.darkBrown,
-          ),
+          foregroundColor: WidgetStatePropertyAll(AppColors.textPrimary),
           textStyle: WidgetStatePropertyAll(
-            AppTextStyles.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            AppTextStyles.labelLarge,
           ),
         ),
-        onPressed: () {},
-        child: Text(
+        onPressed:
+            () {}, // TODO: goToProcess(context, AuthenProcess.forgotPassword)
+        child: AppText(
           context.wording.forgotPassword,
         ),
       ),
     );
   }
 
-  /// เปลี่ยนข้อความ Separator เป็น "เข้าสู่ระบบด้วย..." (loginWith)
-  /// ต่างจาก SignUp ที่ใช้ "สมัครด้วย..."
-  ///
-  /// [AuthenProcess.login]
+  /// เปลี่ยนข้อความ Separator เป็น "เข้าสู่ระบบด้วย..."
   @override
-  String wordingAlternateAuthen(BuildContext context) {
-    return context.wording.loginWith;
-  }
+  String wordingAlternateAuthen(BuildContext context) =>
+      context.wording.loginWith;
 
   /// เปลี่ยน Title เป็น "เข้าสู่ระบบ"
-  ///
-  /// [AuthenProcess.login]
   @override
-  Widget contentTitle(
-    BuildContext context, {
-    required String wording,
-  }) {
-    return super.contentTitle(
-      context,
-      wording: context.wording.login,
-    );
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return super.contentTitle(context, wording: context.wording.login);
   }
 
-  /// เปลี่ยน Description เป็นข้อความต้อนรับเข้าสู่ระบบ
-  ///
-  /// [AuthenProcess.login]
+  /// เปลี่ยน Description เป็นข้อความต้อนรับ
   @override
-  Widget contentDescription(
-    BuildContext context, {
-    required String wording,
-  }) {
+  Widget contentDescription(BuildContext context, {required String wording}) {
     return super.contentDescription(
       context,
       wording: context.wording.loginWelcomeDescription,
     );
   }
 
-  /// ไม่แสดง Checkbox สำหรับยอมรับข้อตกลง (ต่างจาก SignUp)
-  ///
-  /// [AuthenProcess.login]
+  /// ไม่แสดง Checkbox ยอมรับข้อตกลง (return spacing แทน)
   @override
-  Widget contentCheckboxTermOfPolicy() {
-    // หน้า login ไม่ต้องมี Checkbox สำหรับยอมรับเงื่อนไข
-    // return ช่องว่างแทน
+  Widget contentCheckboxTermOfPolicy(BuildContext context) {
     return AppDims.vericalPadding_12;
   }
 
-  /// ปุ่ม Summit สำหรับ Login (เปลี่ยนข้อความและ Event)
-  /// ต่างจาก SignUp ที่จะเป็นปุ่มสมัครสมาชิก
-  ///
-  /// [AuthenProcess.login]
+  /// ปุ่ม Submit สำหรับ Login
+  /// - เรียก vm.onLogin()
+  /// - แสดง error dialog ถ้า login ไม่สำเร็จ
+  /// - pop ออกจากหน้าถ้า login สำเร็จ
   @override
   Widget contentButtonSummit(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () async {
-          AppOverlays.showLoading(context);
-          final result = await viewmodel.onLogin();
-          if (!context.mounted) return;
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return SizedBox(
+          height: AppDims.size_40.h,
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () async {
+              AppOverlays.showLoading(context);
+              final result = await vm.onLogin();
+              if (!context.mounted) return;
 
-          if (result.hasError) {
-            if (result.error is UserNotFound) {
-              AppOverlays.showBrownyDialog(
-                context,
-                message: (result.error as UserNotFound).toUiMessage(context),
-                imageAsset: Assets.png.brownyError1.path,
-                confirmText: context.wording.tryAgain,
-              );
-            } else if (result.error is UserUnauthorized) {
-              AppOverlays.showBrownyDialog(
-                context,
-                message: (result.error as UserUnauthorized).toUiMessage(
-                  context,
-                ),
-                imageAsset: Assets.png.brownyError1.path,
-                confirmText: context.wording.tryAgain,
-              );
-            } else {
-              AppOverlays.showBrownyDialog(
-                context,
-                message: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
-                imageAsset: Assets.png.brownyError2.path,
-                confirmText: context.wording.tryAgain,
-              );
-            }
-          }
+              AppOverlays.hideLoading();
 
-          if (result.isSuccess) {
-            context.pop();
-          }
-          AppOverlays.hideLoading();
-        },
-        child: Text(
-          context.wording.login,
-        ),
-      ),
+              if (result.hasError) {
+                _showLoginErrorDialog(context, result.error);
+                return;
+              }
+
+              // สำเร็จ → ออกจากหน้า Authentication
+              if (result.isSuccess) {
+                context.pop();
+              }
+            },
+            child: AppText(context.wording.login),
+          ),
+        );
+      },
+    );
+  }
+
+  /// แสดง Error Dialog สำหรับ Login
+  /// - UserNotFound: ไม่พบผู้ใช้
+  /// - UserUnauthorized: รหัสผ่านไม่ถูกต้อง
+  /// - อื่นๆ: ข้อผิดพลาดทั่วไป
+  void _showLoginErrorDialog(BuildContext context, dynamic error) {
+    String message;
+    String imageAsset;
+
+    if (error is UserNotFound || error is UserUnauthorized) {
+      message = (error as AuthenExceptions).toUiMessage(context);
+      imageAsset = Assets.png.brownyError1.path;
+    } else {
+      message = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+      imageAsset = Assets.png.brownyError2.path;
+    }
+
+    AppOverlays.showBrownyDialog(
+      context,
+      message: message,
+      imageAsset: imageAsset,
+      confirmText: context.wording.tryAgain,
     );
   }
 }
 
-/// Widget สำหรับหน้าลืมรหัสผ่าน (Forgot Password)
-///
-/// - สืบทอด (_extends_) มาจาก [_SignUpWidget] เพื่อใช้โครงสร้างและ UI หลักร่วมกัน
-/// - ปรับเปลี่ยนเฉพาะส่วนที่แตกต่างจากหน้าสมัครสมาชิก เช่น:
-///   - เปลี่ยนข้อความ Title/Description ให้เหมาะกับการลืมรหัสผ่าน
-///   - เปลี่ยนข้อความของปุ่มเป็น "ถัดไป" (Next)
-///   - ไม่แสดง Checkbox สำหรับยอมรับข้อตกลง (contentCheckboxTermOfPolicy)
-///   - ไม่แสดง Social Login และ Separator
-///   - ฟอร์มจะมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์เท่านั้น
-///
-/// ความแตกต่างหลักจาก [_SignUpWidget]:
-///   - [_SignUpWidget] จะมี Checkbox สำหรับยอมรับข้อตกลง, ปุ่มและข้อความสำหรับสมัครสมาชิก, Social Login
-///   - [_ForgotPasswordWidget] จะไม่มี Checkbox, ไม่มี Social Login, ไม่มี Separator, เปลี่ยนข้อความและ Event ให้เหมาะกับการลืมรหัสผ่าน
-class _ForgotPasswordWidget extends _SignUpWidget {
-  const _ForgotPasswordWidget(super.viewmodel);
+class _ReferralWidget extends _SignUpWidget {
+  const _ReferralWidget();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constrainedBox) {
-          return Stack(
-            children: [
-              // พื้นหลังแบบ Gradient (เหมือน SignUp)
-              super.buildBackground(),
-
-              // Banner และปุ่มย้อนกลับ (เหมือน SignUp)
-              super.buildBanner(context),
-
-              // เนื้อหาหลัก: Title, Description, Form (ไม่มี Social Login)
-              buildContent(constrainedBox, context),
-            ],
-          );
-        },
-      ),
+    // context.read<AuthenticationViewModel>().clearValidatorForReferral();
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
     );
   }
 
-  /// ปุ่ม Summit สำหรับ Forgot Password (เปลี่ยนข้อความและ Event)
-  /// ต่างจาก SignUp ที่จะเป็นปุ่มสมัครสมาชิก และ Login ที่จะเป็นปุ่มเข้าสู่ระบบ
-  ///
-  /// [AuthenProcess.forgotPassword]
+  @override
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return super.contentTitle(
+      context,
+      wording: 'กรอกเบอร์เพื่อนสมาชิก',
+    );
+  }
+
+  @override
+  Widget contentDescription(BuildContext context, {required String wording}) {
+    return super.contentDescription(
+      context,
+      wording: 'กรอกเบอร์มือถือของเพื่อนที่แนะนำให้พี่รู้จักน้องบราวนี่',
+    );
+  }
+
+  @override
+  Key getFormKey(BuildContext context) {
+    return viewmodel(context).formKeyReferral;
+  }
+
   @override
   Widget contentButtonSummit(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: viewmodel.onSignUp,
-        child: Text(
-          context.wording.next,
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.validatorTriggle, // referral
+          builder: (context, isValid, _) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isValid
+                    ? () async {
+                        AppOverlays.showLoading(context);
+                        final result = await vm.onSummitForm();
+                        AppOverlays.hideLoading();
+                        if (result.isSuccess) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          context.pushNamed(CreateAppPinPage.pageName);
+                        }
+                      }
+                    : null,
+                child: AppText(context.wording.confirm),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget contentButtonForgotPassword(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          context.pushReplacementNamed(CreateAppPinPage.pageName);
+        },
+        child: AppText(
+          '${context.wording.skip} ',
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ),
     );
   }
 
-  /// ไม่แสดง Social Login (ต่างจาก SignUp)
-  ///
-  /// [AuthenProcess.forgotPassword]
+  @override
+  Widget textFormFieldEmailOrPhone(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return AppTextFormField(
+          controller: vm.usernameController,
+          textInputAction: TextInputAction.done,
+          keyboardType: TextInputType.phone,
+          decoration: InputDecoration(
+            hint: AppText(
+              context.wording.phoneNumber,
+              style: DefaultTextStyle.of(context).style.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            prefixIcon: SizedBox.shrink(),
+          ),
+          autovalidateMode: AutovalidateMode.onUnfocus,
+          validator: vm.validatorPhone,
+          onChanged: vm.validatorPhone,
+        );
+      },
+    );
+  }
+
+  @override
+  Widget textFormFieldPasswordWithObscure(BuildContext context) =>
+      const SizedBox();
+
+  @override
+  Widget contentCheckboxTermOfPolicy(BuildContext context) => const SizedBox();
+
+  @override
+  // Widget contentSocialLoginSeparator(BuildContext context) => const SizedBox();
+  Widget contentSocialLoginSeparator(BuildContext context) =>
+      Consumer<AuthenticationViewModel>(
+        builder: (context, viewModel, _) {
+          return ValueListenableBuilder<String?>(
+            valueListenable: viewModel.referralErrorMessageNotifier,
+            builder: (context, message, _) {
+              if (message != null) {
+                return Center(
+                  child: AppText(
+                    message,
+                    style: context.textTheme.labelLarge!.copyWith(
+                      color: AppColors.error,
+                    ),
+                  ),
+                );
+              }
+
+              return const SizedBox();
+            },
+          );
+        },
+      );
+
+  @override
+  Widget contentSocialLogin() => const SizedBox();
+
+  @override
+  Widget contentSignUpCheering(BuildContext context) => const SizedBox();
+}
+
+/// หน้า Forgot Password (ลืมรหัสผ่าน)
+///
+/// **Extends จาก [_SignUpWidget]:**
+/// - ใช้โครงสร้างและ UI หลักร่วมกัน
+/// - Override เฉพาะส่วนที่แตกต่าง
+///
+/// **ความแตกต่างจาก Sign Up:**
+/// - เปลี่ยน Title/Description เป็น "ลืมรหัสผ่านใช่ไหม"
+/// - ฟอร์มมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์
+/// - ไม่มีช่องกรอกรหัสผ่าน
+/// - ไม่มี Checkbox ยอมรับข้อตกลง
+/// - ไม่มี Social Login และ Separator
+/// - ปุ่ม Submit ข้อความ "ถัดไป" (Next)
+/// - ปุ่ม Submit เรียก vm.onSignUp() (TODO: should be vm.onForgotPassword)
+class _ForgotPasswordWidget extends _SignUpWidget {
+  const _ForgotPasswordWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
+    );
+  }
+
+  /// ปุ่ม Submit สำหรับ Forgot Password
+  /// - ข้อความ "ถัดไป" (Next)
+  /// - TODO: เปลี่ยนจาก vm.onSignUp() เป็น vm.onForgotPassword()
+  @override
+  Widget contentButtonSummit(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: vm.onSummitForm, // TODO: Change to vm.onForgotPassword()
+            child: AppText(context.wording.next),
+          ),
+        );
+      },
+    );
+  }
+
+  /// ไม่แสดง Social Login
   @override
   Widget contentSocialLogin() => SizedBox();
 
-  /// ไม่แสดง Separator ระหว่างฟอร์มกับ Social Login (ต่างจาก SignUp)
-  ///
-  /// [AuthenProcess.forgotPassword]
+  /// ไม่แสดง Separator
   @override
   Widget contentSocialLoginSeparator(BuildContext context) => SizedBox();
 
-  /// ฟอร์มจะมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์เท่านั้น (ต่างจาก SignUp ที่มีช่องรหัสผ่านและ Checkbox)
-  ///
-  /// [AuthenProcess.forgotPassword]
+  /// ฟอร์มมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์
+  /// - ไม่มีช่องรหัสผ่าน
+  /// - ไม่มี Checkbox
   @override
-  List<Widget> listOfFormAuth(BuildContext context) => [
-    // ช่องกรอกอีเมลหรือเบอร์โทรศัพท์
-    textFormFieldEmailOrPhon(context),
+  List<Widget> listOfFormAuth(
+    BuildContext context,
+    AuthenticationViewModel vm,
+  ) => [
+    textFormFieldEmailOrPhone(context),
     AppDims.vericalPadding_12,
   ];
 
-  /// ไม่แสดง Checkbox สำหรับยอมรับข้อตกลง (ต่างจาก SignUp)
-  ///
-  /// [AuthenProcess.forgotPassword]
+  /// ไม่แสดง Checkbox ยอมรับข้อตกลง (return spacing แทน)
   @override
-  Widget contentCheckboxTermOfPolicy() {
-    // หน้า forgot password ไม่ต้องมี Checkbox สำหรับยอมรับเงื่อนไข
-    // return ช่องว่างแทน
+  Widget contentCheckboxTermOfPolicy(BuildContext context) {
     return AppDims.vericalPadding_12;
   }
 
   /// เปลี่ยน Title เป็น "ลืมรหัสผ่านใช่ไหม"
-  ///
-  /// [AuthenProcess.forgotPassword]
   @override
-  Widget contentTitle(
-    BuildContext context, {
-    required String wording,
-  }) {
+  Widget contentTitle(BuildContext context, {required String wording}) {
     return super.contentTitle(
       context,
       wording: context.wording.forgotYourPassword,
     );
   }
 
-  /// เปลี่ยน Description เป็นข้อความอธิบายการลืมรหัสผ่าน
-  ///
-  /// [AuthenProcess.forgotPassword]
+  /// เปลี่ยน Description เป็นคำอธิบายการลืมรหัสผ่าน
   @override
-  Widget contentDescription(
-    BuildContext context, {
-    required String wording,
-  }) {
+  Widget contentDescription(BuildContext context, {required String wording}) {
     return super.contentDescription(
       context,
       wording: context.wording.forgotPasswordDescription,
@@ -1204,37 +1462,48 @@ class _ForgotPasswordWidget extends _SignUpWidget {
   }
 }
 
-/// Widget นี้เป็น Checkbox สำหรับให้ผู้ใช้ยอมรับข้อตกลงและนโยบายความเป็นส่วนตัว
-/// โดยจะแสดงข้อความพร้อมลิงก์ไปยัง "ข้อกำหนดการใช้งานและนโยบายความเป็นส่วนตัว"
-/// เมื่อผู้ใช้กดที่ Checkbox จะเรียก callback ที่ส่งค่าการเปลี่ยนแปลง (onChanged)
-/// และเมื่อกดที่ข้อความลิงก์จะแสดง SnackBar แจ้งเตือน
-/// เหมาะสำหรับใช้ในหน้าลงทะเบียนหรือเข้าสู่ระบบ เพื่อให้ผู้ใช้ยืนยันการยอมรับข้อตกลง
+/// Checkbox สำหรับยอมรับข้อตกลงและนโยบายความเป็นส่วนตัว
+///
+/// **ใช้ในหน้า Sign Up เท่านั้น**
+///
+/// **การทำงาน:**
+/// - แสดง Checkbox พร้อมข้อความ "ข้าพเจ้ายอมรับ ข้อกำหนดการใช้งานและนโยบายความเป็นส่วนตัว ของ Browny 24hr Wash & Dry"
+/// - ข้อความ "ข้อกำหนดการใช้งานและนโยบายความเป็นส่วนตัว" มี underline และเป็นลิงก์
+/// - กดแล้วแสดง SnackBar (TODO: เปลี่ยนเป็นเปิดหน้า Terms & Privacy Policy)
+/// - เมื่อกด Checkbox จะเรียก callback onChanged ส่งค่า true/false กลับไป
 class _CheckBoxTermOfPolicy extends StatefulWidget {
   const _CheckBoxTermOfPolicy({
     required this.onChanged,
+    this.initialValue = false,
   });
 
   final ValueChanged<bool?> onChanged;
+  final bool initialValue;
+
   @override
   State<_CheckBoxTermOfPolicy> createState() => _CheckBoxTermOfPolicyState();
 }
 
 class _CheckBoxTermOfPolicyState extends State<_CheckBoxTermOfPolicy> {
-  bool _value = false;
+  bool _isChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isChecked = widget.initialValue;
+  }
 
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      value: _value,
+      value: _isChecked,
       titleAlignment: ListTileTitleAlignment.top,
       controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.symmetric(
-        vertical: AppDims.size_8.h,
-      ),
+      contentPadding: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
       onChanged: (_) {
         setState(() {
-          _value = !_value;
-          widget.onChanged.call(_value);
+          _isChecked = !_isChecked;
+          widget.onChanged.call(_isChecked);
         });
       },
       title: RichText(
@@ -1248,16 +1517,12 @@ class _CheckBoxTermOfPolicyState extends State<_CheckBoxTermOfPolicy> {
               text: context.wording.termsOfUseAndPrivacyPolicy,
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(
-                    SnackBar(
-                      content: Text('tap'),
-                    ),
+                  // TODO: เปิดหน้า Terms & Privacy Policy
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: AppText('tap')),
                   );
                 },
-              style: context.textTheme.bodySmall!.copyWith(
-                decoration: TextDecoration.underline,
+              style: context.textTheme.labelMedium!.copyWith(
                 color: AppColors.primary,
               ),
             ),

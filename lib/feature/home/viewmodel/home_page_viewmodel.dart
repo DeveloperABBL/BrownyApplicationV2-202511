@@ -11,6 +11,10 @@ class HomePageViewmodel extends AppViewModel {
 
   HomeDataSourceMixin _repo;
 
+  bool isProfileGuest() {
+    return currentCustomerProvider.current.isGuest;
+  }
+
   Future<UiResult<List<BannerModel>>> fetchBanners() async {
     await Future.delayed(Duration(seconds: 2));
     return UiResult.empty();

@@ -1,10 +1,12 @@
-import 'package:browny_applications_new/core/res/dims/app_dims.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../res/colors/app_colors.dart';
+import '../../res/colors/app_colors.dart';
 
 /// BrownyBottomNav - Navigation Bar แบบกำหนดเองสำหรับแอป Browny
 ///
@@ -124,7 +126,7 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
                 child: Container(
                   margin: widget.margin,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
+                    horizontal: 12,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.background,
@@ -267,20 +269,15 @@ class _NavItem extends StatelessWidget {
                   iconWidget,
                   if (canShowLabel) const SizedBox(height: 2),
                   if (canShowLabel)
-                    Text(
+                    AppText(
                       label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10,
+                      style: context.textTheme.labelSmall!.copyWith(
+                        fontSize: 10.sp,
                         height: 1.1,
                         letterSpacing: 0.3,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                        color: selected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        color: AppColors.primary,
                       ),
                     ),
                 ],

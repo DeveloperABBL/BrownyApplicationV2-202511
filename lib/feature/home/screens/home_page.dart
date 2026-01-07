@@ -1,12 +1,14 @@
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
-import 'package:browny_applications_new/core/res/dims/app_dims.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
-import 'package:browny_applications_new/core/res/styles/app_text_style.dart';
+import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/styles/app_text_style.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
@@ -171,18 +173,39 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               ),
             ),
             AppDims.horizonPadding_10,
-            CircleAvatar(
-              backgroundColor: AppColors.background,
-              child: IconButton(
-                onPressed: () => context.pushNamed(ProfilePage.pageName),
-                icon: Assets.svg.icPerson.svg(
-                  // เปลี่ยนสี svg
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
+            Consumer<CustomerProvider>(
+              builder: (context, customer, _) {
+                return CircleAvatar(
+                  backgroundColor: AppColors.background,
+                  child: IconButton(
+                    onPressed: () {
+                      if (_viewmodel.isProfileGuest()) {
+                        context.pushNamed(
+                          AuthenticationPage.pageName,
+                          extra: {
+                            AuthenProcess: AuthenProcess.login,
+                          },
+                        );
+                      } else {
+                        context.pushNamed(ProfilePage.pageName);
+                      }
+                    },
+                    icon: customer.current.image.orEmpty.isEmpty
+                        // ถ้าไม่มีรูป Profile ใช้รูป Default
+                        ? Assets.svg.icPerson.svg(
+                            // เปลี่ยนสี svg
+                            colorFilter: ColorFilter.mode(
+                              AppColors.primary,
+                              BlendMode.srcIn,
+                            ),
+                          )
+                        // มีรูป Profile ให้ไปโหลดมา
+                        : Image.network(
+                            customer.current.image!,
+                          ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -231,9 +254,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   children: [
                     Row(
                       children: [
-                        Text(
+                        AppText(
                           'TP+ Wallet',
-                          style: context.textTheme.bodySmall!.copyWith(
+                          style: context.textTheme.titleSmall!.copyWith(
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -259,7 +282,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       AuthenProcess: AuthenProcess.login,
                                     },
                                   )
-                                : () {};
+                                : () {
+                                    context.pushNamed(WalletPage.pageName);
+                                  };
 
                             final label = provider.current.isGuest
                                 ? context.wording.login
@@ -295,7 +320,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       ),
                                     ),
                                   ),
-                              label: Text(label),
+                              label: AppText(
+                                label,
+                                style: context.textTheme.titleSmall!.copyWith(
+                                  color: AppColors.white,
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -304,10 +334,10 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     Selector<CustomerProvider, String>(
                       selector: (context, provider) =>
                           provider.current.creditBalance ?? '0.00',
-                      builder: (context, value, child) => Text(
+                      builder: (context, value, child) => AppText(
                         '฿${formatCurrency(string: value)}',
-                        style: AppTextNumberStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
+                        style: context.textTheme.headlineSmall!.copyWith(
+                          fontSize: AppDims.size_16.sp,
                         ),
                       ),
                     ),
@@ -345,10 +375,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         height: AppDims.size_20.h,
                       ),
                       AppDims.horizonPadding_8,
-                      Text(
+                      AppText(
                         'Browny Coin',
-                        style: context.textTheme.bodySmall!.copyWith(
+                        style: context.textTheme.titleSmall!.copyWith(
                           color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(
@@ -359,10 +390,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   Selector<CustomerProvider, String>(
                     selector: (context, provider) =>
                         provider.current.brownyCoin ?? '0.00',
-                    builder: (context, value, child) => Text(
+                    builder: (context, value, child) => AppText(
                       '${formatCurrency(string: value)} ${context.wording.coin}',
-                      style: AppTextNumberStyles.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w600,
+                      style: context.textTheme.titleSmall!.copyWith(
+                        fontSize: AppDims.size_16.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

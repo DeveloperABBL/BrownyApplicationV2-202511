@@ -1,8 +1,7 @@
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/env/dev_environment.dart';
-import 'package:browny_applications_new/core/res/strings/app_localizations.dart';
-import 'package:browny_applications_new/core/res/theme/app_theme.dart';
-import 'package:browny_applications_new/models/user_model.dart';
+import 'package:browny_applications_new/res/strings/app_localizations.dart';
+import 'package:browny_applications_new/res/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +42,7 @@ class BrownyApp extends StatelessWidget {
           return ScreenUtilInit(
             // From Team design screen sizing
             designSize: const Size(375, 812),
-            minTextAdapt: true,
+            // minTextAdapt: true,
             splitScreenMode: true,
             builder: (_, _) {
               return MaterialApp.router(

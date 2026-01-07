@@ -1,17 +1,22 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
+import 'package:browny_applications_new/feature/authentication/models/otp_model.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:browny_applications_new/feature/authentication/repository/otp_data_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum SignUpRequiredState {
   valideEmalOrPhone,
-  // passwordHasUppercase,
   passwordHasLowercase,
   passwordHasDigit,
   acceptTermOfPolicy,
@@ -20,38 +25,171 @@ enum SignUpRequiredState {
 enum AuthenProcess {
   login,
   signup,
-  signupPinning,
+  signupOTP,
   forgotPassword,
   forgotPasswordPinning,
   forgotPasswordNewPassword,
+  referral,
 }
 
-class AuthenticationViewModel extends AppViewModelObscureHandler {
+class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   AuthenticationViewModel({
     required super.context,
     required this.authenProcess,
     required this.customerDataRepo,
   });
 
-  final CustomerDataSoureMixin customerDataRepo;
+  final CustomerDataSourceMixin customerDataRepo;
+  OTPDataSourceMixin get otpDataRepo => customerDataRepo as OTPDataSourceMixin;
 
   final AuthenProcess authenProcess;
 
-  final GlobalKey<FormState> formKey = GlobalKey();
+  // =========== Page Navigation ===========
+  late final PageController pageController;
+  final ValueNotifier<int> _currentPageIndexNotifier = ValueNotifier(0);
+  ValueNotifier<int> get currentPageIndex => _currentPageIndexNotifier;
+
+  // กำหนด flow ของหน้า authentication
+  final List<AuthenProcess> _pageFlow = AuthenProcess.values.toList();
+
+  AuthenProcess get currentProcess =>
+      _pageFlow[_currentPageIndexNotifier.value];
+  bool get canGoBack => _currentPageIndexNotifier.value > 0;
+
+  void goToPage(int index, {bool animate = true}) {
+    if (index >= 0 && index < _pageFlow.length) {
+      if (animate) {
+        pageController.animateToPage(
+          index,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        pageController.jumpToPage(index);
+      }
+      _currentPageIndexNotifier.value = index;
+    }
+  }
+
+  void goToProcess(AuthenProcess process, {bool animate = true}) {
+    final index = _pageFlow.indexOf(process);
+    if (index != -1) {
+      switch (process) {
+        case AuthenProcess.login:
+          _validations.addAll(SignUpRequiredState.values);
+          usernameController.text = '';
+          passwordController.text = '';
+          break;
+        case AuthenProcess.signup:
+          // clear text ที่เคยกรอกไว้
+          usernameController.text = '';
+          passwordController.text = '';
+          break;
+        case AuthenProcess.forgotPasswordPinning:
+        case AuthenProcess.signupOTP:
+          // do nothing
+          break;
+        case AuthenProcess.forgotPassword:
+          // TODO: Handle this case.
+          throw UnimplementedError();
+        case AuthenProcess.forgotPasswordNewPassword:
+          // TODO: Handle this case.
+          throw UnimplementedError();
+
+        case AuthenProcess.referral:
+          _validations.add(SignUpRequiredState.valideEmalOrPhone);
+          _onValidatorTriggle();
+          _otpTimer?.cancel();
+          _otpTimer = null;
+          usernameController.text = '';
+          passwordController.text = '';
+          break;
+        default:
+          break;
+      }
+      goToPage(index, animate: animate);
+    }
+  }
+
+  void goBack() {
+    if (canGoBack) {
+      switch (currentProcess) {
+        case AuthenProcess.login:
+          // do nothing
+          break;
+        case AuthenProcess.signup:
+          // do nothing
+          break;
+        case AuthenProcess.forgotPasswordPinning:
+        case AuthenProcess.signupOTP:
+          _verifyOTPMessageErrorNotifier.value = null;
+          break;
+        case AuthenProcess.forgotPassword:
+          // TODO: Handle this case.
+          throw UnimplementedError();
+        case AuthenProcess.forgotPasswordNewPassword:
+          // TODO: Handle this case.
+          throw UnimplementedError();
+
+        case AuthenProcess.referral:
+          goToProcess(AuthenProcess.login, animate: false);
+          return;
+        default:
+          break;
+      }
+      goToPage(_currentPageIndexNotifier.value - 1);
+    }
+  }
+
+  void goNext() {
+    goToPage(_currentPageIndexNotifier.value + 1);
+  }
+
+  late GlobalKey<FormState> _formKey;
+  GlobalKey<FormState> initialFormKey(GlobalKey<FormState> key) {
+    _formKey = key;
+    return _formKey;
+  }
+
+  // =========== Validator ===========
+  late final GlobalKey<FormState> formKeyLogin = GlobalKey();
+  late final GlobalKey<FormState> formKeySignup = GlobalKey();
+  late final GlobalKey<FormState> formKeyReferral = GlobalKey();
   late final TextEditingController usernameController = TextEditingController();
   late final TextEditingController passwordController = TextEditingController();
   final Set<SignUpRequiredState> _validations = SignUpRequiredState.values
       .toSet();
-  late final ValueNotifier<bool> _validatorTriggle = ValueNotifier(false);
-  ValueNotifier<bool> get validatorTriggle => _validatorTriggle;
+  late final ValueNotifier<bool> _validatorTriggleNotifier = ValueNotifier(
+    false,
+  );
+  late final ValueNotifier<String?> _referralErrorMessageNotifier =
+      ValueNotifier(
+        null,
+      );
+  ValueListenable<bool> get validatorTriggle => _validatorTriggleNotifier;
+  ValueListenable<String?> get referralErrorMessageNotifier =>
+      _referralErrorMessageNotifier;
 
   // =========== OTP Timer ===========
   Timer? _otpTimer;
-  final ValueNotifier<int> _remainingSeconds = ValueNotifier(60);
-  final ValueNotifier<bool> _canResendOtp = ValueNotifier(false);
+  late final ValueNotifier<bool> _otpButtonNextNotifier = ValueNotifier(false);
+  late final ValueNotifier<String?> _verifyOTPMessageErrorNotifier =
+      ValueNotifier(
+        null,
+      );
+  late final ValueNotifier<RequestOTPModel> _requestOtpNotifier = ValueNotifier(
+    RequestOTPModel(),
+  );
+  late final ValueNotifier<int> _remainingSecondsNotifier = ValueNotifier(60);
+  late final ValueNotifier<bool> _canResendOtpNotifier = ValueNotifier(false);
 
-  ValueNotifier<int> get remainingSeconds => _remainingSeconds;
-  ValueNotifier<bool> get canResendOtp => _canResendOtp;
+  ValueListenable<bool> get otpButtonNextNotifier => _otpButtonNextNotifier;
+  ValueListenable<String?> get verifyOTPMessageErrorNotifier =>
+      _verifyOTPMessageErrorNotifier;
+  ValueListenable<RequestOTPModel> get requestOtpNotifier =>
+      _requestOtpNotifier;
+  ValueListenable<int> get remainingSeconds => _remainingSecondsNotifier;
+  ValueListenable<bool> get canResendOtp => _canResendOtpNotifier;
 
   // =========== getter ===========
   /// Getter สำหรับแสดงชื่อผู้ใช้แบบปิดบัง (obscure)
@@ -87,10 +225,13 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
     }
 
     // ตรวจสอบว่าเป็นเบอร์โทรศัพท์ของไทย (10 หลัก ขึ้นต้นด้วย 0)
-    final phoneRegex = RegExp(r'^0\d{9}$');
-    if (phoneRegex.hasMatch(text)) {
+    if (isValidPhoneThai(text)) {
       // แสดง 6 หลักแรก แล้วปิดบังที่เหลือด้วย ***
-      return '${text.substring(0, 6)}***';
+      try {
+        return '***${text.substring(6, 10)}';
+      } catch (e) {
+        return '***';
+      }
     }
 
     // ถ้าไม่ใช่ทั้ง email และเบอร์โทร ให้คืนค่าข้อความต้นฉบับ
@@ -106,21 +247,17 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
       return context.wording.pleaseEnterEmailOrPhone;
     }
 
-    // สร้างรูปแบบ (regex) สำหรับตรวจสอบอีเมล
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    // สร้างรูปแบบ (regex) สำหรับตรวจสอบเบอร์โทรศัพท์ของประเทศไทย (10 หลัก ขึ้นต้นด้วย 0)
-    final phoneRegex = RegExp(r'^0\d{9}$');
-
-    if (value.contains('@') && !emailRegex.hasMatch(value)) {
+    // ตรวจสอบด้วย pattern จาก parent class
+    if (value.contains('@') && !isValidEmail(value)) {
       return context.wording.pleaseEnterValidEmail;
     }
 
-    if (value.startsWith('0') && !phoneRegex.hasMatch(value)) {
+    if (value.startsWith('0') && !isValidPhoneThai(value)) {
       return context.wording.pleaseEnterValidPhoneNumber;
     }
 
     // ถ้าไม่ตรงกับรูปแบบอีเมลและไม่ตรงกับรูปแบบเบอร์โทร
-    if (!emailRegex.hasMatch(value) && !phoneRegex.hasMatch(value)) {
+    if (!isEmailOrPhone(value)) {
       return context.wording.pleaseEnterValidEmailOrPhone;
     }
 
@@ -129,6 +266,25 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
     );
     _onValidatorTriggle();
     return null; // ข้อมูลถูกต้อง ไม่ต้องแจ้งเตือน
+  }
+
+  String? validatorPhone(String? value) {
+    _validations.add(SignUpRequiredState.valideEmalOrPhone);
+    // ตรวจสอบว่าค่าที่รับเข้ามาเป็นค่าว่างหรือไม่
+    _onValidatorTriggle();
+    if (value == null || value.trim().isEmpty) {
+      return context.wording.enterYourPhoneNumber;
+    }
+
+    // ตรวจสอบด้วย pattern จาก parent class
+    if (!isValidPhoneThai(value)) {
+      return context.wording.pleaseEnterCorrectPhoneFormat;
+    }
+    _validations.removeWhere(
+      (e) => e == SignUpRequiredState.valideEmalOrPhone,
+    );
+    _onValidatorTriggle();
+    return null;
   }
 
   String? validatorPassword(String? value) {
@@ -140,12 +296,12 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
     if (value.length < 8) {
       return context.wording.passwordMustBeAtLeast8Characters;
     }
-    // final hasUppercase = value.contains(RegExp(r'[A-Z]'));
-    final hasCharectorcase = value.contains(RegExp(r'[a-zA-Z]'));
-    final hasDigit = value.contains(RegExp(r'\d'));
+
+    // ตรวจสอบด้วย pattern จาก parent class
+    final hasCharacter = passwordHasCharacter(value);
+    final hasDigit = passwordHasDigit(value);
 
     _validations.addAll({
-      // SignUpRequiredState.passwordHasUppercase,
       SignUpRequiredState.passwordHasLowercase,
       SignUpRequiredState.passwordHasDigit,
     });
@@ -153,19 +309,10 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
 
     StringBuffer stringBuffer = StringBuffer();
 
-    // if (!hasUppercase) {
-    //   stringBuffer.write(
-    //     '- ${context.wording.passwordMustContainUppercase}',
-    //   );
-    // } else {
-    //   _validations.removeWhere(
-    //     (e) => e == SignUpRequiredState.passwordHasUppercase,
-    //   );
-    // }
-    if (!hasCharectorcase) {
+    if (!hasCharacter) {
       stringBuffer
-        ..writeln()
-        ..write('- ${context.wording.passwordMustContainLowercase}');
+        ..write('- ${context.wording.passwordMustContainLowercase}')
+        ..writeln();
     } else {
       _validations.removeWhere(
         (e) => e == SignUpRequiredState.passwordHasLowercase,
@@ -173,20 +320,23 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
     }
     if (!hasDigit) {
       stringBuffer
-        ..writeln()
-        ..write('- ${context.wording.passwordMustContainNumber}');
+        ..write('- ${context.wording.passwordMustContainNumber}')
+        ..writeln();
     } else {
       _validations.removeWhere(
         (e) => e == SignUpRequiredState.passwordHasDigit,
       );
     }
-    if (!hasCharectorcase || !hasDigit) {
+    if (!hasCharacter || !hasDigit) {
       return stringBuffer.toString();
     }
     _onValidatorTriggle();
     return null;
   }
 
+  bool get checkBoxTermOfPolicy => !_validations.contains(
+    SignUpRequiredState.acceptTermOfPolicy,
+  );
   void checkboxTermOfPolicyChanged(bool? value) {
     if (value == null || !value) {
       _validations.add(SignUpRequiredState.acceptTermOfPolicy);
@@ -200,18 +350,89 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
   }
 
   void _onValidatorTriggle() {
-    _validatorTriggle.value = _validations.isEmpty;
+    _validatorTriggleNotifier.value = !_validations.contains(
+      SignUpRequiredState.acceptTermOfPolicy,
+    );
   }
 
+  Future<UiResult<bool>> verifyOTP(String otp) async {
+    // await Future.delayed(Duration(seconds: 2));
+    // // _verifyOTPMessageErrorNotifier.value = context.wording.otpUnauthorizedError;
+    // _verifyOTPMessageErrorNotifier.value = null;
+    // await onSignUp();
+    // return UiResult.success(data: true);
+    _otpButtonNextNotifier.value = true;
+    return UiResult.success(data: true);
+
+    _verifyOTPMessageErrorNotifier.value = null;
+    _otpButtonNextNotifier.value = false;
+    final validateResult = await otpDataRepo.verifyOTP(
+      VerifyOTP(
+        username: usernameController.text,
+        refCode: _requestOtpNotifier.value.refCode,
+        otp: otp,
+      ),
+    );
+
+    if (!context.mounted) return UiResult.empty();
+
+    if (validateResult.hasError) {
+      if (validateResult.error is AuthenExceptions) {
+        final message = (validateResult.error as AuthenExceptions).toUiMessage(
+          context,
+        );
+        // เกิด Error ขึ้น จะ notfi ไปแสดงที่ UI ด้วย
+        _verifyOTPMessageErrorNotifier.value = message;
+        return UiResult.empty();
+      }
+
+      return UiResult.error(error: validateResult.error);
+    }
+    // clear error verify otp
+    _verifyOTPMessageErrorNotifier.value = null;
+    // เปิดการทำงานปุ่ม ต่อไป
+    _otpButtonNextNotifier.value = true;
+    return UiResult.success(data: true);
+  }
   // =========== event login, logout, regist ===========
 
-  Future<UiResult<void>> onSignUp() async {
-    if (formKey.currentState?.validate() == true && _validations.isEmpty) {
-      // ถ้าเป็นจังหวะกรอก username, password validate แล้วข้อมูลถูกต้องตามเงื่อนไข
-      // จะ return success ออกไปเพื่อให้ไป AuthenProcess.signupPinning ต่อ
-      if (authenProcess == AuthenProcess.signup) {
+  Future<UiResult<void>> onSummitForm() async {
+    // ขั้นตอนการสมัครสมาชิก
+    if (currentProcess == AuthenProcess.signup) {
+      if (formKeySignup.currentState?.validate() == true &&
+          _validations.isEmpty) {
+        // validate ทุกอย่างผ่าน จะ call API เช็คก่อนว่ามี User นี้ในระบบแล้วหรือยัง
+        final checkUserExists = await customerDataRepo.checkUsernameExists(
+          usernameController.text,
+        );
+
+        if (checkUserExists.isEmpty) {
+          return UiResult.error(error: checkUserExists.error);
+        }
+
         return UiResult.success(data: null);
       }
+      return UiResult.empty();
+    }
+
+    if (currentProcess == AuthenProcess.signupOTP) {
+      // ลงทะเบียนสำเร็จ จะ fetch Profile มาเก็บเอาไว้ใช้
+      final profileMockResult = await customerDataRepo.fetchProfile(
+        '019b683f-9ea2-7242-82e1-6b27d2cf721d',
+      );
+      if (profileMockResult.isEmpty) {
+        // handle ถ้าไม่สามารถ fetch Profile ได้
+        return UiResult.empty(error: profileMockResult.error);
+      }
+      if (profileMockResult.isError) {
+        // Error อื่นๆ ที่ไม่ได้ handle เอาไว้
+        return UiResult.error(error: profileMockResult.error);
+      }
+
+      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+        profileMockResult.data.data,
+      );
+      return UiResult.success(data: null);
 
       final response = await customerDataRepo.register(
         CustomerCredential(
@@ -227,19 +448,69 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
         return UiResult.empty(error: response.error);
       }
 
-      if (response.hasError) {
+      if (response.isError) {
         // Error อื่นๆ ที่ไม่ได้ handle เอาไว้
         return UiResult.error(error: response.error);
       }
-      // ลงทะเบียนสำเร็จ
+
+      // ลงทะเบียนสำเร็จ จะ fetch Profile มาเก็บเอาไว้ใช้
+      final profileResult = await customerDataRepo.fetchProfile(
+        response.data.data!.customerId!,
+      );
+      if (profileResult.isEmpty) {
+        // handle ถ้าไม่สามารถ fetch Profile ได้
+        return UiResult.empty(error: profileResult.error);
+      }
+      if (profileResult.isError) {
+        // Error อื่นๆ ที่ไม่ได้ handle เอาไว้
+        return UiResult.error(error: profileResult.error);
+      }
+
+      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+        profileResult.data.data,
+      );
+      // return
       return UiResult.success(data: null);
     }
 
+    if (currentProcess == AuthenProcess.referral) {
+      _referralErrorMessageNotifier.value = null;
+      if (formKeyReferral.currentState?.validate() == true) {
+        final customerProfile = await customerDataRepo.customerProfileData();
+        if (customerProfile.hasError) {
+          return UiResult.error(error: customerProfile.error);
+        }
+
+        if (!customerProfile.hasData) {}
+        final saveReferralResult = await customerDataRepo.saveReferral(
+          CustomerCredential(
+            referrerContact: usernameController.text,
+            customerId: customerProfile.data.id,
+            username: '',
+            password: '',
+          ),
+        );
+
+        if (saveReferralResult.isEmpty && saveReferralResult.hasError) {
+          _referralErrorMessageNotifier.value =
+              (saveReferralResult.error as AuthenExceptions).toUiMessage(
+                context,
+              );
+          return UiResult.empty(error: saveReferralResult.error);
+        }
+        if (saveReferralResult.hasError) {
+          return UiResult.error(error: saveReferralResult.error);
+        }
+
+        return UiResult.success(data: null);
+      }
+      return UiResult.empty();
+    }
     return UiResult.empty();
   }
 
   Future<UiResult<LoginCustomerData>> onLogin() async {
-    if (formKey.currentState?.validate() == true) {
+    if (formKeyLogin.currentState?.validate() == true) {
       final loginResult = await customerDataRepo.login(
         username: usernameController.text,
         password: passwordController.text,
@@ -273,33 +544,75 @@ class AuthenticationViewModel extends AppViewModelObscureHandler {
 
   // =========== OTP Timer Methods ===========
 
-  void startOtpTimer() {
-    _remainingSeconds.value = 60;
-    _canResendOtp.value = false;
+  Future<void> startOtpTimer() async {
+    if (_otpTimer == null || !_otpTimer!.isActive || _otpRequestResend) {
+      await _otpProcess();
 
-    _otpTimer?.cancel();
-    _otpTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_remainingSeconds.value > 0) {
-        _remainingSeconds.value--;
-      } else {
-        _canResendOtp.value = true;
-        timer.cancel();
-      }
-    });
+      _remainingSecondsNotifier.value = 60;
+      _canResendOtpNotifier.value = false;
+      _otpRequestResend = false;
+
+      _otpTimer?.cancel();
+      _otpTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+        if (_remainingSecondsNotifier.value > 0) {
+          _remainingSecondsNotifier.value--;
+        } else {
+          _canResendOtpNotifier.value = true;
+          timer.cancel();
+        }
+      });
+    }
   }
 
-  void resendOtp() {
-    // TODO: เรียก API เพื่อส่ง OTP ใหม่
-    print('Resending OTP...');
+  bool _otpRequestResend = false;
+  Future<void> resendOtp() async {
+    _otpRequestResend = true;
     startOtpTimer();
+  }
+
+  /// Call API เพื่อส่ง OTP ไปตาม username ที่กรอกเข้ามา
+  /// ถ้า [_otpTimer] active อยู่ จะไม่ส่งซ้ำ
+  Future<void> _otpProcess() async {
+    // TODO เอาจุดออกเวลาใช้จริง
+    // print('OTP Requested');
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(
+      SnackBar(content: Text('OTP Requested')),
+    );
+    return;
+
+    final requestOTPResult = await otpDataRepo.requestOTP(
+      RequestOTP(username: usernameController.text),
+    );
+    if (requestOTPResult.isSuccess) {
+      _requestOtpNotifier.value = RequestOTPModel(
+        refCode: requestOTPResult.data.data?.refCode ?? '',
+      );
+    }
+  }
+
+  void initializePageController() {
+    // หา index ของ authenProcess ที่ส่งเข้ามา
+    final initialIndex = _pageFlow.indexOf(authenProcess);
+    pageController = PageController(
+      initialPage: initialIndex >= 0 ? initialIndex : 0,
+    );
+    _currentPageIndexNotifier.value = initialIndex >= 0 ? initialIndex : 0;
   }
 
   @override
   void dispose() {
     _otpTimer?.cancel();
-    _validatorTriggle.dispose();
-    _remainingSeconds.dispose();
-    _canResendOtp.dispose();
+    pageController.dispose();
+    _referralErrorMessageNotifier.dispose();
+    _otpButtonNextNotifier.dispose();
+    _verifyOTPMessageErrorNotifier.dispose();
+    _requestOtpNotifier.dispose();
+    _validatorTriggleNotifier.dispose();
+    _remainingSecondsNotifier.dispose();
+    _canResendOtpNotifier.dispose();
+    _currentPageIndexNotifier.dispose();
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();

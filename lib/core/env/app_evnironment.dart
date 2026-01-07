@@ -31,4 +31,9 @@ abstract class AppEvnironment extends ChangeNotifier {
   Future<void> loadEnv();
 
   CustomerProvider get currentUser;
+
+  void onLocaleChange(String localeCode) {
+    appPreferences.setLanguage(localeCode);
+    notifyListeners();
+  }
 }

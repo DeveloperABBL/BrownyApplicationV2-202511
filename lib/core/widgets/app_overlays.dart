@@ -1,4 +1,8 @@
-import 'package:browny_applications_new/core/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -38,10 +42,17 @@ class AppOverlays {
 
     Overlay.of(context).insert(_loadingOverlay!);
 
-    _delayTimeout = Future.delayed(timeout ?? const Duration(minutes: 1), () {
-      hideLoading();
-      onTimeout?.call();
-    });
+    _delayTimeout = Future.delayed(
+      timeout ??
+          const Duration(
+            minutes: 1,
+            seconds: 30,
+          ),
+      () {
+        hideLoading();
+        onTimeout?.call();
+      },
+    );
   }
 
   /// ซ่อน Loading overlay
@@ -111,7 +122,7 @@ class AppOverlays {
         right: 20,
         child: _ToastWidget(
           message: message,
-          backgroundColor: backgroundColor ?? AppColors.darkBrown,
+          backgroundColor: backgroundColor ?? AppColors.textPrimary,
           textColor: textColor ?? Colors.white,
         ),
       ),
@@ -164,7 +175,7 @@ class AppOverlays {
         confirmText: confirmText,
         cancelText: cancelText,
         image: image,
-        imageAsset: imageAsset,
+        imageAsset: imageAsset ?? Assets.png.brownyError2.path,
         onConfirm: () {
           onConfirm?.call();
           dismiss(true);
@@ -326,7 +337,7 @@ class _BrownyDialog extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -347,12 +358,11 @@ class _BrownyDialog extends StatelessWidget {
 
                   // Title (ถ้ามี)
                   if (title != null) ...[
-                    Text(
+                    AppText(
                       title!,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                      style: context.textTheme.titleLarge!.copyWith(
+                        fontSize: AppDims.size_18.sp,
+                        color: AppColors.textPrimary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -360,12 +370,10 @@ class _BrownyDialog extends StatelessWidget {
                   ],
 
                   // Message
-                  Text(
+                  AppText(
                     message,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                      height: 1.5,
+                    style: context.textTheme.bodyMedium!.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -374,56 +382,34 @@ class _BrownyDialog extends StatelessWidget {
                   // Buttons
                   if (cancelText != null && onCancel != null) ...[
                     // มีทั้งปุ่มยืนยันและยกเลิก
-                    Row(
-                      children: [
-                        // ปุ่มยกเลิก (พื้นหลังสีขาว, border สีเขียว)
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: onCancel,
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: BorderSide(
-                                color: AppColors.primary,
-                                width: 2,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              cancelText!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
+                    ElevatedButton(
+                      onPressed: onConfirm,
+                      style: ElevatedButton.styleFrom(
+                        // padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                        const SizedBox(width: 12),
-
-                        // ปุ่มยืนยัน (พื้นหลังสีเขียว)
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: onConfirm,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              backgroundColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              confirmText,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                      ),
+                      child: Text(
+                        confirmText,
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        // padding: const EdgeInsets.symmetric(vertical: 14),
+                        // side: BorderSide(
+                        //   color: AppColors.primary,
+                        //   width: 2,
+                        // ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                      ],
+                      ),
+                      child: AppText(
+                        cancelText!,
+                      ),
                     ),
                   ] else ...[
                     // มีแค่ปุ่มยืนยัน
@@ -435,7 +421,7 @@ class _BrownyDialog extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Text(

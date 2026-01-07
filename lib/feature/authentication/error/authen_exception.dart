@@ -1,4 +1,4 @@
-import 'package:browny_applications_new/core/res/strings/app_strings.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,6 +9,15 @@ sealed class AuthenExceptions implements Exception {
 
   String toUiMessage(BuildContext context) {
     return message.orEmpty;
+  }
+}
+
+class Unprocessable extends AuthenExceptions {
+  Unprocessable([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return context.wording.errorUi;
   }
 }
 
@@ -36,5 +45,32 @@ class UserDuplicated extends AuthenExceptions {
   @override
   String toUiMessage(BuildContext context) {
     return context.wording.userDuplicated;
+  }
+}
+
+class UserConsentTermOfPolicy extends AuthenExceptions {
+  UserConsentTermOfPolicy([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return context.wording.userDuplicated;
+  }
+}
+
+class OTPUnauthorized extends AuthenExceptions {
+  OTPUnauthorized([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return context.wording.otpUnauthorizedError;
+  }
+}
+
+class OTPExpired extends AuthenExceptions {
+  OTPExpired([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return context.wording.otpExpiredError;
   }
 }

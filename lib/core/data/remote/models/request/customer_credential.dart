@@ -15,9 +15,17 @@ class CustomerCredential {
   @JsonKey(name: 'password')
   final String password;
 
+  @JsonKey(name: 'referrer_contact')
+  final String? referrerContact;
+
+  @JsonKey(name: 'customer_id')
+  final String? customerId;
+
   CustomerCredential({
     required this.username,
     required this.password,
+    this.referrerContact,
+    this.customerId,
   });
 
   factory CustomerCredential.fromJson(Map<String, dynamic> json) =>

@@ -62,6 +62,10 @@ class UiResult<T> {
 
   bool get isSuccess => _state == UiState.success;
 
+  bool get isEmpty => _state == UiState.empty;
+
+  bool get isError => _state == UiState.error;
+
   /// ตรวจสอบว่า UiResult มีข้อมูลหรือไม่
   bool get hashData => _data != null;
 

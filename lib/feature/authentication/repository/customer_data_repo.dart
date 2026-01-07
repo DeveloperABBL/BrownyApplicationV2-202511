@@ -2,17 +2,21 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
-import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
+import 'package:browny_applications_new/feature/authentication/repository/otp_data_repo.dart';
 import 'package:dio/dio.dart';
-import 'package:retrofit/dio.dart';
 
 /// มิกซ์อินสำหรับจัดการข้อมูลการเข้าสู่ระบบ
-mixin CustomerDataSoureMixin {
+mixin CustomerDataSourceMixin {
+  Future<RepoResult<BaseResponse>> saveReferral(CustomerCredential data);
+
+  Future<RepoResult<bool>> checkUsernameExists(String username);
+
   FutureOr<RepoResult<CustomerProfileData>> customerProfileData();
 
   /// ฟังก์ชันดึง coin และ wallet ตาม [id] ของ user ที่ login เข้ามา
@@ -37,7 +41,45 @@ mixin CustomerDataSoureMixin {
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
-class CustomerDataRepo extends AppRepository with CustomerDataSoureMixin {
+class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
+  @override
+  Future<RepoResult<BaseResponse>> saveReferral(CustomerCredential data) async {
+    try {
+      final saveReferralResponse = await requireRemote.saveReferral(data);
+      return RepoResult.dependOn(saveReferralResponse.data);
+    } on DioException catch (dioEx) {
+      if (dioEx.response!.isNotFound) {
+        return RepoResult.empty(error: UserNotFound());
+      }
+      if (dioEx.response!.isDuplicated) {
+        return RepoResult.empty(error: UserDuplicated());
+      }
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+
+    return RepoResult.empty();
+  }
+
+  @override
+  Future<RepoResult<bool>> checkUsernameExists(String username) async {
+    try {
+      final checkUserResponse = await requireRemote.checkUsername(
+        CustomerCredential(username: username, password: ''),
+      );
+
+      return RepoResult.success(data: checkUserResponse.data!.success);
+    } on DioException catch (dioEx) {
+      if (dioEx.response!.isDuplicated) {
+        return RepoResult.empty(error: UserDuplicated());
+      }
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+
+    return RepoResult.empty();
+  }
+
   @override
   FutureOr<RepoResult<CustomerProfileData>> customerProfileData() {
     try {
@@ -69,8 +111,21 @@ class CustomerDataRepo extends AppRepository with CustomerDataSoureMixin {
   @override
   Future<RepoResult<CustomerProfileResponse>> fetchProfile(String id) async {
     try {
+      String mId = id;
+      if (mId.isEmpty) {
+        final localProfileResult = await customerProfileData();
+        if (localProfileResult.isEmpty) {
+          return RepoResult.empty();
+        }
+
+        if (localProfileResult.hasError) {
+          return RepoResult.error(error: localProfileResult.error);
+        }
+        mId = localProfileResult.data.id!;
+      }
+
       final response = await requireRemote.fetchCustomerProfile(
-        {'id': id},
+        {'id': mId},
       );
       if (response.isSuccessful) {
         var profile = response.data!.data;
@@ -186,7 +241,7 @@ class CustomerDataRepo extends AppRepository with CustomerDataSoureMixin {
       if (dioEx.response!.isDuplicated) {
         return RepoResult.empty(error: UserDuplicated());
       }
-      return RepoResult.empty(error: dioEx);
+      return RepoResult.error(error: dioEx);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }
