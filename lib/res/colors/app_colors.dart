@@ -71,6 +71,20 @@ class AppColors {
   /// สีพื้นหลังหลัก (ขาว)
   static const Color background = Color(0xFFFFFFFF); // #FFFFFF
 
+  static const Color walletBackgroundClicked = Color.fromARGB(
+    255,
+    0,
+    91,
+    176,
+  ); // #FFFFFF
+
+  static const Color walletBackgroundHover = Color.fromARGB(
+    255,
+    13,
+    82,
+    146,
+  ); // #FFFFFF
+
   static const Color walletBackground = darkBlue; // #FFFFFF
 
   /// สีพื้นหลังสำหรับ Product Card
@@ -86,7 +100,7 @@ class AppColors {
   /// สีข้อความรอง (เทา)
   static const Color textSecondary = Color(0xFF777777); // #777777
 
-  static const Color textBlack = blackText; // #777777
+  static const Color textBlack = black2A; // #777777
 
   // ============================================================================
   // Border/Stroke Colors
@@ -188,7 +202,7 @@ class AppColors {
   static const Color black = Color(0xFF000000); // #000000
 
   /// Black สำหรับ Text
-  static const Color blackText = Color(0xFF2A2A2A); // #2A2A2A
+  static const Color black2A = Color(0xFF2A2A2A); // #2A2A2A
 
   /// Green 400 (จากคำอธิบาย แต่ค่าคือ #DFDFDF ซึ่งเป็นเทาอ่อน - ใช้ตามข้อมูลที่ให้มา)
   static const Color green400 = Color(0xFFDFDFDF); // #DFDFDF

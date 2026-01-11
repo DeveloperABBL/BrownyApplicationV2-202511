@@ -199,6 +199,69 @@ class AppOverlays {
 
     return result;
   }
+
+  /// แสดง Dialog แบบกำหนดเอง (Browny Coin Dialog)
+  ///
+  /// [context] - BuildContext สำหรับการแสดงผล
+  /// [title] - หัวข้อของ dialog (ไม่บังคับ)
+  /// [message] - ข้อความที่จะแสดงใน dialog
+  /// [confirmText] - ข้อความปุ่มยืนยัน (default: "รับทราบ")
+  /// [cancelText] - ข้อความปุ่มยกเลิก (ถ้ามี)
+  /// [onConfirm] - Callback เมื่อกดปุ่มยืนยัน
+  /// [onCancel] - Callback เมื่อกดปุ่มยกเลิก
+  /// [barrierDismissible] - กำหนดว่าสามารถปิด dialog ด้วยการแตะพื้นหลังได้หรือไม่
+  ///
+  /// Returns Future<bool?> - true ถ้ากดยืนยัน, false ถ้ากดยกเลิก, null ถ้าปิดด้วยวิธีอื่น
+  static Future<bool?> showWalletDialog(
+    BuildContext context, {
+    String? title,
+    required String message,
+    String confirmText = 'รับทราบ',
+    String? cancelText,
+    VoidCallback? onConfirm,
+    VoidCallback? onCancel,
+    bool barrierDismissible = true,
+    Widget? image,
+    String? imageAsset,
+  }) async {
+    late OverlayEntry overlayEntry;
+    bool? result;
+
+    void dismiss([bool? value]) {
+      result = value;
+      overlayEntry.remove();
+    }
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => _WalletDialog(
+        title: title,
+        message: message,
+        confirmText: confirmText,
+        cancelText: cancelText,
+        image: image,
+        onConfirm: () {
+          onConfirm?.call();
+          dismiss(true);
+        },
+        onCancel: cancelText != null
+            ? () {
+                onCancel?.call();
+                dismiss(false);
+              }
+            : null,
+        onDismiss: barrierDismissible ? () => dismiss(null) : null,
+      ),
+    );
+
+    Overlay.of(context).insert(overlayEntry);
+
+    // รอจนกว่า dialog จะถูกปิด
+    while (overlayEntry.mounted) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+
+    return result;
+  }
 }
 
 /// Widget สำหรับแสดง Loading overlay
@@ -420,6 +483,141 @@ class _BrownyDialog extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WalletDialog extends StatelessWidget {
+  const _WalletDialog({
+    this.title,
+    required this.message,
+    required this.confirmText,
+    this.cancelText,
+    required this.onConfirm,
+    this.onCancel,
+    this.onDismiss,
+    this.image,
+  });
+
+  final String? title;
+  final String message;
+  final String confirmText;
+  final String? cancelText;
+  final VoidCallback onConfirm;
+  final VoidCallback? onCancel;
+  final VoidCallback? onDismiss;
+  final Widget? image;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onDismiss,
+      child: Material(
+        color: Colors.black.withValues(alpha: 0.5),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {}, // ป้องกันการปิด dialog เมื่อแตะที่ content
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title (ถ้ามี)
+                  if (title != null) ...[
+                    AppText(
+                      title!,
+                      style: context.textTheme.titleLarge!.copyWith(
+                        fontSize: AppDims.size_18.sp,
+                        color: AppColors.textBlack,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  // Message
+                  AppText(
+                    message,
+                    style: context.textTheme.bodyMedium!.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Buttons
+                  if (cancelText != null && onCancel != null) ...[
+                    // มีทั้งปุ่มยืนยันและยกเลิก
+                    ElevatedButton(
+                      onPressed: onConfirm,
+                      style: ElevatedButton.styleFrom(
+                        // padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.walletBackground,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                      child: Text(
+                        confirmText,
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        // padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(
+                          color: AppColors.walletBackground,
+                          width: 2,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            8.r,
+                          ),
+                        ),
+                        foregroundColor: AppColors.walletBackground,
+                      ),
+                      child: AppText(
+                        cancelText!,
+                        style: context.textTheme.labelLarge!.copyWith(
+                          color: AppColors.walletBackground,
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    // มีแค่ปุ่มยืนยัน
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: onConfirm,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: AppColors.walletBackground,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.r),
                           ),

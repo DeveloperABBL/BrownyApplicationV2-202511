@@ -15,6 +15,8 @@ UpdateProfileRequest _$UpdateProfileRequestFromJson(
   birthdate: json['birthdate'] as String?,
   profileImageBase64: json['profile_image_base64'] as String?,
   profileImageUrl: json['profile_image_url'] as String?,
+  email: json['email'] as String?,
+  phone: json['phone'] as String?,
 );
 
 Map<String, dynamic> _$UpdateProfileRequestToJson(
@@ -26,4 +28,6 @@ Map<String, dynamic> _$UpdateProfileRequestToJson(
   'birthdate': instance.birthdate,
   'profile_image_base64': instance.profileImageBase64,
   'profile_image_url': instance.profileImageUrl,
+  'email': instance.email,
+  'phone': instance.phone,
 };

@@ -1563,6 +1563,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add phone number'**
   String get addPhoneNumber;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @balanceRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance Remaining'**
+  String get balanceRemaining;
+
+  /// No description provided for @reportIssueOrRefundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'*If you encounter any usage problems or wish to request a refund, please click here'**
+  String get reportIssueOrRefundMessage;
+
+  /// No description provided for @specifyAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Specify Amount'**
+  String get specifyAmount;
+
+  /// No description provided for @minimumTopUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum top-up 100 THB'**
+  String get minimumTopUp;
+
+  /// No description provided for @payWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay with'**
+  String get payWith;
+
+  /// No description provided for @promptPayQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'PromptPay QR Code'**
+  String get promptPayQRCode;
+
+  /// No description provided for @minimumTopUpValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum top-up 100 THB'**
+  String get minimumTopUpValidation;
+
+  /// No description provided for @maximumTopUpValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum top-up 2,000 THB'**
+  String get maximumTopUpValidation;
+
+  /// No description provided for @qrCodeSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code saved successfully'**
+  String get qrCodeSavedSuccessfully;
+
+  /// No description provided for @cannotSaveQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot save QR Code'**
+  String get cannotSaveQRCode;
+
+  /// No description provided for @pleaseAllowPhotoLibraryAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Please allow photo library access in settings'**
+  String get pleaseAllowPhotoLibraryAccess;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'Error occurred'**
+  String get errorOccurred;
+
+  /// No description provided for @cancelTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Transaction'**
+  String get cancelTransaction;
+
+  /// No description provided for @confirmCancelTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to cancel the transaction?'**
+  String get confirmCancelTransaction;
+
+  /// No description provided for @payment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payment;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get backToHome;
 }
 
 class _AppLocalizationsDelegate

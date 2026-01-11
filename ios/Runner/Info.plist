@@ -43,7 +43,13 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to the camera allows you to take photos for your profile or to scan QR code to proceed the payment.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>เราต้องการใช้ Face ID หรือ Touch ID เพื่อยืนยันตัวตนของคุณ</string>
+	<string>Allow application to authenticating using face Id.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
 </dict>
 </plist>

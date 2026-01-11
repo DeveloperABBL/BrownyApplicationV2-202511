@@ -15,7 +15,6 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 class ProfileViewModel extends AppViewModelFormFieldValidation {
   ProfileViewModel({
@@ -183,9 +182,13 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
       genders.first.keys.first,
     );
     // update Birthday ที่ fetch มา
-    dateOfBirth.text = DateTime.parse(
-      userModel.birthday.orEmpty,
-    ).formatForShow();
+    try {
+      dateOfBirth.text = DateTime.parse(
+        userModel.birthday.orEmpty,
+      ).formatForShow();
+    } on Exception catch (e) {
+      dateOfBirth.text = '';
+    }
 
     _profileDataNotifier.value = UiResult.success(
       data: userModel,
@@ -263,6 +266,8 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
           : currentUser.birthday,
       profileImageBase64: profileImage64Update,
       profileImageUrl: profileImageUrlUpdate,
+      email: emailController.text,
+      phone: phoneController.text,
     );
 
     try {

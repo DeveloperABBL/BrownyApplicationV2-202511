@@ -739,4 +739,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addPhoneNumber => '添加电话号码';
+
+  @override
+  String get history => '历史记录';
+
+  @override
+  String get balanceRemaining => '余额';
+
+  @override
+  String get reportIssueOrRefundMessage => '*如果您遇到任何使用问题或希望申请退款，请点击这里';
+
+  @override
+  String get specifyAmount => '指定金额';
+
+  @override
+  String get minimumTopUp => '最低充值100泰铢';
+
+  @override
+  String get payWith => '支付方式';
+
+  @override
+  String get promptPayQRCode => 'PromptPay 二维码';
+
+  @override
+  String get minimumTopUpValidation => '最低充值100泰铢';
+
+  @override
+  String get maximumTopUpValidation => '最高充值2,000泰铢';
+
+  @override
+  String get qrCodeSavedSuccessfully => '二维码保存成功';
+
+  @override
+  String get cannotSaveQRCode => '无法保存二维码';
+
+  @override
+  String get pleaseAllowPhotoLibraryAccess => '请在设置中允许访问相册';
+
+  @override
+  String get openSettings => '打开设置';
+
+  @override
+  String get errorOccurred => '发生错误';
+
+  @override
+  String get cancelTransaction => '取消交易';
+
+  @override
+  String get confirmCancelTransaction => '您确定要取消交易吗？';
+
+  @override
+  String get payment => '付款';
+
+  @override
+  String get backToHome => '返回主页';
 }

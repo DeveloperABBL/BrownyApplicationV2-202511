@@ -335,7 +335,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       selector: (context, provider) =>
                           provider.current.creditBalance ?? '0.00',
                       builder: (context, value, child) => AppText(
-                        '฿${formatCurrency(string: value)}',
+                        formatCurrency(string: value, leadingSign: '฿'),
                         style: context.textTheme.headlineSmall!.copyWith(
                           fontSize: AppDims.size_16.sp,
                         ),

@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
@@ -6,7 +7,9 @@ import 'package:browny_applications_new/core/data/remote/models/response/base_re
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
 import 'package:dio/dio.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
@@ -41,6 +44,30 @@ abstract class AppClient {
         () => 'Bearer ${config.token}',
       );
   }
+
+  /// DONG 2026-01-10
+  ///
+  /// สำหรับเช็คข้อมูล Receipt ตาม [paymentRef]
+  @GET('/wallet/receipt/{payment_ref}')
+  Future<HttpResponse<WalletReceiptResponse>> walletReceipt(
+    @Path('payment_ref') String paymentRef,
+  );
+
+  /// DONG 2026-01-10
+  ///
+  /// สำหรับเช็ค Status ที่ [topupRequest]
+  @GET('/wallet/payment/status/{payment_ref}')
+  Future<HttpResponse<TopupRequestResponse>> checkWalletStatusPayment(
+    @Path('payment_ref') String paymentRef,
+  );
+
+  /// DONG 2026-01-10
+  ///
+  /// สำหรับสร้าง request เติมเงิน
+  @POST('/wallet/topup-request')
+  Future<HttpResponse<TopupRequestResponse>> topupRequest(
+    @Body() TopupRequest body,
+  );
 
   @POST('/referrals')
   Future<HttpResponse<BaseResponse?>> saveReferral(

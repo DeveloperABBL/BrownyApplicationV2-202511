@@ -16,6 +16,8 @@ class UpdateProfileRequest {
     this.birthdate,
     this.profileImageBase64,
     this.profileImageUrl,
+    this.email,
+    this.phone,
   });
 
   @JsonKey(name: 'id')
@@ -35,6 +37,12 @@ class UpdateProfileRequest {
 
   @JsonKey(name: 'profile_image_url')
   final String? profileImageUrl;
+
+  @JsonKey(name: 'email')
+  final String? email;
+
+  @JsonKey(name: 'phone')
+  final String? phone;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileRequestFromJson(json);

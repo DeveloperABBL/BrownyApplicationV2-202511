@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:retrofit/dio.dart';
 
@@ -275,6 +276,15 @@ extension StringExtension on String? {
   /// print(title.ifNullOrEmpty('ไม่มีชื่อ')); // แสดงผล: 'ไม่มีชื่อ'
   /// /// ```
   String ifNullOrEmpty(String value) => orEmpty.isEmpty ? value : this!;
+
+  /// Example:
+  /// ```dart
+  /// String title = '';
+  /// print(title.ifEmpty('ไม่มีชื่อ')); // แสดงผล: 'ไม่มีชื่อ'
+  /// /// ```
+  String ifEmpty(String value) => orEmpty.isEmpty ? value : this!;
+
+  String commaReplacer() => ifEmpty('').replaceAll(',', '');
 }
 
 /// Extension สำหรับจัดรูปแบบวันที่ (DateTime)
@@ -294,6 +304,32 @@ extension DateTimeAppFormat on DateTime {
       DateFormat(format).format(
         this,
       );
+
+  // String formatForShowByLocale(String locale) {
+  // initializeDateFormatting(locale);
+  // const thaiMonths = [
+  //   'ม.ค.',
+  //   'ก.พ.',
+  //   'มี.ค.',
+  //   'เม.ย.',
+  //   'พ.ค.',
+  //   'มิ.ย.',
+  //   'ก.ค.',
+  //   'ส.ค.',
+  //   'ก.ย.',
+  //   'ต.ค.',
+  //   'พ.ย.',
+  //   'ธ.ค.',
+  // ];
+
+  // final day = this.day;
+  // final month = thaiMonths[this.month - 1];
+  // final year = (this.year + 543).toString().substring(2);
+  // final hour = this.hour.toString().padLeft(2, '0');
+  // final minute = this.minute.toString().padLeft(2, '0');
+
+  // return '$day $month $year $hour:$minute น.';
+  // }
 
   /// Example:
   /// ```dart

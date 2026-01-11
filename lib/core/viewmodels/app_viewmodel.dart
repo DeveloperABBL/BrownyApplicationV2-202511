@@ -24,17 +24,25 @@ abstract class AppViewModel extends ChangeNotifier {
 }
 
 class AppViewModelObscureHandler extends AppViewModel {
-  AppViewModelObscureHandler({required super.context});
+  AppViewModelObscureHandler({
+    required super.context,
+    this.initIsObscure = true,
+  });
 
-  final ValueNotifier<bool> _isObscure = ValueNotifier(true);
-  ValueNotifier<bool> get isObscure => _isObscure;
+  final bool initIsObscure;
+
+  @protected
+  late final ValueNotifier<bool> isObscureNotifier = ValueNotifier(
+    initIsObscure,
+  );
+  ValueNotifier<bool> get isObscure => isObscureNotifier;
   void onObscureChange() {
-    _isObscure.value = !_isObscure.value;
+    isObscureNotifier.value = !isObscureNotifier.value;
   }
 
   @override
   void dispose() {
-    _isObscure.dispose();
+    isObscureNotifier.dispose();
     super.dispose();
   }
 }

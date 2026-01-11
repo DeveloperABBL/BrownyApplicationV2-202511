@@ -66,6 +66,14 @@ class $AssetsPngGen {
   AssetGenImage get logoReferral =>
       const AssetGenImage('assets/png/logo_referral.png');
 
+  /// File path: assets/png/promptpay_badge.png
+  AssetGenImage get promptpayBadge =>
+      const AssetGenImage('assets/png/promptpay_badge.png');
+
+  /// File path: assets/png/promptpay_badge_no_line.png
+  AssetGenImage get promptpayBadgeNoLine =>
+      const AssetGenImage('assets/png/promptpay_badge_no_line.png');
+
   /// File path: assets/png/splash_background.png
   AssetGenImage get splashBackground =>
       const AssetGenImage('assets/png/splash_background.png');
@@ -89,6 +97,8 @@ class $AssetsPngGen {
     icLine,
     launcherIcon,
     logoReferral,
+    promptpayBadge,
+    promptpayBadgeNoLine,
     splashBackground,
     walletObjBg,
   ];
@@ -123,6 +133,13 @@ class $AssetsSvgGen {
   SvgGenImage get icCalendarToday =>
       const SvgGenImage('assets/svg/ic_calendar_today.svg');
 
+  /// File path: assets/svg/ic_down_storage.svg
+  SvgGenImage get icDownStorage =>
+      const SvgGenImage('assets/svg/ic_down_storage.svg');
+
+  /// File path: assets/svg/ic_download.svg
+  SvgGenImage get icDownload => const SvgGenImage('assets/svg/ic_download.svg');
+
   /// File path: assets/svg/ic_edit.svg
   SvgGenImage get icEdit => const SvgGenImage('assets/svg/ic_edit.svg');
 
@@ -137,6 +154,9 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_headset.svg
   SvgGenImage get icHeadset => const SvgGenImage('assets/svg/ic_headset.svg');
+
+  /// File path: assets/svg/ic_history.svg
+  SvgGenImage get icHistory => const SvgGenImage('assets/svg/ic_history.svg');
 
   /// File path: assets/svg/ic_home.svg
   SvgGenImage get icHome => const SvgGenImage('assets/svg/ic_home.svg');
@@ -178,6 +198,20 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_plus.svg
   SvgGenImage get icPlus => const SvgGenImage('assets/svg/ic_plus.svg');
 
+  /// File path: assets/svg/ic_promptpay.svg
+  SvgGenImage get icPromptpay =>
+      const SvgGenImage('assets/svg/ic_promptpay.svg');
+
+  /// File path: assets/svg/ic_promptpay_text.svg
+  SvgGenImage get icPromptpayText =>
+      const SvgGenImage('assets/svg/ic_promptpay_text.svg');
+
+  /// File path: assets/svg/ic_scan.svg
+  SvgGenImage get icScan => const SvgGenImage('assets/svg/ic_scan.svg');
+
+  /// File path: assets/svg/ic_share.svg
+  SvgGenImage get icShare => const SvgGenImage('assets/svg/ic_share.svg');
+
   /// File path: assets/svg/ic_shop.svg
   SvgGenImage get icShop => const SvgGenImage('assets/svg/ic_shop.svg');
 
@@ -208,11 +242,14 @@ class $AssetsSvgGen {
     icBranch,
     icBranchActive,
     icCalendarToday,
+    icDownStorage,
+    icDownload,
     icEdit,
     icFlagEn,
     icFlagTh,
     icFlagZh,
     icHeadset,
+    icHistory,
     icHome,
     icHomeActive,
     icLogin,
@@ -224,6 +261,10 @@ class $AssetsSvgGen {
     icOnboardThird,
     icPerson,
     icPlus,
+    icPromptpay,
+    icPromptpayText,
+    icScan,
+    icShare,
     icShop,
     icShopActive,
     icTicket,

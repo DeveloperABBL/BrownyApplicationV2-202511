@@ -757,4 +757,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPhoneNumber => 'Add phone number';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get balanceRemaining => 'Balance Remaining';
+
+  @override
+  String get reportIssueOrRefundMessage =>
+      '*If you encounter any usage problems or wish to request a refund, please click here';
+
+  @override
+  String get specifyAmount => 'Specify Amount';
+
+  @override
+  String get minimumTopUp => 'Minimum top-up 100 THB';
+
+  @override
+  String get payWith => 'Pay with';
+
+  @override
+  String get promptPayQRCode => 'PromptPay QR Code';
+
+  @override
+  String get minimumTopUpValidation => 'Minimum top-up 100 THB';
+
+  @override
+  String get maximumTopUpValidation => 'Maximum top-up 2,000 THB';
+
+  @override
+  String get qrCodeSavedSuccessfully => 'QR Code saved successfully';
+
+  @override
+  String get cannotSaveQRCode => 'Cannot save QR Code';
+
+  @override
+  String get pleaseAllowPhotoLibraryAccess =>
+      'Please allow photo library access in settings';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get errorOccurred => 'Error occurred';
+
+  @override
+  String get cancelTransaction => 'Cancel Transaction';
+
+  @override
+  String get confirmCancelTransaction =>
+      'Do you want to cancel the transaction?';
+
+  @override
+  String get payment => 'Payment';
+
+  @override
+  String get backToHome => 'Back to Home';
 }

@@ -5,6 +5,7 @@ import 'package:browny_applications_new/res/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   // if (PlatformUtils.isWeb) {
@@ -16,6 +17,7 @@ void main() async {
   final appEnvironment = DevEnvironment();
   await appEnvironment.loadEnv();
 
+  await initializeDateFormatting('th_TH', null);
   runApp(BrownyApp(appEnvironment: appEnvironment));
 }
 

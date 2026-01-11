@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:intl/intl.dart';
 
 /// Local storage key
@@ -9,20 +10,37 @@ const String kCustomerProfile = 'kCustomerProfile';
 /// ```dart
 /// '฿${(formatCurrency.format(standardPrice)).toString()}'
 /// ```
-String formatCurrency({num? value, String? string}) {
+String formatCurrency({
+  num? value,
+  String? string,
+  bool decimal = true,
+  String? leadingSign,
+  String? trailingSign,
+}) {
+  String mLeadSing = leadingSign.orEmpty;
+  String mTrailingSign = trailingSign.orEmpty;
+  String formatCurrentcy = decimal ? '#,##0.00' : '#,##0';
   try {
     if (value != null) {
-      return NumberFormat('#,##0.00').format(value).toString();
+      return '$mLeadSing${NumberFormat(
+        formatCurrentcy,
+      ).format(value).toString()}$mTrailingSign';
     }
-  } catch (ignore) {}
+  } catch (ignore) {
+    print(ignore);
+  }
 
   try {
     if (string != null) {
-      return NumberFormat(
-        '#,##0.00',
-      ).format(string.replaceAll(',', '')).toString();
+      return '$mLeadSing${NumberFormat(
+        formatCurrentcy,
+      ).format(num.parse(string.replaceAll(',', ''))).toString()}$mTrailingSign';
     }
-  } catch (ignore) {}
+  } catch (ignore) {
+    print(ignore);
+  }
 
-  return NumberFormat('#,##0.00').format(0.0).toString();
+  return '$mLeadSing${NumberFormat(
+    formatCurrentcy,
+  ).format(0.0).toString()}$mTrailingSign';
 }

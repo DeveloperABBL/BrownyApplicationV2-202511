@@ -5,7 +5,10 @@ import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
+import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_page.dart';
+import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
+import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -65,6 +68,24 @@ class AppRouter {
         path: WalletPage.pagePath,
         name: WalletPage.pageName,
         builder: (context, state) => const WalletPage(),
+      ),
+      GoRoute(
+        path: ShowQRPromptpayPage.pagePath,
+        name: ShowQRPromptpayPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as WalletViewModel;
+          return ShowQRPromptpayPage(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: PaymentSuccessPage.pagePath,
+        name: PaymentSuccessPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as WalletViewModel;
+          return PaymentSuccessPage(
+            viewmodel: viewModel,
+          );
+        },
       ),
     ],
   );

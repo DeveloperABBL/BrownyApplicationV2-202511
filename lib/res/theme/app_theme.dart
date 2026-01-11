@@ -91,8 +91,8 @@ class AppTheme {
       // Input Decoration Theme
       // ============================================================================
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.inputFieldDefaultBg,
+        // filled: true,
+        // fillColor: AppColors.background,
         // constraints: BoxConstraints(minHeight: 45.h, maxHeight: 45.h),
         // Border styles
         border: OutlineInputBorder(

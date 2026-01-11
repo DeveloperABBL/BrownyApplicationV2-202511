@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   const rawJson = '''
@@ -49,6 +51,24 @@ void main() {
 ''';
 
   group('IntroductionsResponse parsing', () {
+    test('DateTime', () async {
+      await initializeDateFormatting();
+      var dateFromat = DateFormat(
+        'dd-MM-yyyy / HH:mm',
+        'zh',
+      ).parse('9-06-2025 / 14:30');
+      // final dateTime = DateTime.parse('10-06-2025 / 14:30');
+      dateFromat = dateFromat.copyWith(year: dateFromat.year + 543);
+      // dateTimeSymbolMap()['th'];
+      final formater = DateFormat(
+        'dd MMM yy HH:mm น.',
+        'zh',
+      ).format(dateFromat);
+
+      print(formater);
+      print(dateFromat);
+    });
+
     test('parses raw array JSON into List<IntroductionsResponse>', () {
       final List<dynamic> list = jsonDecode(rawJson) as List<dynamic>;
       final items = list

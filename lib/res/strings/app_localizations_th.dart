@@ -77,7 +77,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get rewards => 'คูปอง';
 
   @override
-  String get scan => 'สแกน';
+  String get scan => 'สแกนจ่าย';
 
   @override
   String get stores => 'สาขา';
@@ -208,7 +208,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get yourPhoneNumber => 'เบอร์แนะนำเพื่อนของคุณ';
 
   @override
-  String get share => 'ชวนเพื่อนใช้';
+  String get share => 'แชร์';
 
   @override
   String get numberOfSuccessfulReferrals => 'จำนวนเพื่อนที่ใช้รหัสแนะนำคุณ';
@@ -754,4 +754,60 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get addPhoneNumber => 'เพิ่มเบอร์โทรศัพท์';
+
+  @override
+  String get history => 'ประวัติ';
+
+  @override
+  String get balanceRemaining => 'ยอดเงินคงเหลือ';
+
+  @override
+  String get reportIssueOrRefundMessage =>
+      '*ในกรณีที่ท่านพบปัญหาการใช้งาน หรือต้องการขอคืนเงิน กรุณาคลิกที่นี่';
+
+  @override
+  String get specifyAmount => 'ระบุจำนวนเงิน';
+
+  @override
+  String get minimumTopUp => 'เติมเงินขั้นต่ำ 100 บาท';
+
+  @override
+  String get payWith => 'ชำระด้วย';
+
+  @override
+  String get promptPayQRCode => 'QR Code พร้อมเพย์';
+
+  @override
+  String get minimumTopUpValidation => 'เติมขั้นต่ำ 100 บาท';
+
+  @override
+  String get maximumTopUpValidation => 'เติมได้สูงสุด 2,000 บาท';
+
+  @override
+  String get qrCodeSavedSuccessfully => 'บันทึก QR Code สำเร็จ';
+
+  @override
+  String get cannotSaveQRCode => 'ไม่สามารถบันทึก QR Code ได้';
+
+  @override
+  String get pleaseAllowPhotoLibraryAccess =>
+      'กรุณาอนุญาตการเข้าถึงคลังรูปภาพในการตั้งค่า';
+
+  @override
+  String get openSettings => 'เปิดการตั้งค่า';
+
+  @override
+  String get errorOccurred => 'เกิดข้อผิดพลาด';
+
+  @override
+  String get cancelTransaction => 'ยกเลิกการทำรายการ';
+
+  @override
+  String get confirmCancelTransaction => 'ต้องการยกเลิกการทำรายการใช่หรือไม่ ?';
+
+  @override
+  String get payment => 'จ่ายเงิน';
+
+  @override
+  String get backToHome => 'กลับสู่หน้าหลัก';
 }

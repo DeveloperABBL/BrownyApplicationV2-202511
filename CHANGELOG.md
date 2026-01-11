@@ -1,5 +1,13 @@
 # CHANGELOG
 ---
+### DONG 2026-01-11
+- เพิ่มหน้า Wallet
+ - Process การ topup, QRCode Display, Slip (Mockup Data)
+- เก็บรายละเอียดหน้า ProfilePage
+- Process การสมัครสมาชิก
+ - หน้าเก็บรายละเอียดหน้า Pin input
+
+---
 ### DONG 2025-12-02
 - Process การสมัครสมาชิก
   - หน้า Pin input (ยังไม่เสร็จ)

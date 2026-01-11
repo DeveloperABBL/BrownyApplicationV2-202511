@@ -104,8 +104,6 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           usernameController.text = '';
           passwordController.text = '';
           break;
-        default:
-          break;
       }
       goToPage(index, animate: animate);
     }
@@ -134,8 +132,6 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         case AuthenProcess.referral:
           goToProcess(AuthenProcess.login, animate: false);
           return;
-        default:
-          break;
       }
       goToPage(_currentPageIndexNotifier.value - 1);
     }
@@ -361,8 +357,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     // _verifyOTPMessageErrorNotifier.value = null;
     // await onSignUp();
     // return UiResult.success(data: true);
-    _otpButtonNextNotifier.value = true;
-    return UiResult.success(data: true);
+    // _otpButtonNextNotifier.value = true;
+    // return UiResult.success(data: true);
 
     _verifyOTPMessageErrorNotifier.value = null;
     _otpButtonNextNotifier.value = false;
@@ -416,23 +412,24 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     }
 
     if (currentProcess == AuthenProcess.signupOTP) {
+      // TODO เอาจุดออกเวลาใช้จริง
       // ลงทะเบียนสำเร็จ จะ fetch Profile มาเก็บเอาไว้ใช้
-      final profileMockResult = await customerDataRepo.fetchProfile(
-        '019b683f-9ea2-7242-82e1-6b27d2cf721d',
-      );
-      if (profileMockResult.isEmpty) {
-        // handle ถ้าไม่สามารถ fetch Profile ได้
-        return UiResult.empty(error: profileMockResult.error);
-      }
-      if (profileMockResult.isError) {
-        // Error อื่นๆ ที่ไม่ได้ handle เอาไว้
-        return UiResult.error(error: profileMockResult.error);
-      }
+      // final profileMockResult = await customerDataRepo.fetchProfile(
+      //   '019b683f-9ea2-7242-82e1-6b27d2cf721d',
+      // );
+      // if (profileMockResult.isEmpty) {
+      //   // handle ถ้าไม่สามารถ fetch Profile ได้
+      //   return UiResult.empty(error: profileMockResult.error);
+      // }
+      // if (profileMockResult.isError) {
+      //   // Error อื่นๆ ที่ไม่ได้ handle เอาไว้
+      //   return UiResult.error(error: profileMockResult.error);
+      // }
 
-      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
-        profileMockResult.data.data,
-      );
-      return UiResult.success(data: null);
+      // currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+      //   profileMockResult.data.data,
+      // );
+      // return UiResult.success(data: null);
 
       final response = await customerDataRepo.register(
         CustomerCredential(
@@ -575,12 +572,12 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   Future<void> _otpProcess() async {
     // TODO เอาจุดออกเวลาใช้จริง
     // print('OTP Requested');
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(
-      SnackBar(content: Text('OTP Requested')),
-    );
-    return;
+    // ScaffoldMessenger.of(
+    //   context,
+    // ).showSnackBar(
+    //   SnackBar(content: Text('OTP Requested')),
+    // );
+    // return;
 
     final requestOTPResult = await otpDataRepo.requestOTP(
       RequestOTP(username: usernameController.text),

@@ -19,7 +19,7 @@ mixin ProfileDataSourceMixin {
 
 class ProfileRepo extends CustomerDataRepo with ProfileDataSourceMixin {
   final UnmodifiableListView<String> genders = UnmodifiableListView([
-    'not_specified',
+    'other',
     'male',
     'female',
   ]);

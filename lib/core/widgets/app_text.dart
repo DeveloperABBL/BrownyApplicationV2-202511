@@ -1,6 +1,8 @@
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppText extends StatelessWidget {
@@ -32,12 +34,13 @@ class AppText extends StatelessWidget {
   });
 
   final RegExp regExp = RegExp(r'(?<=\d)(?=\D)|(?=\d)(?<=\D)');
-  final RegExp number = RegExp(r'\d');
+  final RegExp number = RegExp(r'[\d$฿]');
 
   late final List<String> split = text.split(regExp);
 
   @override
   Widget build(BuildContext context) {
+    TextStyle mStyle = style ?? context.textTheme.labelLarge!;
     return RichText(
       text: TextSpan(
         children: split
@@ -46,25 +49,25 @@ class AppText extends StatelessWidget {
                   ? TextSpan(
                       text: e,
                       style: GoogleFonts.prompt(
-                        textStyle: style,
-                        color: style!.color,
-                        backgroundColor: style!.backgroundColor,
-                        fontSize: style!.fontSize,
-                        fontWeight: style!.fontWeight,
-                        fontStyle: style!.fontStyle,
-                        letterSpacing: style!.letterSpacing,
-                        wordSpacing: style!.wordSpacing,
-                        textBaseline: style!.textBaseline,
-                        height: style!.height,
-                        locale: style!.locale,
-                        foreground: style!.foreground,
-                        background: style!.background,
-                        shadows: style!.shadows,
-                        fontFeatures: style!.fontFeatures,
-                        decoration: style!.decoration,
-                        decorationColor: style!.decorationColor,
-                        decorationStyle: style!.decorationStyle,
-                        decorationThickness: style!.decorationThickness,
+                        textStyle: mStyle,
+                        color: mStyle.color,
+                        backgroundColor: mStyle.backgroundColor,
+                        fontSize: mStyle.fontSize,
+                        fontWeight: mStyle.fontWeight,
+                        fontStyle: mStyle.fontStyle,
+                        letterSpacing: mStyle.letterSpacing,
+                        wordSpacing: mStyle.wordSpacing,
+                        textBaseline: mStyle.textBaseline,
+                        height: mStyle.height,
+                        locale: mStyle.locale,
+                        foreground: mStyle.foreground,
+                        background: mStyle.background,
+                        shadows: mStyle.shadows,
+                        fontFeatures: mStyle.fontFeatures,
+                        decoration: mStyle.decoration,
+                        decorationColor: mStyle.decorationColor,
+                        decorationStyle: mStyle.decorationStyle,
+                        decorationThickness: mStyle.decorationThickness,
                       ),
                     )
                   : TextSpan(
@@ -145,6 +148,7 @@ class AppTextFormField extends StatelessWidget {
   final UndoHistoryController? undoController;
   final SpellCheckConfiguration? spellCheckConfiguration;
   final TextMagnifierConfiguration? magnifierConfiguration;
+  final Widget? title;
 
   const AppTextFormField({
     super.key,
@@ -203,66 +207,74 @@ class AppTextFormField extends StatelessWidget {
     this.undoController,
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
+    this.title,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      initialValue: initialValue,
-      focusNode: focusNode,
-      decoration: decoration,
-      keyboardType: keyboardType,
-      textCapitalization: textCapitalization,
-      textInputAction: textInputAction,
-      style: style?.merge(context.inputTextStyle) ?? context.inputTextStyle,
-      strutStyle: strutStyle,
-      textDirection: textDirection,
-      textAlign: textAlign,
-      textAlignVertical: textAlignVertical,
-      autofocus: autofocus,
-      readOnly: readOnly,
-      showCursor: showCursor,
-      obscuringCharacter: obscuringCharacter,
-      obscureText: obscureText,
-      autocorrect: autocorrect,
-      smartDashesType: smartDashesType,
-      smartQuotesType: smartQuotesType,
-      enableSuggestions: enableSuggestions,
-      maxLengthEnforcement: maxLengthEnforcement,
-      maxLines: maxLines,
-      minLines: minLines,
-      expands: expands,
-      maxLength: maxLength,
-      onChanged: onChanged,
-      onTap: onTap,
-      onEditingComplete: onEditingComplete,
-      onFieldSubmitted: onFieldSubmitted,
-      onSaved: onSaved,
-      validator: validator,
-      inputFormatters: inputFormatters,
-      enabled: enabled,
-      cursorWidth: cursorWidth,
-      cursorHeight: cursorHeight,
-      cursorRadius: cursorRadius,
-      cursorColor: cursorColor,
-      keyboardAppearance: keyboardAppearance,
-      scrollPadding: scrollPadding,
-      enableInteractiveSelection: enableInteractiveSelection,
-      selectionControls: selectionControls,
-      buildCounter: buildCounter,
-      scrollPhysics: scrollPhysics,
-      autofillHints: autofillHints,
-      autovalidateMode: autovalidateMode,
-      scrollController: scrollController,
-      restorationId: restorationId,
-      enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
-      mouseCursor: mouseCursor,
-      contextMenuBuilder: contextMenuBuilder,
-      canRequestFocus: canRequestFocus,
-      undoController: undoController,
-      spellCheckConfiguration: spellCheckConfiguration,
-      magnifierConfiguration: magnifierConfiguration,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title ?? SizedBox(),
+        title != null ? SizedBox(height: AppDims.size_8.h) : SizedBox(),
+        TextFormField(
+          controller: controller,
+          initialValue: initialValue,
+          focusNode: focusNode,
+          decoration: decoration,
+          keyboardType: keyboardType,
+          textCapitalization: textCapitalization,
+          textInputAction: textInputAction,
+          style: style?.merge(context.inputTextStyle) ?? context.inputTextStyle,
+          strutStyle: strutStyle,
+          textDirection: textDirection,
+          textAlign: textAlign,
+          textAlignVertical: textAlignVertical,
+          autofocus: autofocus,
+          readOnly: readOnly,
+          showCursor: showCursor,
+          obscuringCharacter: obscuringCharacter,
+          obscureText: obscureText,
+          autocorrect: autocorrect,
+          smartDashesType: smartDashesType,
+          smartQuotesType: smartQuotesType,
+          enableSuggestions: enableSuggestions,
+          maxLengthEnforcement: maxLengthEnforcement,
+          maxLines: maxLines,
+          minLines: minLines,
+          expands: expands,
+          maxLength: maxLength,
+          onChanged: onChanged,
+          onTap: onTap,
+          onEditingComplete: onEditingComplete,
+          onFieldSubmitted: onFieldSubmitted,
+          onSaved: onSaved,
+          validator: validator,
+          inputFormatters: inputFormatters,
+          enabled: enabled,
+          cursorWidth: cursorWidth,
+          cursorHeight: cursorHeight,
+          cursorRadius: cursorRadius,
+          cursorColor: cursorColor,
+          keyboardAppearance: keyboardAppearance,
+          scrollPadding: scrollPadding,
+          enableInteractiveSelection: enableInteractiveSelection,
+          selectionControls: selectionControls,
+          buildCounter: buildCounter,
+          scrollPhysics: scrollPhysics,
+          autofillHints: autofillHints,
+          autovalidateMode: autovalidateMode,
+          scrollController: scrollController,
+          restorationId: restorationId,
+          enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
+          mouseCursor: mouseCursor,
+          contextMenuBuilder: contextMenuBuilder,
+          canRequestFocus: canRequestFocus,
+          undoController: undoController,
+          spellCheckConfiguration: spellCheckConfiguration,
+          magnifierConfiguration: magnifierConfiguration,
+        ),
+      ],
     );
   }
 }
