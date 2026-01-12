@@ -5,6 +5,7 @@ import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
@@ -86,6 +87,11 @@ class AppRouter {
             viewmodel: viewModel,
           );
         },
+      ),
+      GoRoute(
+        path: ScannerPage.pagePath,
+        name: ScannerPage.pageName,
+        builder: (context, state) => const ScannerPage(),
       ),
     ],
   );

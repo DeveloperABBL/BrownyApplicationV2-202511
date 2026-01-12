@@ -263,5 +263,15 @@
   "cancelTransaction": "取消交易",
   "confirmCancelTransaction": "您确定要取消交易吗？",
   "payment": "付款",
-  "backToHome": "返回主页"
+  "backToHome": "返回主页",
+  "transactionReceipt": "充值交易记录",
+  "backToTopUpPage": "返回充值页面",
+  "transactionSuccessful": "交易成功",
+  "youReceivedBonus": "您获得了奖金",
+  "transactionNumber": "交易号码",
+  "topUpFailed": "充值失败",
+  "topUpFailedMessage": "由于目标银行出现问题或账户余额不足。请重新检查交易。",
+  "scanning": "扫描",
+  "scanQR": "扫描二维码",
+  "brownyID": "Browny ID"
 }

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
@@ -16,7 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class ShowQRPromptpayPage extends StatefulWidget {
   const ShowQRPromptpayPage({
@@ -35,6 +35,7 @@ class ShowQRPromptpayPage extends StatefulWidget {
 
 class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
   final GlobalKey _qrKey = GlobalKey();
+  late WebViewController controller;
   String? _qrCodeData;
 
   @override
@@ -58,6 +59,17 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
     if (topupResponse != null) {
       _qrCodeData = topupResponse.qrCodeData;
     }
+
+    controller = WebViewController()
+      ..setJavaScriptMode(
+        JavaScriptMode.unrestricted,
+      )
+      ..setBackgroundColor(
+        const Color(0x00000000),
+      )
+      ..loadRequest(
+        Uri.parse(_qrCodeData.orEmpty),
+      );
   }
 
   Future<void> _captureAndSaveQR() async {
@@ -285,12 +297,13 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
                             AppDims.vericalPadding_16,
 
                             // QR Code
-                            if (_qrCodeData != null)
-                              QrImageView(
-                                data: _qrCodeData!,
-                                version: QrVersions.auto,
-                                size: 228.w,
-                                backgroundColor: AppColors.white,
+                            if (_qrCodeData.orEmpty.isNotEmpty)
+                              SizedBox(
+                                width: 228.w,
+                                height: 228.h,
+                                child: WebViewWidget(
+                                  controller: controller,
+                                ),
                               ),
                           ],
                         ),

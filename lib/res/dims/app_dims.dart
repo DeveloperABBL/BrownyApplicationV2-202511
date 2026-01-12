@@ -21,6 +21,7 @@ class AppDims {
   static final double size_28 = 28.0;
   static final double size_32 = 32.0;
   static final double size_36 = 36.0;
+  static final double size_38 = 38.0;
   static final double size_40 = 40.0;
   static final double size_42 = 42.0;
   static final double size_48 = 48.0;
@@ -30,6 +31,12 @@ class AppDims {
   static final double size_84 = 84.0;
   static final double size_100 = 100.0;
 
+  static SizedBox get vericalPadding_2 => SizedBox(
+    height: 2.h,
+  );
+  static SizedBox get horizonPadding_2 => SizedBox(
+    width: 2.w,
+  );
   static SizedBox get vericalPadding_4 => SizedBox(
     height: 4.h,
   );

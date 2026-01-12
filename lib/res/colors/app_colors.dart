@@ -210,11 +210,16 @@ class AppColors {
   /// Gray 500
   static const Color gray500 = Color(0xFF949494); // #949494
 
+  /// Gray 600
+  static const Color gray600 = Color(0xFF777777); // #777777
+
   /// Gray 400
   static const Color gray400 = Color(0xFFCDCDCD); // #CDCDCD
 
   /// CI (Corporate Identity) - สีเขียวหลัก
   static const Color ci = Color(0xFF2FBA38); // #2FBA38
+
+  static const Color ci2 = Color(0xFF8FCB8A); // #8FCB8A
 
   /// Dark Brown
   static const Color darkBrown = Color(0xFF593817); // #593817

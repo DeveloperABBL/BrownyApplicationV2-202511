@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:browny_applications_new/core/const/app_constants.dart';
-import 'package:browny_applications_new/core/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
@@ -10,6 +9,7 @@ import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -64,9 +64,8 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
         if (widget.viewmodel.recieptDataNotifier.value.hasError) {
           AppOverlays.showWalletDialog(
             context,
-            title: 'เติมเงินไม่สำเร็จ',
-            message:
-                ' เนื่องจากธนาคารปลายทางมีปัญหา หรือเงินในบัญชีอาจไม่พอ กรุณาตรวจสอบรายการใหม่อีกครั้ง',
+            title: context.wording.topUpFailed,
+            message: context.wording.topUpFailedMessage,
             confirmText: context.wording.tryAgain,
             onConfirm: () async {
               if (context.mounted) {
@@ -269,7 +268,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
           onPressed: () => context.pop(),
         ),
         title: AppText(
-          'ใบบันทึกรายการเติมเงิน',
+          context.wording.transactionReceipt,
           style: context.textTheme.titleLarge!.copyWith(
             color: AppColors.textPrimary,
           ),
@@ -296,7 +295,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
             ),
           ),
           child: AppText(
-            'กลับสู่หน้าเติมเงิน',
+            context.wording.backToTopUpPage,
             style: context.textTheme.labelLarge!.copyWith(
               color: AppColors.white,
             ),
@@ -362,7 +361,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
 
                             // ทำรายการสำเร็จ
                             AppText(
-                              'ทำรายการสำเร็จ',
+                              context.wording.transactionSuccessful,
                               style: context.textTheme.bodySmall!.copyWith(
                                 color: AppColors.textBlack,
                               ),
@@ -403,30 +402,31 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                             ),
                             AppDims.vericalPadding_4,
                             // Browny Coin Bonus
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Assets.png.brownyCoin.image(
-                                  width: 20.w,
-                                  height: 20.w,
-                                ),
-                                SizedBox(width: 8.w),
-                                AppText(
-                                  'คุณได้รับโบนัส ',
-                                  style: context.textTheme.labelMedium!
-                                      .copyWith(
-                                        color: AppColors.cocoaBrown,
-                                      ),
-                                ),
-                                AppText(
-                                  'Browny Coin + 10.00',
-                                  style: context.textTheme.labelMedium!
-                                      .copyWith(
-                                        color: AppColors.cocoaBrown,
-                                      ),
-                                ),
-                              ],
-                            ),
+                            if (result.data!.bonus.orEmpty.isNotEmpty)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Assets.png.brownyCoin.image(
+                                    width: 20.w,
+                                    height: 20.w,
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  AppText(
+                                    context.wording.youReceivedBonus,
+                                    style: context.textTheme.labelMedium!
+                                        .copyWith(
+                                          color: AppColors.cocoaBrown,
+                                        ),
+                                  ),
+                                  AppText(
+                                    'Browny Coin ${formatCurrency(string: result.data!.bonus, leadingSign: '+ ')}',
+                                    style: context.textTheme.labelMedium!
+                                        .copyWith(
+                                          color: AppColors.cocoaBrown,
+                                        ),
+                                  ),
+                                ],
+                              ),
                             AppDims.vericalPadding_12,
 
                             Column(
@@ -436,30 +436,10 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                                 Row(
                                   children: [
                                     // ข้อมูลการโอน - จาก
-                                    Expanded(
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        leading: Assets.svg.icPromptpay.svg(
-                                          width: 36.w,
-                                          height: 36.h,
-                                        ),
-                                        title: AppText(
-                                          'บรรจุนี้ รักคนซักผ้า',
-                                          style: context.textTheme.labelMedium!
-                                              .copyWith(
-                                                color: AppColors.textBlack,
-                                              ),
-                                        ),
-                                        subtitle: AppText(
-                                          'XXX-XXX-1234',
-                                          style: context.textTheme.bodySmall!
-                                              .copyWith(
-                                                color: AppColors.textSecondary,
-                                                fontSize: AppDims.size_10.sp,
-                                              ),
-                                        ),
-                                      ),
+                                    Assets.png.promptpayBadge.image(
+                                      width: 150.w,
                                     ),
+                                    Expanded(child: SizedBox()),
                                     Container(
                                       width: 60.w,
                                       height: 60.h,
@@ -485,59 +465,69 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                                     ),
                                   ],
                                 ),
-
+                                AppDims.vericalPadding_8,
                                 // ลูกศรลง
                                 Icon(
                                   Icons.arrow_downward,
                                   size: 24.w,
                                   color: AppColors.gray500,
                                 ),
+                                AppDims.vericalPadding_8,
 
                                 // ข้อมูลการโอน - ถึง
-                                ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  leading: Container(
-                                    width: 36.w,
-                                    height: 36.h,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: AppColors.border,
-                                        width: 1,
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 36.w,
+                                      height: 36.h,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: AppColors.border,
+                                          width: 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          100.r,
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.circular(
-                                        100.r,
+                                      child: Assets.svg.icTpWallet.svg(
+                                        width: 22.w,
+                                        height: 20.h,
+                                        fit: BoxFit.none,
                                       ),
                                     ),
-                                    child: Assets.svg.icTpWallet.svg(
-                                      width: 22.w,
-                                      height: 20.h,
-                                      fit: BoxFit.none,
-                                    ),
-                                  ),
-                                  title: AppText(
-                                    'TP+ Wallet',
-                                    style: context.textTheme.labelMedium!
-                                        .copyWith(
-                                          color: AppColors.textBlack,
-                                        ),
-                                  ),
-                                  subtitle: AppText(
-                                    'XXX-XXX-1234',
-                                    style: context.textTheme.bodySmall!
-                                        .copyWith(
-                                          color: AppColors.textSecondary,
-                                          fontSize: AppDims.size_10.sp,
-                                        ),
-                                  ),
-                                ),
+                                    AppDims.horizonPadding_8,
 
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppText(
+                                          'TP+ Wallet',
+                                          style: context.textTheme.labelMedium!
+                                              .copyWith(
+                                                color: AppColors.textBlack,
+                                              ),
+                                        ),
+                                        AppText(
+                                          result.data!.walletShow,
+                                          style: context.textTheme.bodySmall!
+                                              .copyWith(
+                                                color: AppColors.textSecondary,
+                                                fontSize: AppDims.size_10.sp,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                AppDims.vericalPadding_16,
                                 // เลขที่รายการ
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     AppText(
-                                      'เลขที่รายการ',
+                                      context.wording.transactionNumber,
                                       style: context.textTheme.labelMedium!
                                           .copyWith(
                                             color: AppColors.textSecondary,

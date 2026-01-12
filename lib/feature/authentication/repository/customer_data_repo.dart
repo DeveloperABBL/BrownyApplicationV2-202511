@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
@@ -13,6 +14,8 @@ import 'package:dio/dio.dart';
 
 /// มิกซ์อินสำหรับจัดการข้อมูลการเข้าสู่ระบบ
 mixin CustomerDataSourceMixin {
+  Future<RepoResult<CustomerQRResponse>> fetchCustomerQR(String uuid);
+
   Future<RepoResult<BaseResponse>> saveReferral(CustomerCredential data);
 
   Future<RepoResult<bool>> checkUsernameExists(String username);
@@ -42,6 +45,19 @@ mixin CustomerDataSourceMixin {
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
 class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
+  @override
+  Future<RepoResult<CustomerQRResponse>> fetchCustomerQR(String uuid) async {
+    try {
+      final response = await requireRemote.fetchCustomerQRCode(uuid);
+      if (!response.isSuccessful) {
+        return RepoResult.empty();
+      }
+      return RepoResult.success(data: response.data);
+    } catch (e) {
+      return RepoResult.empty();
+    }
+  }
+
   @override
   Future<RepoResult<BaseResponse>> saveReferral(CustomerCredential data) async {
     try {

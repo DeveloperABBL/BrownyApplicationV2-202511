@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/verify_o
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
@@ -44,6 +45,14 @@ abstract class AppClient {
         () => 'Bearer ${config.token}',
       );
   }
+
+  /// DONG 2026-01-11
+  ///
+  /// API fetch QRCode ของ customer ตาม [uuid]
+  @GET('/customer/{uuid}/qrcode')
+  Future<HttpResponse<CustomerQRResponse>> fetchCustomerQRCode(
+    @Path('uuid') String uuid,
+  );
 
   /// DONG 2026-01-10
   ///

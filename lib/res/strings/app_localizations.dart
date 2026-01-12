@@ -1671,6 +1671,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Home'**
   String get backToHome;
+
+  /// No description provided for @transactionReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Receipt'**
+  String get transactionReceipt;
+
+  /// No description provided for @backToTopUpPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Top-up Page'**
+  String get backToTopUpPage;
+
+  /// No description provided for @transactionSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Successful'**
+  String get transactionSuccessful;
+
+  /// No description provided for @youReceivedBonus.
+  ///
+  /// In en, this message translates to:
+  /// **'You received a bonus'**
+  String get youReceivedBonus;
+
+  /// No description provided for @transactionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Number'**
+  String get transactionNumber;
+
+  /// No description provided for @topUpFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-up Failed'**
+  String get topUpFailed;
+
+  /// No description provided for @topUpFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Due to a problem with the destination bank or insufficient account balance. Please check the transaction again.'**
+  String get topUpFailedMessage;
+
+  /// No description provided for @scanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning'**
+  String get scanning;
+
+  /// No description provided for @scanQR.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get scanQR;
+
+  /// No description provided for @brownyID.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny ID'**
+  String get brownyID;
 }
 
 class _AppLocalizationsDelegate

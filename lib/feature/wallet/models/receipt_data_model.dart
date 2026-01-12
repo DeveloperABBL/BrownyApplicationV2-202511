@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:intl/date_symbol_data_local.dart' as date_symbol;
 import 'package:intl/intl.dart';
 
@@ -58,5 +59,14 @@ class ReceiptDataModel extends WalletReceiptData {
     }
 
     return DateFormat(pattern, locale).format(dateTimeData);
+  }
+
+  String get walletShow {
+    if (wallet.orEmpty.isEmpty) return '';
+    if (wallet!.length == 10) {
+      return 'XXX-XXX-${wallet!.substring(6, 10)}';
+    }
+
+    return 'XXX-XXX-${wallet!.substring(wallet!.length - 4, wallet!.length)}';
   }
 }

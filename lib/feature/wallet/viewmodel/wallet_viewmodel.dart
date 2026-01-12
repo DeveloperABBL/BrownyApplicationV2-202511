@@ -14,6 +14,15 @@ import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+enum WalletProcessState {
+  // สำหรับเติมเงิน
+  topup,
+  // สำหรับ Scan เปิดกล้อง
+  scan,
+  // สำหรับประวัติ
+  history,
+}
+
 class WalletViewModel extends AppViewModelObscureHandler {
   WalletViewModel({
     required super.context,
@@ -31,6 +40,7 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   @override
   void dispose() {
+    _procesStateNotfier.dispose();
     _recieptDataNotifier.dispose();
     _walletDataNotifier.dispose();
     _statusCheckTimer?.cancel();
@@ -38,10 +48,11 @@ class WalletViewModel extends AppViewModelObscureHandler {
   }
 
   // ========= valueNotifier, controller =========
-  bool _amountValidNotifier = false;
-  // เก็บ Response จากที่ Request ชำระ
-  TopupRequestResponse? _topupResponse;
-  TopupRequestResponse? get topupResponse => _topupResponse;
+  final ValueNotifier<WalletProcessState> _procesStateNotfier = ValueNotifier(
+    WalletProcessState.topup,
+  );
+  ValueListenable<WalletProcessState> get procesStateNotfier =>
+      _procesStateNotfier;
 
   /// เก็บ Response จากที่ ChechStatus
   /// จะถูก Assign จาก [startPaymentStatusCheck] เท่านั่น
@@ -60,6 +71,12 @@ class WalletViewModel extends AppViewModelObscureHandler {
   TextEditingController amountController = TextEditingController();
 
   // ========= Logic =========
+
+  bool _amountValidNotifier = false;
+  // เก็บ Response จากที่ Request ชำระ
+  TopupRequestResponse? _topupResponse;
+  TopupRequestResponse? get topupResponse => _topupResponse;
+
   Future<UiResult<TopupRequestResponse>> onSummitClick() async {
     if (_amountValidNotifier) {
       final result = await repo.requestTopup(
@@ -121,9 +138,9 @@ class WalletViewModel extends AppViewModelObscureHandler {
       value.orEmpty.ifEmpty('0').commaReplacer(),
     ).toInt();
     String? ret;
-    if (inputAmount < 100) {
-      ret = context.wording.minimumTopUpValidation;
-    }
+    // if (inputAmount < 100) {
+    //   ret = context.wording.minimumTopUpValidation;
+    // }
 
     if (inputAmount > 2000) {
       ret = context.wording.maximumTopUpValidation;
@@ -145,24 +162,27 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
     // Start status check timer
     _statusCheckTimer = Timer.periodic(
-      const Duration(seconds: 3),
+      const Duration(seconds: 7),
       (timer) async {
-        stopPaymentStatusCheck();
-        onSuccess.call();
+        // ======= mock =======
+        // stopPaymentStatusCheck();
+        // onSuccess.call();
+        // return;
 
-        // final result = await repo.checkWalletStatusPayment(paymentRef);
+        // ======= real =======
+        final result = await repo.checkWalletStatusPayment(paymentRef);
 
-        // if (result.hasData) {
-        //   final data = result.data;
-        //   if (data.confirmedAt != null) {
-        //     // Payment confirmed - stop timers
-        //     stopPaymentStatusCheck();
+        if (result.hasData) {
+          final data = result.data;
+          if (data.confirmedAt != null) {
+            // Payment confirmed - stop timers
+            stopPaymentStatusCheck();
 
-        //     // Refresh credit balance
-        //     await fetchCredit();
-        //     onSuccess.call();
-        //   }
-        // }
+            // Refresh credit balance
+            await fetchCredit();
+            onSuccess.call();
+          }
+        }
       },
     );
   }
@@ -200,21 +220,21 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   Future<void> fetchReceiptData(BuildContext context) async {
     // ======= mock =======
-    final locale = Localizations.localeOf(context);
-    _recieptDataNotifier.value = UiResult.success(
-      data: ReceiptDataModel.fromWalletReceiptData(
-        locale.countryCode.orEmpty.ifEmpty('th'),
-        WalletReceiptData(
-          amount: '100',
-          dateTime: DateTime.now(),
-          paymentRef: topupResponse?.paymentRef,
-          gateway: 'promptpay',
-          receiptNo: 'RCPT202506101430',
-          transactionId: 'TXN123456789',
-        ),
-      ),
-    );
-    return;
+    // final locale = Localizations.localeOf(context);
+    // _recieptDataNotifier.value = UiResult.success(
+    //   data: ReceiptDataModel.fromWalletReceiptData(
+    //     locale.languageCode.orEmpty.ifEmpty('th'),
+    //     WalletReceiptData(
+    //       amount: '100',
+    //       dateTime: DateTime.now(),
+    //       paymentRef: topupResponse?.paymentRef,
+    //       gateway: 'promptpay',
+    //       receiptNo: 'RCPT202506101430',
+    //       transactionId: 'TXN123456789',
+    //     ),
+    //   ),
+    // );
+    // return;
 
     // ======= real =======
     if (!_recieptDataNotifier.value.isLoading) {
@@ -242,5 +262,12 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   void clearValue() {
     onTextAmountChange('');
+  }
+
+  void onProcessStateChange(WalletProcessState toState) {
+    final currentState = _procesStateNotfier.value;
+    if (currentState == toState) return;
+
+    _procesStateNotfier.value = toState;
   }
 }

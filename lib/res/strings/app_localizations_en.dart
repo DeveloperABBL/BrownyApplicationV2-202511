@@ -814,4 +814,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToHome => 'Back to Home';
+
+  @override
+  String get transactionReceipt => 'Transaction Receipt';
+
+  @override
+  String get backToTopUpPage => 'Back to Top-up Page';
+
+  @override
+  String get transactionSuccessful => 'Transaction Successful';
+
+  @override
+  String get youReceivedBonus => 'You received a bonus';
+
+  @override
+  String get transactionNumber => 'Transaction Number';
+
+  @override
+  String get topUpFailed => 'Top-up Failed';
+
+  @override
+  String get topUpFailedMessage =>
+      'Due to a problem with the destination bank or insufficient account balance. Please check the transaction again.';
+
+  @override
+  String get scanning => 'Scanning';
+
+  @override
+  String get scanQR => 'Scan QR';
+
+  @override
+  String get brownyID => 'Browny ID';
 }

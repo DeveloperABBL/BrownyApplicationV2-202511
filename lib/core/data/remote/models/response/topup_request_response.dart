@@ -32,7 +32,7 @@ class TopupRequestResponse extends BaseResponse {
   final DateTime? confirmedAt;
 
   @JsonKey(name: 'amount')
-  final double? amount;
+  final String? amount;
 
   factory TopupRequestResponse.fromJson(Map<String, dynamic> json) =>
       _$TopupRequestResponseFromJson(json);

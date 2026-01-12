@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:intl/intl.dart';
@@ -52,17 +53,21 @@ void main() {
 
   group('IntroductionsResponse parsing', () {
     test('DateTime', () async {
+      String v =
+          "{\"status\":\"success\",\"message\":\"ชำระเงินเรียบร้อยแล้ว\",\"confirmed_at\":\"2026-01-11T17:11:47.000000Z\",\"amount\":\"1.00\"}";
+      final t = TopupRequestResponse.fromJson(jsonDecode(v));
+      print(t);
       await initializeDateFormatting();
       var dateFromat = DateFormat(
         'dd-MM-yyyy / HH:mm',
-        'zh',
+        'th',
       ).parse('9-06-2025 / 14:30');
       // final dateTime = DateTime.parse('10-06-2025 / 14:30');
       dateFromat = dateFromat.copyWith(year: dateFromat.year + 543);
       // dateTimeSymbolMap()['th'];
       final formater = DateFormat(
-        'dd MMM yy HH:mm น.',
-        'zh',
+        'dd MMM yy HH:mm v',
+        'th',
       ).format(dateFromat);
 
       print(formater);

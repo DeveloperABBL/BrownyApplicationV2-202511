@@ -793,4 +793,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get backToHome => '返回主页';
+
+  @override
+  String get transactionReceipt => '充值交易记录';
+
+  @override
+  String get backToTopUpPage => '返回充值页面';
+
+  @override
+  String get transactionSuccessful => '交易成功';
+
+  @override
+  String get youReceivedBonus => '您获得了奖金';
+
+  @override
+  String get transactionNumber => '交易号码';
+
+  @override
+  String get topUpFailed => '充值失败';
+
+  @override
+  String get topUpFailedMessage => '由于目标银行出现问题或账户余额不足。请重新检查交易。';
+
+  @override
+  String get scanning => '扫描';
+
+  @override
+  String get scanQR => '扫描二维码';
+
+  @override
+  String get brownyID => 'Browny ID';
 }

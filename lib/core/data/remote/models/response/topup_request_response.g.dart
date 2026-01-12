@@ -17,7 +17,7 @@ TopupRequestResponse _$TopupRequestResponseFromJson(
   confirmedAt: const DateTimeConverter().fromJson(
     json['confirmed_at'] as String?,
   ),
-  amount: (json['amount'] as num?)?.toDouble(),
+  amount: json['amount'] as String?,
 );
 
 Map<String, dynamic> _$TopupRequestResponseToJson(

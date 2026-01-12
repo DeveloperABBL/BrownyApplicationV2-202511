@@ -810,4 +810,35 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get backToHome => 'กลับสู่หน้าหลัก';
+
+  @override
+  String get transactionReceipt => 'ใบบันทึกรายการเติมเงิน';
+
+  @override
+  String get backToTopUpPage => 'กลับสู่หน้าเติมเงิน';
+
+  @override
+  String get transactionSuccessful => 'ทำรายการสำเร็จ';
+
+  @override
+  String get youReceivedBonus => 'คุณได้รับโบนัส';
+
+  @override
+  String get transactionNumber => 'เลขที่รายการ';
+
+  @override
+  String get topUpFailed => 'เติมเงินไม่สำเร็จ';
+
+  @override
+  String get topUpFailedMessage =>
+      'เนื่องจากธนาคารปลายทางมีปัญหา หรือเงินในบัญชีอาจไม่พอ กรุณาตรวจสอบรายการใหม่อีกครั้ง';
+
+  @override
+  String get scanning => 'การสแกน';
+
+  @override
+  String get scanQR => 'สแกน QR';
+
+  @override
+  String get brownyID => 'Browny ID';
 }

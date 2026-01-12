@@ -37,6 +37,10 @@ class $AssetsPngGen {
   AssetGenImage get brownyHorizaontal =>
       const AssetGenImage('assets/png/browny_horizaontal.png');
 
+  /// File path: assets/png/browny_horizaontal_2.png
+  AssetGenImage get brownyHorizaontal2 =>
+      const AssetGenImage('assets/png/browny_horizaontal_2.png');
+
   /// File path: assets/png/browny_logo.png
   AssetGenImage get brownyLogo =>
       const AssetGenImage('assets/png/browny_logo.png');
@@ -66,9 +70,21 @@ class $AssetsPngGen {
   AssetGenImage get logoReferral =>
       const AssetGenImage('assets/png/logo_referral.png');
 
+  /// File path: assets/png/promptpay_badge.png
+  AssetGenImage get promptpayBadge =>
+      const AssetGenImage('assets/png/promptpay_badge.png');
+
+  /// File path: assets/png/promptpay_badge_no_line.png
+  AssetGenImage get promptpayBadgeNoLine =>
+      const AssetGenImage('assets/png/promptpay_badge_no_line.png');
+
   /// File path: assets/png/splash_background.png
   AssetGenImage get splashBackground =>
       const AssetGenImage('assets/png/splash_background.png');
+
+  /// File path: assets/png/wallet_obj_bg.png
+  AssetGenImage get walletObjBg =>
+      const AssetGenImage('assets/png/wallet_obj_bg.png');
 
   /// List of all assets
   List<AssetGenImage> get values => [
@@ -77,6 +93,7 @@ class $AssetsPngGen {
     brownyError1,
     brownyError2,
     brownyHorizaontal,
+    brownyHorizaontal2,
     brownyLogo,
     brownyLogoAndroid,
     icApple,
@@ -85,7 +102,10 @@ class $AssetsPngGen {
     icLine,
     launcherIcon,
     logoReferral,
+    promptpayBadge,
+    promptpayBadgeNoLine,
     splashBackground,
+    walletObjBg,
   ];
 }
 
@@ -118,6 +138,17 @@ class $AssetsSvgGen {
   SvgGenImage get icCalendarToday =>
       const SvgGenImage('assets/svg/ic_calendar_today.svg');
 
+  /// File path: assets/svg/ic_cross_hair.svg
+  SvgGenImage get icCrossHair =>
+      const SvgGenImage('assets/svg/ic_cross_hair.svg');
+
+  /// File path: assets/svg/ic_down_storage.svg
+  SvgGenImage get icDownStorage =>
+      const SvgGenImage('assets/svg/ic_down_storage.svg');
+
+  /// File path: assets/svg/ic_download.svg
+  SvgGenImage get icDownload => const SvgGenImage('assets/svg/ic_download.svg');
+
   /// File path: assets/svg/ic_edit.svg
   SvgGenImage get icEdit => const SvgGenImage('assets/svg/ic_edit.svg');
 
@@ -129,6 +160,12 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_flag_zh.svg
   SvgGenImage get icFlagZh => const SvgGenImage('assets/svg/ic_flag_zh.svg');
+
+  /// File path: assets/svg/ic_headset.svg
+  SvgGenImage get icHeadset => const SvgGenImage('assets/svg/ic_headset.svg');
+
+  /// File path: assets/svg/ic_history.svg
+  SvgGenImage get icHistory => const SvgGenImage('assets/svg/ic_history.svg');
 
   /// File path: assets/svg/ic_home.svg
   SvgGenImage get icHome => const SvgGenImage('assets/svg/ic_home.svg');
@@ -170,6 +207,26 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_plus.svg
   SvgGenImage get icPlus => const SvgGenImage('assets/svg/ic_plus.svg');
 
+  /// File path: assets/svg/ic_promptpay.svg
+  SvgGenImage get icPromptpay =>
+      const SvgGenImage('assets/svg/ic_promptpay.svg');
+
+  /// File path: assets/svg/ic_promptpay_text.svg
+  SvgGenImage get icPromptpayText =>
+      const SvgGenImage('assets/svg/ic_promptpay_text.svg');
+
+  /// File path: assets/svg/ic_qr_dummy.svg
+  SvgGenImage get icQrDummy => const SvgGenImage('assets/svg/ic_qr_dummy.svg');
+
+  /// File path: assets/svg/ic_scan.svg
+  SvgGenImage get icScan => const SvgGenImage('assets/svg/ic_scan.svg');
+
+  /// File path: assets/svg/ic_scan_2.svg
+  SvgGenImage get icScan2 => const SvgGenImage('assets/svg/ic_scan_2.svg');
+
+  /// File path: assets/svg/ic_share.svg
+  SvgGenImage get icShare => const SvgGenImage('assets/svg/ic_share.svg');
+
   /// File path: assets/svg/ic_shop.svg
   SvgGenImage get icShop => const SvgGenImage('assets/svg/ic_shop.svg');
 
@@ -188,6 +245,9 @@ class $AssetsSvgGen {
   SvgGenImage get icTpWallet =>
       const SvgGenImage('assets/svg/ic_tp_wallet.svg');
 
+  /// File path: assets/svg/ic_upload.svg
+  SvgGenImage get icUpload => const SvgGenImage('assets/svg/ic_upload.svg');
+
   /// File path: assets/svg/scan_icon.svg
   SvgGenImage get scanIcon => const SvgGenImage('assets/svg/scan_icon.svg');
 
@@ -200,10 +260,15 @@ class $AssetsSvgGen {
     icBranch,
     icBranchActive,
     icCalendarToday,
+    icCrossHair,
+    icDownStorage,
+    icDownload,
     icEdit,
     icFlagEn,
     icFlagTh,
     icFlagZh,
+    icHeadset,
+    icHistory,
     icHome,
     icHomeActive,
     icLogin,
@@ -215,11 +280,18 @@ class $AssetsSvgGen {
     icOnboardThird,
     icPerson,
     icPlus,
+    icPromptpay,
+    icPromptpayText,
+    icQrDummy,
+    icScan,
+    icScan2,
+    icShare,
     icShop,
     icShopActive,
     icTicket,
     icTicketActive,
     icTpWallet,
+    icUpload,
     scanIcon,
   ];
 }

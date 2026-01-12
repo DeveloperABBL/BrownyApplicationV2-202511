@@ -264,5 +264,15 @@
     "cancelTransaction": "Cancel Transaction",
     "confirmCancelTransaction": "Do you want to cancel the transaction?",
     "payment": "Payment",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "transactionReceipt": "Transaction Receipt",
+    "backToTopUpPage": "Back to Top-up Page",
+    "transactionSuccessful": "Transaction Successful",
+    "youReceivedBonus": "You received a bonus",
+    "transactionNumber": "Transaction Number",
+    "topUpFailed": "Top-up Failed",
+    "topUpFailedMessage": "Due to a problem with the destination bank or insufficient account balance. Please check the transaction again.",
+    "scanning": "Scanning",
+    "scanQR": "Scan QR",
+    "brownyID": "Browny ID"
 }

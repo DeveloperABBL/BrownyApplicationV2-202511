@@ -1,5 +1,17 @@
 # CHANGELOG
 ---
+### DONG 2026-01-12
+* build 3.0.0(21) เป็นตัว update progress ล่าสุด ซึ่งยังไม่ครบใน phase1
+  * ที่เล่นได้แล้วจะมี
+    - login
+    - Register
+    - ตั้ง Pin, Biometric
+    - ตั้งค่า Profile
+    - เติมเงิน
+    - Scan QRCode (Scan ติดแล้วแต่ยังไม่มี Process อะไรต่อ)
+    - History(เป็น Mockup Data รอ API)
+
+---
 ### DONG 2026-01-11
 - เพิ่มหน้า Wallet
  - Process การ topup, QRCode Display, Slip (Mockup Data)

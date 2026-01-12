@@ -263,5 +263,15 @@
     "cancelTransaction": "ยกเลิกการทำรายการ",
     "confirmCancelTransaction": "ต้องการยกเลิกการทำรายการใช่หรือไม่ ?",
     "payment": "จ่ายเงิน",
-    "backToHome": "กลับสู่หน้าหลัก"
+    "backToHome": "กลับสู่หน้าหลัก",
+    "transactionReceipt": "ใบบันทึกรายการเติมเงิน",
+    "backToTopUpPage": "กลับสู่หน้าเติมเงิน",
+    "transactionSuccessful": "ทำรายการสำเร็จ",
+    "youReceivedBonus": "คุณได้รับโบนัส",
+    "transactionNumber": "เลขที่รายการ",
+    "topUpFailed": "เติมเงินไม่สำเร็จ",
+    "topUpFailedMessage": "เนื่องจากธนาคารปลายทางมีปัญหา หรือเงินในบัญชีอาจไม่พอ กรุณาตรวจสอบรายการใหม่อีกครั้ง",
+    "scanning": "การสแกน",
+    "scanQR": "สแกน QR",
+    "brownyID": "Browny ID"
 }

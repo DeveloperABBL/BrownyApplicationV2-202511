@@ -305,6 +305,30 @@ extension DateTimeAppFormat on DateTime {
         this,
       );
 
+  String formatDateDDMMMMyyyyHHmmMinText(
+    BuildContext context, {
+    String pattern = 'dd MMM yy HH:mm',
+    bool thYear = false,
+  }) {
+    final locale = Localizations.localeOf(context).languageCode;
+    initializeDateFormatting();
+    String mPattern;
+    DateTime dateTimeData = copyWith();
+    switch (locale) {
+      case 'en':
+      case 'zh':
+        mPattern = pattern;
+        break;
+      default:
+        dateTimeData = thYear
+            ? dateTimeData.copyWith(year: dateTimeData.year + 543)
+            : dateTimeData;
+        mPattern = '$pattern น.';
+    }
+
+    return DateFormat(mPattern, locale).format(dateTimeData);
+  }
+
   // String formatForShowByLocale(String locale) {
   // initializeDateFormatting(locale);
   // const thaiMonths = [
