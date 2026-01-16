@@ -114,7 +114,7 @@ class _WallHistoryContent extends StatelessWidget {
                           ? context.wording.topup
                           : 'โอนเงิน/ชำระเงิน',
                       date: DateTime.now().formatDateDDMMMMyyyyHHmmMinText(
-                        context,
+                        Localizations.localeOf(context).languageCode,
                         pattern: 'dd MMM yyyy - HH:mm',
                       ),
                       amount: '100',

@@ -66,12 +66,20 @@ void main() {
       dateFromat = dateFromat.copyWith(year: dateFromat.year + 543);
       // dateTimeSymbolMap()['th'];
       final formater = DateFormat(
-        'dd MMM yy HH:mm v',
+        'dd MM',
         'th',
       ).format(dateFromat);
 
       print(formater);
       print(dateFromat);
+    });
+
+    test('DateTime', () {
+      final dateParse1 = DateFormat('yyyy-MM-dd', 'th').parse('2025-01-13');
+      final dateParse2 = DateFormat('yyyy-MM-dd', 'th').parse('2025-01-14');
+      int count = dateParse2.difference(dateParse1).inDays;
+      final dateAdd = dateParse1.add(Duration(days: count));
+      print(dateAdd);
     });
 
     test('parses raw array JSON into List<IntroductionsResponse>', () {

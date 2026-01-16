@@ -823,4 +823,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get brownyID => 'Browny ID';
+
+  @override
+  String get inviteFriendsForCoupons => '邀请朋友换优惠券';
+
+  @override
+  String get rewardsTitle => '奖励';
+
+  @override
+  String get termsAndConditions => '条款和服务';
+
+  @override
+  String get referralCode => '推荐码';
+
+  @override
+  String get shareLink => '分享链接';
+
+  @override
+  String get noRewardsFound => '找不到奖励';
 }

@@ -704,7 +704,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get passwordMustContainNumber => 'ต้องมีตัวเลขอย่างน้อย 1 ตัว';
 
   @override
-  String get loginWelcomeDescription => 'Browny ยินดีตอนรับ มาซักผ้ากัน';
+  String get loginWelcomeDescription => 'Browny ยินดีต้อนรับ มาซักผ้ากัน';
 
   @override
   String get loginWith => 'เข้าสู่ระบบด้วย';
@@ -841,4 +841,22 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get brownyID => 'Browny ID';
+
+  @override
+  String get inviteFriendsForCoupons => 'ชวนเพื่อนแลกคูปอง';
+
+  @override
+  String get rewardsTitle => 'รางวัล';
+
+  @override
+  String get termsAndConditions => 'เงื่อนไขและการให้บริการ';
+
+  @override
+  String get referralCode => 'รหัสชวนเพื่อน';
+
+  @override
+  String get shareLink => 'แชร์ลิงก์';
+
+  @override
+  String get noRewardsFound => 'ไม่พบรายการรางวัล';
 }

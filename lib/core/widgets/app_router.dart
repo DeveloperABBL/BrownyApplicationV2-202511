@@ -1,7 +1,9 @@
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
+import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
@@ -92,6 +94,16 @@ class AppRouter {
         path: ScannerPage.pagePath,
         name: ScannerPage.pageName,
         builder: (context, state) => const ScannerPage(),
+      ),
+      GoRoute(
+        path: InvitFriendPage.pagePath,
+        name: InvitFriendPage.pageName,
+        builder: (context, state) => const InvitFriendPage(),
+      ),
+      GoRoute(
+        path: CoinPage.pagePath,
+        name: CoinPage.pageName,
+        builder: (context, state) => const CoinPage(),
       ),
     ],
   );

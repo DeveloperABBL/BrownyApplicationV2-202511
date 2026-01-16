@@ -1731,6 +1731,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browny ID'**
   String get brownyID;
+
+  /// No description provided for @inviteFriendsForCoupons.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friends for Coupons'**
+  String get inviteFriendsForCoupons;
+
+  /// No description provided for @rewardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get rewardsTitle;
+
+  /// No description provided for @termsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get termsAndConditions;
+
+  /// No description provided for @referralCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral Code'**
+  String get referralCode;
+
+  /// No description provided for @shareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Link'**
+  String get shareLink;
+
+  /// No description provided for @noRewardsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No rewards found'**
+  String get noRewardsFound;
 }
 
 class _AppLocalizationsDelegate

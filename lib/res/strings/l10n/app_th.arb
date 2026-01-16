@@ -229,7 +229,7 @@
     "passwordMustContainUppercase" : "ต้องมีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว",
     "passwordMustContainLowercase" : "ต้องมีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว",
     "passwordMustContainNumber" : "ต้องมีตัวเลขอย่างน้อย 1 ตัว",
-    "loginWelcomeDescription" : "Browny ยินดีตอนรับ มาซักผ้ากัน",
+    "loginWelcomeDescription" : "Browny ยินดีต้อนรับ มาซักผ้ากัน",
     "loginWith" : "เข้าสู่ระบบด้วย",
     "forgotPasswordDescription" : "กรุณากรอกอีเมล/เบอร์โทรศัพท์ของคุณ",
     "dontHaveAccountYet" : "ยังไม่มีบัญชีหรอ?",
@@ -273,5 +273,11 @@
     "topUpFailedMessage": "เนื่องจากธนาคารปลายทางมีปัญหา หรือเงินในบัญชีอาจไม่พอ กรุณาตรวจสอบรายการใหม่อีกครั้ง",
     "scanning": "การสแกน",
     "scanQR": "สแกน QR",
-    "brownyID": "Browny ID"
+    "brownyID": "Browny ID",
+    "inviteFriendsForCoupons": "ชวนเพื่อนแลกคูปอง",
+    "rewardsTitle": "รางวัล",
+    "termsAndConditions": "เงื่อนไขและการให้บริการ",
+    "referralCode": "รหัสชวนเพื่อน",
+    "shareLink": "แชร์ลิงก์",
+    "noRewardsFound": "ไม่พบรายการรางวัล"
 }

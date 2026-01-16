@@ -23,6 +23,15 @@ class AppContainerRadius extends StatelessWidget {
     this.color,
     this.borderRadius,
     this.child,
+    this.alignment,
+    this.padding,
+    this.margin,
+    this.decoration,
+    this.foregroundDecoration,
+    this.constraints,
+    this.transform,
+    this.transformAlignment,
+    this.clipBehavior = Clip.none,
   });
 
   final double? height;
@@ -30,21 +39,40 @@ class AppContainerRadius extends StatelessWidget {
   final Color? color;
   final BorderRadius? borderRadius;
   final Widget? child;
+  final AlignmentGeometry? alignment;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final Decoration? decoration;
+  final Decoration? foregroundDecoration;
+  final BoxConstraints? constraints;
+  final Matrix4? transform;
+  final AlignmentGeometry? transformAlignment;
+  final Clip clipBehavior;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
       width: width ?? double.infinity,
-      decoration: BoxDecoration(
-        color: color ?? AppColors.background,
-        borderRadius:
-            borderRadius ??
-            BorderRadius.only(
-              topLeft: Radius.circular(AppDims.primaryRadius),
-              topRight: Radius.circular(AppDims.primaryRadius),
-            ),
-      ),
+      alignment: alignment,
+      padding: padding,
+      margin: margin,
+      decoration:
+          decoration ??
+          BoxDecoration(
+            color: color ?? AppColors.background,
+            borderRadius:
+                borderRadius ??
+                BorderRadius.only(
+                  topLeft: Radius.circular(AppDims.primaryRadius),
+                  topRight: Radius.circular(AppDims.primaryRadius),
+                ),
+          ),
+      foregroundDecoration: foregroundDecoration,
+      constraints: constraints,
+      transform: transform,
+      transformAlignment: transformAlignment,
+      clipBehavior: clipBehavior,
       child: child,
     );
   }

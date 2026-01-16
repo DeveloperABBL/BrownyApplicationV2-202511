@@ -57,5 +57,18 @@
 	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>sms</string>
+		<string>mailto</string>
+		<string>fb</string>
+		<string>instagram</string>
+		<string>twitter</string>
+		<string>whatsapp</string>
+		<string>line</string>
+	</array>
 </dict>
 </plist>

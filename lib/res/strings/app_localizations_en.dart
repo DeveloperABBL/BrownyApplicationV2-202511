@@ -845,4 +845,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get brownyID => 'Browny ID';
+
+  @override
+  String get inviteFriendsForCoupons => 'Invite Friends for Coupons';
+
+  @override
+  String get rewardsTitle => 'Rewards';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get referralCode => 'Referral Code';
+
+  @override
+  String get shareLink => 'Share Link';
+
+  @override
+  String get noRewardsFound => 'No rewards found';
 }

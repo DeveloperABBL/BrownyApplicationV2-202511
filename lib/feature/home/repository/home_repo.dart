@@ -4,12 +4,12 @@ import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 
 mixin HomeDataSourceMixin {
-  Future<RepoResult<List<BannerResponse>>> fetchBanner();
+  Future<RepoResult<BannerResponse>> fetchBanner();
 }
 
 class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   @override
-  Future<RepoResult<List<BannerResponse>>> fetchBanner() async {
+  Future<RepoResult<BannerResponse>> fetchBanner() async {
     try {
       // fetch data จาก api
       final response = await requireRemote.fetchBanners();
@@ -21,7 +21,7 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
         );
       }
 
-      if (response.data.orEmpty.isEmpty) {
+      if (response.data == null) {
         return RepoResult.empty();
       }
 

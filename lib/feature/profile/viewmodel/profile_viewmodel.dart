@@ -186,7 +186,7 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
       dateOfBirth.text = DateTime.parse(
         userModel.birthday.orEmpty,
       ).formatForShow();
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       dateOfBirth.text = '';
     }
 

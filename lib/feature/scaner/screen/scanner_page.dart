@@ -50,12 +50,23 @@ class __ScannerWidgetState extends State<_ScannerWidget>
       detectionSpeed: DetectionSpeed.noDuplicates,
       facing: CameraFacing.back,
       torchEnabled: false,
+      autoStart: false,
     );
 
     // Initialize camera after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewModel.initializeCamera();
     });
+  }
+
+  @override
+  void dispose() {
+    try {
+      _viewModel.cameraController.stop();
+    } finally {
+      _viewModel.cameraController.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -81,6 +92,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
             backgroundColor: AppColors.background,
             appBar: _buildAppBar(context, tabIndex),
             body: TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
               children: [
                 // index 0 : Scanner
                 _buildScannerView(context),

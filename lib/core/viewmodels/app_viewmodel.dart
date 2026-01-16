@@ -18,8 +18,8 @@ abstract class AppViewModel extends ChangeNotifier {
   CustomerProvider get currentCustomerProvider =>
       context.read<CustomerProvider>();
 
-  void attachContext(BuildContext newContext) {
-    context = newContext;
+  void attachContext(BuildContext context) {
+    this.context = context;
   }
 }
 

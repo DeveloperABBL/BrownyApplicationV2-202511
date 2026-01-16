@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -12,16 +13,20 @@ class ShareHelper {
   ///
   /// [text] - ข้อความที่ต้องการแชร์
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareText(
     String text, {
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       return await Share.share(
         text,
         subject: subject,
+        sharePositionOrigin:
+            sharePositionOrigin ?? const Rect.fromLTWH(0, 0, 10, 10),
       );
     } catch (e) {
       return ShareResult.unavailable;
@@ -32,15 +37,19 @@ class ShareHelper {
   ///
   /// [url] - URL ที่ต้องการแชร์
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareUrl(
     String url, {
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       return await Share.shareUri(
         Uri.parse(url),
+        sharePositionOrigin:
+            sharePositionOrigin ?? const Rect.fromLTWH(0, 0, 10, 10),
       );
     } catch (e) {
       return ShareResult.unavailable;
@@ -52,12 +61,14 @@ class ShareHelper {
   /// [filePath] - Path ของไฟล์ที่ต้องการแชร์
   /// [text] - ข้อความที่จะแนบไปกับไฟล์ (optional)
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareFile(
     String filePath, {
     String? text,
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       final file = XFile(filePath);
@@ -65,6 +76,8 @@ class ShareHelper {
         [file],
         text: text,
         subject: subject,
+        sharePositionOrigin:
+            sharePositionOrigin ?? const Rect.fromLTWH(0, 0, 10, 10),
       );
     } catch (e) {
       return ShareResult.unavailable;
@@ -76,12 +89,14 @@ class ShareHelper {
   /// [filePaths] - List ของ paths ของไฟล์ที่ต้องการแชร์
   /// [text] - ข้อความที่จะแนบไปกับไฟล์ (optional)
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareFiles(
     List<String> filePaths, {
     String? text,
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       final files = filePaths.map((path) => XFile(path)).toList();
@@ -89,6 +104,8 @@ class ShareHelper {
         files,
         text: text,
         subject: subject,
+        sharePositionOrigin:
+            sharePositionOrigin ?? const Rect.fromLTWH(0, 0, 10, 10),
       );
     } catch (e) {
       return ShareResult.unavailable;
@@ -101,6 +118,7 @@ class ShareHelper {
   /// [fileName] - ชื่อไฟล์ที่ต้องการใช้ (รวม extension เช่น 'receipt.png')
   /// [text] - ข้อความที่จะแนบไปกับรูปภาพ (optional)
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareImage(
@@ -108,6 +126,7 @@ class ShareHelper {
     required String fileName,
     String? text,
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       // สร้างไฟล์ชั่วคราวใน temp directory
@@ -122,6 +141,7 @@ class ShareHelper {
         tempFile.path,
         text: text,
         subject: subject,
+        sharePositionOrigin: sharePositionOrigin,
       );
 
       // ลบไฟล์ชั่วคราวหลังจากแชร์เสร็จ (optional - iOS จะลบอัตโนมัติ)
@@ -144,12 +164,14 @@ class ShareHelper {
   /// [images] - List ของ Map ที่มี 'bytes' และ 'fileName'
   /// [text] - ข้อความที่จะแนบไปกับรูปภาพ (optional)
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareImages(
     List<Map<String, dynamic>> images, {
     String? text,
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       final tempDir = await getTemporaryDirectory();
@@ -169,6 +191,7 @@ class ShareHelper {
         tempFiles.map((f) => f.path).toList(),
         text: text,
         subject: subject,
+        sharePositionOrigin: sharePositionOrigin,
       );
 
       // ลบไฟล์ชั่วคราวหลังจากแชร์เสร็จ
@@ -193,12 +216,14 @@ class ShareHelper {
   /// [text] - ข้อความที่ต้องการแชร์
   /// [filePath] - Path ของไฟล์ที่ต้องการแชร์
   /// [subject] - หัวข้อของการแชร์ (optional)
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareTextWithFile(
     String text,
     String filePath, {
     String? subject,
+    Rect? sharePositionOrigin,
   }) async {
     try {
       final file = XFile(filePath);
@@ -206,6 +231,8 @@ class ShareHelper {
         [file],
         text: text,
         subject: subject,
+        sharePositionOrigin:
+            sharePositionOrigin ?? const Rect.fromLTWH(0, 0, 10, 10),
       );
     } catch (e) {
       return ShareResult.unavailable;
@@ -217,17 +244,20 @@ class ShareHelper {
   /// [imageBytes] - ข้อมูลรูปภาพในรูปแบบ bytes
   /// [fileName] - ชื่อไฟล์ที่ต้องการใช้
   /// [caption] - ข้อความที่จะแนบไปกับรูปภาพ
+  /// [sharePositionOrigin] - ตำแหน่งที่จะแสดง share sheet (required สำหรับ iOS/iPadOS)
   ///
   /// Returns [ShareResult] ผลลัพธ์ของการแชร์
   static Future<ShareResult> shareImageWithCaption(
     Uint8List imageBytes, {
     required String fileName,
     required String caption,
+    Rect? sharePositionOrigin,
   }) async {
     return await shareImage(
       imageBytes,
       fileName: fileName,
       text: caption,
+      sharePositionOrigin: sharePositionOrigin,
     );
   }
 

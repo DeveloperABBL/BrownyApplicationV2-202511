@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -61,7 +63,7 @@ class ScannerViewModel extends AppViewModel {
   /// Toggle flash on/off
   Future<void> toggleFlash() async {
     try {
-      await cameraController.toggleTorch();
+      unawaited(cameraController.toggleTorch());
       isFlashOn.value = !isFlashOn.value;
     } catch (e) {
       debugPrint('Error toggling flash: $e');
@@ -160,6 +162,11 @@ class ScannerViewModel extends AppViewModel {
   /// Change tab
   void onTabChanged(int index) {
     selectedTab.value = index;
+    if (index == 1) {
+      unawaited(cameraController.pause());
+    } else if (!cameraController.value.isRunning) {
+      unawaited(cameraController.start());
+    }
   }
 
   Future<void> fetchCustomerQRCode() async {
@@ -177,7 +184,7 @@ class ScannerViewModel extends AppViewModel {
   @override
   void dispose() {
     _qrNotifier.dispose();
-    cameraController.dispose();
+    // cameraController.dispose(); ไป dispose จาก Widget
     isFlashOn.dispose();
     selectedTab.dispose();
     isScanning.dispose();

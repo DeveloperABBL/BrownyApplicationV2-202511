@@ -110,8 +110,8 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
     }
 
     return SafeArea(
-      bottom: false,
-      maintainBottomViewPadding: true,
+      // bottom: false,
+      // maintainBottomViewPadding: true,
       minimum: EdgeInsets.only(bottom: AppDims.size_12.h),
       child: SizedBox(
         height: _barHeight(hasCenter),

@@ -15,7 +15,6 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-
 	"Auto JsonSerializable Class Generate": {
 		"prefix": "classjson",
 		"body": [
@@ -40,7 +39,6 @@
 			"}",
 		]
 	},
-
 	"Auto JsonSerializable Class Generate extend BaseModel": {
 		"prefix": "classjsonbasemodel",
 		"body": [
@@ -70,8 +68,7 @@
 			"}",
 		]
 	},
-
-		"Auto Comment documentation generate": {
+	"Auto Comment documentation generate": {
 		"prefix": "comdoc_dong",
 		"body": [
 			"/// DONG ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
@@ -83,4 +80,10 @@
 			"/// ```"
 		]
 	},
+	"Auto Spearater": {
+		"prefix": "=s=",
+		"body": [
+			"// ========== $1 =========="
+		]
+	},	
 }

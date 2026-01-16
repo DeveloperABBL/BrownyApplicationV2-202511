@@ -4,9 +4,12 @@ import 'package:browny_applications_new/core/data/remote/models/request/update_p
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
@@ -45,6 +48,30 @@ abstract class AppClient {
         () => 'Bearer ${config.token}',
       );
   }
+
+  /// DONG 2026-01-15
+  ///
+  /// API ส่งไป claim coin
+  @POST('/coin/claim')
+  Future<HttpResponse<CoinClaimedResponse>> coinClaiming(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// DONG 2026-01-15
+  ///
+  /// API fetch coin claim data ตาม customer_id
+  @GET('/coin')
+  Future<HttpResponse<CoinClaimResponse>> getCoinClaimData(
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-01-13
+  ///
+  /// API fetch referral rewards ตาม customer_id
+  @GET('/referral/rewards')
+  Future<HttpResponse<ReferralRewardResponse>> fetchReferralReward(
+    @Body() Map<String, dynamic> body,
+  );
 
   /// DONG 2026-01-11
   ///
@@ -157,7 +184,7 @@ abstract class AppClient {
   ///
   /// API Fetch รูป Banners
   @GET('/banners')
-  Future<HttpResponse<List<BannerResponse>?>> fetchBanners();
+  Future<HttpResponse<BannerResponse?>> fetchBanners();
 
   /// DONG 2025-11-10
   ///

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';

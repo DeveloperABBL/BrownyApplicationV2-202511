@@ -274,5 +274,11 @@
     "topUpFailedMessage": "Due to a problem with the destination bank or insufficient account balance. Please check the transaction again.",
     "scanning": "Scanning",
     "scanQR": "Scan QR",
-    "brownyID": "Browny ID"
+    "brownyID": "Browny ID",
+    "inviteFriendsForCoupons": "Invite Friends for Coupons",
+    "rewardsTitle": "Rewards",
+    "termsAndConditions": "Terms and Conditions",
+    "referralCode": "Referral Code",
+    "shareLink": "Share Link",
+    "noRewardsFound": "No rewards found"
 }

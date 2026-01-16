@@ -45,6 +45,41 @@ class AppColors {
     ],
   );
 
+  /// Container Coin gradient - linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 100%)
+  static const LinearGradient containerCoinGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [
+      Color(0x00FFFFFF), // rgba(255, 255, 255, 0) - สีขาวโปร่งใสสนิท
+      Color(0x1AFFFFFF), // rgba(255, 255, 255, 0.1) - สีขาวโปร่งใส 10%
+    ],
+    stops: [0.0, 1.0],
+  );
+
+  /// Claim Coin Button gradient - Alias ของ yellowToGreenGradient สำหรับปุ่ม Claim Coin
+  static const LinearGradient claimCoinButtonGradient = LinearGradient(
+    // 91.26deg ใน CSS คือเกือบจะเป็นแนวนอน (Left to Right)
+    // การใช้ Alignment.centerLeft ไป centerRight ให้ผลลัพธ์ที่สะอาดและใกล้เคียงที่สุด
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+
+    colors: [
+      Color(0xFFD4CF46), // -0.38%
+      Color(0xFF87CE45), // 47.14%
+      Color(0xFF24B52D), // 105.71%
+    ],
+
+    stops: [
+      0.0, // แปลงจาก -0.38% (ใน Flutter เริ่มที่ 0.0)
+      0.4714, // แปลงจาก 47.14%
+      1.0, // แปลงจาก 105.71% (ใน Flutter จบที่ 1.0)
+    ],
+
+    // หมายเหตุ: หากต้องการความเป๊ะแบบ Pixel Perfect ตาม Figma จริงๆ
+    // โดยยอมให้ค่าเกินขอบเขต 0-1 สามารถใช้ stops ด้านล่างนี้แทนได้:
+    // stops: [-0.0038, 0.4714, 1.0571],
+  );
+
   // ============================================================================
   // Primary CTA Colors
   // ============================================================================
@@ -221,6 +256,12 @@ class AppColors {
 
   static const Color ci2 = Color(0xFF8FCB8A); // #8FCB8A
 
+  static const Color ci3 = Color(0xFFD8FDE8); // #D8FDE8
+
+  static const Color ci4 = Color(0xFF8CCE45); // #8CCE45
+
+  static const Color ci5 = Color(0xFFA6DFAA); // #A6DFAA
+
   /// Dark Brown
   static const Color darkBrown = Color(0xFF593817); // #593817
 
@@ -230,6 +271,8 @@ class AppColors {
   static const Color paleOrange = Color(0xFFFFDCC2); // #FFDCC2
 
   static const Color cocoaBrown = Color(0xFFCC6E29); // #CC6E29
+
+  static const Color yellow = Color(0xFFF5E221); // #F5E221
 
   // ============================================================================
   // Status Colors

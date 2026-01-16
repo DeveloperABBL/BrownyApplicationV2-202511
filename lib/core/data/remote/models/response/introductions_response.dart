@@ -53,6 +53,17 @@ class ContentLocalizeData {
   @JsonKey(name: 'zh')
   final String? zh;
 
+  String? getByLocaleCode(String locale) {
+    switch (locale) {
+      case 'en':
+        return en;
+      case 'zh':
+        return zh;
+      default:
+        return th;
+    }
+  }
+
   factory ContentLocalizeData.fromJson(Map<String, dynamic> json) =>
       _$ContentLocalizeDataFromJson(json);
 

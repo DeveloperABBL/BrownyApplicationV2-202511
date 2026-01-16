@@ -11,10 +11,18 @@ part 'banner_response.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class BannerResponse extends BaseModelResponse {
-  BannerResponse({
-    super.success,
-    super.errorType,
-    super.message,
+  @JsonKey(name: 'data')
+  final List<BannerData>? data;
+  BannerResponse({super.success, super.errorType, super.message, this.data});
+
+  factory BannerResponse.fromJson(Map<String, dynamic> json) =>
+      _$BannerResponseFromJson(json);
+  Map<String, dynamic> toJson() => baseToJson(_$BannerResponseToJson(this));
+}
+
+@JsonSerializable()
+class BannerData {
+  BannerData({
     this.id,
     this.name,
     this.type,
@@ -45,7 +53,7 @@ class BannerResponse extends BaseModelResponse {
   @JsonKey(name: 'subtitle')
   final ContentLocalizeData? subtitle;
 
-  factory BannerResponse.fromJson(Map<String, dynamic> json) =>
-      _$BannerResponseFromJson(json);
-  Map<String, dynamic> toJson() => baseToJson(_$BannerResponseToJson(this));
+  factory BannerData.fromJson(Map<String, dynamic> json) =>
+      _$BannerDataFromJson(json);
+  Map<String, dynamic> toJson() => _$BannerDataToJson(this);
 }
