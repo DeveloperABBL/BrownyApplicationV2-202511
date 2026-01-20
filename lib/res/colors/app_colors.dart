@@ -106,6 +106,8 @@ class AppColors {
   /// สีพื้นหลังหลัก (ขาว)
   static const Color background = Color(0xFFFFFFFF); // #FFFFFF
 
+  static const Color bareBackground = Color(0xFFEFEFEF); // #EFEFEF
+
   static const Color walletBackgroundClicked = Color.fromARGB(
     255,
     0,
@@ -136,6 +138,8 @@ class AppColors {
   static const Color textSecondary = Color(0xFF777777); // #777777
 
   static const Color textBlack = black2A; // #777777
+
+  static const Color textWhite = white; // #777777
 
   // ============================================================================
   // Border/Stroke Colors
@@ -243,10 +247,10 @@ class AppColors {
   static const Color green400 = Color(0xFFDFDFDF); // #DFDFDF
 
   /// Gray 500
-  static const Color gray500 = Color(0xFF949494); // #949494
+  static const Color grey500 = Color(0xFF949494); // #949494
 
   /// Gray 600
-  static const Color gray600 = Color(0xFF777777); // #777777
+  static const Color grey600 = Color(0xFF777777); // #777777
 
   /// Gray 400
   static const Color gray400 = Color(0xFFCDCDCD); // #CDCDCD
@@ -279,7 +283,7 @@ class AppColors {
   // ============================================================================
 
   /// สีแสดงสถานะ Error
-  static const Color error = Color(0xFFFF334B); // #FF334B
+  static const Color error = Color(0xFFE02A48); // #E02A48
 
   static const Color walletButtonForegroundColor = paleOrange; // #FF334B
 }

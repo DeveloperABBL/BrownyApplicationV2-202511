@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';

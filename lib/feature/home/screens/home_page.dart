@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/coupon_voucher/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
@@ -73,6 +74,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
       backgroundColor: AppColors.transparent,
       useRootNavigator: true,
       builder: (dialogContext) {
@@ -141,7 +143,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               ),
                               AppDims.vericalPadding_8,
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () => dialogContext.pop(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.ci3,
                                   foregroundColor: AppColors.primary,
@@ -188,7 +190,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                 children: [
                   SizedBox(
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: null,
                       icon: Assets.svg.icCouponRoundGreen.svg(),
                       label: Column(
                         children: [
@@ -203,14 +205,17 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         foregroundColor: AppColors.primary,
                         alignment: AlignmentDirectional.centerStart,
                         padding: EdgeInsets.zero,
+                        disabledBackgroundColor: AppColors.transparent,
                         overlayColor: AppColors.transparent,
                       ),
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
-                      _showInvitBottomSheet();
+                      context.pushNamed(CouponVoucherPage.pageName);
+                      // _showInvitBottomSheet();
                     },
+                    // banner เก็บคูปอง
                     child: Stack(
                       children: [
                         Opacity(
@@ -234,42 +239,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           ),
 
           SliverFillRemaining(),
-          // SliverToBoxAdapter(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: Container(
-          //       height: 134,
-          //       color: Colors.blue,
-          //     ),
-          //   ),
-          // ),
-          // SliverToBoxAdapter(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: Container(
-          //       height: 205,
-          //       color: Colors.blue,
-          //     ),
-          //   ),
-          // ),
-          // SliverToBoxAdapter(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: Container(
-          //       height: 140,
-          //       color: Colors.blue,
-          //     ),
-          //   ),
-          // ),
-
-          // SliverToBoxAdapter(
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(16.0),
-          //     child: SizedBox(
-          //       height: 100.h,
-          //     ),
-          //   ),
-          // ),
         ],
       ),
       bottomNavigationBar: BrownyBottomNav(
@@ -314,8 +283,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               options: CarouselOptions(
                 initialPage: 0,
                 // enlargeCenterPage: true,
-                // enableInfiniteScroll: result.requireData.length > 1,
-                enableInfiniteScroll: true,
+                enableInfiniteScroll: result.requireData.length > 1,
                 viewportFraction: 1,
                 aspectRatio: 1,
                 // onPageChanged: (index, reason) {
@@ -345,11 +313,16 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           children: [
             CircleAvatar(
               backgroundColor: AppColors.background,
-              child: Assets.svg.icNotification.svg(
-                // เปลี่ยนสี svg
-                colorFilter: ColorFilter.mode(
-                  AppColors.primary,
-                  BlendMode.srcIn,
+              child: IconButton(
+                onPressed: () async {
+                  await _showInvitBottomSheet();
+                },
+                icon: Assets.svg.icNotification.svg(
+                  // เปลี่ยนสี svg
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -397,199 +370,376 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   Widget _buildMyWalletAndCoinZone() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // TP+ Wallet Container
-          Container(
-            height: 84.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                width: 1.5,
-                color: AppColors.primary,
-              ),
-            ),
-            child: Row(
-              children: [
-                AppDims.horizonPadding_12,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      child: Assets.svg.icTpWallet.svg(),
+      child: Consumer<CustomerProvider>(
+        builder: (context, provider, _) {
+          bool isGuest = provider.current.isGuest;
+          EdgeInsets? margin = isGuest
+              ? null
+              : EdgeInsets.only(top: AppDims.size_21.h);
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppDims.horizonPadding_9,
+
+              // TP+ Wallet Container
+              Column(
+                children: [
+                  if (!isGuest) AppDims.vericalPadding_20,
+                  Container(
+                    // height: 84.h,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_12.w,
+                      vertical: AppDims.size_16.h,
                     ),
-                    // Widget หลอกเพื่อให้ได้ระดับของ Widget ซ้ายขวาเท่ากัน
-                    Text(
-                      '',
-                      style: AppTextNumberStyles.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w600,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        width: 1.5,
+                        color: AppColors.primary,
                       ),
                     ),
-                  ],
-                ),
-                AppDims.horizonPadding_8,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
+                    child: Row(
                       children: [
-                        AppText(
-                          'TP+ Wallet',
-                          style: context.textTheme.titleSmall!.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
+                        // AppDims.horizonPadding_12,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              child: Assets.svg.icTpWallet.svg(),
+                            ),
+                            // Widget หลอกเพื่อให้ได้ระดับของ Widget ซ้ายขวาเท่ากัน
+                            Text(
+                              '',
+                              style: AppTextNumberStyles.bodyLarge.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        AppDims.horizonPadding_8,
-
-                        // สร้าง button TP+ Wallet
-                        Consumer<CustomerProvider>(
-                          builder: (context, provider, _) {
-                            final icon = provider.current.isGuest
-                                ? Assets.svg.icLogin.svg(
-                                    width: AppDims.size_12.w,
-                                    height: AppDims.size_12.h,
-                                  )
-                                : Assets.svg.icPlus.svg(
-                                    width: AppDims.size_12.w,
-                                    height: AppDims.size_12.h,
-                                  );
-
-                            final onPressed = provider.current.isGuest
-                                ? () => context.pushNamed(
-                                    AuthenticationPage.pageName,
-                                    extra: {
-                                      AuthenProcess: AuthenProcess.login,
-                                    },
-                                  )
-                                : () {
-                                    context.pushNamed(WalletPage.pageName);
-                                  };
-
-                            final label = provider.current.isGuest
-                                ? context.wording.login
-                                : context.wording.topup;
-
-                            return ElevatedButton.icon(
-                              icon: icon,
-                              // icon: Icon(Icons.login),
-                              iconAlignment: IconAlignment.end,
-                              onPressed: onPressed,
-                              style: context.appTheme.elevatedButtonTheme.style!
-                                  .copyWith(
-                                    shape: WidgetStatePropertyAll(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          AppDims.size_4,
-                                        ),
-                                      ),
-                                    ),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    padding: WidgetStatePropertyAll(
-                                      EdgeInsets.symmetric(
-                                        horizontal: AppDims.size_4,
-                                      ),
-                                    ),
-                                    minimumSize: WidgetStatePropertyAll(
-                                      Size(70.w, 22.h),
-                                    ), // Set this
-                                    textStyle: WidgetStatePropertyAll(
-                                      context.textTheme.bodySmall!.copyWith(
-                                        color: AppColors.white,
-                                      ),
-                                    ),
+                        AppDims.horizonPadding_12,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                AppText(
+                                  'TP+ Wallet',
+                                  style: context.textTheme.titleSmall!.copyWith(
+                                    color: AppColors.textPrimary,
                                   ),
-                              label: AppText(
-                                label,
+                                ),
+                                AppDims.horizonPadding_16,
+
+                                // สร้าง button TP+ Wallet
+                                Builder(
+                                  builder: (context) {
+                                    final icon = isGuest
+                                        ? Assets.svg.icLogin.svg(
+                                            width: AppDims.size_12.w,
+                                            height: AppDims.size_12.h,
+                                          )
+                                        : Assets.svg.icPlus.svg(
+                                            width: AppDims.size_12.w,
+                                            height: AppDims.size_12.h,
+                                          );
+
+                                    final onPressed = provider.current.isGuest
+                                        ? () => context.pushNamed(
+                                            AuthenticationPage.pageName,
+                                            extra: {
+                                              AuthenProcess:
+                                                  AuthenProcess.login,
+                                            },
+                                          )
+                                        : () {
+                                            context.pushNamed(
+                                              WalletPage.pageName,
+                                            );
+                                          };
+
+                                    final label = provider.current.isGuest
+                                        ? context.wording.login
+                                        : context.wording.topup;
+
+                                    return ElevatedButton.icon(
+                                      icon: icon,
+                                      // icon: Icon(Icons.login),
+                                      iconAlignment: IconAlignment.end,
+                                      onPressed: onPressed,
+                                      style: context
+                                          .appTheme
+                                          .elevatedButtonTheme
+                                          .style!
+                                          .copyWith(
+                                            shape: WidgetStatePropertyAll(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      AppDims.size_4,
+                                                    ),
+                                              ),
+                                            ),
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                            padding: WidgetStatePropertyAll(
+                                              EdgeInsets.symmetric(
+                                                horizontal: AppDims.size_4,
+                                              ),
+                                            ),
+                                            minimumSize: WidgetStatePropertyAll(
+                                              Size(70.w, 22.h),
+                                            ), // Set this
+                                            textStyle: WidgetStatePropertyAll(
+                                              context.textTheme.bodySmall!
+                                                  .copyWith(
+                                                    color: AppColors.white,
+                                                  ),
+                                            ),
+                                          ),
+                                      label: AppText(
+                                        label,
+                                        style: context.textTheme.titleSmall!
+                                            .copyWith(
+                                              color: AppColors.white,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            Selector<CustomerProvider, String>(
+                              selector: (context, provider) =>
+                                  provider.current.creditBalance ?? '0.00',
+                              builder: (context, value, child) => AppText(
+                                formatCurrency(string: value, leadingSign: '฿'),
+                                style: context.textTheme.headlineSmall!
+                                    .copyWith(
+                                      fontSize: AppDims.size_16.sp,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // AppDims.horizonPadding_12,
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              AppDims.horizonPadding_9,
+
+              // Coin Container
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Text เก็บได้ทุกวัน
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      padding: EdgeInsets.only(
+                        left: 8,
+                        top: 2,
+                        right: 8,
+                        bottom: 20,
+                      ),
+                      margin: EdgeInsets.only(top: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        // ถ้าเป็น Guest ไม่แสดง
+                        color: isGuest ? null : AppColors.error,
+                      ),
+                      // ถ้าเป็น Guest ไม่แสดง
+                      child: isGuest
+                          ? null
+                          : AppText(
+                              'เก็บได้ทุกวัน',
+                              style: context.textTheme.labelSmall!.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                    ),
+                  ),
+                  // Icon browny
+                  Positioned(
+                    left: -28.w,
+                    right: 0,
+                    top: -1.w,
+                    child: isGuest
+                        ? SizedBox()
+                        : Assets.svg.icBrownySpeaker.svg(width: 35.w),
+                  ),
+                  // Card แสดง Coin
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8.r),
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                      states,
+                    ) {
+                      if (states.contains(WidgetState.hovered)) {
+                        return AppColors.ctaPrimaryClicked.withValues(
+                          alpha: 0.1,
+                        );
+                      }
+                      if (states.contains(WidgetState.pressed)) {
+                        return AppColors.ctaPrimaryClicked.withValues(
+                          alpha: 0.2,
+                        );
+                      }
+                      return null;
+                    }),
+                    onTap: () {
+                      context.pushNamed(CoinPage.pageName);
+                    },
+                    child: Container(
+                      margin: margin,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_12.w,
+                        vertical: AppDims.size_16.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          width: 1.5,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Coin
+                              Image.asset(
+                                Assets.png.brownyCoin.path,
+                                width: AppDims.size_20.w,
+                                height: AppDims.size_20.h,
+                              ),
+                              AppDims.horizonPadding_8,
+                              AppText(
+                                'Browny Coin',
                                 style: context.textTheme.titleSmall!.copyWith(
-                                  color: AppColors.white,
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    Selector<CustomerProvider, String>(
-                      selector: (context, provider) =>
-                          provider.current.creditBalance ?? '0.00',
-                      builder: (context, value, child) => AppText(
-                        formatCurrency(string: value, leadingSign: '฿'),
-                        style: context.textTheme.headlineSmall!.copyWith(
-                          fontSize: AppDims.size_16.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                AppDims.horizonPadding_12,
-              ],
-            ),
-          ),
-          AppDims.horizonPadding_9,
-
-          // Coin Container
-          InkWell(
-            borderRadius: BorderRadius.circular(8.r),
-            onTap: () {
-              context.pushNamed(CoinPage.pageName);
-            },
-            child: Container(
-              height: 84.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(
-                  width: 1.5,
-                  color: AppColors.primary,
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppDims.size_12.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Coin
-                        Image.asset(
-                          Assets.png.brownyCoin.path,
-                          width: AppDims.size_20.w,
-                          height: AppDims.size_20.h,
-                        ),
-                        AppDims.horizonPadding_8,
-                        AppText(
-                          'Browny Coin',
-                          style: context.textTheme.titleSmall!.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w500,
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                      ],
-                    ),
-                    Selector<CustomerProvider, String>(
-                      selector: (context, provider) =>
-                          provider.current.brownyCoin ?? '0.00',
-                      builder: (context, value, child) => AppText(
-                        '${formatCurrency(string: value)} ${context.wording.coin}',
-                        style: context.textTheme.titleSmall!.copyWith(
-                          fontSize: AppDims.size_16.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                          Selector<CustomerProvider, String>(
+                            selector: (context, provider) =>
+                                provider.current.brownyCoin ?? '0.00',
+                            builder: (context, value, child) => AppText(
+                              formatCurrency(
+                                string: value,
+                                trailingSign: ' ${context.wording.coin}',
+                              ),
+                              style: context.textTheme.titleSmall!.copyWith(
+                                fontSize: AppDims.size_16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
+              AppDims.horizonPadding_9,
+
+              // Coupon
+              Column(
+                children: [
+                  if (!isGuest) AppDims.vericalPadding_20,
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8.r),
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                      states,
+                    ) {
+                      if (states.contains(WidgetState.hovered)) {
+                        return AppColors.ctaPrimaryClicked.withValues(
+                          alpha: 0.1,
+                        );
+                      }
+                      if (states.contains(WidgetState.pressed)) {
+                        return AppColors.ctaPrimaryClicked.withValues(
+                          alpha: 0.2,
+                        );
+                      }
+                      return null;
+                    }),
+                    onTap: () {
+                      context.pushNamed(CouponVoucherPage.pageName);
+                    },
+                    child: Container(
+                      // height: 84.h,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_12.w,
+                        vertical: AppDims.size_16.h,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          width: 1.5,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Coin
+                              Assets.svg.icTicketFilled.svg(
+                                width: AppDims.size_20.w,
+                                height: AppDims.size_20.h,
+                              ),
+                              AppDims.horizonPadding_8,
+                              AppText(
+                                context.wording.rewards,
+                                style: context.textTheme.titleSmall!.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
+                          Selector<CustomerProvider, String>(
+                            selector: (context, provider) => '0',
+                            builder: (context, value, child) => AppText(
+                              formatCurrency(
+                                string: value,
+                                decimal: false,
+                                trailingSign: ' ใบ',
+                              ),
+                              style: context.textTheme.titleSmall!.copyWith(
+                                fontSize: AppDims.size_16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -1,9 +1,10 @@
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:flutter/foundation.dart';
+
+enum HomePageState { home, invitFriend }
 
 class HomePageViewmodel extends AppViewModel {
   HomePageViewmodel({
@@ -14,7 +15,24 @@ class HomePageViewmodel extends AppViewModel {
   // ========== Repo ==========
   HomeDataSourceMixin _repo;
 
+  // ========== Dispose ==========
+  @override
+  void dispose() {
+    _homePageStateNotifier.dispose();
+    _bannerNotifier.dispose();
+    super.dispose();
+  }
+
   // ========== Controller, ValueNotifier ==========
+  /// Notifier สำหรับคุมการแสดงผลที่หน้า home_page
+  final ValueNotifier<UiResult<HomePageState>> _homePageStateNotifier =
+      ValueNotifier(
+        UiResult.success(data: HomePageState.home),
+      );
+  ValueListenable<UiResult<HomePageState>> get homePageStateNotifier =>
+      _homePageStateNotifier;
+
+  /// Notifier fetch banner
   final ValueNotifier<UiResult<List<BannerModel>>> _bannerNotifier =
       ValueNotifier(
         UiResult.loading(),
@@ -24,6 +42,21 @@ class HomePageViewmodel extends AppViewModel {
 
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
+  }
+
+  // ========== Logic ==========
+  void onHomePageNavigationChage(int index) {
+    switch (index) {
+      case 0:
+        onHomePageStateChange(HomePageState.home);
+        break;
+    }
+  }
+
+  void onHomePageStateChange(HomePageState state) {
+    _homePageStateNotifier.value = UiResult.success(
+      data: state,
+    );
   }
 
   Future<void> fetchBanners() async {

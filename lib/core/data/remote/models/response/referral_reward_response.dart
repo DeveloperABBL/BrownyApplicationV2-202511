@@ -1,6 +1,6 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 
 part 'referral_reward_response.g.dart';
 
@@ -10,7 +10,7 @@ part 'referral_reward_response.g.dart';
 // dart run build_runner watch (auto gen)
 // **************************************************************************
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class ReferralRewardResponse extends BaseModelResponse {
   ReferralRewardResponse({
     this.terms,

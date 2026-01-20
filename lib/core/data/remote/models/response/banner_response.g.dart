@@ -21,7 +21,7 @@ Map<String, dynamic> _$BannerResponseToJson(BannerResponse instance) =>
       'success': instance.success,
       'message': instance.message,
       'error_type': instance.errorType,
-      'data': instance.data?.map((e) => e.toJson()).toList(),
+      'data': instance.data,
     };
 
 BannerData _$BannerDataFromJson(Map<String, dynamic> json) => BannerData(

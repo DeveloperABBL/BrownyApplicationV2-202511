@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 
@@ -34,38 +35,4 @@ class IntroductionsResponse extends BaseModelResponse {
   Map<String, dynamic> toJson() => baseToJson(
     _$IntroductionsResponseToJson(this),
   );
-}
-
-@JsonSerializable()
-class ContentLocalizeData {
-  ContentLocalizeData({
-    this.th,
-    this.en,
-    this.zh,
-  });
-
-  @JsonKey(name: 'th')
-  final String? th;
-
-  @JsonKey(name: 'en')
-  final String? en;
-
-  @JsonKey(name: 'zh')
-  final String? zh;
-
-  String? getByLocaleCode(String locale) {
-    switch (locale) {
-      case 'en':
-        return en;
-      case 'zh':
-        return zh;
-      default:
-        return th;
-    }
-  }
-
-  factory ContentLocalizeData.fromJson(Map<String, dynamic> json) =>
-      _$ContentLocalizeDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ContentLocalizeDataToJson(this);
 }

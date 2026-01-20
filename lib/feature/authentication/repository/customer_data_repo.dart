@@ -128,6 +128,7 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
   Future<RepoResult<CustomerProfileResponse>> fetchProfile(String id) async {
     try {
       String mId = id;
+      CustomerProfileResponse? profileResult;
       if (mId.isEmpty) {
         final localProfileResult = await customerProfileData();
         if (localProfileResult.isEmpty) {
@@ -144,16 +145,21 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
         {'id': mId},
       );
       if (response.isSuccessful) {
-        var profile = response.data!.data;
+        profileResult = response.data;
+        var profile = profileResult!.data;
 
         try {
           // ถ้า fetch profile ได้ จะ fetch coin มาด้วย
-          final creditData = await fetchCustomerCredit(id);
+          final creditData = await fetchCustomerCredit(mId);
 
           if (creditData.isSuccess) {
             profile = profile.copyWith(
               creditBalance: creditData.data.creditBalance,
               brownyCoin: creditData.data.brownyCoin,
+            );
+
+            profileResult = profileResult.copyWith(
+              data: profile,
             );
           }
         } finally {
@@ -162,7 +168,7 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
       }
 
       // คืนค่าตามข้อมูลที่ได้รับจาก response
-      return RepoResult.dependOn(response.data);
+      return RepoResult.dependOn(profileResult);
     } on DioException catch (dioEx) {
       // ถ้าไม่พบผู้ใช้
       if (dioEx.response!.isNotFound) {

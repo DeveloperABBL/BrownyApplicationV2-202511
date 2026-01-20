@@ -6,6 +6,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/banner_
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
@@ -48,6 +49,12 @@ abstract class AppClient {
         () => 'Bearer ${config.token}',
       );
   }
+
+  /// DONG 2026-01-20
+  ///
+  /// API fetch รายการสาขาร้านค้าที่ใช้คูปองได้
+  @GET('/coupon/stores/list')
+  Future<HttpResponse<CouponStoreListResponse>> fetchCouponStoreList();
 
   /// DONG 2026-01-15
   ///

@@ -20,6 +20,20 @@ class CustomerProfileResponse extends BaseModelResponse {
   @JsonKey(name: 'data')
   final CustomerProfileData data;
 
+  CustomerProfileResponse copyWith({
+    CustomerProfileData? data,
+    bool? success,
+    String? errorType,
+    String? message,
+  }) {
+    return CustomerProfileResponse(
+      data: data ?? this.data,
+      success: success ?? this.success,
+      errorType: errorType ?? this.errorType,
+      message: message ?? this.message,
+    );
+  }
+
   factory CustomerProfileResponse.fromJson(Map<String, dynamic> json) =>
       _$CustomerProfileResponseFromJson(json);
   Map<String, dynamic> toJson() =>

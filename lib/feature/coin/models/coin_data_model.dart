@@ -165,17 +165,29 @@ class CoinDataModel extends CoinClaimData {
     }
 
     return CoinDataModel(
+      // เก็บ Locale ภาษา ณ ปัจจุบัน
       locale: locale,
+      // รหัส uuid user
       customerId: data.customerId,
+      // index ใน streaks cliam coin ล่าสุด
       streakDay: data.streakDay,
+      // datetime claim coin ล่าสุด
       lastClaimedDate: data.lastClaimedDate,
+      // flag claim ณ วันนี้ได้หรือไม่
       claimableToday: data.claimableToday,
+      // ยังไม่แน่ใจหน้าที่
       nextDay: data.nextDay,
+      // ยังไม่แน่ใจหน้าที่
       targetDay: data.targetDay,
+      // จำนวน coin ที่จะได้รับในวัน
       todayAmount: data.todayAmount,
+      // จำนวนวัน coin ที่ claim ได้สูงสุด
       maxDay: data.maxDay,
+      // raw list streaks
       streaks: data.streaks,
+      // streak ที่ mapping ข้อมูลสำหรับ display แล้ว
       streaksDisplay: data.streaks?.map((e) => itemBuild(e)).toList() ?? [],
+      // url banner ยังไม่แน่ใจจุดที่ใช้แสดง
       banners: data.banners,
     );
   }

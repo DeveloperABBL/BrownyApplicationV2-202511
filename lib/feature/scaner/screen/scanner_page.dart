@@ -197,7 +197,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
           color: tabIndex == 0 ? AppColors.primary : AppColors.white,
         ),
         unselectedLabelStyle: context.textTheme.titleMedium!.copyWith(
-          color: tabIndex == 0 ? AppColors.gray500 : AppColors.white,
+          color: tabIndex == 0 ? AppColors.grey500 : AppColors.white,
         ),
         onTap: (index) {
           _viewModel.onTabChanged(index);
@@ -232,7 +232,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
                 SizedBox(width: 8), // Add spacing between text and icon
                 Assets.svg.icQrDummy.svg(
                   colorFilter: ColorFilter.mode(
-                    tabIndex == 0 ? AppColors.gray500 : AppColors.white,
+                    tabIndex == 0 ? AppColors.grey500 : AppColors.white,
                     BlendMode.srcIn,
                   ),
                 ), // Your trailing icon

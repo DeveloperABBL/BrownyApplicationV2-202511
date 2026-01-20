@@ -154,118 +154,29 @@ class __CoinContentState extends State<_CoinContent> {
                                   AppDims.vericalPadding_16,
 
                                   // Claim Coin
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: List.generate(
-                                      coinData.maxDay!,
-                                      (index) {
-                                        // สร้าง item สำหรับ Claim Coin
-                                        return _buildItemCoinClaim(
-                                          coinData.streaksDisplay[index],
-                                          context,
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                  _buildListClaimCoinProgress(coinData),
+                                  // Row(
+                                  //   mainAxisAlignment:
+                                  //       MainAxisAlignment.spaceBetween,
+                                  //   children: List.generate(
+                                  //     coinData.maxDay!,
+                                  //     (index) {
+                                  //       // สร้าง item สำหรับ Claim Coin
+                                  //       return _buildItemCoinClaim(
+                                  //         coinData.streaksDisplay[index],
+                                  //         context,
+                                  //       );
+                                  //     },
+                                  //   ),
+                                  // ),
                                   AppDims.vericalPadding_4,
 
                                   // แถวเงื่อนไข
-                                  Row(
-                                    children: [
-                                      Spacer(),
-                                      TextButton.icon(
-                                        onPressed: () {},
-                                        style: context
-                                            .appTheme
-                                            .textButtonTheme
-                                            .style!
-                                            .copyWith(
-                                              minimumSize:
-                                                  WidgetStatePropertyAll(
-                                                    Size(
-                                                      AppDims.size_50.w,
-                                                      AppDims.size_18.h,
-                                                    ),
-                                                  ),
-                                              tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              padding: WidgetStatePropertyAll(
-                                                EdgeInsets.only(
-                                                  top: AppDims.size_2.h,
-                                                ),
-                                              ),
-                                            ),
-                                        icon: Icon(
-                                          Icons.info_outline_rounded,
-                                          color: AppColors.gray500,
-                                        ),
-                                        label: AppText(
-                                          'เงื่อนไข',
-                                          style: context.textTheme.labelMedium!
-                                              .copyWith(
-                                                color: AppColors.gray500,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  _buildButtonCondition(context),
                                   AppDims.vericalPadding_16,
 
                                   // Button Get Coin
-                                  GestureDetector(
-                                    onTap: coinData.claimableToday!
-                                        ? _onCoinClaiming
-                                        : null,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 57,
-                                        vertical: 16,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        gradient: coinData.claimableToday!
-                                            ? AppColors.claimCoinButtonGradient
-                                            : null,
-                                        color: coinData.claimableToday!
-                                            ? null
-                                            : AppColors.green400,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8.r),
-                                        ),
-                                        // ถ้าสามารถ claim. ได้
-                                        boxShadow: coinData.claimableToday!
-                                            ? [
-                                                BoxShadow(
-                                                  color: AppColors.ci4,
-                                                  blurRadius: 6.r,
-                                                ),
-                                              ]
-                                            // claim ไม่ได้ ไม่ต้องมี shadow
-                                            : null,
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          AppText(
-                                            coinData.claimableToday!
-                                                ? 'รับคอนย์'
-                                                : 'รับพรุ่งนี้',
-                                            style: context
-                                                .textTheme
-                                                .headlineSmall!
-                                                .copyWith(
-                                                  fontSize: AppDims.size_14.sp,
-                                                  color: AppColors.white,
-                                                ),
-                                          ),
-                                          AppDims.horizonPadding_8,
-
-                                          Assets.svg.icPaw.svg(),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  _buildButtonClaimCoin(coinData, context),
                                 ],
                               );
                             },
@@ -281,6 +192,104 @@ class __CoinContentState extends State<_CoinContent> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildListClaimCoinProgress(CoinDataModel coinData) {
+    return SizedBox(
+      height: 100.0.h,
+      child: ListView.separated(
+        padding: EdgeInsets.only(top: 10.h),
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        itemBuilder: (context, index) => _buildItemCoinClaim(
+          coinData.streaksDisplay[index],
+          context,
+        ),
+        separatorBuilder: (_, _) => AppDims.horizonPadding_12,
+        itemCount: coinData.maxDay!,
+      ),
+    );
+  }
+
+  Widget _buildButtonClaimCoin(CoinDataModel coinData, BuildContext context) {
+    return GestureDetector(
+      onTap: coinData.claimableToday! ? _onCoinClaiming : null,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 57,
+          vertical: 16,
+        ),
+        decoration: BoxDecoration(
+          gradient: coinData.claimableToday!
+              ? AppColors.claimCoinButtonGradient
+              : null,
+          color: coinData.claimableToday! ? null : AppColors.green400,
+          borderRadius: BorderRadius.all(
+            Radius.circular(8.r),
+          ),
+          // ถ้าสามารถ claim. ได้
+          boxShadow: coinData.claimableToday!
+              ? [
+                  BoxShadow(
+                    color: AppColors.ci4,
+                    blurRadius: 6.r,
+                  ),
+                ]
+              // claim ไม่ได้ ไม่ต้องมี shadow
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppText(
+              coinData.claimableToday! ? 'รับคอนย์' : 'รับพรุ่งนี้',
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontSize: AppDims.size_14.sp,
+                color: AppColors.textWhite,
+              ),
+            ),
+            AppDims.horizonPadding_8,
+
+            Assets.svg.icPaw.svg(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonCondition(BuildContext context) {
+    return Row(
+      children: [
+        Spacer(),
+        TextButton.icon(
+          onPressed: () {},
+          style: context.appTheme.textButtonTheme.style!.copyWith(
+            minimumSize: WidgetStatePropertyAll(
+              Size(
+                AppDims.size_50.w,
+                AppDims.size_18.h,
+              ),
+            ),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: WidgetStatePropertyAll(
+              EdgeInsets.only(
+                top: AppDims.size_2.h,
+              ),
+            ),
+          ),
+          icon: Icon(
+            Icons.info_outline_rounded,
+            color: AppColors.grey500,
+          ),
+          label: AppText(
+            'เงื่อนไข',
+            style: context.textTheme.labelMedium!.copyWith(
+              color: AppColors.grey500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -418,14 +427,14 @@ class __CoinContentState extends State<_CoinContent> {
                           GoogleFonts.prompt(
                             textStyle: context.textTheme.headlineMedium,
                           ).copyWith(
-                            color: AppColors.white,
+                            color: AppColors.textWhite,
                           ),
                       children: [
                         TextSpan(text: ' '),
                         TextSpan(
                           text: context.wording.coin,
                           style: context.textTheme.labelSmall?.copyWith(
-                            color: AppColors.white,
+                            color: AppColors.textWhite,
                             fontSize: AppDims.size_10.sp,
                           ),
                         ),
@@ -448,7 +457,7 @@ class __CoinContentState extends State<_CoinContent> {
         'Browny Coin',
         style: context.textTheme.titleLarge!.copyWith(
           fontSize: AppDims.size_18.sp,
-          color: AppColors.white,
+          color: AppColors.textWhite,
         ),
       ),
     );
@@ -477,8 +486,8 @@ class __CoinContentState extends State<_CoinContent> {
           clipBehavior: Clip.none, // ✅ ให้วงกลมยื่นออกนอกขอบได้
           children: [
             Container(
-              width: 40.w,
-              height: 70.h,
+              width: 35.w,
+              height: 65.h,
               padding: EdgeInsets.only(
                 left: 3,
                 right: 3,
@@ -532,7 +541,7 @@ class __CoinContentState extends State<_CoinContent> {
                       alignment: Alignment.bottomCenter,
                       child: brownyItemState.svg(
                         fit: BoxFit.cover,
-                        width: 38.w,
+                        width: 33.w,
                       ),
                     ),
                   ],

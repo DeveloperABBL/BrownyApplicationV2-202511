@@ -81,10 +81,6 @@ class $AssetsPngGen {
   AssetGenImage get coinCoinClaim =>
       const AssetGenImage('assets/png/coin_coin_claim.png');
 
-  /// File path: assets/png/coin_item_browny_smile.png
-  AssetGenImage get coinItemBrownySmile =>
-      const AssetGenImage('assets/png/coin_item_browny_smile.png');
-
   /// File path: assets/png/ic_apple.png
   AssetGenImage get icApple => const AssetGenImage('assets/png/ic_apple.png');
 
@@ -97,18 +93,6 @@ class $AssetsPngGen {
 
   /// File path: assets/png/ic_line.png
   AssetGenImage get icLine => const AssetGenImage('assets/png/ic_line.png');
-
-  /// File path: assets/png/item_coin_claim.png
-  AssetGenImage get itemCoinClaim =>
-      const AssetGenImage('assets/png/item_coin_claim.png');
-
-  /// File path: assets/png/item_coin_claim_next_day.png
-  AssetGenImage get itemCoinClaimNextDay =>
-      const AssetGenImage('assets/png/item_coin_claim_next_day.png');
-
-  /// File path: assets/png/item_coin_claimed.png
-  AssetGenImage get itemCoinClaimed =>
-      const AssetGenImage('assets/png/item_coin_claimed.png');
 
   /// File path: assets/png/launcher_icon.png
   AssetGenImage get launcherIcon =>
@@ -152,14 +136,10 @@ class $AssetsPngGen {
     cardInvitFriend,
     cardInvitTitle,
     coinCoinClaim,
-    coinItemBrownySmile,
     icApple,
     icFacebook,
     icGoogle,
     icLine,
-    itemCoinClaim,
-    itemCoinClaimNextDay,
-    itemCoinClaimed,
     launcherIcon,
     logoReferral,
     promptpayBadge,
@@ -206,6 +186,10 @@ class $AssetsSvgGen {
   SvgGenImage get icBrownySmile2 =>
       const SvgGenImage('assets/svg/ic_browny_smile_2.svg');
 
+  /// File path: assets/svg/ic_browny_speaker.svg
+  SvgGenImage get icBrownySpeaker =>
+      const SvgGenImage('assets/svg/ic_browny_speaker.svg');
+
   /// File path: assets/svg/ic_calendar_today.svg
   SvgGenImage get icCalendarToday =>
       const SvgGenImage('assets/svg/ic_calendar_today.svg');
@@ -213,13 +197,37 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_copy.svg
   SvgGenImage get icCopy => const SvgGenImage('assets/svg/ic_copy.svg');
 
+  /// File path: assets/svg/ic_coupon_check_rounded_green.svg
+  SvgGenImage get icCouponCheckRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_coupon_check_rounded_green.svg');
+
+  /// File path: assets/svg/ic_coupon_edit_rounded_green.svg
+  SvgGenImage get icCouponEditRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_coupon_edit_rounded_green.svg');
+
+  /// File path: assets/svg/ic_coupon_heat_rounded_green.svg
+  SvgGenImage get icCouponHeatRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_coupon_heat_rounded_green.svg');
+
   /// File path: assets/svg/ic_coupon_round_green.svg
   SvgGenImage get icCouponRoundGreen =>
       const SvgGenImage('assets/svg/ic_coupon_round_green.svg');
 
+  /// File path: assets/svg/ic_coupon_used_rounded_green.svg
+  SvgGenImage get icCouponUsedRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_coupon_used_rounded_green.svg');
+
+  /// File path: assets/svg/ic_coupon_wash_rounded_green.svg
+  SvgGenImage get icCouponWashRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_coupon_wash_rounded_green.svg');
+
   /// File path: assets/svg/ic_cross_hair.svg
   SvgGenImage get icCrossHair =>
       const SvgGenImage('assets/svg/ic_cross_hair.svg');
+
+  /// File path: assets/svg/ic_cross_round_green.svg
+  SvgGenImage get icCrossRoundGreen =>
+      const SvgGenImage('assets/svg/ic_cross_round_green.svg');
 
   /// File path: assets/svg/ic_down_storage.svg
   SvgGenImage get icDownStorage =>
@@ -230,6 +238,9 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_edit.svg
   SvgGenImage get icEdit => const SvgGenImage('assets/svg/ic_edit.svg');
+
+  /// File path: assets/svg/ic_face_id.svg
+  SvgGenImage get icFaceId => const SvgGenImage('assets/svg/ic_face_id.svg');
 
   /// File path: assets/svg/ic_flag_en.svg
   SvgGenImage get icFlagEn => const SvgGenImage('assets/svg/ic_flag_en.svg');
@@ -273,8 +284,14 @@ class $AssetsSvgGen {
   SvgGenImage get icInvitStatePawInactive =>
       const SvgGenImage('assets/svg/ic_invit_state_paw_inactive.svg');
 
+  /// File path: assets/svg/ic_location.svg
+  SvgGenImage get icLocation => const SvgGenImage('assets/svg/ic_location.svg');
+
   /// File path: assets/svg/ic_login.svg
   SvgGenImage get icLogin => const SvgGenImage('assets/svg/ic_login.svg');
+
+  /// File path: assets/svg/ic_magnify.svg
+  SvgGenImage get icMagnify => const SvgGenImage('assets/svg/ic_magnify.svg');
 
   /// File path: assets/svg/ic_notification.svg
   SvgGenImage get icNotification =>
@@ -326,6 +343,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_scan_2.svg
   SvgGenImage get icScan2 => const SvgGenImage('assets/svg/ic_scan_2.svg');
 
+  /// File path: assets/svg/ic_scan_3.svg
+  SvgGenImage get icScan3 => const SvgGenImage('assets/svg/ic_scan_3.svg');
+
   /// File path: assets/svg/ic_share.svg
   SvgGenImage get icShare => const SvgGenImage('assets/svg/ic_share.svg');
 
@@ -342,6 +362,10 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_ticket_active.svg
   SvgGenImage get icTicketActive =>
       const SvgGenImage('assets/svg/ic_ticket_active.svg');
+
+  /// File path: assets/svg/ic_ticket_filled.svg
+  SvgGenImage get icTicketFilled =>
+      const SvgGenImage('assets/svg/ic_ticket_filled.svg');
 
   /// File path: assets/svg/ic_title_invit_friend.svg
   SvgGenImage get icTitleInvitFriend =>
@@ -368,13 +392,21 @@ class $AssetsSvgGen {
     icBrownyLove,
     icBrownySmile,
     icBrownySmile2,
+    icBrownySpeaker,
     icCalendarToday,
     icCopy,
+    icCouponCheckRoundedGreen,
+    icCouponEditRoundedGreen,
+    icCouponHeatRoundedGreen,
     icCouponRoundGreen,
+    icCouponUsedRoundedGreen,
+    icCouponWashRoundedGreen,
     icCrossHair,
+    icCrossRoundGreen,
     icDownStorage,
     icDownload,
     icEdit,
+    icFaceId,
     icFlagEn,
     icFlagTh,
     icFlagZh,
@@ -387,7 +419,9 @@ class $AssetsSvgGen {
     icInvitStateCouponInactive,
     icInvitStatePawActive,
     icInvitStatePawInactive,
+    icLocation,
     icLogin,
+    icMagnify,
     icNotification,
     icObscureOff,
     icObscureOn,
@@ -402,11 +436,13 @@ class $AssetsSvgGen {
     icQrDummy,
     icScan,
     icScan2,
+    icScan3,
     icShare,
     icShop,
     icShopActive,
     icTicket,
     icTicketActive,
+    icTicketFilled,
     icTitleInvitFriend,
     icTpWallet,
     icUpload,

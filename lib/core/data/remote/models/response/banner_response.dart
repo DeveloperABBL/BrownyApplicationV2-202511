@@ -1,4 +1,4 @@
-import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 
@@ -9,7 +9,7 @@ part 'banner_response.g.dart';
 // dart run build_runner build --delete-conflicting-outputs
 // **************************************************************************
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class BannerResponse extends BaseModelResponse {
   @JsonKey(name: 'data')
   final List<BannerData>? data;

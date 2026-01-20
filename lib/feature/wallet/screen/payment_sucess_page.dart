@@ -470,7 +470,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                                 Icon(
                                   Icons.arrow_downward,
                                   size: 24.w,
-                                  color: AppColors.gray500,
+                                  color: AppColors.grey500,
                                 ),
                                 AppDims.vericalPadding_8,
 

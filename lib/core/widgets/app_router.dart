@@ -2,6 +2,7 @@ import 'package:browny_applications_new/feature/authentication/screen/biometric_
 import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/coupon_voucher/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
@@ -104,6 +105,11 @@ class AppRouter {
         path: CoinPage.pagePath,
         name: CoinPage.pageName,
         builder: (context, state) => const CoinPage(),
+      ),
+      GoRoute(
+        path: CouponVoucherPage.pagePath,
+        name: CouponVoucherPage.pageName,
+        builder: (context, state) => const CouponVoucherPage(),
       ),
     ],
   );

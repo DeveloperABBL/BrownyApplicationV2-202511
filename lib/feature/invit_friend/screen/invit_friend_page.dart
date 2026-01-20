@@ -77,6 +77,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
           children: [
             AppBar(
               backgroundColor: AppColors.transparent,
+              leading: BackButton(),
               title: AppText(
                 'ชวนเพื่อนมาซักกับ Browny',
                 style: context.textTheme.titleLarge!.copyWith(
@@ -132,6 +133,8 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                         style: context.textTheme.titleMedium,
                       ),
                       AppDims.vericalPadding_12,
+
+                      // Step ชวนเพื่อนสะสม
                       SizedBox(
                         height: 50.h,
                         child: ListView.separated(
@@ -142,21 +145,30 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
 
                           itemBuilder: (context, index) {
                             final data = result.data!.referralRewardData[index];
-                            if (data.active && data.isReward) {
-                              return Assets.svg.icInvitStateCouponInactive
-                                  .svg();
-                            }
-
-                            if (data.isReward) {
-                              return Assets.svg.icInvitStateCouponInactive
-                                  .svg();
-                            }
-
+                            SvgGenImage icReferral;
+                            // สะสมชวนเพื่อนแล้ว
                             if (data.active) {
-                              return Assets.svg.icInvitStatePawActive.svg();
+                              if (data.isReward) {
+                                // Icon ที่เป็น Reward
+                                icReferral =
+                                    Assets.svg.icInvitStateCouponActive;
+                              } else {
+                                // Icon ธรรมดา
+                                icReferral = Assets.svg.icInvitStatePawActive;
+                              }
+                            } else {
+                              // ยังไม่เคยสะสม หรือ ยังสะสมไม่ถึง
+                              if (data.isReward) {
+                                // Icon ที่เป็น Reward
+                                icReferral =
+                                    Assets.svg.icInvitStateCouponInactive;
+                              } else {
+                                // Icon ธรรมดา
+                                icReferral = Assets.svg.icInvitStatePawInactive;
+                              }
                             }
 
-                            return Assets.svg.icInvitStatePawInactive.svg();
+                            return icReferral.svg();
                           },
                         ),
                       ),
@@ -185,7 +197,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                             fontSize: FontSize(
                               12.sp,
                             ),
-                            color: AppColors.gray600,
+                            color: AppColors.grey600,
                             padding: HtmlPaddings.zero,
                             textAlign: TextAlign.start,
                             margin: Margins.all(0),
@@ -248,6 +260,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                   Expanded(
                     child: TextButton.icon(
                       onPressed: () async {
+                        // Copy ข้อความเข้า Clipboard
                         await Clipboard.setData(
                           ClipboardData(
                             text: value.current.phone.orEmpty,
@@ -391,9 +404,15 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                     bottomLeft: Radius.circular(8.r),
                     topLeft: Radius.circular(8.r),
                   ),
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      rewardData.imageDisplay,
+                    ),
+                    fit: BoxFit.fill,
+                  ),
                 ),
                 // child: Icon(Icons.discount_rounded),
-                child: Assets.png.brownyCreatePin.image(),
+                // child: Assets.png.brownyCreatePin.image(),
               ),
 
               Container(

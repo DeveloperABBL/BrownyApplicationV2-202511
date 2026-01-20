@@ -96,7 +96,7 @@ class _TopupContent extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: formatCurrency(value: 0.0),
                       hintStyle: context.inputTextStyle.copyWith(
-                        color: AppColors.gray500,
+                        color: AppColors.grey500,
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.r),
@@ -122,7 +122,7 @@ class _TopupContent extends StatelessWidget {
                   AppText(
                     context.wording.minimumTopUp,
                     style: context.textTheme.bodySmall!.copyWith(
-                      color: AppColors.gray500,
+                      color: AppColors.grey500,
                     ),
                   ),
                   AppDims.vericalPadding_8,

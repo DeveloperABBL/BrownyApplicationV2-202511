@@ -14,6 +14,13 @@ class InvitFriendViewModel extends AppViewModel {
 
   final InvitFriendDataSourceMixin repo;
 
+  // ========== Dispose ==========
+  @override
+  void dispose() {
+    _referralRewardNotifier.dispose();
+    super.dispose();
+  }
+
   // ========== ValueNotifier, Controller ==========
   final ValueNotifier<UiResult<ReferralRewardModel>> _referralRewardNotifier =
       ValueNotifier(UiResult.loading());

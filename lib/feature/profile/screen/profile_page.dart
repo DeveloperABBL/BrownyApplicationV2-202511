@@ -145,52 +145,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         : null,
                   ),
 
-                  // AppText(
-                  //   context.wording.updateYourProfile,
-                  //   style: context.textTheme.titleMedium!.copyWith(
-                  //     color: AppColors.textPrimary,
-                  //     fontSize: AppDims.size_16.sp,
-                  //   ),
-                  // ),
-
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   mainAxisSize: MainAxisSize.max,
-                  //   children: [
-                  //     // ปุ่มย้อนกลับ
-                  //     ElevatedButton.icon(
-                  //       onPressed: () {},
-                  //       icon: Icon(
-                  //         Icons.arrow_back_ios_new,
-                  //         color: AppColors.primary,
-                  //         size: 24.sp,
-                  //       ),
-                  //       label: AppText(
-                  //         context.wording.back,
-                  //         style: AppTextStyles.bodyMedium.copyWith(
-                  //           color: AppColors.primary,
-                  //           fontWeight: FontWeight.w600,
-                  //         ),
-                  //       ),
-                  //       style: ElevatedButton.styleFrom(
-                  //         minimumSize: Size(50.w, 40.h),
-                  //         backgroundColor: Colors.transparent,
-                  //         shadowColor: Colors.transparent,
-                  //         padding: EdgeInsets.zero,
-                  //         elevation: 0,
-                  //       ),
-                  //     ),
-                  //     Center(
-                  //       child: AppText(
-                  //         context.wording.updateYourProfile,
-                  //         style: context.textTheme.titleMedium!.copyWith(
-                  //           color: AppColors.textPrimary,
-                  //           fontSize: AppDims.size_16.sp,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                   _buildProfileImage(data),
 
                   AppDims.vericalPadding_10,
@@ -245,7 +199,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               decoration: InputDecoration(
                 hintText: 'Browny1234@gmail.com',
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.gray500,
+                  color: AppColors.grey500,
                 ),
                 fillColor: AppColors.background,
                 prefixIcon: SizedBox.shrink(),
@@ -277,7 +231,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               decoration: InputDecoration(
                 hintText: context.wording.nameSurname,
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.gray500,
+                  color: AppColors.grey500,
                 ),
                 fillColor: AppColors.background,
                 prefixIcon: SizedBox.shrink(),
@@ -310,7 +264,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
               decoration: InputDecoration(
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.gray500,
+                  color: AppColors.grey500,
                 ),
                 fillColor: AppColors.background,
                 hintText: context.wording.gender,
@@ -357,7 +311,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 fillColor: AppColors.background,
                 hintText: context.wording.ddMMyy,
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.gray500,
+                  color: AppColors.grey500,
                 ),
                 suffixIcon: Padding(
                   padding: EdgeInsets.symmetric(
@@ -408,12 +362,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
               icon: Icon(
                 Icons.info_outline_rounded,
-                color: AppColors.gray500,
+                color: AppColors.grey500,
               ),
               label: AppText(
                 'เงื่อนไขสิทธิพิเศษวันเกิด',
                 style: context.textTheme.labelMedium!.copyWith(
-                  color: AppColors.gray500,
+                  color: AppColors.grey500,
                 ),
               ),
             ),
@@ -558,7 +512,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               style: context.textTheme.headlineMedium!.copyWith(
                 fontSize: AppDims.size_20.sp,
                 color: phone.orEmpty.isEmpty
-                    ? AppColors.gray500
+                    ? AppColors.grey500
                     : AppColors.textPrimary,
               ),
             );
@@ -713,7 +667,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           icon: Icon(
                             Icons.chevron_left_rounded,
                             size: AppDims.size_40.w,
-                            color: AppColors.gray500,
+                            color: AppColors.grey500,
                           ),
                           onPressed: () {
                             _viewModel.carouselController.previousPage(
@@ -730,7 +684,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icon(
                       Icons.chevron_right_rounded,
                       size: AppDims.size_40.w,
-                      color: AppColors.gray500,
+                      color: AppColors.grey500,
                     ),
                     onPressed: () {
                       _viewModel.carouselController.nextPage(

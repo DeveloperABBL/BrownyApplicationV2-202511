@@ -28,9 +28,9 @@ Map<String, dynamic> _$ReferralRewardResponseToJson(
   'success': instance.success,
   'message': instance.message,
   'error_type': instance.errorType,
-  'terms': instance.terms?.toJson(),
+  'terms': instance.terms,
   'total_step': instance.totalStep,
-  'rewards': instance.rewards?.map((e) => e.toJson()).toList(),
+  'rewards': instance.rewards,
   'now_step': instance.nowStep,
 };
 

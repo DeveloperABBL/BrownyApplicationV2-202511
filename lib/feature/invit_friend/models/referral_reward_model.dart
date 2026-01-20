@@ -9,7 +9,9 @@ class ReferralRewardModel extends ReferralRewardResponse {
       (response.totalStep ?? 0),
       (index) => ReferralRewardData(
         active: response.nowStep! > 0 && response.nowStep! >= index,
-        isReward: response.rewards!.where((e) => e.step! == index).isNotEmpty,
+        isReward: response.rewards!
+            .where((e) => e.step! == (index + 1))
+            .isNotEmpty,
       ),
     );
 
