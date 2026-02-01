@@ -274,7 +274,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get skip => 'ข้าม';
 
   @override
-  String get eVouchers => 'คูปองซัก-อบผ้าล่วงหน้า';
+  String get eVouchers => 'E-Voucher';
 
   @override
   String get chooseStore => 'เลือกสาขา';
@@ -859,4 +859,55 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get noRewardsFound => 'ไม่พบรายการรางวัล';
+
+  @override
+  String get cannotEnableBiometric => 'ไม่สามารถเปิดใช้งาน Biometric ได้';
+
+  @override
+  String get qrCodeNotFoundInImage => 'ไม่พบ QR Code ในรูปภาพ';
+
+  @override
+  String get makePayment => 'ชำระเงิน';
+
+  @override
+  String get products => 'สินค้า';
+
+  @override
+  String get collectCoupon => 'เก็บคูปอง';
+
+  @override
+  String get scanCoupon => 'สแกนคูปอง';
+
+  @override
+  String get sakob => 'ซักอบ';
+
+  @override
+  String get eVoucherDetails => 'รายละเอียด E-Voucher';
+
+  @override
+  String get buyEVoucher => 'ซื้อคูปอง E-Voucher';
+
+  @override
+  String get birthdaySpecialConditions => 'เงื่อนไขสิทธิพิเศษวันเกิด';
+
+  @override
+  String get profileSavedSuccessfully => 'บันทึกข้อมูลเรียบร้อย';
+
+  @override
+  String get confirmLogoutMessage => 'คุณแน่ใจหรือไม่ว่าจะออกจากระบบ';
+
+  @override
+  String get acknowledge => 'รับทราบ';
+
+  @override
+  String get changeBirthday => 'เปลี่ยนวันเกิด';
+
+  @override
+  String get searchStoreParticipating => 'ค้นหาสาขาที่ร่วมรายการ';
+
+  @override
+  String get storeNotFound => 'ไม่พบสาขาที่ค้นหา';
+
+  @override
+  String get recent => 'ล่าสุด';
 }

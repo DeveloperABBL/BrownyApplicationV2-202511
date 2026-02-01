@@ -86,7 +86,7 @@ class AppOverlays {
       builder: (context) => GestureDetector(
         onTap: barrierDismissible ? dismiss : null,
         child: Material(
-          color: barrierColor ?? Colors.black.withOpacity(0.5),
+          color: barrierColor ?? Colors.black.withValues(alpha: 0.5),
           child: GestureDetector(
             onTap: () {}, // ป้องกันการ dismiss เมื่อแตะที่ content
             child: builder(dismiss),
@@ -458,6 +458,8 @@ class _BrownyDialog extends StatelessWidget {
                         confirmText,
                       ),
                     ),
+                    AppDims.vericalPadding_12,
+
                     OutlinedButton(
                       onPressed: onCancel,
                       style: OutlinedButton.styleFrom(

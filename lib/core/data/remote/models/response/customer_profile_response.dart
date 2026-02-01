@@ -53,6 +53,10 @@ class CustomerProfileData {
     this.creditBalance,
     this.brownyCoin,
     this.avatars,
+    this.couponsRedemption,
+    this.couponsDiscount,
+    this.couponsEVoucher,
+    this.totalCoupons,
   });
 
   @JsonKey(name: 'id')
@@ -85,6 +89,18 @@ class CustomerProfileData {
   @JsonKey(name: 'avatars')
   final List<String>? avatars;
 
+  @JsonKey(name: 'coupons_redemption')
+  final int? couponsRedemption;
+
+  @JsonKey(name: 'coupons_discount')
+  final int? couponsDiscount;
+
+  @JsonKey(name: 'coupons_e_voucher')
+  final int? couponsEVoucher;
+
+  @JsonKey(name: 'total_coupons')
+  final int? totalCoupons;
+
   CustomerProfileData copyWith({
     String? id,
     String? name,
@@ -96,6 +112,10 @@ class CustomerProfileData {
     String? creditBalance,
     String? brownyCoin,
     List<String>? avatars,
+    int? couponsRedemption,
+    int? couponsDiscount,
+    int? couponsEVoucher,
+    int? totalCoupons,
   }) {
     return CustomerProfileData(
       id: id ?? this.id,
@@ -108,6 +128,10 @@ class CustomerProfileData {
       creditBalance: creditBalance ?? this.creditBalance,
       brownyCoin: brownyCoin ?? this.brownyCoin,
       avatars: avatars ?? this.avatars,
+      couponsRedemption: couponsRedemption ?? this.couponsRedemption,
+      couponsDiscount: couponsDiscount ?? this.couponsDiscount,
+      couponsEVoucher: couponsEVoucher ?? this.couponsEVoucher,
+      totalCoupons: totalCoupons ?? this.totalCoupons,
     );
   }
 

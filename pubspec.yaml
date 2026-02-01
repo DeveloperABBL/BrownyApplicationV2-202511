@@ -68,6 +68,10 @@ dependencies:
   webview_flutter: ^4.9.0
   url_launcher: ^6.3.1
   dropdown_search: ^6.0.2
+  google_maps_flutter: ^2.10.0
+  geolocator: ^13.0.2
+  speech_to_text: ^7.0.0
+  firebase_core: ^4.4.0
 
 dev_dependencies:
   build_runner: ^2.10.1
@@ -111,6 +115,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/icon_shortcut/
     - assets/svg/
     - assets/png/
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -2,13 +2,18 @@ import 'package:browny_applications_new/feature/authentication/screen/biometric_
 import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
-import 'package:browny_applications_new/feature/coupon_voucher/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
+import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
@@ -53,7 +58,7 @@ class AppRouter {
           bool isEditing = false;
           try {
             final extra = state.extra as Map<String, dynamic>?;
-            isEditing = extra?[ProfilePage.kEditing];
+            isEditing = extra?[ProfilePage.kFirstSignup];
           } catch (ignore) {}
           return ProfilePage(isFirstSignup: isEditing);
         },
@@ -61,7 +66,19 @@ class AppRouter {
       GoRoute(
         path: CreateAppPinPage.pagePath,
         name: CreateAppPinPage.pageName,
-        builder: (context, state) => const CreateAppPinPage(),
+        builder: (context, state) {
+          bool implementBackButton = false;
+          bool isFirstSignup = false;
+          try {
+            final extra = state.extra as Map<String, dynamic>?;
+            implementBackButton = extra?[CreateAppPinPage.kImplementBackButton];
+            isFirstSignup = extra?[CreateAppPinPage.kFirstSignup];
+          } catch (ignore) {}
+          return CreateAppPinPage(
+            implementBackButton: implementBackButton,
+            isFirstSignup: isFirstSignup,
+          );
+        },
       ),
       GoRoute(
         path: BiometricPage.pagePath,
@@ -110,6 +127,33 @@ class AppRouter {
         path: CouponVoucherPage.pagePath,
         name: CouponVoucherPage.pageName,
         builder: (context, state) => const CouponVoucherPage(),
+      ),
+      GoRoute(
+        path: PurchaseCouponVoucherPage.pagePath,
+        name: PurchaseCouponVoucherPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as PurchaseCouponViewmodelDelegate;
+          return PurchaseCouponVoucherPage(
+            viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: TransactionSelectedPage.pagePath,
+        name: TransactionSelectedPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as TransactionsViewmodel;
+          return TransactionSelectedPage(
+            viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: MapPage.pagePath,
+        name: MapPage.pageName,
+        builder: (context, state) {
+          return MapPage();
+        },
       ),
     ],
   );

@@ -1,6 +1,6 @@
+import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../colors/app_colors.dart';
 import '../styles/app_text_style.dart';
 
@@ -48,9 +48,8 @@ class AppTheme {
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.mitr(
-          fontSize: 18,
-          fontWeight: FontWeight.w400,
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(
+          fontSize: AppDims.size_18.sp,
           color: AppColors.textPrimary,
         ),
         iconTheme: const IconThemeData(

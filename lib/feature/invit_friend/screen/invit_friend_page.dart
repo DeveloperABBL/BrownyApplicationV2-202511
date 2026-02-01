@@ -6,9 +6,13 @@ import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
+import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/models/referral_reward_model.dart';
 import 'package:browny_applications_new/feature/invit_friend/repository/invit_friend_repo.dart';
 import 'package:browny_applications_new/feature/invit_friend/viewmodel/invit_friend_viewmodel.dart';
+import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -197,7 +201,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                             fontSize: FontSize(
                               12.sp,
                             ),
-                            color: AppColors.grey600,
+                            color: AppColors.gray600,
                             padding: HtmlPaddings.zero,
                             textAlign: TextAlign.start,
                             margin: Margins.all(0),
@@ -233,10 +237,37 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
       bottomNavigationBar: BrownyBottomNav(
         currentIndex: 0,
         onTap: (index) {
-          context.pop();
+          // final HomePageState bypassState;
+          // if (index == 0) {
+          //   bypassState = HomePageState.home;
+          // } else if (index == 1) {
+          //   bypassState = HomePageState.couponVoucher;
+          // } else if (index == 2) {
+          //   bypassState = HomePageState.branches;
+          // } else {
+          //   bypassState = HomePageState.brownyShop;
+          // }
+          // context.pop({HomePageState: bypassState});
+          if (index == 0) {
+            context.pop();
+            return;
+          }
+
+          if (index == 1) {
+            context.pushNamed(CouponVoucherPage.pageName);
+            return;
+          }
+
+          if (index == 2) {
+            context.pushNamed(MapPage.pageName);
+            return;
+          }
         },
         onCenterTap: () {
-          print('onCenterTap');
+          // ไปหน้า Scan
+          context.pushNamed(
+            ScannerPage.pageName,
+          );
         },
       ),
     );
@@ -371,10 +402,12 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
       ...result.rewardDisplay.map(
         (rewardData) => Container(
           // Disable
-          foregroundDecoration: BoxDecoration(
-            color: Colors.grey,
-            backgroundBlendMode: BlendMode.saturation,
-          ),
+          foregroundDecoration: rewardData.active
+              ? null
+              : BoxDecoration(
+                  color: Colors.grey,
+                  backgroundBlendMode: BlendMode.saturation,
+                ),
           height: 85.h,
           margin: EdgeInsets.only(bottom: AppDims.size_12),
           decoration: BoxDecoration(
@@ -408,51 +441,53 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                     image: NetworkImage(
                       rewardData.imageDisplay,
                     ),
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 // child: Icon(Icons.discount_rounded),
                 // child: Assets.png.brownyCreatePin.image(),
               ),
 
-              Container(
-                padding: EdgeInsets.all(AppDims.size_8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppText(
-                      rewardData.typeDisplay,
-                      style: context.textTheme.titleSmall,
-                    ),
-                    AppText(
-                      rewardData.descriptionDisplay,
-                      style: context.textTheme.labelSmall!.copyWith(
-                        color: AppColors.primary,
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(AppDims.size_8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText(
+                        rewardData.typeDisplay,
+                        style: context.textTheme.titleSmall,
                       ),
-                    ),
-                    Spacer(),
-
-                    RichText(
-                      text: TextSpan(
-                        text: rewardData.expireDisplay,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          fontSize: AppDims.size_10.sp,
-                          color: AppColors.textSecondary,
+                      AppText(
+                        rewardData.descriptionDisplay,
+                        style: context.textTheme.labelSmall!.copyWith(
+                          color: AppColors.primary,
                         ),
-                        children: [
-                          TextSpan(text: ' '),
-                          TextSpan(
-                            text: 'เงื่อนไข',
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: AppColors.primary,
-                              fontSize: AppDims.size_10.sp,
-                            ),
-                            recognizer: TapGestureRecognizer()..onTap = () {},
-                          ),
-                        ],
                       ),
-                    ),
-                  ],
+                      Spacer(),
+
+                      RichText(
+                        text: TextSpan(
+                          text: rewardData.expireDisplay,
+                          style: context.textTheme.bodySmall?.copyWith(
+                            fontSize: AppDims.size_10.sp,
+                            color: AppColors.textSecondary,
+                          ),
+                          children: [
+                            TextSpan(text: ' '),
+                            TextSpan(
+                              text: 'เงื่อนไข',
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: AppColors.primary,
+                                fontSize: AppDims.size_10.sp,
+                              ),
+                              recognizer: TapGestureRecognizer()..onTap = () {},
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

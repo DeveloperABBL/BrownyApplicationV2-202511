@@ -1,3 +1,6 @@
+import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/coupon_payment_check_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
@@ -6,10 +9,17 @@ import 'package:browny_applications_new/core/data/remote/models/response/banner_
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_payment_check_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
@@ -50,11 +60,92 @@ abstract class AppClient {
       );
   }
 
+  /// DONG 2026-01-28
+  ///
+  /// API fetch map locations (สาขาทั้งหมดบนแผนที่)
+  @GET('/map/locations')
+  Future<HttpResponse<MapLocationResponse>> fetchMapLocations();
+
+  /// DONG 2026-01-24
+  ///
+  /// API ตรวจสอบสถานะการชำระเงินคูปอง/e-voucher
+  @POST('/payment/coupon-evorcher/check')
+  Future<HttpResponse<CouponPaymentCheckResponse>> checkCouponPaymentStatus(
+    @Body() CouponPaymentCheckRequest body,
+  );
+
+  /// DONG 2026-01-24
+  ///สร้างคำสั่งซื้อคูปอง (create coupon order)
+  @POST('/coupon-orders')
+  Future<HttpResponse<CouponOrderResponse>> createCouponOrder(
+    @Body() CouponOrderRequest body,
+  );
+
+  /// DONG 2026-01-24
+  ///
+  /// API fetch รายการแพ็คเกจคูปอง
+  ///
+  /// Body parameters:
+  /// - latitude: String
+  /// - longitude: String
+  /// - customer_id: String
+  @GET('/coupon/list')
+  Future<HttpResponse<CouponPackageListResponse>> fetchCouponPackageList(
+    @Body() CouponListRequest body,
+  );
+
+  /// DONG 2026-01-31
+  ///
+  /// API fetch รายละเอียดคูปองตาม coupon_id
+  ///
+  /// Body parameters:
+  /// - latitude: String
+  /// - longitude: String
+  /// - customer_id: String
+  @GET('/coupon/detail/{coupon_id}')
+  Future<HttpResponse<CouponDetailResponse>> fetchCouponDetail(
+    @Path('coupon_id') int couponId,
+    @Body() CouponListRequest body,
+  );
+
+  /// DONG 2026-01-20
+  ///
+  /// API fetch จำนวนคูปองที่มีอยู่ของ customer ตาม uuid
+  @GET('/customer/{uuid}/coupons/available-count')
+  Future<HttpResponse<CouponAvailableCountResponse>> fetchCouponAvailableCount(
+    @Path('uuid') String uuid,
+  );
+
   /// DONG 2026-01-20
   ///
   /// API fetch รายการสาขาร้านค้าที่ใช้คูปองได้
   @GET('/coupon/stores/list')
   Future<HttpResponse<CouponStoreListResponse>> fetchCouponStoreList();
+
+  /// DONG 2026-01-21
+  ///
+  /// API fetch คูปองแลกซื้อของ customer ตาม uuid
+  @GET('/customer/coupons/redemption/{uuid}')
+  Future<HttpResponse<CouponRedemptionResponse>> fetchCouponRedemption(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-01-21
+  ///
+  /// API fetch คูปองส่วนลดของ customer ตาม uuid
+  @GET('/customer/coupons/discount/{uuid}')
+  Future<HttpResponse<CouponDiscountResponse>> fetchCouponDiscount(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-01-21
+  ///
+  /// API fetch E-Voucher ของ customer ตาม uuid
+  @GET('/customer/coupons/e-voucher/{uuid}')
+  Future<HttpResponse<CouponEVoucherResponse>> fetchCouponEVoucher(
+    @Path('uuid') String uuid,
+    @Query('store_machine_id') String? storeMachinId,
+  );
 
   /// DONG 2026-01-15
   ///
@@ -159,6 +250,14 @@ abstract class AppClient {
   @PUT('/customer/update-profile')
   Future<HttpResponse<CustomerProfileResponse?>> updateProfile(
     @Body() UpdateProfileRequest body,
+  );
+
+  /// DONG 2026-01-27
+  ///
+  /// API อัพเดทรหัสผ่านของ User
+  @PUT('/update-password')
+  Future<HttpResponse<BaseResponse>> updatePassword(
+    @Body() Map<String, String> body,
   );
 
   /// DONG 2025-11-24

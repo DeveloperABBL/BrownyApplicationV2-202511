@@ -452,16 +452,16 @@ class _BiometricSettingTileState extends State<BiometricSettingTile> {
     if (!_isAvailable) {
       return ListTile(
         leading: Icon(Icons.fingerprint),
-        title: Text('Face ID / Fingerprint'),
-        subtitle: Text('อุปกรณ์ไม่รองรับหรือไม่มีการลงทะเบียน'),
+        title: AppText('Face ID / Fingerprint'),
+        subtitle: AppText('อุปกรณ์ไม่รองรับหรือไม่มีการลงทะเบียน'),
         enabled: false,
       );
     }
 
     return SwitchListTile(
       secondary: Icon(Icons.fingerprint),
-      title: Text('Face ID / Fingerprint'),
-      subtitle: Text(_isEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'),
+      title: AppText('Face ID / Fingerprint'),
+      subtitle: AppText(_isEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'),
       value: _isEnabled,
       onChanged: _toggleBiometric,
     );

@@ -1,0 +1,155 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'coupon_order_response.g.dart';
+
+@JsonSerializable()
+class CouponOrderResponse {
+  @JsonKey(name: 'success')
+  final bool success;
+
+  @JsonKey(name: 'message')
+  final String? message;
+
+  /// ข้อมูลคำสั่งซื้อ (มีเมื่อ success = true และมีการสร้างคำสั่งซื้อ)
+  @JsonKey(name: 'data')
+  final CouponOrderData? data;
+
+  /// ยอดเงินคงเหลือใน Wallet
+  /// - มีเมื่อชำระผ่าน wallet สำเร็จ
+  /// - หรือเมื่อ wallet ไม่พอ (success = false)
+  @JsonKey(name: 'wallet_balance')
+  final double? walletBalance;
+
+  /// URL สำหรับ redirect ไปชำระเงิน (สำหรับกรณี pending payment)
+  @JsonKey(name: 'redirect_url')
+  final String? redirectUrl;
+
+  /// สถานะการชำระเงิน
+  /// - true: ชำระเงินสำเร็จแล้ว (กรณี wallet payment)
+  /// - false: รอการชำระเงิน (pending)
+  @JsonKey(name: 'paid')
+  final bool? paid;
+
+  /// ราคาที่ต้องชำระ (มีเมื่อ wallet ไม่พอ)
+  @JsonKey(name: 'price_required')
+  final double? priceRequired;
+
+  CouponOrderResponse({
+    required this.success,
+    this.message,
+    this.data,
+    this.walletBalance,
+    this.redirectUrl,
+    this.paid,
+    this.priceRequired,
+  });
+
+  factory CouponOrderResponse.fromJson(Map<String, dynamic> json) =>
+      _$CouponOrderResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CouponOrderResponseToJson(this);
+
+  /// ตรวจสอบว่าชำระเงินสำเร็จแล้วหรือไม่
+  bool get isPaid => success && (paid ?? false);
+
+  /// ตรวจสอบว่ารอการชำระเงินหรือไม่
+  bool get isPending => success && !(paid ?? false);
+
+  /// ตรวจสอบว่า wallet ไม่พอหรือไม่
+  bool get isInsufficientWallet =>
+      !success && priceRequired != null && walletBalance != null;
+
+  /// คำนวณจำนวนเงินที่ขาด (กรณี wallet ไม่พอ)
+  double get amountShortage {
+    if (!isInsufficientWallet) return 0.0;
+    return (priceRequired ?? 0.0) - (walletBalance ?? 0.0);
+  }
+}
+
+@JsonSerializable()
+class CouponOrderData {
+  @JsonKey(name: 'id')
+  final int? id;
+
+  @JsonKey(name: 'order_no')
+  final String? orderNo;
+
+  @JsonKey(name: 'customer_id')
+  final String? customerId;
+
+  @JsonKey(name: 'coupon_package_id')
+  final int? couponPackageId;
+
+  @JsonKey(name: 'quantity')
+  final int? quantity;
+
+  @JsonKey(name: 'price')
+  final String? price;
+
+  @JsonKey(name: 'total_price')
+  final String? totalPrice;
+
+  @JsonKey(name: 'payment_method')
+  final String? paymentMethod;
+
+  @JsonKey(name: 'payment_status')
+  final String? paymentStatus;
+
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
+  CouponOrderData({
+    this.id,
+    this.orderNo,
+    this.customerId,
+    this.couponPackageId,
+    this.quantity,
+    this.price,
+    this.totalPrice,
+    this.paymentMethod,
+    this.paymentStatus,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory CouponOrderData.fromJson(Map<String, dynamic> json) =>
+      _$CouponOrderDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CouponOrderDataToJson(this);
+
+  /// แปลง price เป็น double
+  double get priceValue => double.tryParse(price ?? '0') ?? 0.0;
+
+  /// แปลง total price เป็น double
+  double get totalPriceValue => double.tryParse(totalPrice ?? '0') ?? 0.0;
+
+  /// แปลง created_at เป็น DateTime
+  DateTime? get createdDate {
+    if (createdAt == null || createdAt!.isEmpty) return null;
+    try {
+      return DateTime.parse(createdAt!);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// แปลง updated_at เป็น DateTime
+  DateTime? get updatedDate {
+    if (updatedAt == null || updatedAt!.isEmpty) return null;
+    try {
+      return DateTime.parse(updatedAt!);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// ตรวจสอบสถานะการชำระเงิน
+  bool get isPaid => paymentStatus?.toLowerCase() == 'paid';
+
+  bool get isPending => paymentStatus?.toLowerCase() == 'pending';
+
+  bool get isFailed => paymentStatus?.toLowerCase() == 'failed';
+}

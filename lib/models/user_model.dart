@@ -90,6 +90,10 @@ class UserModel extends CustomerProfileData {
     String? brownyCoin,
     List<String>? avatars,
     List<AvatarData>? avatarDataList,
+    int? couponsRedemption,
+    int? couponsDiscount,
+    int? couponsEVoucher,
+    int? totalCoupons,
   }) {
     return UserModel(
       loginPlatform: loginPlatform ?? this.loginPlatform,

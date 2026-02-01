@@ -76,13 +76,17 @@ class CustomerProfileDataAdapter extends TypeAdapter<CustomerProfileData> {
       creditBalance: fields[7] as String?,
       brownyCoin: fields[9] as String?,
       avatars: (fields[8] as List?)?.cast<String>(),
+      couponsRedemption: (fields[10] as num?)?.toInt(),
+      couponsDiscount: (fields[11] as num?)?.toInt(),
+      couponsEVoucher: (fields[12] as num?)?.toInt(),
+      totalCoupons: (fields[13] as num?)?.toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, CustomerProfileData obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -102,7 +106,15 @@ class CustomerProfileDataAdapter extends TypeAdapter<CustomerProfileData> {
       ..writeByte(8)
       ..write(obj.avatars)
       ..writeByte(9)
-      ..write(obj.brownyCoin);
+      ..write(obj.brownyCoin)
+      ..writeByte(10)
+      ..write(obj.couponsRedemption)
+      ..writeByte(11)
+      ..write(obj.couponsDiscount)
+      ..writeByte(12)
+      ..write(obj.couponsEVoucher)
+      ..writeByte(13)
+      ..write(obj.totalCoupons);
   }
 
   @override
@@ -112,6 +124,58 @@ class CustomerProfileDataAdapter extends TypeAdapter<CustomerProfileData> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is CustomerProfileDataAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StoreSearchHistoryAdapter extends TypeAdapter<StoreSearchHistory> {
+  @override
+  final typeId = 2;
+
+  @override
+  StoreSearchHistory read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StoreSearchHistory(
+      packageId: (fields[0] as num).toInt(),
+      storeId: (fields[1] as num?)?.toInt(),
+      storeName: fields[2] as String,
+      packageName: fields[3] as String,
+      groupOption: fields[4] as String?,
+      distance: fields[5] as String?,
+      searchedAt: fields[6] as DateTime?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, StoreSearchHistory obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.packageId)
+      ..writeByte(1)
+      ..write(obj.storeId)
+      ..writeByte(2)
+      ..write(obj.storeName)
+      ..writeByte(3)
+      ..write(obj.packageName)
+      ..writeByte(4)
+      ..write(obj.groupOption)
+      ..writeByte(5)
+      ..write(obj.distance)
+      ..writeByte(6)
+      ..write(obj.searchedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StoreSearchHistoryAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

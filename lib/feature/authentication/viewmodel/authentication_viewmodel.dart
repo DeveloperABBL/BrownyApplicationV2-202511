@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/customer
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -15,11 +16,16 @@ import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum SignUpRequiredState {
+enum SignUpRequiredConditions {
   valideEmalOrPhone,
   passwordHasLowercase,
   passwordHasDigit,
   acceptTermOfPolicy,
+}
+
+enum ResetPasswordConditions {
+  samePassword,
+  atleastLength,
 }
 
 enum AuthenProcess {
@@ -27,7 +33,7 @@ enum AuthenProcess {
   signup,
   signupOTP,
   forgotPassword,
-  forgotPasswordPinning,
+  forgotPasswordOTP,
   forgotPasswordNewPassword,
   referral,
 }
@@ -76,7 +82,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     if (index != -1) {
       switch (process) {
         case AuthenProcess.login:
-          _validations.addAll(SignUpRequiredState.values);
+          _validations.addAll(SignUpRequiredConditions.values);
           usernameController.text = '';
           passwordController.text = '';
           break;
@@ -85,19 +91,30 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           usernameController.text = '';
           passwordController.text = '';
           break;
-        case AuthenProcess.forgotPasswordPinning:
+        case AuthenProcess.forgotPasswordOTP:
         case AuthenProcess.signupOTP:
           // do nothing
           break;
         case AuthenProcess.forgotPassword:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          // clear text ที่เคยกรอกไว้
+          usernameController.text = '';
+          passwordController.text = '';
         case AuthenProcess.forgotPasswordNewPassword:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          // do nothing
+          if (!isObscure.value) {
+            onObscureChange();
+          }
+          passwordController.text = '';
+          confirmPasswordController.text = '';
+          _resetValidationNotifier.value = {
+            ResetPasswordConditions.samePassword: false,
+            ResetPasswordConditions.atleastLength: false,
+          };
+          _onResetPasswordValidatorTriggle();
+          break;
 
         case AuthenProcess.referral:
-          _validations.add(SignUpRequiredState.valideEmalOrPhone);
+          _validations.add(SignUpRequiredConditions.valideEmalOrPhone);
           _onValidatorTriggle();
           _otpTimer?.cancel();
           _otpTimer = null;
@@ -118,16 +135,24 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         case AuthenProcess.signup:
           // do nothing
           break;
-        case AuthenProcess.forgotPasswordPinning:
+        case AuthenProcess.forgotPasswordOTP:
+          // do nothing
+          break;
         case AuthenProcess.signupOTP:
           _verifyOTPMessageErrorNotifier.value = null;
           break;
         case AuthenProcess.forgotPassword:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          goToProcess(AuthenProcess.login, animate: false);
+          return;
         case AuthenProcess.forgotPasswordNewPassword:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          if (!isObscure.value) {
+            onObscureChange();
+          }
+          _resetValidationNotifier.value = {
+            ResetPasswordConditions.samePassword: false,
+            ResetPasswordConditions.atleastLength: false,
+          };
+          break;
 
         case AuthenProcess.referral:
           goToProcess(AuthenProcess.login, animate: false);
@@ -150,11 +175,30 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   // =========== Validator ===========
   late final GlobalKey<FormState> formKeyLogin = GlobalKey();
   late final GlobalKey<FormState> formKeySignup = GlobalKey();
+  late final GlobalKey<FormState> formKeyForgetPasswordUsername = GlobalKey();
+  late final GlobalKey<FormState> formKeyForgetPasswordReset = GlobalKey();
   late final GlobalKey<FormState> formKeyReferral = GlobalKey();
   late final TextEditingController usernameController = TextEditingController();
   late final TextEditingController passwordController = TextEditingController();
-  final Set<SignUpRequiredState> _validations = SignUpRequiredState.values
+  late final TextEditingController confirmPasswordController =
+      TextEditingController();
+
+  /// เก็บเงื่อนไข [SignUpRequiredConditions] ที่จำเป็นต้องทำให้ครบ ถึงจะสามารถ Process ต่อไป
+  final Set<SignUpRequiredConditions> _validations = SignUpRequiredConditions
+      .values
       .toSet();
+
+  /// เก็บเงื่อนไข [ResetPasswordConditions] ที่จำเป็นต้องทำให้ครบ ถึงจะสามารถ Process ต่อไป
+  late final Set<ResetPasswordConditions> _resetValidation =
+      ResetPasswordConditions.values.toSet();
+  late final ValueNotifier<Map<ResetPasswordConditions, bool>>
+  _resetValidationNotifier = ValueNotifier({
+    ResetPasswordConditions.samePassword: false,
+    ResetPasswordConditions.atleastLength: false,
+  });
+  ValueListenable<Map<ResetPasswordConditions, bool>>
+  get resetValidationNotifier => _resetValidationNotifier;
+
   late final ValueNotifier<bool> _validatorTriggleNotifier = ValueNotifier(
     false,
   );
@@ -237,7 +281,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   // =========== validation ===========
 
   String? validatorEmailOrPhone(String? value) {
-    _validations.add(SignUpRequiredState.valideEmalOrPhone);
+    _validations.add(SignUpRequiredConditions.valideEmalOrPhone);
     // ตรวจสอบว่าค่าที่รับเข้ามาเป็นค่าว่างหรือไม่
     if (value == null || value.trim().isEmpty) {
       return context.wording.pleaseEnterEmailOrPhone;
@@ -258,14 +302,14 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     }
 
     _validations.removeWhere(
-      (e) => e == SignUpRequiredState.valideEmalOrPhone,
+      (e) => e == SignUpRequiredConditions.valideEmalOrPhone,
     );
     _onValidatorTriggle();
     return null; // ข้อมูลถูกต้อง ไม่ต้องแจ้งเตือน
   }
 
   String? validatorPhone(String? value) {
-    _validations.add(SignUpRequiredState.valideEmalOrPhone);
+    _validations.add(SignUpRequiredConditions.valideEmalOrPhone);
     // ตรวจสอบว่าค่าที่รับเข้ามาเป็นค่าว่างหรือไม่
     _onValidatorTriggle();
     if (value == null || value.trim().isEmpty) {
@@ -277,12 +321,15 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       return context.wording.pleaseEnterCorrectPhoneFormat;
     }
     _validations.removeWhere(
-      (e) => e == SignUpRequiredState.valideEmalOrPhone,
+      (e) => e == SignUpRequiredConditions.valideEmalOrPhone,
     );
     _onValidatorTriggle();
     return null;
   }
 
+  /// validate สำหรับ Process
+  /// [AuthenProcess.login]
+  /// [AuthenProcess.signup]
   String? validatorPassword(String? value) {
     // ตรวจสอบว่าค่าที่รับเข้ามาเป็นค่าว่างหรือไม่
     if (value == null || value.trim().isEmpty) {
@@ -298,8 +345,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     final hasDigit = passwordHasDigit(value);
 
     _validations.addAll({
-      SignUpRequiredState.passwordHasLowercase,
-      SignUpRequiredState.passwordHasDigit,
+      SignUpRequiredConditions.passwordHasLowercase,
+      SignUpRequiredConditions.passwordHasDigit,
     });
     _onValidatorTriggle();
 
@@ -311,7 +358,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         ..writeln();
     } else {
       _validations.removeWhere(
-        (e) => e == SignUpRequiredState.passwordHasLowercase,
+        (e) => e == SignUpRequiredConditions.passwordHasLowercase,
       );
     }
     if (!hasDigit) {
@@ -320,7 +367,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         ..writeln();
     } else {
       _validations.removeWhere(
-        (e) => e == SignUpRequiredState.passwordHasDigit,
+        (e) => e == SignUpRequiredConditions.passwordHasDigit,
       );
     }
     if (!hasCharacter || !hasDigit) {
@@ -330,24 +377,116 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     return null;
   }
 
+  /// validate password สำหรับ Process
+  /// [AuthenProcess.forgotPassword]
+  String? resetPasswordValidator(String? value) {
+    _resetValidationNotifier.removeListener(_onResetPasswordValidatorTriggle);
+    _resetValidationNotifier.addListener(_onResetPasswordValidatorTriggle);
+    if (value == null || value.trim().isEmpty) {
+      return context.wording.pleaseEnterPassword;
+    }
+
+    _resetValidation.addAll(ResetPasswordConditions.values.toSet());
+
+    if (value.length < 8) {
+      _resetValidationNotifier.value = {
+        ResetPasswordConditions.atleastLength: false,
+        ResetPasswordConditions.samePassword: !_resetValidation.contains(
+          ResetPasswordConditions.atleastLength,
+        ),
+      };
+      return context.wording.passwordMustBeAtLeast8Characters;
+    }
+
+    // ตรวจสอบด้วย pattern จาก parent class
+    final hasCharacter = passwordHasCharacter(value);
+    final hasDigit = passwordHasDigit(value);
+
+    if (!hasDigit) {
+      _resetValidationNotifier.value = {
+        ResetPasswordConditions.atleastLength: false,
+        ResetPasswordConditions.samePassword: !_resetValidation.contains(
+          ResetPasswordConditions.atleastLength,
+        ),
+      };
+      return context.wording.passwordMustContainNumber;
+    }
+
+    if (!hasCharacter) {
+      _resetValidationNotifier.value = {
+        ResetPasswordConditions.atleastLength: false,
+        ResetPasswordConditions.samePassword: !_resetValidation.contains(
+          ResetPasswordConditions.samePassword,
+        ),
+      };
+      return context.wording.passwordMustContainLowercase;
+    }
+
+    _resetValidation.remove(ResetPasswordConditions.atleastLength);
+    _resetValidationNotifier.value = {
+      ResetPasswordConditions.atleastLength: true,
+      ResetPasswordConditions.samePassword: !_resetValidation.contains(
+        ResetPasswordConditions.samePassword,
+      ),
+    };
+
+    return null;
+  }
+
+  /// validate confirmPassword สำหรับ Process
+  /// [AuthenProcess.forgotPassword]
+  String? resetConfirmPasswordValidator(String? value) {
+    _resetValidationNotifier.removeListener(_onResetPasswordValidatorTriggle);
+    _resetValidationNotifier.addListener(_onResetPasswordValidatorTriggle);
+    if (value == null || value.trim().isEmpty) {
+      return context.wording.pleaseEnterPassword;
+    }
+    _resetValidation.add(ResetPasswordConditions.samePassword);
+
+    String password = passwordController.text;
+    if (value != password) {
+      _resetValidationNotifier.value = {
+        ResetPasswordConditions.atleastLength: !_resetValidation.contains(
+          ResetPasswordConditions.atleastLength,
+        ),
+        ResetPasswordConditions.samePassword: false,
+      };
+      return 'รหัสผ่านไม่ตรงกัน';
+    }
+
+    _resetValidation.remove(ResetPasswordConditions.samePassword);
+    _resetValidationNotifier.value = {
+      ResetPasswordConditions.atleastLength: !_resetValidation.contains(
+        ResetPasswordConditions.atleastLength,
+      ),
+      ResetPasswordConditions.samePassword: true,
+    };
+
+    return null;
+  }
+
+  void _onResetPasswordValidatorTriggle() {
+    _validatorTriggleNotifier.value = _resetValidation.isEmpty;
+  }
+
   bool get checkBoxTermOfPolicy => !_validations.contains(
-    SignUpRequiredState.acceptTermOfPolicy,
+    SignUpRequiredConditions.acceptTermOfPolicy,
   );
   void checkboxTermOfPolicyChanged(bool? value) {
     if (value == null || !value) {
-      _validations.add(SignUpRequiredState.acceptTermOfPolicy);
+      _validations.add(SignUpRequiredConditions.acceptTermOfPolicy);
       _onValidatorTriggle();
       return;
     }
     _validations.removeWhere(
-      (e) => e == SignUpRequiredState.acceptTermOfPolicy,
+      (e) => e == SignUpRequiredConditions.acceptTermOfPolicy,
     );
     _onValidatorTriggle();
   }
 
   void _onValidatorTriggle() {
     _validatorTriggleNotifier.value = !_validations.contains(
-      SignUpRequiredState.acceptTermOfPolicy,
+      SignUpRequiredConditions.acceptTermOfPolicy,
     );
   }
 
@@ -357,8 +496,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     // _verifyOTPMessageErrorNotifier.value = null;
     // await onSignUp();
     // return UiResult.success(data: true);
-    // _otpButtonNextNotifier.value = true;
-    // return UiResult.success(data: true);
+    _otpButtonNextNotifier.value = true;
+    return UiResult.success(data: true);
 
     _verifyOTPMessageErrorNotifier.value = null;
     _otpButtonNextNotifier.value = false;
@@ -384,10 +523,20 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
 
       return UiResult.error(error: validateResult.error);
     }
+    if (validateResult.data.customerId == null) {
+      _verifyOTPMessageErrorNotifier.value = UserNotFound().message;
+      return UiResult.empty();
+    }
     // clear error verify otp
     _verifyOTPMessageErrorNotifier.value = null;
     // เปิดการทำงานปุ่ม ต่อไป
     _otpButtonNextNotifier.value = true;
+
+    // update uuid ของ customer เอาไว้ กรณี process forgotpassword จะต้องใช้
+    currentCustomerProvider.newUser = currentCustomerProvider.current.copyWith(
+      id: validateResult.data.customerId,
+    );
+
     return UiResult.success(data: true);
   }
   // =========== event login, logout, regist ===========
@@ -411,12 +560,13 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       return UiResult.empty();
     }
 
+    // ขั้นตอนกรอก OTP จังหวะสมัครสมาชิก
     if (currentProcess == AuthenProcess.signupOTP) {
       // TODO เอาจุดออกเวลาใช้จริง
       // ลงทะเบียนสำเร็จ จะ fetch Profile มาเก็บเอาไว้ใช้
-      // final profileMockResult = await customerDataRepo.fetchProfile(
-      //   '019b683f-9ea2-7242-82e1-6b27d2cf721d',
-      // );
+      final profileMockResult = await customerDataRepo.fetchProfile(
+        '019b683f-9ea2-7242-82e1-6b27d2cf721d',
+      );
       // if (profileMockResult.isEmpty) {
       //   // handle ถ้าไม่สามารถ fetch Profile ได้
       //   return UiResult.empty(error: profileMockResult.error);
@@ -426,10 +576,10 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       //   return UiResult.error(error: profileMockResult.error);
       // }
 
-      // currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
-      //   profileMockResult.data.data,
-      // );
-      // return UiResult.success(data: null);
+      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+        profileMockResult.data.data,
+      );
+      return UiResult.success(data: null);
 
       final response = await customerDataRepo.register(
         CustomerCredential(
@@ -470,6 +620,47 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       return UiResult.success(data: null);
     }
 
+    // ขั้นตอน ลืมพาสเวิร์ด
+    if (currentProcess == AuthenProcess.forgotPassword) {
+      if (formKeyForgetPasswordUsername.currentState?.validate() == true) {
+        final checkUserExists = await customerDataRepo.checkUsernameExists(
+          usernameController.text,
+        );
+
+        if (checkUserExists.isEmpty && !checkUserExists.hasError) {
+          return UiResult.empty(error: UserNotFound());
+        }
+
+        if (checkUserExists.error is! UserDuplicated) {
+          return UiResult.empty(error: checkUserExists.error);
+        }
+
+        return UiResult.success(data: null);
+      }
+    }
+
+    // ขั้นตอน Resetpassword
+    if (currentProcess == AuthenProcess.forgotPasswordNewPassword) {
+      // สำหรับทดสอบต้องปิด
+      return UiResult.success(
+        data: null,
+      );
+
+      final updateResulse = await customerDataRepo.updatePassword({
+        "id": currentCustomerProvider.current.id.orEmpty,
+        "new_password": passwordController.text,
+      });
+
+      if (updateResulse.hasError) {
+        return UiResult.empty(error: updateResulse.error);
+      }
+
+      return UiResult.success(
+        data: null,
+      );
+    }
+
+    // ขั้นตอน save referral
     if (currentProcess == AuthenProcess.referral) {
       _referralErrorMessageNotifier.value = null;
       if (formKeyReferral.currentState?.validate() == true) {
@@ -489,10 +680,17 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         );
 
         if (saveReferralResult.isEmpty && saveReferralResult.hasError) {
-          _referralErrorMessageNotifier.value =
-              (saveReferralResult.error as AuthenExceptions).toUiMessage(
-                context,
-              );
+          if (saveReferralResult.error is UserDuplicated) {
+            _referralErrorMessageNotifier.value =
+                (saveReferralResult.error as UserDuplicated).toUiMessage(
+                  context,
+                );
+          } else if (saveReferralResult.error is AuthenExceptions) {
+            _referralErrorMessageNotifier.value =
+                (saveReferralResult.error as AuthenExceptions).toUiMessage(
+                  context,
+                );
+          }
           return UiResult.empty(error: saveReferralResult.error);
         }
         if (saveReferralResult.hasError) {
@@ -571,13 +769,13 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   /// ถ้า [_otpTimer] active อยู่ จะไม่ส่งซ้ำ
   Future<void> _otpProcess() async {
     // TODO เอาจุดออกเวลาใช้จริง
-    // print('OTP Requested');
-    // ScaffoldMessenger.of(
-    //   context,
-    // ).showSnackBar(
-    //   SnackBar(content: Text('OTP Requested')),
-    // );
-    // return;
+    print('OTP Requested');
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(
+      SnackBar(content: Text('OTP Requested')),
+    );
+    return;
 
     final requestOTPResult = await otpDataRepo.requestOTP(
       RequestOTP(username: usernameController.text),
@@ -602,6 +800,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   void dispose() {
     _otpTimer?.cancel();
     pageController.dispose();
+    _resetValidationNotifier.dispose();
     _referralErrorMessageNotifier.dispose();
     _otpButtonNextNotifier.dispose();
     _verifyOTPMessageErrorNotifier.dispose();

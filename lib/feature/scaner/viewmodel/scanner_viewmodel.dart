@@ -4,7 +4,9 @@ import 'package:browny_applications_new/core/data/remote/models/response/custome
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -42,7 +44,9 @@ class ScannerViewModel extends AppViewModel {
   final ImagePicker _imagePicker = ImagePicker();
 
   /// Initialize camera with permissions
-  Future<void> initializeCamera() async {
+  Future<void> initializeCamera({
+    required VoidCallback onPermissionDenied,
+  }) async {
     try {
       // Request camera permission
       final hasPermission = await PermissionHelper.hasCameraPermission();
@@ -50,10 +54,10 @@ class ScannerViewModel extends AppViewModel {
         final status = await PermissionHelper.requestCameraPermission();
         if (status != handler.PermissionStatus.granted) {
           // Show error dialog or navigate back
+          onPermissionDenied.call();
           return;
         }
       }
-
       await cameraController.start();
     } catch (e) {
       debugPrint('Error initializing camera: $e');
@@ -97,8 +101,8 @@ class ScannerViewModel extends AppViewModel {
           // No QR code found in image
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('ไม่พบ QR Code ในรูปภาพ'),
+              SnackBar(
+                content: AppText(context.wording.qrCodeNotFoundInImage),
               ),
             );
           }
@@ -118,7 +122,7 @@ class ScannerViewModel extends AppViewModel {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('เกิดข้อผิดพลาด: $e'),
+            content: AppText(context.wording.errorOccurred),
           ),
         );
       }
@@ -160,12 +164,12 @@ class ScannerViewModel extends AppViewModel {
   }
 
   /// Change tab
-  void onTabChanged(int index) {
+  Future<void> onTabChanged(int index) async {
     selectedTab.value = index;
     if (index == 1) {
-      unawaited(cameraController.pause());
+      await cameraController.pause();
     } else if (!cameraController.value.isRunning) {
-      unawaited(cameraController.start());
+      await cameraController.start();
     }
   }
 

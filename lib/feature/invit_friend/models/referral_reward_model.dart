@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 
 class ReferralRewardModel extends ReferralRewardResponse {
   factory ReferralRewardModel.fromResponse(
@@ -8,7 +9,7 @@ class ReferralRewardModel extends ReferralRewardResponse {
     final refRData = List.generate(
       (response.totalStep ?? 0),
       (index) => ReferralRewardData(
-        active: response.nowStep! > 0 && response.nowStep! >= index,
+        active: response.nowStep! > 0 && ((response.nowStep!) - 1) >= index,
         isReward: response.rewards!
             .where((e) => e.step! == (index + 1))
             .isNotEmpty,
@@ -19,7 +20,13 @@ class ReferralRewardModel extends ReferralRewardResponse {
       locale: locale,
       rewardDisplay:
           response.rewards
-              ?.map((item) => RewardModel.fromRewardItem(item, locale))
+              ?.mapIndex(
+                (index, item) => RewardModel.fromRewardItem(
+                  item,
+                  locale,
+                  response.nowStep! > 0 && response.nowStep! >= item.step!,
+                ),
+              )
               .toList() ??
           [],
       referralRewardData: refRData,
@@ -60,9 +67,11 @@ class ReferralRewardData {
 
 class RewardModel extends RewardItem {
   final String local;
+  final bool active;
 
   RewardModel({
     required this.local,
+    required this.active,
     super.step,
     super.icon,
     super.type,
@@ -72,9 +81,14 @@ class RewardModel extends RewardItem {
     super.expire,
   });
 
-  factory RewardModel.fromRewardItem(RewardItem item, String locale) {
+  factory RewardModel.fromRewardItem(
+    RewardItem item,
+    String locale,
+    bool active,
+  ) {
     return RewardModel(
       local: locale,
+      active: active,
       type: item.type,
       name: item.name,
       description: item.description,

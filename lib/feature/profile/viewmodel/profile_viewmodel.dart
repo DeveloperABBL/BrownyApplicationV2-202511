@@ -15,6 +15,7 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class ProfileViewModel extends AppViewModelFormFieldValidation {
   ProfileViewModel({
@@ -22,14 +23,63 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
     required this.repo,
   });
 
+  // ========== Repository ==========
   final ProfileRepo repo;
 
+  // ========== Notifier, Controller ==========
   final GlobalKey<FormState> formKey = GlobalKey();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController dateOfBirth = TextEditingController();
+  // สำหรับ parseDate กรณีที่มีข้อมูลมาอยู่แล้วหรือเลือกใหม่
+  DateTime initialCalendarDate() {
+    final initDate = dateOfBirth.text;
+    var initialDate = DateTime.now();
+    if (initDate.isNotEmpty) {
+      initialDate = DateFormat('dd/MM/yyyy').parse(initDate);
+    }
+    return initialDate;
+  }
+
+  String titlePopupBirthDayOffers(BuildContext context) {
+    switch (context.languageCode) {
+      case 'en':
+        return 'Special birthday privileges are waiting for you!';
+      case 'zh':
+        return '特别的生日优惠正在等着您!';
+      default:
+        return 'สิทธิพิเศษวันเกิดสุดพิเศษ รอคุณอยู่!';
+    }
+  }
+
+  String descriptionPopupBirthDayOffers(BuildContext context) {
+    switch (context.languageCode) {
+      case 'en':
+        return '''
+Terms and Conditions
+• Receive special gifts and exclusive member promotions during your birth month
+• To ensure benefit accuracy, birthdate cannot be self-edited. If you need to change it, please contact admin with your ID card attached
+• If birthday privileges have already been used, birthdate cannot be modified
+''';
+      case 'zh':
+        return '''
+条款和条件
+• 在您的生日月份获得特别礼物和会员专属促销
+• 为确保福利的准确性，生日日期无法自行编辑。如需更改，请联系管理员并附上您的身份证
+• 如果已使用生日特权，则无法修改生日日期
+''';
+      default:
+        return '''
+เงื่อนไข
+• รับของขวัญพิเศษ และโปรลับเฉพาะสมาชิกในเดือนเกิด
+• เพื่อความถูกต้องของสิทธิประโยชน์ วันเกิดจะไม่สามารถแก้ไขได้เอง หากต้องการเปลี่ยน โปรดติดต่อแอดมินพร้อมแนบรูปบัตรประชาชน
+• ถ้าหากใช้สิทธิพิเศษวันเกิดไปแล้ว จะไม่สามารถแก้ไขวันเกิดได้
+''';
+    }
+  }
+
   late final CarouselSliderController carouselController =
       CarouselSliderController();
 
@@ -71,6 +121,8 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
 
   // Image Picker
   final ImagePicker _imagePicker = ImagePicker();
+
+  // ========== Function, Logic  ==========
 
   /// หา index ของ avatar ท้ ตรงกับ imageUrl จาก avatarDataList
   /// จะข้าม picked image เพราะเป็น file ไม่ใช่ URL

@@ -34,25 +34,46 @@ import 'package:provider/provider.dart';
 /// - ไม่เก็บ PIN จริง เก็บเฉพาะ Hash (SHA-256 + Salt)
 /// - ใช้ flutter_secure_storage (Keychain/Keystore)
 class CreateAppPinPage extends StatelessWidget {
-  const CreateAppPinPage({super.key});
+  const CreateAppPinPage({
+    super.key,
+    this.implementBackButton = true,
+    this.isFirstSignup = false,
+  });
+
+  final bool implementBackButton;
+  final bool isFirstSignup;
 
   static final pagePath = '/create_app_pin';
   static final pageName = 'create_app_pin';
+  static final kImplementBackButton = 'kImplementBackButton';
+  static final kFirstSignup = 'first_signup';
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => PinBiometricViewModel(
-        context: context,
-        repository: PinBioMetricRepository(),
+    return PopScope(
+      canPop: implementBackButton,
+      child: ChangeNotifierProvider(
+        create: (context) => PinBiometricViewModel(
+          context: context,
+          repository: PinBioMetricRepository(),
+        ),
+        child: _CreateAppPinContent(
+          implementBackButton: implementBackButton,
+          isFirstSignup: isFirstSignup,
+        ),
       ),
-      child: _CreateAppPinContent(),
     );
   }
 }
 
 class _CreateAppPinContent extends StatefulWidget {
-  const _CreateAppPinContent();
+  const _CreateAppPinContent({
+    this.implementBackButton = true,
+    this.isFirstSignup = false,
+  });
+
+  final bool implementBackButton;
+  final bool isFirstSignup;
 
   @override
   State<_CreateAppPinContent> createState() => _CreateAppPinContentState();
@@ -89,7 +110,7 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Header: ปุ่มย้อนกลับ
-            _buildHeader(context, _viewModel),
+            if (widget.implementBackButton) _buildHeader(context, _viewModel),
 
             // ระยะห่าง
             SizedBox(height: AppDims.size_32.h),
@@ -333,7 +354,12 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
                     context.pushNamed(BiometricPage.pageName);
                   } else {
                     // ไม่รองรับ → ไป Profile ทันที
-                    context.pushNamedAndClear(ProfilePage.pageName);
+                    context.pushNamedAndClear(
+                      ProfilePage.pageName,
+                      extra: {
+                        ProfilePage.kFirstSignup: widget.isFirstSignup,
+                      },
+                    );
                   }
                 });
               }),

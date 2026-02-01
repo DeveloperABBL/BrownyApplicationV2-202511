@@ -270,7 +270,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get skip => '跳过';
 
   @override
-  String get eVouchers => '电子券';
+  String get eVouchers => 'E-Voucher';
 
   @override
   String get chooseStore => '选择门店';
@@ -841,4 +841,55 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noRewardsFound => '找不到奖励';
+
+  @override
+  String get cannotEnableBiometric => '无法启用生物识别';
+
+  @override
+  String get qrCodeNotFoundInImage => '图片中未找到二维码';
+
+  @override
+  String get makePayment => '付款';
+
+  @override
+  String get products => '产品';
+
+  @override
+  String get collectCoupon => '收集优惠券';
+
+  @override
+  String get scanCoupon => '扫描优惠券';
+
+  @override
+  String get sakob => 'Sakob';
+
+  @override
+  String get eVoucherDetails => '电子券详情';
+
+  @override
+  String get buyEVoucher => '购买电子优惠券';
+
+  @override
+  String get birthdaySpecialConditions => '生日特别优惠条件';
+
+  @override
+  String get profileSavedSuccessfully => '个人资料保存成功';
+
+  @override
+  String get confirmLogoutMessage => '您确定要退出吗？';
+
+  @override
+  String get acknowledge => '确认';
+
+  @override
+  String get changeBirthday => '更改生日';
+
+  @override
+  String get searchStoreParticipating => '搜索参与商店';
+
+  @override
+  String get storeNotFound => '未找到商店';
+
+  @override
+  String get recent => '最近';
 }

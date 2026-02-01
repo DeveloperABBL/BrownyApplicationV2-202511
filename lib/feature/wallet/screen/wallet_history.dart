@@ -92,7 +92,7 @@ class _WallHistoryContent extends StatelessWidget {
                     child: AppText(
                       context.wording.seeAll,
                       style: context.textTheme.labelLarge!.copyWith(
-                        color: AppColors.grey500,
+                        color: AppColors.gray500,
                       ),
                     ),
                   ),
@@ -219,7 +219,7 @@ class _WallHistoryContent extends StatelessWidget {
               AppText(
                 date,
                 style: context.textTheme.labelSmall!.copyWith(
-                  color: AppColors.grey600,
+                  color: AppColors.gray600,
                 ),
               ),
             ],

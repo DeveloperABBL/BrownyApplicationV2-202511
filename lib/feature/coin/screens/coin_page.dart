@@ -199,7 +199,11 @@ class __CoinContentState extends State<_CoinContent> {
     return SizedBox(
       height: 100.0.h,
       child: ListView.separated(
-        padding: EdgeInsets.only(top: 10.h),
+        padding: EdgeInsets.only(
+          top: 10.h,
+          left: AppDims.size_4.w,
+          right: AppDims.size_10.w,
+        ),
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
         itemBuilder: (context, index) => _buildItemCoinClaim(
@@ -280,12 +284,12 @@ class __CoinContentState extends State<_CoinContent> {
           ),
           icon: Icon(
             Icons.info_outline_rounded,
-            color: AppColors.grey500,
+            color: AppColors.gray500,
           ),
           label: AppText(
             'เงื่อนไข',
             style: context.textTheme.labelMedium!.copyWith(
-              color: AppColors.grey500,
+              color: AppColors.gray500,
             ),
           ),
         ),
@@ -404,41 +408,45 @@ class __CoinContentState extends State<_CoinContent> {
                 ),
                 AppDims.horizonPadding_8,
 
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 8,
-                    bottom: 8,
-                    right: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.containerCoinGradient,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(8.r),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      top: 8,
+                      bottom: 8,
+                      right: 16,
                     ),
-                  ),
-                  child: RichText(
-                    text: TextSpan(
-                      // text: '= 0.25',
-                      text: formatCurrency(
-                        string: value.current.brownyCoin,
-                        leadingSign: '= ',
+                    decoration: BoxDecoration(
+                      gradient: AppColors.containerCoinGradient,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.r),
                       ),
-                      style:
-                          GoogleFonts.prompt(
-                            textStyle: context.textTheme.headlineMedium,
-                          ).copyWith(
-                            color: AppColors.textWhite,
-                          ),
-                      children: [
-                        TextSpan(text: ' '),
-                        TextSpan(
-                          text: context.wording.coin,
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: AppColors.textWhite,
-                            fontSize: AppDims.size_10.sp,
-                          ),
+                    ),
+                    child: RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        // text: '= 0.25',
+                        text: formatCurrency(
+                          string: value.current.brownyCoin,
+                          leadingSign: '= ',
                         ),
-                      ],
+                        style:
+                            GoogleFonts.prompt(
+                              textStyle: context.textTheme.headlineMedium,
+                            ).copyWith(
+                              color: AppColors.textWhite,
+                            ),
+                        children: [
+                          TextSpan(text: ' '),
+                          TextSpan(
+                            text: context.wording.coin,
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: AppColors.textWhite,
+                              fontSize: AppDims.size_10.sp,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -486,7 +494,7 @@ class __CoinContentState extends State<_CoinContent> {
           clipBehavior: Clip.none, // ✅ ให้วงกลมยื่นออกนอกขอบได้
           children: [
             Container(
-              width: 35.w,
+              width: 38.w,
               height: 65.h,
               padding: EdgeInsets.only(
                 left: 3,

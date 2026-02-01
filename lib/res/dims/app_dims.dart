@@ -4,19 +4,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class AppDims {
   AppDims._();
 
+  static final double size_1 = 1.0;
   static final double size_2 = 2.0;
   static final double size_4 = 4.0;
   static final double size_7 = 7.0;
   static final double size_8 = 8.0;
   static final double size_10 = 10.0;
+  static final double size_11 = 11.0;
   static final double size_12 = 12.0;
   static final double size_13 = 13.0;
   static final double size_14 = 14.0;
+  static final double size_15 = 15.0;
   static final double size_16 = 16.0;
   static final double size_18 = 18.0;
   static final double size_20 = 20.0;
   static final double size_21 = 21.0;
   static final double size_24 = 24.0;
+  static final double size_25 = 25.0;
   static final double size_26 = 26.0;
   static final double size_28 = 28.0;
   static final double size_30 = 30.0;
@@ -25,6 +29,7 @@ class AppDims {
   static final double size_38 = 38.0;
   static final double size_40 = 40.0;
   static final double size_42 = 42.0;
+  static final double size_46 = 46.0;
   static final double size_48 = 48.0;
   static final double size_50 = 50.0;
   static final double size_56 = 56.0;
@@ -74,6 +79,12 @@ class AppDims {
   );
   static SizedBox get horizonPadding_12 => SizedBox(
     width: 12.w,
+  );
+  static SizedBox get vericalPadding_14 => SizedBox(
+    height: 14.h,
+  );
+  static SizedBox get horizonPadding_14 => SizedBox(
+    width: 14.w,
   );
   static SizedBox get vericalPadding_16 => SizedBox(
     height: 16.h,

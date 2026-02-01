@@ -38,6 +38,10 @@ CustomerProfileData _$CustomerProfileDataFromJson(Map<String, dynamic> json) =>
       avatars: (json['avatars'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      couponsRedemption: (json['coupons_redemption'] as num?)?.toInt(),
+      couponsDiscount: (json['coupons_discount'] as num?)?.toInt(),
+      couponsEVoucher: (json['coupons_e_voucher'] as num?)?.toInt(),
+      totalCoupons: (json['total_coupons'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CustomerProfileDataToJson(
@@ -53,4 +57,8 @@ Map<String, dynamic> _$CustomerProfileDataToJson(
   'credit_balance': instance.creditBalance,
   'browny_coin': instance.brownyCoin,
   'avatars': instance.avatars,
+  'coupons_redemption': instance.couponsRedemption,
+  'coupons_discount': instance.couponsDiscount,
+  'coupons_e_voucher': instance.couponsEVoucher,
+  'total_coupons': instance.totalCoupons,
 };

@@ -51,7 +51,7 @@ class CoinViewmModel extends AppViewModel {
 
   Future<void> fetchCoinCliamData() async {
     String id = currentCustomerProvider.current.id!;
-    final profileResult = await _repo.fetchProfile(id);
+    final profileResult = await _repo.fetchProfileInfo(id);
 
     if (profileResult.isError || profileResult.isEmpty) {
       // Error จะ claim ไม่ได้
@@ -75,7 +75,7 @@ class CoinViewmModel extends AppViewModel {
     final profileDataLocal = await _repo.customerProfileData();
     // update ข้อมูล profile ทั้งหมด
     currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
-      profileResult.data.data.copyWith(
+      profileResult.data.copyWith(
         creditBalance: profileDataLocal.data.creditBalance,
         brownyCoin: profileDataLocal.data.brownyCoin,
       ),

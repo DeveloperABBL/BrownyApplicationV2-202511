@@ -140,15 +140,25 @@ class CoinDataModel extends CoinClaimData {
           final today = DateTime.now();
           final daysPassed = today.difference(firstDayClaimed).inDays;
 
-          // วันปัจจุบันใน streak คือ daysPassed + 1 (เพราะ day 1 = วันแรกที่รับ)
-          final currentStreakDay = daysPassed + 1;
-          isToday = item.day == currentStreakDay;
+          // เช็คว่า daysPassed เกิน maxDay หรือไม่ (streak ขาดไปแล้ว)
+          if (daysPassed >= (data.maxDay ?? 7)) {
+            // Reset streak: day 1 = today
+            isToday = item.day == 1;
+            dayDisplay = DateTime.now()
+                .add(Duration(days: (item.day ?? 1) - 1))
+                .formatDateLocale(locale, pattern: 'dd MMM')
+                .replaceAll('.', '');
+          } else {
+            // วันปัจจุบันใน streak คือ daysPassed + 1 (เพราะ day 1 = วันแรกที่รับ)
+            final currentStreakDay = daysPassed + 1;
+            isToday = item.day == currentStreakDay;
 
-          // คำนวณวันที่แสดงสำหรับแต่ละ day (day 1 = firstDayClaimed, day 2 = +1 วัน, etc.)
-          dayDisplay = firstDayClaimed
-              .add(Duration(days: (item.day ?? 1) - 1))
-              .formatDateLocale(locale, pattern: 'dd MMM')
-              .replaceAll('.', '');
+            // คำนวณวันที่แสดงสำหรับแต่ละ day (day 1 = firstDayClaimed, day 2 = +1 วัน, etc.)
+            dayDisplay = firstDayClaimed
+                .add(Duration(days: (item.day ?? 1) - 1))
+                .formatDateLocale(locale, pattern: 'dd MMM')
+                .replaceAll('.', '');
+          }
         } catch (e) {
           print(e);
         }

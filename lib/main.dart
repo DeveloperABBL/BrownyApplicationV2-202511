@@ -5,12 +5,19 @@ import 'package:browny_applications_new/res/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   // if (PlatformUtils.isWeb) {
   // usePathUrlStrategy();
   // }
+  // LINE Channel ID : 2009026542
   WidgetsFlutterBinding.ensureInitialized();
+  // https://firebase.google.com/docs/flutter/setup
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Initialize AppEnvironment (สร้างครั้งเดียว)
   final appEnvironment = DevEnvironment();

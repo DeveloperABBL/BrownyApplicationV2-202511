@@ -1,5 +1,20 @@
 # CHANGELOG
 ---
+### DONG 2026-02-01
+* ปรับ UI หน้าซื้อ E-Voucher ด้วย Design UX/UI ใหม่
+  - เก็บ Logic การสั่งซื้อ E-Voucher (ยังไม่เสร็จ)
+* เพิ่มหน้า Map สำหรับดูสาขา
+* เก็บ Process Forgot password
+* เก็บรายละเอียดตาม Review
+  - ปุ่มเปิดกล้่องที่ bottomNav
+  - สมัคร กดกลับหน้า PIN เอาปุ่มกลับออก
+  - (BUG) หน้าตั้งค่าโปรไฟล์ ข้าม ไม่ได้
+  - ออกจากระบบ -> หน้าหลัก
+  - หน้ารายละเอียด E-Voucher หัว รายละเอียด, เงื่อนไขบริการ ออก
+  - ปิด Soft-keyboard หลังกดปุ่มต่างๆ
+* Initialize app to Firebase
+
+---
 ### DONG 2026-01-22
 * เก็บ Logic หน้าการรับ Coin
 * เพิ่ม Banner เก็บได้ทุกวัน จุดการ์ด Browny coin

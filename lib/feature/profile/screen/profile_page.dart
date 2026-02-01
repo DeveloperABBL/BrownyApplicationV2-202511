@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -9,7 +11,6 @@ import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/locale_toggle_widget.dart';
-import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/feature/profile/repository/profile_repo.dart';
 import 'package:browny_applications_new/feature/profile/viewmodel/profile_viewmodel.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -30,7 +31,7 @@ class ProfilePage extends StatelessWidget {
 
   static final pagePath = '/profile_page';
   static final pageName = 'profile_page';
-  static final kEditing = 'profile_editing';
+  static final kFirstSignup = 'first_signup';
 
   final bool isFirstSignup;
 
@@ -60,6 +61,7 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   late final ProfileViewModel _viewModel;
+  final FocusNode _birthDatefocusNode = FocusNode();
 
   // int _currentPage = 0;
 
@@ -78,6 +80,43 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: AppText(
+          context.wording.updateYourProfile,
+          style: context.textTheme.titleMedium!.copyWith(
+            color: AppColors.textPrimary,
+            fontSize: AppDims.size_16.sp,
+          ),
+        ),
+        centerTitle: true,
+        leadingWidth: 100.w,
+        leading: !widget.isFirstSignup
+            ? TextButton.icon(
+                onPressed: () {
+                  context.pop();
+                },
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: AppColors.primary,
+                  size: 24.sp,
+                ),
+                label: AppText(
+                  context.wording.back,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(50.w, 40.h),
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  elevation: 0,
+                ),
+              )
+            : null,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ValueListenableBuilder<UiResult<UserModel>>(
@@ -105,46 +144,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               return Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  AppDims.vericalPadding_10,
-
-                  AppBar(
-                    title: AppText(
-                      context.wording.updateYourProfile,
-                      style: context.textTheme.titleMedium!.copyWith(
-                        color: AppColors.textPrimary,
-                        fontSize: AppDims.size_16.sp,
-                      ),
-                    ),
-                    centerTitle: true,
-                    leadingWidth: 100.w,
-                    leading: !widget.isFirstSignup
-                        ? TextButton.icon(
-                            onPressed: () {
-                              context.pop();
-                            },
-                            icon: Icon(
-                              Icons.arrow_back_ios_new,
-                              color: AppColors.primary,
-                              size: 24.sp,
-                            ),
-                            label: AppText(
-                              context.wording.back,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size(50.w, 40.h),
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: EdgeInsets.zero,
-                              elevation: 0,
-                            ),
-                          )
-                        : null,
-                  ),
-
                   _buildProfileImage(data),
 
                   AppDims.vericalPadding_10,
@@ -199,7 +198,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               decoration: InputDecoration(
                 hintText: 'Browny1234@gmail.com',
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.grey500,
+                  color: AppColors.gray500,
                 ),
                 fillColor: AppColors.background,
                 prefixIcon: SizedBox.shrink(),
@@ -231,7 +230,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               decoration: InputDecoration(
                 hintText: context.wording.nameSurname,
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.grey500,
+                  color: AppColors.gray500,
                 ),
                 fillColor: AppColors.background,
                 prefixIcon: SizedBox.shrink(),
@@ -264,7 +263,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
               decoration: InputDecoration(
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.grey500,
+                  color: AppColors.gray500,
                 ),
                 fillColor: AppColors.background,
                 hintText: context.wording.gender,
@@ -302,6 +301,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             ),
             SizedBox(height: AppDims.size_8.h),
             AppTextFormField(
+              focusNode: _birthDatefocusNode,
               controller: _viewModel.dateOfBirth,
               readOnly: true,
               style: context.textTheme.labelLarge!.copyWith(
@@ -311,7 +311,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 fillColor: AppColors.background,
                 hintText: context.wording.ddMMyy,
                 hintStyle: context.inputTextStyle.copyWith(
-                  color: AppColors.grey500,
+                  color: AppColors.gray500,
                 ),
                 suffixIcon: Padding(
                   padding: EdgeInsets.symmetric(
@@ -325,32 +325,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 prefixIcon: SizedBox.shrink(),
               ),
-              onTap: () async {
-                final locale = Localizations.localeOf(context);
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
-                  locale: locale,
-                  builder: (BuildContext context, Widget? child) {
-                    return Theme(
-                      data: Theme.of(context).copyWith(
-                        textTheme: GoogleFonts.promptTextTheme(
-                          Theme.of(context).textTheme,
-                        ),
-                      ),
-                      child: child!,
-                    );
-                  },
-                );
-                if (pickedDate != null) {
-                  _viewModel.onBirthDayUpdate(pickedDate);
-                }
-              },
+              onTap: _onbirthDateFieldTap,
             ),
+
+            // เงื่อนไขวันเกิด
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                await _showBirthDayOffers(context);
+                // showOverlappingDialog(context);
+              },
               style: context.appTheme.textButtonTheme.style!.copyWith(
                 minimumSize: WidgetStatePropertyAll(
                   Size(AppDims.size_50.w, AppDims.size_18.h),
@@ -362,12 +345,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
               icon: Icon(
                 Icons.info_outline_rounded,
-                color: AppColors.grey500,
+                color: AppColors.gray500,
               ),
               label: AppText(
-                'เงื่อนไขสิทธิพิเศษวันเกิด',
+                context.wording.birthdaySpecialConditions,
                 style: context.textTheme.labelMedium!.copyWith(
-                  color: AppColors.grey500,
+                  color: AppColors.gray500,
                 ),
               ),
             ),
@@ -389,9 +372,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       await AppOverlays.showBrownyDialog(
                         context,
                         title: context.wording.done,
-                        message: 'บันทึกข้อมูลเรียบร้อย',
+                        message: context.wording.profileSavedSuccessfully,
                         confirmText: context.wording.close,
                         imageAsset: Assets.png.brownyCreatePin.path,
+                        onConfirm: () {
+                          if (widget.isFirstSignup) {
+                            context.pushNamedAndClear(HomePage.pageName);
+                          }
+                        },
                       );
                     } else if (result.isError) {
                       await AppOverlays.showBrownyDialog(
@@ -428,7 +416,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 width: double.infinity,
                 child: TextButton(
                   onPressed: () {
-                    // TODO: Handle skip
+                    AppOverlays.showBrownyDialog(
+                      context,
+                      title: 'ยืนยันการข้าม',
+                      message: 'คุณต้องการข้ามการบันทึกข้อมูลโปรไฟล์?',
+                      confirmText: context.wording.confirm,
+                      cancelText: context.wording.cancel,
+                      imageAsset: Assets.png.brownyCreatePin.path,
+                      onConfirm: () {
+                        context.pushNamedAndClear(HomePage.pageName);
+                      },
+                    );
                   },
                   child: Text(
                     context.wording.skip,
@@ -445,7 +443,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     context,
                     imageAsset: Assets.png.brownyError1.path,
                     title: context.wording.logout,
-                    message: 'คุณแน่ใจหรือไม่ว่าจะออกจากระบบ',
+                    message: context.wording.confirmLogoutMessage,
                     confirmText: context.wording.confirm,
                     cancelText: context.wording.cancel,
                     onConfirm: () async {
@@ -463,9 +461,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       final result = await _viewModel.logout();
                       AppOverlays.hideLoading();
                       if (result.isSuccess && context.mounted) {
-                        context.pushNamedAndClear(
-                          OnBoardingPage.pageName,
-                        );
+                        context.pop();
+                        // context.pushNamedAndClear(
+                        //   OnBoardingPage.pageName,
+                        // );
                       }
                     },
                   );
@@ -493,6 +492,31 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  Future<void> _onbirthDateFieldTap() async {
+    final locale = Localizations.localeOf(context);
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _viewModel.initialCalendarDate(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      locale: locale,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            textTheme: GoogleFonts.promptTextTheme(
+              Theme.of(context).textTheme,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate != null) {
+      _viewModel.onBirthDayUpdate(pickedDate);
+    }
+  }
+
   Widget _buildPhoneField(UserModel data, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -512,7 +536,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               style: context.textTheme.headlineMedium!.copyWith(
                 fontSize: AppDims.size_20.sp,
                 color: phone.orEmpty.isEmpty
-                    ? AppColors.grey500
+                    ? AppColors.gray500
                     : AppColors.textPrimary,
               ),
             );
@@ -667,7 +691,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           icon: Icon(
                             Icons.chevron_left_rounded,
                             size: AppDims.size_40.w,
-                            color: AppColors.grey500,
+                            color: AppColors.gray500,
                           ),
                           onPressed: () {
                             _viewModel.carouselController.previousPage(
@@ -684,7 +708,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icon(
                       Icons.chevron_right_rounded,
                       size: AppDims.size_40.w,
-                      color: AppColors.grey500,
+                      color: AppColors.gray500,
                     ),
                     onPressed: () {
                       _viewModel.carouselController.nextPage(
@@ -726,7 +750,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               image: isFile
                   ? FileImage(File(src)) as ImageProvider
                   : NetworkImage(src),
-              fit: isFile ? BoxFit.cover : BoxFit.contain,
+              // fit: isFile ? BoxFit.cover : BoxFit.contain,
+              fit: BoxFit.contain,
             ),
           ),
         ),
@@ -855,5 +880,125 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> _showBirthDayOffers(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: AppDims.size_32.w),
+          child: FractionallySizedBox(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => dialogContext.pop(),
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: Assets.svg.icUnchecked.svg(
+                            width: 20.w,
+                            height: 20.h,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AppContainerRadius(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.popupGradient,
+                          borderRadius: BorderRadius.circular(24.r),
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              // AppDims.vericalPadding_16,
+                              SizedBox(
+                                height: 200.h,
+                              ),
+
+                              // AppDims.vericalPadding_16,
+                              Padding(
+                                padding: EdgeInsets.all(AppDims.size_16),
+                                child: Column(
+                                  children: [
+                                    AppText(
+                                      _viewModel.titlePopupBirthDayOffers(
+                                        context,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      style: context.textTheme.headlineLarge!
+                                          .copyWith(
+                                            fontSize: AppDims.size_24.sp,
+                                            color: AppColors.primary,
+                                          ),
+                                    ),
+                                    AppDims.vericalPadding_10,
+
+                                    AppText(
+                                      _viewModel.descriptionPopupBirthDayOffers(
+                                        context,
+                                      ),
+                                      textAlign: TextAlign.start,
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.gray600,
+                                          ),
+                                    ),
+                                    AppDims.vericalPadding_16,
+
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        dialogContext.pop();
+                                      },
+                                      child: AppText(
+                                        context.wording.acknowledge,
+                                      ),
+                                    ),
+                                    AppDims.vericalPadding_4,
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _birthDatefocusNode.requestFocus();
+                                        dialogContext.pop();
+                                        _onbirthDateFieldTap();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.ci3,
+                                        foregroundColor: AppColors.primary,
+                                      ),
+                                      child: AppText(
+                                        context.wording.changeBirthday,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Positioned(
+                  top: -45.w,
+                  child: Assets.png.brownyPromotion.image(width: 250.w),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

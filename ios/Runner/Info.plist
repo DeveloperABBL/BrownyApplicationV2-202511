@@ -57,6 +57,16 @@
 	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location lets us show you the nearest stores always when in use the application.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location when in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location lets us show you the nearest stores.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app needs access to speech recognition to search for stores by voice.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone to enable voice search.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>

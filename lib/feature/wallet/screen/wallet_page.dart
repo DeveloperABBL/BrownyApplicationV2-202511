@@ -173,7 +173,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                   child: Container(
                     margin: EdgeInsets.only(
                       left: 24,
-                      right: 24,
+                      right: 14,
                       top: 24,
                     ),
                     child: SingleChildScrollView(

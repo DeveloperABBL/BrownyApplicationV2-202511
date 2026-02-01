@@ -35,6 +35,10 @@ class WalletModel extends CustomerProfileData {
     List<String>? avatars,
     List<int>? amountBadge,
     int? selectedAmount,
+    int? couponsRedemption,
+    int? couponsDiscount,
+    int? couponsEVoucher,
+    int? totalCoupons,
   }) {
     return WalletModel._fromCustomerProfileData(
         CustomerProfileData(

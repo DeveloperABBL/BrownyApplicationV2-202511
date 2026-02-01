@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261060252828",
+    "project_id": "brownyapplication",
+    "storage_bucket": "brownyapplication.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261060252828:android:9d9c84bf697e5bb0cb0959",
+        "android_client_info": {
+          "package_name": "com.brownywash.browny_applications_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC54Z7g9HqyTeV8iLgql3UzvKiN6lVX5X4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

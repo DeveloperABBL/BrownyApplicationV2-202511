@@ -1,3 +1,5 @@
+import 'package:browny_applications_new/core/utils/permission_helper.dart';
+import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -21,8 +23,10 @@ class ScannerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) =>
-          ScannerViewModel(context: context, repo: CustomerDataRepo()),
+      create: (context) => ScannerViewModel(
+        context: context,
+        repo: CustomerDataRepo(),
+      ),
       child: _ScannerWidget(),
     );
   }
@@ -55,7 +59,21 @@ class __ScannerWidgetState extends State<_ScannerWidget>
 
     // Initialize camera after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _viewModel.initializeCamera();
+      await _viewModel.initializeCamera(
+        onPermissionDenied: () {
+          AppOverlays.showBrownyDialog(
+            context,
+            imageAsset: Assets.png.brownyError2.path,
+            title: 'ไม่สามารถเปิดกล้องได้',
+            message: 'กรุณาให้สิทธิ์ใช้งานกล้องก่อนใช้งาน',
+            confirmText: 'เปิด Setting',
+            onConfirm: () async {
+              await PermissionHelper.openAppSettings();
+            },
+            cancelText: context.wording.cancel,
+          );
+        },
+      );
     });
   }
 
@@ -187,20 +205,16 @@ class __ScannerWidgetState extends State<_ScannerWidget>
       backgroundColor: tabIndex == 0
           ? AppColors.black.withValues(alpha: 0.5)
           : AppColors.primary,
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
       bottom: TabBar(
         indicatorColor: tabIndex == 0 ? AppColors.primary : AppColors.white,
         labelStyle: context.textTheme.titleMedium!.copyWith(
           color: tabIndex == 0 ? AppColors.primary : AppColors.white,
         ),
         unselectedLabelStyle: context.textTheme.titleMedium!.copyWith(
-          color: tabIndex == 0 ? AppColors.grey500 : AppColors.white,
+          color: tabIndex == 0 ? AppColors.gray500 : AppColors.white,
         ),
-        onTap: (index) {
-          _viewModel.onTabChanged(index);
+        onTap: (index) async {
+          await _viewModel.onTabChanged(index);
         },
         tabs: [
           Tab(
@@ -232,7 +246,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
                 SizedBox(width: 8), // Add spacing between text and icon
                 Assets.svg.icQrDummy.svg(
                   colorFilter: ColorFilter.mode(
-                    tabIndex == 0 ? AppColors.grey500 : AppColors.white,
+                    tabIndex == 0 ? AppColors.gray500 : AppColors.white,
                     BlendMode.srcIn,
                   ),
                 ), // Your trailing icon

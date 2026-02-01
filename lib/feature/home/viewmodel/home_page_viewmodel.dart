@@ -4,7 +4,7 @@ import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:flutter/foundation.dart';
 
-enum HomePageState { home, invitFriend }
+enum HomePageState { home, couponVoucher, scan, branches, brownyShop }
 
 class HomePageViewmodel extends AppViewModel {
   HomePageViewmodel({
@@ -45,6 +45,12 @@ class HomePageViewmodel extends AppViewModel {
   }
 
   // ========== Logic ==========
+  void onBannerSliding() {
+    _bannerNotifier.value = UiResult.success(
+      data: _bannerNotifier.value.data!,
+    );
+  }
+
   void onHomePageNavigationChage(int index) {
     switch (index) {
       case 0:

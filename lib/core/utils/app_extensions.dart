@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,10 @@ import 'package:retrofit/dio.dart';
 extension AppBuildeContext on BuildContext {
   ThemeData get appTheme => Theme.of(this);
   TextTheme get textTheme => appTheme.textTheme;
+  TextStyle get appBarTextThemeWhite => appTheme.textTheme.titleLarge!.copyWith(
+    fontSize: AppDims.size_18.sp,
+    color: AppColors.textWhite,
+  );
   TextStyle get inputTextStyle => appTheme.textTheme.bodyLarge!.merge(
     GoogleFonts.prompt(
       fontSize: 14.sp,
@@ -30,8 +35,15 @@ extension AppBuildeContext on BuildContext {
       router.pop();
     }
     // Now push the new route
-    router.pushReplacementNamed(name);
+    router.pushReplacementNamed(
+      name,
+      extra: extra,
+      pathParameters: pathParameters,
+      queryParameters: queryParameters,
+    );
   }
+
+  String get languageCode => Localizations.localeOf(this).languageCode;
 }
 
 extension LocalizedContentExtension on ContentLocalizeData {

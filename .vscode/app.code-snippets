@@ -85,5 +85,30 @@
 		"body": [
 			"// ========== $1 =========="
 		]
-	},	
+	},
+	"Auto PageName": {
+		"prefix": "page_name",
+		"body": [
+			"  static final pagePath = '$1';",
+			"  static final pageName = '$1';"
+		]
+	},
+	"Auto AppDims Width": {
+		"prefix": "dimssizew",
+		"body": [
+			"AppDims.size_$1.w",
+		]
+	},
+	"Auto AppDims Height": {
+		"prefix": "dimssizeh",
+		"body": [
+			"AppDims.size_$1.h",
+		]
+	},
+	"Auto AppColors Height": {
+		"prefix": "appcolors",
+		"body": [
+			"AppColors.$1",
+		]
+	},
 }

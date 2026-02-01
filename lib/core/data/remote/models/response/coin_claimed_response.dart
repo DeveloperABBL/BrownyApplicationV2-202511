@@ -8,7 +8,8 @@ part 'coin_claimed_response.g.dart';
 // **************************************************************************
 // เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal
 // dart run build_runner build --delete-conflicting-outputs
-// dart run build_runner watch (auto gen)
+// (auto gen)
+// dart run build_runner watch
 // **************************************************************************
 
 @JsonSerializable(explicitToJson: true)

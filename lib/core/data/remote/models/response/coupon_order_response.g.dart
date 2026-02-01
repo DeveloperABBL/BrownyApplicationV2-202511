@@ -1,0 +1,62 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'coupon_order_response.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+CouponOrderResponse _$CouponOrderResponseFromJson(Map<String, dynamic> json) =>
+    CouponOrderResponse(
+      success: json['success'] as bool,
+      message: json['message'] as String?,
+      data: json['data'] == null
+          ? null
+          : CouponOrderData.fromJson(json['data'] as Map<String, dynamic>),
+      walletBalance: (json['wallet_balance'] as num?)?.toDouble(),
+      redirectUrl: json['redirect_url'] as String?,
+      paid: json['paid'] as bool?,
+      priceRequired: (json['price_required'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$CouponOrderResponseToJson(
+  CouponOrderResponse instance,
+) => <String, dynamic>{
+  'success': instance.success,
+  'message': instance.message,
+  'data': instance.data,
+  'wallet_balance': instance.walletBalance,
+  'redirect_url': instance.redirectUrl,
+  'paid': instance.paid,
+  'price_required': instance.priceRequired,
+};
+
+CouponOrderData _$CouponOrderDataFromJson(Map<String, dynamic> json) =>
+    CouponOrderData(
+      id: (json['id'] as num?)?.toInt(),
+      orderNo: json['order_no'] as String?,
+      customerId: json['customer_id'] as String?,
+      couponPackageId: (json['coupon_package_id'] as num?)?.toInt(),
+      quantity: (json['quantity'] as num?)?.toInt(),
+      price: json['price'] as String?,
+      totalPrice: json['total_price'] as String?,
+      paymentMethod: json['payment_method'] as String?,
+      paymentStatus: json['payment_status'] as String?,
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
+    );
+
+Map<String, dynamic> _$CouponOrderDataToJson(CouponOrderData instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'order_no': instance.orderNo,
+      'customer_id': instance.customerId,
+      'coupon_package_id': instance.couponPackageId,
+      'quantity': instance.quantity,
+      'price': instance.price,
+      'total_price': instance.totalPrice,
+      'payment_method': instance.paymentMethod,
+      'payment_status': instance.paymentStatus,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
+    };

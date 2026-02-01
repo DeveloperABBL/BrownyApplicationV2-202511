@@ -72,7 +72,8 @@ class PermissionHelper {
   /// เพื่อให้ผู้ใช้ไปเปิด permission ในการตั้งค่า
   static Future<bool> openAppSettings() async {
     try {
-      return await handler.openAppSettings();
+      final canOpened = await handler.openAppSettings();
+      return canOpened;
     } catch (e) {
       return false;
     }
@@ -83,7 +84,8 @@ class PermissionHelper {
   /// Returns [PermissionStatus] สถานะของ permission ที่ขอ
   static Future<handler.PermissionStatus> requestCameraPermission() async {
     try {
-      return await handler.Permission.camera.request();
+      final granted = await handler.Permission.camera.request();
+      return granted;
     } catch (e) {
       return handler.PermissionStatus.denied;
     }
@@ -151,7 +153,8 @@ class PermissionHelper {
     List<handler.Permission> permissions,
   ) async {
     try {
-      return await permissions.request();
+      final granted = await permissions.request();
+      return granted;
     } catch (e) {
       // ถ้าเกิด error ให้ return map ที่ทุก permission เป็น denied
       return Map.fromEntries(

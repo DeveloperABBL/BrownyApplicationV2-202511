@@ -173,15 +173,19 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
             // หน้า 3
             return _ForgotPasswordWidget();
 
-          case AuthenProcess.forgotPasswordPinning:
+          case AuthenProcess.forgotPasswordOTP:
+            // หน้า 4 (OTP สำหรับ ForgotPassword)
+            return _ForgotPasswordOTPWidget();
+
           case AuthenProcess.forgotPasswordNewPassword:
-            // ยังไม่ implement
-            return SizedBox();
+            // หน้า 5 Reset Password
+            return _ResetPasswordWidget();
 
           case AuthenProcess.referral:
             return _ReferralWidget();
-          default:
-            return SizedBox();
+
+          // default:
+          //   return SizedBox();
         }
       }).toList(),
     );
@@ -257,8 +261,15 @@ class _SignUpWidget extends StatelessWidget {
 
   /// Helper: Navigate ไปยัง Process ที่กำหนด (ควบคุมการเปลี่ยนหน้าใน PageView)
   @protected
-  void goToProcess(BuildContext context, AuthenProcess process) {
-    context.read<AuthenticationViewModel>().goToProcess(process);
+  void goToProcess(
+    BuildContext context,
+    AuthenProcess process, {
+    bool animate = true,
+  }) {
+    context.read<AuthenticationViewModel>().goToProcess(
+      process,
+      animate: animate,
+    );
   }
 
   /// Helper: เข้าถึง AuthenticationViewModel จาก context
@@ -409,6 +420,7 @@ class _SignUpWidget extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: children,
         ),
       ),
@@ -489,7 +501,7 @@ class _SignUpWidget extends StatelessWidget {
     return Consumer<AuthenticationViewModel>(
       builder: (context, vm, _) {
         return AppTextFormField(
-          controller: vm.usernameController,
+          controller: vm.usernameController, // signUp
           textInputAction: TextInputAction.next,
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
@@ -757,21 +769,7 @@ class _OTPContent extends _SignUpWidget {
                       return _PinputWidget(
                         forceErrorState: value != null,
                         onCompleted: (pin) async {
-                          AppOverlays.showLoading(context);
-                          final validateResult = await viewmodel(
-                            context,
-                          ).verifyOTP(pin);
-
-                          if (!context.mounted) return;
-
-                          if (validateResult.hasError) {
-                            AppOverlays.hideLoading();
-                            _showErrorDialog(context, validateResult.error!);
-                            return;
-                          }
-                          AppOverlays.hideLoading();
-                          // auto call ปุ่มต่อไป
-                          await _summitOtp(context);
+                          await onPinComplete(context, pin);
                         },
                       );
                     },
@@ -846,6 +844,24 @@ class _OTPContent extends _SignUpWidget {
     );
   }
 
+  Future<void> onPinComplete(BuildContext context, String pin) async {
+    AppOverlays.showLoading(context);
+    final validateResult = await viewmodel(
+      context,
+    ).verifyOTP(pin);
+
+    if (!context.mounted) return;
+
+    if (validateResult.hasError) {
+      AppOverlays.hideLoading();
+      _showErrorDialog(context, validateResult.error!);
+      return;
+    }
+    AppOverlays.hideLoading();
+    // auto call ปุ่มต่อไป
+    await _summitOtp(context);
+  }
+
   Future<void> _summitOtp(BuildContext context) async {
     AppOverlays.showLoading(context);
     viewmodel(context).onSummitForm().then((
@@ -917,6 +933,47 @@ class _OTPContent extends _SignUpWidget {
           },
         );
       },
+    );
+  }
+}
+
+class _ForgotPasswordOTPWidget extends StatefulWidget {
+  const _ForgotPasswordOTPWidget({super.key});
+
+  @override
+  State<_ForgotPasswordOTPWidget> createState() =>
+      __ForgotPasswordOTPWidgetState();
+}
+
+class __ForgotPasswordOTPWidgetState extends State<_ForgotPasswordOTPWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    // เริ่ม OTP Timer เมื่อหน้าแสดง (หลัง build เสร็จ)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      AppOverlays.showLoading(context);
+      await context.read<AuthenticationViewModel>().startOtpTimer();
+
+      AppOverlays.hideLoading();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _ForgotPasswordOTPContent();
+  }
+}
+
+class _ForgotPasswordOTPContent extends _OTPContent {
+  const _ForgotPasswordOTPContent();
+
+  @override
+  Future<void> _summitOtp(BuildContext context) async {
+    // สำเร็จ → หน้าไป resetpassword
+    goToProcess(
+      context,
+      AuthenProcess.forgotPasswordNewPassword,
     );
   }
 }
@@ -1132,8 +1189,9 @@ class _LoginWidget extends _SignUpWidget {
             AppTextStyles.labelLarge,
           ),
         ),
-        onPressed:
-            () {}, // TODO: goToProcess(context, AuthenProcess.forgotPassword)
+        onPressed: () {
+          goToProcess(context, AuthenProcess.forgotPassword, animate: false);
+        },
         child: AppText(
           context.wording.forgotPassword,
         ),
@@ -1180,6 +1238,8 @@ class _LoginWidget extends _SignUpWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () async {
+              FocusManager.instance.primaryFocus?.unfocus();
+
               AppOverlays.showLoading(context);
               final result = await vm.onLogin();
               if (!context.mounted) return;
@@ -1277,9 +1337,15 @@ class _ReferralWidget extends _SignUpWidget {
                         AppOverlays.showLoading(context);
                         final result = await vm.onSummitForm();
                         AppOverlays.hideLoading();
-                        if (result.isSuccess) {
+                        if (context.mounted && result.isSuccess) {
                           FocusManager.instance.primaryFocus?.unfocus();
-                          context.pushNamed(CreateAppPinPage.pageName);
+                          context.pushNamed(
+                            CreateAppPinPage.pageName,
+                            extra: {
+                              CreateAppPinPage.kImplementBackButton: false,
+                              CreateAppPinPage.kFirstSignup: true,
+                            },
+                          );
                         }
                       }
                     : null,
@@ -1292,12 +1358,19 @@ class _ReferralWidget extends _SignUpWidget {
     );
   }
 
+  /// ใช้เป็นปุ่ม Skip
   @override
   Widget contentButtonForgotPassword(BuildContext context) {
     return Center(
       child: TextButton(
         onPressed: () {
-          context.pushReplacementNamed(CreateAppPinPage.pageName);
+          context.pushReplacementNamed(
+            CreateAppPinPage.pageName,
+            extra: {
+              CreateAppPinPage.kImplementBackButton: false,
+              CreateAppPinPage.kFirstSignup: true,
+            },
+          );
         },
         child: AppText(
           '${context.wording.skip} ',
@@ -1314,7 +1387,7 @@ class _ReferralWidget extends _SignUpWidget {
     return Consumer<AuthenticationViewModel>(
       builder: (context, vm, _) {
         return AppTextFormField(
-          controller: vm.usernameController,
+          controller: vm.usernameController, // save referral
           textInputAction: TextInputAction.done,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
@@ -1401,7 +1474,6 @@ class _ForgotPasswordWidget extends _SignUpWidget {
 
   /// ปุ่ม Submit สำหรับ Forgot Password
   /// - ข้อความ "ถัดไป" (Next)
-  /// - TODO: เปลี่ยนจาก vm.onSignUp() เป็น vm.onForgotPassword()
   @override
   Widget contentButtonSummit(BuildContext context) {
     return Consumer<AuthenticationViewModel>(
@@ -1409,12 +1481,38 @@ class _ForgotPasswordWidget extends _SignUpWidget {
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: vm.onSummitForm, // TODO: Change to vm.onForgotPassword()
+            onPressed: () async {
+              AppOverlays.showLoading(context);
+              final result = await vm.onSummitForm();
+
+              if (!context.mounted) return;
+              AppOverlays.hideLoading();
+
+              if (result.isEmpty && !result.hasError) {
+                return;
+              }
+
+              if (!result.isSuccess) {
+                AppOverlays.showBrownyDialog(
+                  context,
+                  title: context.wording.errorOccurred,
+                  message: context.wording.errorUi,
+                );
+                return;
+              }
+
+              goToProcess(context, AuthenProcess.forgotPasswordOTP);
+            },
             child: AppText(context.wording.next),
           ),
         );
       },
     );
+  }
+
+  @override
+  Key getFormKey(BuildContext context) {
+    return viewmodel(context).formKeyForgetPasswordUsername;
   }
 
   /// ไม่แสดง Social Login
@@ -1460,6 +1558,244 @@ class _ForgotPasswordWidget extends _SignUpWidget {
       wording: context.wording.forgotPasswordDescription,
     );
   }
+}
+
+class _ResetPasswordWidget extends _SignUpWidget {
+  const _ResetPasswordWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
+    );
+  }
+
+  @override
+  Key getFormKey(BuildContext context) =>
+      viewmodel(context).formKeyForgetPasswordReset;
+
+  @override
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return super.contentTitle(
+      context,
+      wording: context.wording.setYourNewPassword,
+    );
+  }
+
+  @override
+  Widget contentDescription(BuildContext context, {required String wording}) {
+    return super.contentDescription(
+      context,
+      wording: 'แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย',
+    );
+  }
+
+  @override
+  Widget textFormFieldPasswordWithObscure(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.isObscure,
+          builder: (context, isObscured, _) {
+            return AppTextFormField(
+              controller: vm.passwordController,
+              textInputAction: TextInputAction.done,
+              obscureText: isObscured,
+              decoration: InputDecoration(
+                hint: AppText(
+                  context.wording.password,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                prefixIcon: SizedBox.shrink(),
+                suffixIcon: IconButton(
+                  onPressed: vm.onObscureChange,
+                  icon: isObscured
+                      ? Assets.svg.icObscureOff.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        )
+                      : Assets.svg.icObscureOn.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        ),
+                ),
+              ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => getValidatorPassword(context, value),
+              onChanged: vm.resetPasswordValidator,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// สร้าง TextFormField ใหม่ เพื่อเป็นการยืินยันรหัสผ่าน ต่อจาก [textFormFieldPasswordWithObscure]
+  Widget textFormFieldConfirmPasswordWithObscure(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.isObscure,
+          builder: (context, isObscured, _) {
+            return AppTextFormField(
+              controller: vm.confirmPasswordController,
+              textInputAction: TextInputAction.done,
+              obscureText: isObscured,
+              decoration: InputDecoration(
+                hint: AppText(
+                  context.wording.password,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                prefixIcon: SizedBox.shrink(),
+                suffixIcon: IconButton(
+                  onPressed: vm.onObscureChange,
+                  icon: isObscured
+                      ? Assets.svg.icObscureOff.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        )
+                      : Assets.svg.icObscureOn.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        ),
+                ),
+              ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) =>
+                  viewmodel(context).resetConfirmPasswordValidator(value),
+              onChanged: viewmodel(context).resetConfirmPasswordValidator,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  List<Widget> listOfFormAuth(
+    BuildContext context,
+    AuthenticationViewModel vm,
+  ) => [
+    textFormFieldPasswordWithObscure(context),
+    AppDims.vericalPadding_12,
+    textFormFieldConfirmPasswordWithObscure(context),
+    AppDims.vericalPadding_8,
+
+    ValueListenableBuilder(
+      valueListenable: viewmodel(context).resetValidationNotifier,
+      builder: (context, value, child) {
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          minVerticalPadding: 0,
+          horizontalTitleGap: 0,
+          minTileHeight: 0,
+          leading: (value[ResetPasswordConditions.samePassword] ?? false)
+              ? Assets.svg.icChecked.svg(width: 14.w)
+              : Assets.svg.icUnchecked.svg(width: 14.w),
+          title: AppText(
+            context.wording.passwordMatches,
+            style: context.textTheme.bodySmall,
+          ),
+        );
+      },
+    ),
+    AppDims.vericalPadding_4,
+    ValueListenableBuilder(
+      valueListenable: viewmodel(context).resetValidationNotifier,
+      builder: (context, value, child) {
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          minVerticalPadding: 0,
+          horizontalTitleGap: 0,
+          minTileHeight: 0,
+          leading: (value[ResetPasswordConditions.atleastLength] ?? false)
+              ? Assets.svg.icChecked.svg(width: 14.w)
+              : Assets.svg.icUnchecked.svg(width: 14.w),
+          title: AppText(
+            context.wording.atleast8Characters,
+            style: context.textTheme.bodySmall,
+          ),
+        );
+      },
+    ),
+
+    AppDims.vericalPadding_24,
+  ];
+
+  @override
+  String? getValidatorPassword(BuildContext context, String? value) =>
+      viewmodel(context).resetPasswordValidator(
+        value,
+      );
+
+  /// reset password
+  @override
+  Widget contentButtonSummit(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.validatorTriggle, // Signup
+          builder: (context, isValid, _) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isValid
+                    ? () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        AppOverlays.showLoading(context);
+                        vm.onSummitForm().then((result) {
+                          if (!context.mounted) return;
+                          AppOverlays.hideLoading();
+
+                          if (result.hasError) {
+                            _showErrorDialog(
+                              context,
+                              result.error,
+                            );
+                            return;
+                          }
+
+                          if (result.isEmpty) {
+                            return;
+                          }
+
+                          AppOverlays.showBrownyDialog(
+                            context,
+                            imageAsset: Assets.png.brownySuccess1.path,
+                            message: 'เปลี่ยนรหัสผ่านสำเร็จ',
+                            onConfirm: () {
+                              goToProcess(
+                                context,
+                                AuthenProcess.login,
+                                animate: false,
+                              );
+                            },
+                          );
+                        });
+                      }
+                    : null,
+                child: AppText(context.wording.repeatPassword),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// reset password
+  @override
+  Widget contentSocialLoginSeparator(BuildContext context) => SizedBox();
+
+  /// reset password
+  @override
+  Widget contentSocialLogin() => SizedBox();
 }
 
 /// Checkbox สำหรับยอมรับข้อตกลงและนโยบายความเป็นส่วนตัว

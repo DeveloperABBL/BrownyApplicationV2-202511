@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
-import 'package:browny_applications_new/feature/coupon_voucher/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
@@ -135,7 +137,36 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               ElevatedButton(
                                 onPressed: () {
                                   dialogContext.pop();
-                                  context.pushNamed(InvitFriendPage.pageName);
+                                  context
+                                      .pushNamed<Map<Type, HomePageState>>(
+                                        InvitFriendPage.pageName,
+                                      )
+                                      .then((bypass) {
+                                        if (context.mounted && bypass != null) {
+                                          switch (bypass.values.first) {
+                                            case HomePageState.home:
+                                              break;
+                                            case HomePageState.couponVoucher:
+                                              context.pushNamed(
+                                                CouponVoucherPage.pageName,
+                                              );
+                                              break;
+                                            case HomePageState.scan:
+                                              // ไปหน้า Scan
+                                              context.pushNamed(
+                                                ScannerPage.pageName,
+                                              );
+                                              break;
+                                            case HomePageState.branches:
+                                              context.pushNamed(
+                                                MapPage.pageName,
+                                              );
+                                              break;
+                                            case HomePageState.brownyShop:
+                                              break;
+                                          }
+                                        }
+                                      });
                                 },
                                 child: AppText(
                                   'เชิญเพื่อนเลย',
@@ -177,8 +208,89 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           _buildMyAppBar(),
 
           // ส่วนของ TP Wallet, Browny Coin
-          _mySliverBox(
+          SliverToBoxAdapter(
             child: _buildMyWalletAndCoinZone(),
+          ),
+          // _mySliverBox(
+          //   child: _buildMyWalletAndCoinZone(),
+          // ),
+
+          // icon shortcut
+          SliverToBoxAdapter(
+            child: SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.only(
+                  left: AppDims.size_16.w,
+                  right: AppDims.size_16.w,
+                  top: AppDims.size_16.h,
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDims.size_8.w,
+                          vertical: AppDims.size_8.h,
+                        ),
+                        child: Column(
+                          children: [
+                            Assets.iconShortcut.iscBrownyLive.image(
+                              width: AppDims.size_64.w,
+                              height: AppDims.size_32.h,
+                            ),
+                            AppText(
+                              'Browny\nLive',
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.titleSmall,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDims.size_8.w,
+                          vertical: AppDims.size_8.h,
+                        ),
+                        child: Column(
+                          children: [
+                            Assets.iconShortcut.iscCoupon.image(
+                              width: AppDims.size_64.w,
+                              height: AppDims.size_32.h,
+                            ),
+                            AppText(
+                              'คูปอง',
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.titleSmall,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDims.size_8.w,
+                          vertical: AppDims.size_8.h,
+                        ),
+                        child: Column(
+                          children: [
+                            Assets.iconShortcut.iscBrownyClub.image(
+                              width: AppDims.size_64.w,
+                              height: AppDims.size_32.h,
+                            ),
+                            AppText(
+                              'Browny\nClub',
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.titleSmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
 
           // เก็บ Coupon
@@ -212,7 +324,17 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.pushNamed(CouponVoucherPage.pageName);
+                      if (_viewmodel.isProfileGuest()) {
+                        context.pushNamed(
+                          AuthenticationPage.pageName,
+                          extra: {
+                            AuthenProcess: AuthenProcess.login,
+                          },
+                        );
+                      } else {
+                        context.pushNamed(CouponVoucherPage.pageName);
+                      }
+
                       // _showInvitBottomSheet();
                     },
                     // banner เก็บคูปอง
@@ -245,9 +367,21 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         currentIndex: 0,
         onTap: (index) {
           print(index.toString());
+          if (index == 1) {
+            context.pushNamed(CouponVoucherPage.pageName);
+            return;
+          }
+
+          if (index == 2) {
+            context.pushNamed(MapPage.pageName);
+            return;
+          }
         },
         onCenterTap: () {
-          print('onCenterTap');
+          // ไปหน้า Scan
+          context.pushNamed(
+            ScannerPage.pageName,
+          );
         },
       ),
     );
@@ -255,8 +389,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   Widget _buildMyAppBar() {
     return SliverAppBar(
-      pinned: false,
-      floating: true,
+      pinned: true,
+      floating: false,
       surfaceTintColor: AppColors.transparent,
       stretch: true,
       expandedHeight: 200.h,
@@ -278,16 +412,19 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                 return Image.network(
                   result.requireData[index].imageDisplay(context),
                   fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
                 );
               },
               options: CarouselOptions(
                 initialPage: 0,
-                // enlargeCenterPage: true,
+                enlargeCenterPage: true,
                 enableInfiniteScroll: result.requireData.length > 1,
+                // enableInfiniteScroll: false,
+                autoPlay: true,
                 viewportFraction: 1,
                 aspectRatio: 1,
                 // onPageChanged: (index, reason) {
-                //   _viewModel.updateIndex = index;
+                //   _viewmodel.onBannerSliding();
                 // },
               ),
             );
@@ -300,9 +437,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         stretchModes: [
           StretchMode.zoomBackground,
         ],
+        expandedTitleScale: 8,
         title: AppContainerRadius(
-          height: AppDims.size_16.h,
+          height: AppDims.size_2.h,
         ),
+        // collapseMode: CollapseMode.none,
         titlePadding: EdgeInsets.all(0.0),
       ),
       actionsPadding: EdgeInsets.symmetric(
@@ -380,7 +519,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AppDims.horizonPadding_9,
+              AppDims.horizonPadding_16,
 
               // TP+ Wallet Container
               Column(
@@ -566,8 +705,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   // Icon browny
                   Positioned(
                     left: -28.w,
-                    right: 0,
-                    top: -1.w,
+                    right: -10.w,
+                    top: -2.w,
                     child: isGuest
                         ? SizedBox()
                         : Assets.svg.icBrownySpeaker.svg(width: 35.w),
@@ -718,7 +857,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             ],
                           ),
                           Selector<CustomerProvider, String>(
-                            selector: (context, provider) => '0',
+                            selector: (context, provider) =>
+                                provider.current.totalCoupons?.toString() ??
+                                '0',
                             builder: (context, value, child) => AppText(
                               formatCurrency(
                                 string: value,
@@ -737,6 +878,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   ),
                 ],
               ),
+
+              AppDims.horizonPadding_16,
             ],
           );
         },

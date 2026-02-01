@@ -274,7 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skip => 'Skip';
 
   @override
-  String get eVouchers => 'E-vouchers';
+  String get eVouchers => 'E-Voucher';
 
   @override
   String get chooseStore => 'Choose store';
@@ -863,4 +863,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noRewardsFound => 'No rewards found';
+
+  @override
+  String get cannotEnableBiometric => 'Cannot enable Biometric';
+
+  @override
+  String get qrCodeNotFoundInImage => 'QR Code not found in image';
+
+  @override
+  String get makePayment => 'Make Payment';
+
+  @override
+  String get products => 'Products';
+
+  @override
+  String get collectCoupon => 'Collect Coupon';
+
+  @override
+  String get scanCoupon => 'Scan Coupon';
+
+  @override
+  String get sakob => 'Sakob';
+
+  @override
+  String get eVoucherDetails => 'E-Voucher Details';
+
+  @override
+  String get buyEVoucher => 'Buy E-Voucher Coupon';
+
+  @override
+  String get birthdaySpecialConditions => 'Birthday Special Conditions';
+
+  @override
+  String get profileSavedSuccessfully => 'Profile saved successfully';
+
+  @override
+  String get confirmLogoutMessage => 'Are you sure you want to log out?';
+
+  @override
+  String get acknowledge => 'Acknowledge';
+
+  @override
+  String get changeBirthday => 'Change Birthday';
+
+  @override
+  String get searchStoreParticipating => 'Search for participating stores';
+
+  @override
+  String get storeNotFound => 'No stores found';
+
+  @override
+  String get recent => 'Recent';
 }

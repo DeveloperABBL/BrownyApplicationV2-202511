@@ -80,6 +80,45 @@ class AppColors {
     // stops: [-0.0038, 0.4714, 1.0571],
   );
 
+  /// Purchase Background gradient - linear-gradient(91.26deg, rgba(212, 207, 70, 0.5) -0.38%, rgba(135, 206, 69, 0.5) 47.14%, rgba(36, 181, 45, 0.5) 105.71%)
+  static const LinearGradient purchaseBackgroundGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    transform: GradientRotation(91.26 * 3.14159 / 180), // 91.26 degrees
+    colors: [
+      Color(0x80D4CF46), // rgba(212, 207, 70, 0.5)
+      Color(0x8087CE45), // rgba(135, 206, 69, 0.5)
+      Color(0x8024B52D), // rgba(36, 181, 45, 0.5)
+    ],
+    stops: [
+      -0.0038, // -0.38%
+      0.4714, // 47.14%
+      1.0571, // 105.71%
+    ],
+  );
+
+  /// Popup gradient - linear-gradient(360deg, #FFFFFF 21.94%, #BFF298 95.02%, #23AE2C 130.51%)
+  static LinearGradient popupGradient = LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: [
+      Color(0xFFFFFFFF), // #FFFFFF
+      Color(0xFFBFF298), // #BFF298
+    ],
+    stops: [
+      0.2194, // 21.94%
+      0.9502, // 95.02%
+    ],
+  );
+
+  static List<BoxShadow> get defatultShadow => [
+    BoxShadow(
+      color: AppColors.black.withValues(alpha: 0.2),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
   // ============================================================================
   // Primary CTA Colors
   // ============================================================================
@@ -247,10 +286,10 @@ class AppColors {
   static const Color green400 = Color(0xFFDFDFDF); // #DFDFDF
 
   /// Gray 500
-  static const Color grey500 = Color(0xFF949494); // #949494
+  static const Color gray500 = Color(0xFF949494); // #949494
 
   /// Gray 600
-  static const Color grey600 = Color(0xFF777777); // #777777
+  static const Color gray600 = Color(0xFF777777); // #777777
 
   /// Gray 400
   static const Color gray400 = Color(0xFFCDCDCD); // #CDCDCD
@@ -266,6 +305,10 @@ class AppColors {
 
   static const Color ci5 = Color(0xFFA6DFAA); // #A6DFAA
 
+  static const Color ci6 = Color(0xFFC9F3CB); // #C9F3CB
+
+  static const Color ci7 = Color(0xFFABF0AF); // #ABF0AF
+
   /// Dark Brown
   static const Color darkBrown = Color(0xFF593817); // #593817
 
@@ -277,6 +320,8 @@ class AppColors {
   static const Color cocoaBrown = Color(0xFFCC6E29); // #CC6E29
 
   static const Color yellow = Color(0xFFF5E221); // #F5E221
+
+  static const Color yellow2 = Color(0xFFFFCD46); // #FFCD46
 
   // ============================================================================
   // Status Colors

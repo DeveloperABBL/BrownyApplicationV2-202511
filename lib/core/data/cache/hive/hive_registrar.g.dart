@@ -9,6 +9,7 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CustomerProfileDataAdapter());
     registerAdapter(LoginCustomerDataAdapter());
+    registerAdapter(StoreSearchHistoryAdapter());
   }
 }
 
@@ -16,5 +17,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CustomerProfileDataAdapter());
     registerAdapter(LoginCustomerDataAdapter());
+    registerAdapter(StoreSearchHistoryAdapter());
   }
 }

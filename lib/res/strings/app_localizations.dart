@@ -625,7 +625,7 @@ abstract class AppLocalizations {
   /// No description provided for @eVouchers.
   ///
   /// In en, this message translates to:
-  /// **'E-vouchers'**
+  /// **'E-Voucher'**
   String get eVouchers;
 
   /// No description provided for @chooseStore.
@@ -1767,6 +1767,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No rewards found'**
   String get noRewardsFound;
+
+  /// No description provided for @cannotEnableBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot enable Biometric'**
+  String get cannotEnableBiometric;
+
+  /// No description provided for @qrCodeNotFoundInImage.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code not found in image'**
+  String get qrCodeNotFoundInImage;
+
+  /// No description provided for @makePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Make Payment'**
+  String get makePayment;
+
+  /// No description provided for @products.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get products;
+
+  /// No description provided for @collectCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect Coupon'**
+  String get collectCoupon;
+
+  /// No description provided for @scanCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Coupon'**
+  String get scanCoupon;
+
+  /// No description provided for @sakob.
+  ///
+  /// In en, this message translates to:
+  /// **'Sakob'**
+  String get sakob;
+
+  /// No description provided for @eVoucherDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'E-Voucher Details'**
+  String get eVoucherDetails;
+
+  /// No description provided for @buyEVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy E-Voucher Coupon'**
+  String get buyEVoucher;
+
+  /// No description provided for @birthdaySpecialConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday Special Conditions'**
+  String get birthdaySpecialConditions;
+
+  /// No description provided for @profileSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved successfully'**
+  String get profileSavedSuccessfully;
+
+  /// No description provided for @confirmLogoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out?'**
+  String get confirmLogoutMessage;
+
+  /// No description provided for @acknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledge'**
+  String get acknowledge;
+
+  /// No description provided for @changeBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Birthday'**
+  String get changeBirthday;
+
+  /// No description provided for @searchStoreParticipating.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for participating stores'**
+  String get searchStoreParticipating;
+
+  /// No description provided for @storeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No stores found'**
+  String get storeNotFound;
+
+  /// No description provided for @recent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get recent;
 }
 
 class _AppLocalizationsDelegate

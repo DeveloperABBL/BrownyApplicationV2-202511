@@ -80,7 +80,7 @@ class _BiometricContentState extends State<_BiometricContent> {
           context.pushNamed(
             ProfilePage.pageName,
             extra: {
-              ProfilePage.kEditing: true,
+              ProfilePage.kFirstSignup: true,
             },
           );
         }
@@ -88,7 +88,7 @@ class _BiometricContentState extends State<_BiometricContent> {
         // แสดง Error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('ไม่สามารถเปิดใช้งาน Biometric ได้'),
+            content: AppText(context.wording.cannotEnableBiometric),
             backgroundColor: AppColors.error,
           ),
         );
@@ -100,7 +100,7 @@ class _BiometricContentState extends State<_BiometricContent> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('เกิดข้อผิดพลาด: ${e.toString()}'),
+          content: AppText(context.wording.errorOccurred),
           backgroundColor: AppColors.error,
         ),
       );

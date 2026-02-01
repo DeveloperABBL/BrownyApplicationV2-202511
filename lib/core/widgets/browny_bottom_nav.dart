@@ -157,9 +157,12 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
             // if (hasCenter)
             Positioned(
               bottom: _centerBottomOffset(),
-              child: Assets.svg.scanIcon.svg(
-                width: 106.w,
-                height: 100.h,
+              child: GestureDetector(
+                onTap: widget.onCenterTap,
+                child: Assets.svg.scanIcon.svg(
+                  width: 106.w,
+                  height: 100.h,
+                ),
               ),
             ),
           ],
