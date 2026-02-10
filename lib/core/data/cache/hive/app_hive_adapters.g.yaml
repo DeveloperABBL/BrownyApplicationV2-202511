@@ -5,7 +5,7 @@ nextTypeId: 3
 types:
   LoginCustomerData:
     typeId: 0
-    nextIndex: 7
+    nextIndex: 8
     fields:
       name:
         index: 1
@@ -19,6 +19,8 @@ types:
         index: 5
       loginPlatform:
         index: 6
+      firstLogin:
+        index: 7
   CustomerProfileData:
     typeId: 1
     nextIndex: 14

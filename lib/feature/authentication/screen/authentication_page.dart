@@ -426,7 +426,8 @@ class _SignUpWidget extends StatelessWidget {
       CreateAppPinPage.pageName,
       extra: {
         CreateAppPinPage.kImplementBackButton: false,
-        CreateAppPinPage.kFirstSignup: false,
+        CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
+        // CreateAppPinPage.kFirstSignup: true,
       },
     );
   }

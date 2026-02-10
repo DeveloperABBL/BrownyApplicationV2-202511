@@ -1,5 +1,11 @@
 # CHANGELOG
 ---
+### DONG 2026-02-11
+* เพิ่ม Assets Menu หน้า home page (ยังไม่ implement การทำงาน)
+* ปรับบ model รับข้อมูล E-Voucher ที่เป็นของ Customer ให้แสดงข้อมูลได้ถูกต้อง
+* เก็บ logic การ Login ด้วย Social ให้ไปหน้า profile initial เมื่อเป็นการ login ครั้งแรก
+
+---
 ### DONG 2026-02-08
 * เพิ่มการ login ด้วย Social GOOGLE, Apple, LINE, FACEBOOK
 * เพิ่ม Popup เงื่อนไขในหน้า claim coin (mockup ข้อมูล ตาม Design)

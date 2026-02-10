@@ -11,7 +11,7 @@ PaymentStatusCheckResponse _$PaymentStatusCheckResponseFromJson(
 ) => PaymentStatusCheckResponse(
   status: json['status'] as String,
   redirect: json['redirect'] as String?,
-  orderId: json['order_id'] as int?,
+  orderId: (json['order_id'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$PaymentStatusCheckResponseToJson(

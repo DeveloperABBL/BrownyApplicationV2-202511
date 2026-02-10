@@ -23,6 +23,10 @@ abstract class AppViewModel extends ChangeNotifier {
   }
 }
 
+mixin AppViewModelDelegateMixin {
+  void disposeDelegate();
+}
+
 class AppViewModelObscureHandler extends AppViewModel {
   AppViewModelObscureHandler({
     required super.context,

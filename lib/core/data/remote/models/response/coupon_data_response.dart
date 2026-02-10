@@ -15,6 +15,9 @@ class CouponData {
   @JsonKey(name: 'coupon_id')
   final dynamic couponId; // รองรับทั้ง int และ String
 
+  @JsonKey(name: 'customer_coupon_id')
+  final dynamic customerCouponId;
+
   @JsonKey(name: 'assigned_quantity')
   final String? assignedQuantity;
 
@@ -36,17 +39,35 @@ class CouponData {
   @JsonKey(name: 'type_label')
   final ContentLocalizeData? typeLabel;
 
+  @JsonKey(name: 'usage_label')
+  final ContentLocalizeData? usageLabel;
+
   @JsonKey(name: 'icon')
   final String? icon;
 
-  @JsonKey(name: 'name')
-  final ContentLocalizeData? name;
+  @JsonKey(name: 'package_name')
+  final ContentLocalizeData? packageName;
 
   @JsonKey(name: 'description')
   final ContentLocalizeData? description;
 
   @JsonKey(name: 'image_url')
   final ContentLocalizeData? imageUrl;
+
+  @JsonKey(name: 'store')
+  final CouponStoreData? store;
+
+  @JsonKey(name: 'qty_washer')
+  final String? qtyWasher;
+
+  @JsonKey(name: 'qty_dryer')
+  final String? qtyDryer;
+
+  @JsonKey(name: 'remain_washer')
+  final String? remainWasher;
+
+  @JsonKey(name: 'remain_dryer')
+  final String? remainDryer;
 
   // ฟิลด์พิเศษสำหรับ Discount
   @JsonKey(name: 'total_uses')
@@ -64,6 +85,7 @@ class CouponData {
 
   CouponData({
     this.couponId,
+    this.customerCouponId,
     this.assignedQuantity,
     this.usedQuantity,
     this.remaining,
@@ -71,10 +93,16 @@ class CouponData {
     this.isExpired,
     this.isAvailable,
     this.typeLabel,
+    this.usageLabel,
     this.icon,
-    this.name,
+    this.packageName,
     this.description,
     this.imageUrl,
+    this.store,
+    this.qtyWasher,
+    this.qtyDryer,
+    this.remainWasher,
+    this.remainDryer,
     this.totalUses,
     this.redemptionLimit,
     this.redeemPrice,
@@ -95,6 +123,37 @@ class CouponData {
     if (couponId is String) return int.tryParse(couponId as String);
     return null;
   }
+
+  /// Helper: แปลง customerCouponId เป็น String
+  String get customerCouponIdString => customerCouponId?.toString() ?? '';
+
+  /// Helper: แปลง customerCouponId เป็น int
+  int? get customerCouponIdInt {
+    if (customerCouponId is int) return customerCouponId as int;
+    if (customerCouponId is String)
+      return int.tryParse(customerCouponId as String);
+    return null;
+  }
+}
+
+/// Store data สำหรับคูปอง
+@JsonSerializable()
+class CouponStoreData {
+  @JsonKey(name: 'id')
+  final int? id;
+
+  @JsonKey(name: 'name')
+  final ContentLocalizeData? name;
+
+  CouponStoreData({
+    this.id,
+    this.name,
+  });
+
+  factory CouponStoreData.fromJson(Map<String, dynamic> json) =>
+      _$CouponStoreDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CouponStoreDataToJson(this);
 }
 
 /// Response สำหรับคูปองแลกซื้อ

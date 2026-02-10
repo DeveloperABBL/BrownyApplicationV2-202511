@@ -8,7 +8,6 @@ import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -334,7 +333,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               onPressed: null,
               icon: Assets.svg.icCouponWashRoundedGreen.svg(),
               label: AppText(
-                'ซักอบ',
+                'คูปองซัก',
                 style: context.textTheme.labelLarge,
               ),
               style: ElevatedButton.styleFrom(
@@ -348,21 +347,39 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             ),
             AppDims.vericalPadding_16,
 
-            ...List.generate(6, (index) => '').map(
-              (e) => CouponEVoucherCardWidget(
-                icon: Assets.png.brownyCreatePin.image(),
-                title: 'Title',
-                description: 'Description',
-                detailUsing: 'Detail using',
-                expired: 'Expired',
-              ),
+            Column(
+              children: [
+                Center(
+                  child: Assets.png.brownyError1.image(
+                    width: 145.w,
+                    height: 100.h,
+                  ),
+                ),
+                AppDims.vericalPadding_16,
+
+                AppText(
+                  'ไม่พบคูปอง',
+                  style: context.textTheme.labelLarge!.copyWith(
+                    fontSize: AppDims.size_16.sp,
+                  ),
+                ),
+              ],
             ),
 
+            // ...List.generate(6, (index) => '').map(
+            //   (e) => CouponEVoucherCardWidget(
+            //     icon: Assets.png.brownyCreatePin.image(),
+            //     title: 'Title',
+            //     description: 'Description',
+            //     detailUsing: 'Detail using',
+            //     expired: 'Expired',
+            //   ),
+            // ),
             ElevatedButton.icon(
               onPressed: null,
-              icon: Assets.svg.icCouponWashRoundedGreen.svg(),
+              icon: Assets.svg.icCouponDryRoundedGreen.svg(),
               label: AppText(
-                'ซักอบ',
+                'คูปองอบ',
                 style: context.textTheme.labelLarge,
               ),
               style: ElevatedButton.styleFrom(
@@ -375,98 +392,117 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               ),
             ),
             AppDims.vericalPadding_16,
-            ...List.generate(3, (index) => '').map(
-              (e) => Container(
-                // Disable
-                // foregroundDecoration: BoxDecoration(
-                //   color: Colors.grey,
-                //   backgroundBlendMode: BlendMode.saturation,
-                // ),
-                height: 85.h,
-                margin: EdgeInsets.only(bottom: AppDims.size_12),
-                decoration: BoxDecoration(
-                  border: BoxBorder.all(
-                    width: 1,
-                    color: AppColors.primary,
+
+            Column(
+              children: [
+                Center(
+                  child: Assets.png.brownyError1.image(
+                    width: 145.w,
+                    height: 100.h,
                   ),
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Row(
-                  children: [
-                    // Icon
-                    Container(
-                      width: 100,
-                      height: 85.h,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        border: BoxBorder.fromLTRB(
-                          right: BorderSide(
-                            width: 1,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(8.r),
-                          topLeft: Radius.circular(8.r),
-                        ),
-                      ),
-                      // child: Icon(Icons.discount_rounded),
-                      child: Assets.png.brownyCreatePin.image(),
-                    ),
+                AppDims.vericalPadding_16,
 
-                    Container(
-                      padding: EdgeInsets.all(AppDims.size_8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                            'Title',
-                            style: context.textTheme.titleSmall,
-                          ),
-                          AppText(
-                            'Description',
-                            style: context.textTheme.labelSmall!.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          Spacer(),
-
-                          RichText(
-                            text: TextSpan(
-                              text: 'Expried',
-                              style: context.textTheme.bodySmall?.copyWith(
-                                fontSize: AppDims.size_10.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                              children: [
-                                TextSpan(text: ' '),
-                                TextSpan(
-                                  text: 'เงื่อนไข',
-                                  style: context.textTheme.labelSmall?.copyWith(
-                                    color: AppColors.primary,
-                                    fontSize: AppDims.size_10.sp,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {},
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                AppText(
+                  'ไม่พบคูปอง',
+                  style: context.textTheme.labelLarge!.copyWith(
+                    fontSize: AppDims.size_16.sp,
+                  ),
                 ),
-              ),
+              ],
             ),
 
+            // ...List.generate(3, (index) => '').map(
+            //   (e) => Container(
+            //     // Disable
+            //     // foregroundDecoration: BoxDecoration(
+            //     //   color: Colors.grey,
+            //     //   backgroundBlendMode: BlendMode.saturation,
+            //     // ),
+            //     height: 85.h,
+            //     margin: EdgeInsets.only(bottom: AppDims.size_12),
+            //     decoration: BoxDecoration(
+            //       border: BoxBorder.all(
+            //         width: 1,
+            //         color: AppColors.primary,
+            //       ),
+            //       color: AppColors.white,
+            //       borderRadius: BorderRadius.circular(8.r),
+            //     ),
+            //     child: Row(
+            //       children: [
+            //         // Icon
+            //         Container(
+            //           width: 100,
+            //           height: 85.h,
+            //           padding: EdgeInsets.all(8),
+            //           decoration: BoxDecoration(
+            //             border: BoxBorder.fromLTRB(
+            //               right: BorderSide(
+            //                 width: 1,
+            //                 color: AppColors.primary,
+            //               ),
+            //             ),
+            //             color: AppColors.white,
+            //             borderRadius: BorderRadius.only(
+            //               bottomLeft: Radius.circular(8.r),
+            //               topLeft: Radius.circular(8.r),
+            //             ),
+            //           ),
+            //           // child: Icon(Icons.discount_rounded),
+            //           child: Assets.png.brownyCreatePin.image(),
+            //         ),
+
+            //         Container(
+            //           padding: EdgeInsets.all(AppDims.size_8),
+            //           child: Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               AppText(
+            //                 'Title',
+            //                 style: context.textTheme.titleSmall,
+            //               ),
+            //               AppText(
+            //                 'Description',
+            //                 style: context.textTheme.labelSmall!.copyWith(
+            //                   color: AppColors.primary,
+            //                 ),
+            //               ),
+            //               Spacer(),
+
+            //               RichText(
+            //                 text: TextSpan(
+            //                   text: 'Expried',
+            //                   style: context.textTheme.bodySmall?.copyWith(
+            //                     fontSize: AppDims.size_10.sp,
+            //                     color: AppColors.textSecondary,
+            //                   ),
+            //                   children: [
+            //                     TextSpan(text: ' '),
+            //                     TextSpan(
+            //                       text: 'เงื่อนไข',
+            //                       style: context.textTheme.labelSmall?.copyWith(
+            //                         color: AppColors.primary,
+            //                         fontSize: AppDims.size_10.sp,
+            //                       ),
+            //                       recognizer: TapGestureRecognizer()
+            //                         ..onTap = () {},
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             ElevatedButton.icon(
               onPressed: null,
-              icon: Assets.svg.icCouponWashRoundedGreen.svg(),
+              icon: Assets.svg.icCrossRoundGreen.svg(),
               label: AppText(
-                'ซักอบ',
+                'คูปองที่ใช้ไม่ได้',
                 style: context.textTheme.labelLarge,
               ),
               style: ElevatedButton.styleFrom(
@@ -479,92 +515,111 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               ),
             ),
             AppDims.vericalPadding_16,
-            ...List.generate(2, (index) => '').map(
-              (e) => Container(
-                // Disable
-                // foregroundDecoration: BoxDecoration(
-                //   color: Colors.grey,
-                //   backgroundBlendMode: BlendMode.saturation,
-                // ),
-                height: 85.h,
-                margin: EdgeInsets.only(bottom: AppDims.size_12),
-                decoration: BoxDecoration(
-                  border: BoxBorder.all(
-                    width: 1,
-                    color: AppColors.primary,
+
+            Column(
+              children: [
+                Center(
+                  child: Assets.png.brownyError1.image(
+                    width: 145.w,
+                    height: 100.h,
                   ),
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Row(
-                  children: [
-                    // Icon
-                    Container(
-                      width: 100,
-                      height: 85.h,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        border: BoxBorder.fromLTRB(
-                          right: BorderSide(
-                            width: 1,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(8.r),
-                          topLeft: Radius.circular(8.r),
-                        ),
-                      ),
-                      // child: Icon(Icons.discount_rounded),
-                      child: Assets.png.brownyCreatePin.image(),
-                    ),
+                AppDims.vericalPadding_16,
 
-                    Container(
-                      padding: EdgeInsets.all(AppDims.size_8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                            'Title',
-                            style: context.textTheme.titleSmall,
-                          ),
-                          AppText(
-                            'Description',
-                            style: context.textTheme.labelSmall!.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          Spacer(),
-
-                          RichText(
-                            text: TextSpan(
-                              text: 'Expried',
-                              style: context.textTheme.bodySmall?.copyWith(
-                                fontSize: AppDims.size_10.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                              children: [
-                                TextSpan(text: ' '),
-                                TextSpan(
-                                  text: 'เงื่อนไข',
-                                  style: context.textTheme.labelSmall?.copyWith(
-                                    color: AppColors.primary,
-                                    fontSize: AppDims.size_10.sp,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {},
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                AppText(
+                  'ไม่พบคูปอง',
+                  style: context.textTheme.labelLarge!.copyWith(
+                    fontSize: AppDims.size_16.sp,
+                  ),
                 ),
-              ),
+              ],
             ),
+            // ...List.generate(2, (index) => '').map(
+            //   (e) => Container(
+            //     // Disable
+            //     // foregroundDecoration: BoxDecoration(
+            //     //   color: Colors.grey,
+            //     //   backgroundBlendMode: BlendMode.saturation,
+            //     // ),
+            //     height: 85.h,
+            //     margin: EdgeInsets.only(bottom: AppDims.size_12),
+            //     decoration: BoxDecoration(
+            //       border: BoxBorder.all(
+            //         width: 1,
+            //         color: AppColors.primary,
+            //       ),
+            //       color: AppColors.white,
+            //       borderRadius: BorderRadius.circular(8.r),
+            //     ),
+            //     child: Row(
+            //       children: [
+            //         // Icon
+            //         Container(
+            //           width: 100,
+            //           height: 85.h,
+            //           padding: EdgeInsets.all(8),
+            //           decoration: BoxDecoration(
+            //             border: BoxBorder.fromLTRB(
+            //               right: BorderSide(
+            //                 width: 1,
+            //                 color: AppColors.primary,
+            //               ),
+            //             ),
+            //             color: AppColors.white,
+            //             borderRadius: BorderRadius.only(
+            //               bottomLeft: Radius.circular(8.r),
+            //               topLeft: Radius.circular(8.r),
+            //             ),
+            //           ),
+            //           // child: Icon(Icons.discount_rounded),
+            //           child: Assets.png.brownyCreatePin.image(),
+            //         ),
+
+            //         Container(
+            //           padding: EdgeInsets.all(AppDims.size_8),
+            //           child: Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               AppText(
+            //                 'Title',
+            //                 style: context.textTheme.titleSmall,
+            //               ),
+            //               AppText(
+            //                 'Description',
+            //                 style: context.textTheme.labelSmall!.copyWith(
+            //                   color: AppColors.primary,
+            //                 ),
+            //               ),
+            //               Spacer(),
+
+            //               RichText(
+            //                 text: TextSpan(
+            //                   text: 'Expried',
+            //                   style: context.textTheme.bodySmall?.copyWith(
+            //                     fontSize: AppDims.size_10.sp,
+            //                     color: AppColors.textSecondary,
+            //                   ),
+            //                   children: [
+            //                     TextSpan(text: ' '),
+            //                     TextSpan(
+            //                       text: 'เงื่อนไข',
+            //                       style: context.textTheme.labelSmall?.copyWith(
+            //                         color: AppColors.primary,
+            //                         fontSize: AppDims.size_10.sp,
+            //                       ),
+            //                       recognizer: TapGestureRecognizer()
+            //                         ..onTap = () {},
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -673,9 +728,9 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                               e.imageUrlDisplay(context),
                               errorBuilder: (_, _, _) => _onImageError(),
                             ),
-                            title: e.nameDisplay(context),
-                            description: e.descriptionDisplay(context),
-                            detailUsing: e.detailUsingDisplay(context),
+                            title: e.packageNameDisplay(context),
+                            description: e.storeNameDisplay(context),
+                            detailUsing: e.usageLabelDisplay(context),
                             expired: e.expireDateDisplay(context),
                           ),
                         ),

@@ -34,6 +34,7 @@ LoginCustomerData _$LoginCustomerDataFromJson(Map<String, dynamic> json) =>
       phone: json['phone'] as String?,
       name: json['name'] as String?,
       profileImage: json['profile_image'] as String?,
+      firstLogin: json['first_login'] as bool?,
     );
 
 Map<String, dynamic> _$LoginCustomerDataToJson(LoginCustomerData instance) =>
@@ -44,4 +45,5 @@ Map<String, dynamic> _$LoginCustomerDataToJson(LoginCustomerData instance) =>
       'phone': instance.phone,
       'name': instance.name,
       'profile_image': instance.profileImage,
+      'first_login': instance.firstLogin,
     };

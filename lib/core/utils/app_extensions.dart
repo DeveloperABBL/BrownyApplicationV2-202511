@@ -10,6 +10,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:retrofit/dio.dart';
 
+/// Signature for the [Navigator.popUntil] predicate argument.
+typedef GoRoutePredicate = bool Function(GoRouterState route);
+
 extension AppBuildeContext on BuildContext {
   ThemeData get appTheme => Theme.of(this);
   TextTheme get textTheme => appTheme.textTheme;
@@ -41,6 +44,42 @@ extension AppBuildeContext on BuildContext {
       pathParameters: pathParameters,
       queryParameters: queryParameters,
     );
+  }
+
+  /// Pop routes จนกว่า predicate จะ return true
+  ///
+  /// ใช้เหมือน Navigator.popUntil แต่สำหรับ GoRouter
+  /// predicate จะรับ GoRouterState ของ route ปัจจุบันและ return true เมื่อต้องการหยุด pop
+  ///
+  /// Example:
+  /// ```dart
+  /// // Pop จนกว่าจะกลับไปหน้า home
+  /// context.popUntil(
+  ///   predicate: (state) => state.matchedLocation == '/home',
+  /// );
+  ///
+  /// // Pop จนกว่าจะเจอ route ที่มีชื่อเฉพาะ
+  /// context.popUntil(
+  ///   predicate: (state) => state.name == 'product_detail',
+  /// );
+  /// ```
+  void popUntil({
+    required GoRoutePredicate predicate,
+  }) {
+    final router = GoRouter.of(this);
+
+    while (router.canPop()) {
+      // ตรวจสอบ state ปัจจุบันก่อน pop
+      final currentState = router.state;
+
+      if (predicate(currentState)) {
+        // เจอ route ที่ต้องการแล้ว หยุด
+        return;
+      }
+
+      // ยังไม่เจอ route ที่ต้องการ ให้ pop ออก
+      router.pop();
+    }
   }
 
   String get languageCode => Localizations.localeOf(this).languageCode;

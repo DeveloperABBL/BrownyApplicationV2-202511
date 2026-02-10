@@ -8,6 +8,7 @@ part of 'coupon_data_response.dart';
 
 CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
   couponId: json['coupon_id'],
+  customerCouponId: json['customer_coupon_id'],
   assignedQuantity: json['assigned_quantity'] as String?,
   usedQuantity: json['used_quantity'] as String?,
   remaining: json['remaining'] as String?,
@@ -19,10 +20,17 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
       : ContentLocalizeData.fromJson(
           json['type_label'] as Map<String, dynamic>,
         ),
-  icon: json['icon'] as String?,
-  name: json['name'] == null
+  usageLabel: json['usage_label'] == null
       ? null
-      : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
+      : ContentLocalizeData.fromJson(
+          json['usage_label'] as Map<String, dynamic>,
+        ),
+  icon: json['icon'] as String?,
+  packageName: json['package_name'] == null
+      ? null
+      : ContentLocalizeData.fromJson(
+          json['package_name'] as Map<String, dynamic>,
+        ),
   description: json['description'] == null
       ? null
       : ContentLocalizeData.fromJson(
@@ -31,6 +39,13 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
   imageUrl: json['image_url'] == null
       ? null
       : ContentLocalizeData.fromJson(json['image_url'] as Map<String, dynamic>),
+  store: json['store'] == null
+      ? null
+      : CouponStoreData.fromJson(json['store'] as Map<String, dynamic>),
+  qtyWasher: json['qty_washer'] as String?,
+  qtyDryer: json['qty_dryer'] as String?,
+  remainWasher: json['remain_washer'] as String?,
+  remainDryer: json['remain_dryer'] as String?,
   totalUses: json['total_uses'] as String?,
   redemptionLimit: json['redemption_limit'] as String?,
   redeemPrice: json['redeem_price'] as String?,
@@ -40,6 +55,7 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
 Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
     <String, dynamic>{
       'coupon_id': instance.couponId,
+      'customer_coupon_id': instance.customerCouponId,
       'assigned_quantity': instance.assignedQuantity,
       'used_quantity': instance.usedQuantity,
       'remaining': instance.remaining,
@@ -47,15 +63,32 @@ Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
       'is_expired': instance.isExpired,
       'is_available': instance.isAvailable,
       'type_label': instance.typeLabel,
+      'usage_label': instance.usageLabel,
       'icon': instance.icon,
-      'name': instance.name,
+      'package_name': instance.packageName,
       'description': instance.description,
       'image_url': instance.imageUrl,
+      'store': instance.store,
+      'qty_washer': instance.qtyWasher,
+      'qty_dryer': instance.qtyDryer,
+      'remain_washer': instance.remainWasher,
+      'remain_dryer': instance.remainDryer,
       'total_uses': instance.totalUses,
       'redemption_limit': instance.redemptionLimit,
       'redeem_price': instance.redeemPrice,
       'delivery_fee': instance.deliveryFee,
     };
+
+CouponStoreData _$CouponStoreDataFromJson(Map<String, dynamic> json) =>
+    CouponStoreData(
+      id: (json['id'] as num?)?.toInt(),
+      name: json['name'] == null
+          ? null
+          : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$CouponStoreDataToJson(CouponStoreData instance) =>
+    <String, dynamic>{'id': instance.id, 'name': instance.name};
 
 CouponRedemptionResponse _$CouponRedemptionResponseFromJson(
   Map<String, dynamic> json,

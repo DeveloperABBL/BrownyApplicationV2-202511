@@ -82,18 +82,18 @@ class AppColors {
 
   /// Purchase Background gradient - linear-gradient(91.26deg, rgba(212, 207, 70, 0.5) -0.38%, rgba(135, 206, 69, 0.5) 47.14%, rgba(36, 181, 45, 0.5) 105.71%)
   static const LinearGradient purchaseBackgroundGradient = LinearGradient(
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
-    transform: GradientRotation(91.26 * 3.14159 / 180), // 91.26 degrees
+    // คำนวณจาก 91.26deg
+    begin: Alignment(-1.0, -0.04), // ประมาณค่าจากองศาที่เกิน 90 มานิดหน่อย
+    end: Alignment(1.0, 0.04),
     colors: [
       Color(0x80D4CF46), // rgba(212, 207, 70, 0.5)
       Color(0x8087CE45), // rgba(135, 206, 69, 0.5)
       Color(0x8024B52D), // rgba(36, 181, 45, 0.5)
     ],
     stops: [
-      -0.0038, // -0.38%
+      0.0, // -0.38% (ปัดเป็น 0.0 สำหรับขอบด้านซ้ายสุด)
       0.4714, // 47.14%
-      1.0571, // 105.71%
+      1.0, // 105.71% (ปัดเป็น 1.0 สำหรับขอบด้านขวาสุด)
     ],
   );
 

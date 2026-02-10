@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
@@ -14,7 +15,7 @@ class HomePageViewmodel extends AppViewModel {
   }) : _repo = repo;
 
   // ========== Repo ==========
-  HomeDataSourceMixin _repo;
+  final HomeDataSourceMixin _repo;
 
   // ========== Dispose ==========
   @override
@@ -88,5 +89,18 @@ class HomePageViewmodel extends AppViewModel {
           .map((e) => BannerModel.fromBannerResponse(e))
           .toList(),
     );
+  }
+
+  Future<UiResult<BrownyLiveResponse>> fetchBrownyLive() async {
+    try {
+      final result = await _repo.fetchBrownyLive();
+      if (result.isEmpty || result.hasError) {
+        return UiResult.empty(error: result.error);
+      }
+
+      return UiResult.success(data: result.data);
+    } on Exception catch (e) {
+      return UiResult.error(error: e);
+    }
   }
 }

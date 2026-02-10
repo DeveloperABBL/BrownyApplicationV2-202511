@@ -46,6 +46,7 @@ class LoginCustomerData {
     required this.phone,
     required this.name,
     required this.profileImage,
+    required this.firstLogin,
   });
 
   @JsonKey(name: 'id')
@@ -65,6 +66,9 @@ class LoginCustomerData {
 
   @JsonKey(name: 'profile_image')
   final String? profileImage;
+
+  @JsonKey(name: 'first_login')
+  final bool? firstLogin;
 
   factory LoginCustomerData.fromJson(Map<String, dynamic> json) =>
       _$LoginCustomerDataFromJson(json);

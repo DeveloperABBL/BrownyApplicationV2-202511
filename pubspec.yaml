@@ -120,6 +120,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/services/
     - assets/ic_payment/
     - assets/icon_shortcut/
     - assets/svg/

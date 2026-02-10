@@ -59,16 +59,45 @@ class $AssetsIconShortcutGen {
   AssetGenImage get iscBrownyClub =>
       const AssetGenImage('assets/icon_shortcut/isc_browny_club.png');
 
+  /// File path: assets/icon_shortcut/isc_browny_id.png
+  AssetGenImage get iscBrownyId =>
+      const AssetGenImage('assets/icon_shortcut/isc_browny_id.png');
+
   /// File path: assets/icon_shortcut/isc_browny_live.png
   AssetGenImage get iscBrownyLive =>
       const AssetGenImage('assets/icon_shortcut/isc_browny_live.png');
+
+  /// File path: assets/icon_shortcut/isc_browny_shop.png
+  AssetGenImage get iscBrownyShop =>
+      const AssetGenImage('assets/icon_shortcut/isc_browny_shop.png');
+
+  /// File path: assets/icon_shortcut/isc_contact.png
+  AssetGenImage get iscContact =>
+      const AssetGenImage('assets/icon_shortcut/isc_contact.png');
 
   /// File path: assets/icon_shortcut/isc_coupon.png
   AssetGenImage get iscCoupon =>
       const AssetGenImage('assets/icon_shortcut/isc_coupon.png');
 
+  /// File path: assets/icon_shortcut/isc_lucky_scan.png
+  AssetGenImage get iscLuckyScan =>
+      const AssetGenImage('assets/icon_shortcut/isc_lucky_scan.png');
+
+  /// File path: assets/icon_shortcut/isc_transaction_history.png
+  AssetGenImage get iscTransactionHistory =>
+      const AssetGenImage('assets/icon_shortcut/isc_transaction_history.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [iscBrownyClub, iscBrownyLive, iscCoupon];
+  List<AssetGenImage> get values => [
+    iscBrownyClub,
+    iscBrownyId,
+    iscBrownyLive,
+    iscBrownyShop,
+    iscContact,
+    iscCoupon,
+    iscLuckyScan,
+    iscTransactionHistory,
+  ];
 }
 
 class $AssetsPngGen {
@@ -158,6 +187,10 @@ class $AssetsPngGen {
   AssetGenImage get brownySuccess1 =>
       const AssetGenImage('assets/png/browny_success_1.png');
 
+  /// File path: assets/png/browny_washy.png
+  AssetGenImage get brownyWashy =>
+      const AssetGenImage('assets/png/browny_washy.png');
+
   /// File path: assets/png/card_coupon_evoucher.png
   AssetGenImage get cardCouponEvoucher =>
       const AssetGenImage('assets/png/card_coupon_evoucher.png');
@@ -238,6 +271,7 @@ class $AssetsPngGen {
     brownyPromotion,
     brownySuccess,
     brownySuccess1,
+    brownyWashy,
     cardCouponEvoucher,
     cardIcBackground,
     cardInvitFriend,
@@ -254,6 +288,23 @@ class $AssetsPngGen {
     splashBackground,
     walletObjBg,
   ];
+}
+
+class $AssetsServicesGen {
+  const $AssetsServicesGen();
+
+  /// File path: assets/services/charger.png
+  AssetGenImage get charger =>
+      const AssetGenImage('assets/services/charger.png');
+
+  /// File path: assets/services/dryer.png
+  AssetGenImage get dryer => const AssetGenImage('assets/services/dryer.png');
+
+  /// File path: assets/services/washer.png
+  AssetGenImage get washer => const AssetGenImage('assets/services/washer.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [charger, dryer, washer];
 }
 
 class $AssetsSvgGen {
@@ -473,6 +524,10 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_paw.svg
   SvgGenImage get icPaw => const SvgGenImage('assets/svg/ic_paw.svg');
 
+  /// File path: assets/svg/ic_paw_rounded_green.svg
+  SvgGenImage get icPawRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_paw_rounded_green.svg');
+
   /// File path: assets/svg/ic_person.svg
   SvgGenImage get icPerson => const SvgGenImage('assets/svg/ic_person.svg');
 
@@ -492,6 +547,10 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_refresh.svg
   SvgGenImage get icRefresh => const SvgGenImage('assets/svg/ic_refresh.svg');
+
+  /// File path: assets/svg/ic_refresh_round_green.svg
+  SvgGenImage get icRefreshRoundGreen =>
+      const SvgGenImage('assets/svg/ic_refresh_round_green.svg');
 
   /// File path: assets/svg/ic_scan.svg
   SvgGenImage get icScan => const SvgGenImage('assets/svg/ic_scan.svg');
@@ -612,12 +671,14 @@ class $AssetsSvgGen {
     icOnboardSecond,
     icOnboardThird,
     icPaw,
+    icPawRoundedGreen,
     icPerson,
     icPlus,
     icPromptpay,
     icPromptpayText,
     icQrDummy,
     icRefresh,
+    icRefreshRoundGreen,
     icScan,
     icScan2,
     icScan3,
@@ -644,6 +705,7 @@ class Assets {
   static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();
   static const $AssetsPngGen png = $AssetsPngGen();
+  static const $AssetsServicesGen services = $AssetsServicesGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
 }
 

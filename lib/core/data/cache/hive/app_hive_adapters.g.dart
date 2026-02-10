@@ -23,13 +23,14 @@ class LoginCustomerDataAdapter extends TypeAdapter<LoginCustomerData> {
       phone: fields[3] as String?,
       name: fields[1] as String?,
       profileImage: fields[4] as String?,
+      firstLogin: fields[7] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoginCustomerData obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
@@ -41,7 +42,9 @@ class LoginCustomerDataAdapter extends TypeAdapter<LoginCustomerData> {
       ..writeByte(5)
       ..write(obj.customerId)
       ..writeByte(6)
-      ..write(obj.loginPlatform);
+      ..write(obj.loginPlatform)
+      ..writeByte(7)
+      ..write(obj.firstLogin);
   }
 
   @override

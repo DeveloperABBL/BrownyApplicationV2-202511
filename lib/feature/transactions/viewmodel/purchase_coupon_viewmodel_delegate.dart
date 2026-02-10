@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/coupon_l
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
+import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_list_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/store_list_model.dart';
@@ -9,8 +10,9 @@ import 'package:browny_applications_new/feature/transactions/repository/coupon_v
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 
-mixin PurchaseCouponViewmodelDelegate {
+mixin PurchaseCouponViewmodelDelegate implements AppViewModelDelegateMixin {
   // ========== Dispose ==========
+  @override
   void disposeDelegate() {
     storeListNotifier?.dispose();
     storeListNotifier = null;

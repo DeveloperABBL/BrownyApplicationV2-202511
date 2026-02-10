@@ -63,9 +63,7 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
         final position = await LocationHelper.getCurrentPosition();
         latitude = position.latitude.toString();
         longitude = position.longitude.toString();
-      } catch (e) {
-        print('Error getting location: $e');
-      }
+      } catch (_) {}
     }
 
     // Fetch coupon detail with or without location

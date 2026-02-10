@@ -1,7 +1,11 @@
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
+import 'package:browny_applications_new/core/utils/launch_helper.dart';
+import 'package:browny_applications_new/core/utils/ui_result.dart';
+import 'package:browny_applications_new/core/widgets/app_toggle_widget.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
@@ -208,7 +212,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         await _viewmodel.refresh();
       },
       child: Scaffold(
-        extendBody: true,
+        // extendBody: true,
         body: CustomScrollView(
           slivers: [
             // build AppBar
@@ -225,6 +229,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             // icon shortcut
             SliverToBoxAdapter(
               child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Container(
                   margin: EdgeInsets.only(
                     left: AppDims.size_16.w,
@@ -234,24 +239,44 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   child: IntrinsicHeight(
                     child: Row(
                       children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscBrownyLive.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
+                        FutureBuilder<UiResult<BrownyLiveResponse>>(
+                          future: _viewmodel.fetchBrownyLive(),
+                          builder: (context, snapshot) {
+                            final hasData =
+                                snapshot.hasData &&
+                                snapshot.requireData.isSuccess;
+                            if (snapshot.requireData.data!.enabled == false) {
+                              return SizedBox();
+                            }
+                            return GestureDetector(
+                              onTap: hasData
+                                  ? () {
+                                      LaunchHelper.openUrlInBrowser(
+                                        snapshot.requireData.data!.link!,
+                                      );
+                                    }
+                                  : null,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: AppDims.size_8.w,
+                                  vertical: AppDims.size_8.h,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Assets.iconShortcut.iscBrownyLive.image(
+                                      width: AppDims.size_64.w,
+                                      height: AppDims.size_32.h,
+                                    ),
+                                    AppText(
+                                      'Browny\nLive',
+                                      textAlign: TextAlign.center,
+                                      style: context.textTheme.titleSmall,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              AppText(
-                                'Browny\nLive',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
 
                         Container(
@@ -293,6 +318,106 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             ],
                           ),
                         ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscBrownyShop.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'Browny\nShop',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscLuckyScan.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'Lucky\nScan',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscTransactionHistory.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'ประวัติ\nการใช้งาน',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscContact.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'ติดต่อ\nสอบถาม',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscBrownyId.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'Browny ID',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -303,7 +428,11 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             // เก็บ Coupon
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(
+                  left: AppDims.size_16.w,
+                  right: AppDims.size_16.w,
+                  top: AppDims.size_16.h,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -370,7 +499,116 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               ),
             ),
 
-            SliverFillRemaining(),
+            // สถานะบริการ
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: AppDims.size_16.w,
+                  right: AppDims.size_16.w,
+                  top: AppDims.size_8.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      child: ElevatedButton.icon(
+                        onPressed: null,
+                        icon: Assets.svg.icRefreshRoundGreen.svg(),
+                        label: Column(
+                          children: [
+                            AppText(
+                              'สถานะการใช้งาน',
+                              style: context.textTheme.labelLarge,
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.transparent,
+                          foregroundColor: AppColors.primary,
+                          alignment: AlignmentDirectional.centerStart,
+                          padding: EdgeInsets.zero,
+                          disabledBackgroundColor: AppColors.transparent,
+                          overlayColor: AppColors.transparent,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: AppToggleWidget(),
+                    ),
+                    AppDims.vericalPadding_8,
+
+                    Align(
+                      alignment: Alignment.center,
+                      child: Assets.png.brownyWashy.image(
+                        width: AppDims.size_90.w,
+                      ),
+                    ),
+                    AppDims.vericalPadding_8,
+
+                    Align(
+                      alignment: Alignment.center,
+                      child: AppText('#รักใครให้ซักผ้า'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // สถานะบริการ
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: AppDims.size_16.w,
+                  right: AppDims.size_16.w,
+                  top: AppDims.size_8.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      child: ElevatedButton.icon(
+                        onPressed: null,
+                        icon: Assets.svg.icPawRoundedGreen.svg(),
+                        label: Column(
+                          children: [
+                            AppText(
+                              'บริการ',
+                              style: context.textTheme.labelLarge,
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.transparent,
+                          foregroundColor: AppColors.primary,
+                          alignment: AlignmentDirectional.centerStart,
+                          padding: EdgeInsets.zero,
+                          disabledBackgroundColor: AppColors.transparent,
+                          overlayColor: AppColors.transparent,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: AppDims.size_106.h,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) =>
+                            Assets.services.values[index].image(
+                              width: AppDims.size_109.w,
+                              height: AppDims.size_106.h,
+                            ),
+                        separatorBuilder: (context, index) =>
+                            AppDims.horizonPadding_8,
+                        itemCount: Assets.services.values.length,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: AppDims.vericalPadding_64,
+            ),
           ],
         ),
         bottomNavigationBar: BrownyBottomNav(
@@ -761,7 +999,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                   // Icon browny
                   Positioned(
                     left: -28.w,
-                    right: -10.w,
+                    right: -6,
                     top: -2.w,
                     child: isGuest
                         ? SizedBox()

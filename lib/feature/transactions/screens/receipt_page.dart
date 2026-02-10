@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -13,7 +14,6 @@ import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -266,7 +266,11 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
           ),
           child: ElevatedButton(
             onPressed: () {
-              context.pop();
+              context.popUntil(
+                predicate: (route) {
+                  return route.name.orEmpty == CouponVoucherPage.pageName;
+                },
+              );
             },
             child: AppText(
               'กลับสู่ E-Voucher',
@@ -280,21 +284,34 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
             // Card หลัก - ใบเสร็จ
             _capturableArea(
               child: ValueListenableBuilder(
-                valueListenable: widget.viewmodel.couponReceiptNotifier,
+                valueListenable: widget.viewmodel.transactionStateNotifier,
                 builder: (context, result, child) {
-                  if (result.isLoading) {
+                  // Loading state
+                  if (result.isLoading || result.data?.isLoading == true) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
-                  if (result.hasError) {
+                  // Error state
+                  if (result.hasError || result.data?.hasError == true) {
                     return Center(
-                      child: AppText(result.error.toString()),
+                      child: AppText(
+                        result.error?.toString() ??
+                            result.data?.error?.toString() ??
+                            'เกิดข้อผิดพลาด',
+                      ),
                     );
                   }
 
-                  final receiptData = result.data!;
+                  // No receipt data
+                  if (!result.data!.hasReceipt) {
+                    return Center(
+                      child: AppText('ไม่พบข้อมูลใบเสร็จ'),
+                    );
+                  }
+
+                  final receiptData = result.data!.receipt!;
                   return Column(
                     children: [
                       AppDims.vericalPadding_24,

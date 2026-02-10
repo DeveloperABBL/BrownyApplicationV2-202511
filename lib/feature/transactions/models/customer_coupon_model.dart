@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class CustomerCouponModel extends CouponData {
   CustomerCouponModel({
     required super.couponId,
+    super.customerCouponId,
     required super.assignedQuantity,
     required super.usedQuantity,
     required super.remaining,
@@ -12,20 +13,27 @@ class CustomerCouponModel extends CouponData {
     required super.isExpired,
     required super.isAvailable,
     required super.typeLabel,
+    super.usageLabel,
     required super.icon,
-    required super.name,
+    required super.packageName,
     required super.description,
     required super.imageUrl,
+    super.store,
+    super.qtyWasher,
+    super.qtyDryer,
+    super.remainWasher,
+    super.remainDryer,
     super.totalUses,
     super.redemptionLimit,
     super.redeemPrice,
     super.deliveryFee,
   });
 
-  /// Factory constructor สำหรับแปลง CouponData เป็น EVoucherModel
+  /// Factory constructor สำหรับแปลง CouponData เป็น CustomerCouponModel
   factory CustomerCouponModel.fromCouponData(CouponData data) {
     return CustomerCouponModel(
       couponId: data.couponId,
+      customerCouponId: data.customerCouponId,
       assignedQuantity: data.assignedQuantity,
       usedQuantity: data.usedQuantity,
       remaining: data.remaining,
@@ -33,10 +41,16 @@ class CustomerCouponModel extends CouponData {
       isExpired: data.isExpired,
       isAvailable: data.isAvailable,
       typeLabel: data.typeLabel,
+      usageLabel: data.usageLabel,
       icon: data.icon,
-      name: data.name,
+      packageName: data.packageName,
       description: data.description,
       imageUrl: data.imageUrl,
+      store: data.store,
+      qtyWasher: data.qtyWasher,
+      qtyDryer: data.qtyDryer,
+      remainWasher: data.remainWasher,
+      remainDryer: data.remainDryer,
       totalUses: data.totalUses,
       redemptionLimit: data.redemptionLimit,
       redeemPrice: data.redeemPrice,
@@ -44,10 +58,22 @@ class CustomerCouponModel extends CouponData {
     );
   }
 
-  /// ดึง localized name ตาม locale ปัจจุบัน
-  String nameDisplay(BuildContext context) {
+  /// ดึง localized package name ตาม locale ปัจจุบัน
+  String packageNameDisplay(BuildContext context) {
     final locale = context.languageCode;
-    return name?.getByLocaleCode(locale) ?? '';
+    return packageName?.getByLocaleCode(locale) ?? '';
+  }
+
+  /// ดึง localized usage label ตาม locale ปัจจุบัน
+  String usageLabelDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    return usageLabel?.getByLocaleCode(locale) ?? '';
+  }
+
+  /// ดึง localized store name ตาม locale ปัจจุบัน
+  String storeNameDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    return store?.name?.getByLocaleCode(locale) ?? '';
   }
 
   /// ดึง localized description ตาม locale ปัจจุบัน
@@ -126,5 +152,49 @@ class CustomerCouponModel extends CouponData {
     final now = DateTime.now();
     final difference = expiry.difference(now);
     return difference.inDays <= 7 && difference.inDays >= 0;
+  }
+
+  /// จำนวนเครื่องซักที่มี
+  int get qtyWasherCount => int.tryParse(qtyWasher ?? '0') ?? 0;
+
+  /// จำนวนเครื่องอบที่มี
+  int get qtyDryerCount => int.tryParse(qtyDryer ?? '0') ?? 0;
+
+  /// จำนวนเครื่องซักที่เหลือ
+  int get remainWasherCount => int.tryParse(remainWasher ?? '0') ?? 0;
+
+  /// จำนวนเครื่องอบที่เหลือ
+  int get remainDryerCount => int.tryParse(remainDryer ?? '0') ?? 0;
+
+  /// แสดงจำนวนการใช้งาน Washer/Dryer
+  String washDryDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    final washer = qtyWasherCount;
+    final dryer = qtyDryerCount;
+
+    switch (locale) {
+      case 'en':
+        return 'Wash $washer / Dry $dryer times';
+      case 'zh':
+        return '洗 $washer / 烘干 $dryer 次';
+      default:
+        return 'ซัก $washer / อบ $dryer ครั้ง';
+    }
+  }
+
+  /// แสดงจำนวนที่เหลือของ Washer/Dryer
+  String remainWashDryDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    final washer = remainWasherCount;
+    final dryer = remainDryerCount;
+
+    switch (locale) {
+      case 'en':
+        return 'Remaining: Wash $washer / Dry $dryer';
+      case 'zh':
+        return '剩余：洗 $washer / 烘干 $dryer';
+      default:
+        return 'เหลือ: ซัก $washer / อบ $dryer';
+    }
   }
 }

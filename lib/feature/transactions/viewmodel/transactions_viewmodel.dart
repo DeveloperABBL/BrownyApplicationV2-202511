@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/coupon_o
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/feature/transactions/models/payment_transaction_state.dart';
 import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
@@ -14,6 +15,7 @@ import 'package:browny_applications_new/feature/transactions/models/customer_cou
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -25,7 +27,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
 
 class TransactionsViewmodel extends AppViewModel
-    with PurchaseCouponViewmodelDelegate {
+    with
+        // viewmodel สำหรับคุมการทำงานจังหวะสั่งซื้อ e-voucher
+        PurchaseCouponViewmodelDelegate,
+        // viewmodel สำหรับควบคุมการทำงานเมื่อเลือก coupon, e-voucher ที่ซื้อแล้ว
+        CouponVoucherSelectedViewmodelDelegate {
   TransactionsViewmodel({
     required super.context,
     required CouponVoucherDataSourceMixin couponRepo,
@@ -48,8 +54,7 @@ class TransactionsViewmodel extends AppViewModel
     _showNearbyStoresNotifier.dispose();
     _evoucherForSellNotifier.dispose();
     _evoucherNotifier.dispose();
-    _paymentStatusNotifier.dispose();
-    _couponReceiptNotifier.dispose();
+    _transactionStateNotifier.dispose();
     super.dispose();
   }
 
@@ -83,15 +88,14 @@ class TransactionsViewmodel extends AppViewModel
   // เก็บค่า payment ก่อนที่จะเข้าหน้าแก้ไข (สำหรับ cancel)
   PaymentMethodModel? _paymentSelectedBeforeEdit;
 
-  late final ValueNotifier<UiResult<PaymentStatusCheckResponse>>
-  _paymentStatusNotifier = ValueNotifier(UiResult.loading());
-  ValueListenable<UiResult<PaymentStatusCheckResponse>>
-  get paymentStatusNotifier => _paymentStatusNotifier;
-
-  late final ValueNotifier<UiResult<CouponReceiptModel>>
-  _couponReceiptNotifier = ValueNotifier(UiResult.loading());
-  ValueListenable<UiResult<CouponReceiptModel>> get couponReceiptNotifier =>
-      _couponReceiptNotifier;
+  /// Unified state สำหรับจัดการ Payment Transaction (payment status + receipt)
+  /// แทนที่การใช้ paymentStatusNotifier และ couponReceiptNotifier แยกกัน
+  late final ValueNotifier<UiResult<PaymentTransactionState>>
+  _transactionStateNotifier = ValueNotifier(
+    UiResult.success(data: PaymentTransactionState.idle()),
+  );
+  ValueListenable<UiResult<PaymentTransactionState>>
+  get transactionStateNotifier => _transactionStateNotifier;
 
   // ========== function, Logic ==========
   late CouponPackageItem _selectedCoupon;
@@ -448,6 +452,8 @@ class TransactionsViewmodel extends AppViewModel
 
   /// ตรวจสอบสถานะการชำระเงิน
   ///
+  /// อัพเดท transaction state เป็น checkingPayment -> paymentSuccess
+  ///
   /// Returns:
   /// - UiResult.success: สำเร็จ พร้อม PaymentStatusCheckResponse
   /// - UiResult.error: เกิด error
@@ -456,85 +462,137 @@ class TransactionsViewmodel extends AppViewModel
     CouponOrderData orderData,
   ) async {
     try {
+      // อัพเดท state เป็น checking
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.checkingPayment(),
+      );
+
       final result = await _transactionRepo.checkPaymentStatus(orderData);
 
       if (result.isSuccess) {
-        // เก็บ response ไว้ใช้งาน orderId ต่อ
-        _paymentStatusNotifier.value = UiResult.success(data: result.data);
+        // อัพเดท state เป็น payment success
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.paymentSuccess(result.data),
+        );
         return UiResult.success(data: result.data);
       } else if (result.isEmpty) {
-        _paymentStatusNotifier.value = UiResult.empty(error: result.error);
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(
+            result.error,
+          ),
+        );
         return UiResult.empty(error: result.error);
       } else {
-        _paymentStatusNotifier.value = UiResult.error(error: result.error);
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(
+            result.error,
+          ),
+        );
         return UiResult.error(error: result.error);
       }
     } catch (e) {
       final exception = Exception(
         'เกิดข้อผิดพลาดในการตรวจสอบสถานะ: ${e.toString()}',
       );
-      _paymentStatusNotifier.value = UiResult.error(error: exception);
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.error(exception),
+      );
       return UiResult.error(error: exception);
     }
   }
 
   /// ดึงข้อมูลใบเสร็จคูปอง/e-voucher
   ///
-  /// ใช้ orderId จาก PaymentStatusCheckResponse ที่เก็บไว้
+  /// ใช้ orderId จาก transaction state ที่เก็บไว้
+  /// อัพเดท transaction state เป็น loadingReceipt -> receiptLoaded
   ///
   /// Returns:
-  /// - UiResult.success: สำเร็จ พร้อม CouponReceiptResponse
+  /// - UiResult.success: สำเร็จ พร้อม CouponReceiptModel
   /// - UiResult.error: เกิด error
   /// - UiResult.empty: ไม่มี orderId หรือ API ไม่สำเร็จ
   Future<UiResult<CouponReceiptModel>> fetchCouponReceipt() async {
-    // ตรวจสอบว่ามี payment status response หรือไม่
-    if (!_paymentStatusNotifier.value.isSuccess) {
-      final error = Exception('ไม่พบข้อมูลการชำระเงิน กรุณาตรวจสอบสถานะก่อน');
-      _couponReceiptNotifier.value = UiResult.empty(error: error);
+    final currentState = _transactionStateNotifier.value;
+
+    // ตรวจสอบว่า state พร้อมดึงใบเสร็จหรือไม่
+    if (!currentState.isSuccess || !currentState.data!.canFetchReceipt) {
+      final error = Exception(
+        'ไม่สามารถดึงใบเสร็จได้ กรุณาตรวจสอบสถานะการชำระเงินก่อน',
+      );
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.error(
+          error,
+          paymentStatus: currentState.data?.paymentStatus,
+        ),
+      );
       return UiResult.empty(error: error);
     }
 
-    final orderId = _paymentStatusNotifier.value.data?.orderId;
+    final state = currentState.data!;
+    final orderId = state.orderId;
 
-    // ตรวจสอบว่ามี orderId หรือไม่
+    // ตรวจสอบว่ามี orderId หรือไม่ (double check)
     if (orderId == null) {
       final error = Exception('ไม่พบ Order ID');
-      _couponReceiptNotifier.value = UiResult.empty(error: error);
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.error(
+          error,
+          paymentStatus: state.paymentStatus,
+        ),
+      );
       return UiResult.empty(error: error);
     }
 
     try {
-      _couponReceiptNotifier.value = UiResult.loading();
+      // อัพเดท state เป็น loading receipt
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.loadingReceipt(state.paymentStatus!),
+      );
 
       final result = await _transactionRepo.fetchCouponReceipt(
         orderId.toString(),
       );
 
       if (result.isSuccess) {
-        _couponReceiptNotifier.value = UiResult.success(
-          // แปลงเป็น model สำหรับนำไปแสดงผล
-          data: CouponReceiptModel.fromCouponReceiptData(
-            result.data.data!,
+        final receiptModel = CouponReceiptModel.fromCouponReceiptData(
+          result.data.data!,
+        );
+
+        // อัพเดท state เป็น receipt loaded (transaction complete)
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.receiptLoaded(
+            state.paymentStatus!,
+            receiptModel,
           ),
         );
-        return UiResult.success(
-          // แปลงเป็น model สำหรับนำไปแสดงผล
-          data: CouponReceiptModel.fromCouponReceiptData(
-            result.data.data!,
-          ),
-        );
+
+        return UiResult.success(data: receiptModel);
       } else if (result.isEmpty) {
-        _couponReceiptNotifier.value = UiResult.empty(error: result.error);
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(
+            result.error,
+            paymentStatus: state.paymentStatus,
+          ),
+        );
         return UiResult.empty(error: result.error);
       } else {
-        _couponReceiptNotifier.value = UiResult.error(error: result.error);
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(
+            result.error,
+            paymentStatus: state.paymentStatus,
+          ),
+        );
         return UiResult.error(error: result.error);
       }
     } catch (e) {
       final exception = Exception(
         'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ: ${e.toString()}',
       );
-      _couponReceiptNotifier.value = UiResult.error(error: exception);
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.error(
+          exception,
+          paymentStatus: state.paymentStatus,
+        ),
+      );
       return UiResult.error(error: exception);
     }
   }

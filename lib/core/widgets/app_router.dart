@@ -6,6 +6,7 @@ import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
@@ -148,6 +149,13 @@ class AppRouter {
           return const CouponVoucherPage();
         },
       ),
+      // GoRoute(
+      //   path: CouponVoucherSelected.pagePath,
+      //   name: CouponVoucherSelected.pageName,
+      //   builder: (context, state) {
+      //     return CouponVoucherSelected();
+      //   },
+      // ),
       GoRoute(
         path: PurchaseCouponVoucherPage.pagePath,
         name: PurchaseCouponVoucherPage.pageName,
