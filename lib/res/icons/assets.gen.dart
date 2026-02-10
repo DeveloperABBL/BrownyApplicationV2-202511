@@ -14,6 +14,44 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart' as _svg;
 import 'package:vector_graphics/vector_graphics.dart' as _vg;
 
+class $AssetsIcPaymentGen {
+  const $AssetsIcPaymentGen();
+
+  /// File path: assets/ic_payment/ic_alipay.png
+  AssetGenImage get icAlipay =>
+      const AssetGenImage('assets/ic_payment/ic_alipay.png');
+
+  /// File path: assets/ic_payment/ic_promptpay.png
+  AssetGenImage get icPromptpay =>
+      const AssetGenImage('assets/ic_payment/ic_promptpay.png');
+
+  /// File path: assets/ic_payment/ic_rabbit_linepay.png
+  AssetGenImage get icRabbitLinepay =>
+      const AssetGenImage('assets/ic_payment/ic_rabbit_linepay.png');
+
+  /// File path: assets/ic_payment/ic_shopeepay.png
+  AssetGenImage get icShopeepay =>
+      const AssetGenImage('assets/ic_payment/ic_shopeepay.png');
+
+  /// File path: assets/ic_payment/ic_truemoney.png
+  AssetGenImage get icTruemoney =>
+      const AssetGenImage('assets/ic_payment/ic_truemoney.png');
+
+  /// File path: assets/ic_payment/ic_wechat.png
+  AssetGenImage get icWechat =>
+      const AssetGenImage('assets/ic_payment/ic_wechat.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [
+    icAlipay,
+    icPromptpay,
+    icRabbitLinepay,
+    icShopeepay,
+    icTruemoney,
+    icWechat,
+  ];
+}
+
 class $AssetsIconShortcutGen {
   const $AssetsIconShortcutGen();
 
@@ -56,6 +94,10 @@ class $AssetsPngGen {
   AssetGenImage get bgMapCharger =>
       const AssetGenImage('assets/png/bg_map_charger.png');
 
+  /// File path: assets/png/bg_pawn_pattern.png
+  AssetGenImage get bgPawnPattern =>
+      const AssetGenImage('assets/png/bg_pawn_pattern.png');
+
   /// File path: assets/png/browny_coin.png
   AssetGenImage get brownyCoin =>
       const AssetGenImage('assets/png/browny_coin.png');
@@ -67,6 +109,10 @@ class $AssetsPngGen {
   /// File path: assets/png/browny_coin_claimed.png
   AssetGenImage get brownyCoinClaimed =>
       const AssetGenImage('assets/png/browny_coin_claimed.png');
+
+  /// File path: assets/png/browny_coinclaim_condition.png
+  AssetGenImage get brownyCoinclaimCondition =>
+      const AssetGenImage('assets/png/browny_coinclaim_condition.png');
 
   /// File path: assets/png/browny_create_pin.png
   AssetGenImage get brownyCreatePin =>
@@ -103,6 +149,10 @@ class $AssetsPngGen {
   /// File path: assets/png/browny_promotion.png
   AssetGenImage get brownyPromotion =>
       const AssetGenImage('assets/png/browny_promotion.png');
+
+  /// File path: assets/png/browny_success.png
+  AssetGenImage get brownySuccess =>
+      const AssetGenImage('assets/png/browny_success.png');
 
   /// File path: assets/png/browny_success_1.png
   AssetGenImage get brownySuccess1 =>
@@ -172,9 +222,11 @@ class $AssetsPngGen {
     bgMapBrowny,
     bgMapBrownyPlus,
     bgMapCharger,
+    bgPawnPattern,
     brownyCoin,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
+    brownyCoinclaimCondition,
     brownyCreatePin,
     brownyError1,
     brownyError2,
@@ -184,6 +236,7 @@ class $AssetsPngGen {
     brownyLogo,
     brownyLogoAndroid,
     brownyPromotion,
+    brownySuccess,
     brownySuccess1,
     cardCouponEvoucher,
     cardIcBackground,
@@ -208,9 +261,6 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/arrow_right.svg
   SvgGenImage get arrowRight => const SvgGenImage('assets/svg/arrow_right.svg');
-
-  /// File path: assets/svg/ic_alipay.svg
-  SvgGenImage get icAlipay => const SvgGenImage('assets/svg/ic_alipay.svg');
 
   /// File path: assets/svg/ic_arrow_backward.svg
   SvgGenImage get icArrowBackward =>
@@ -440,10 +490,6 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_qr_dummy.svg
   SvgGenImage get icQrDummy => const SvgGenImage('assets/svg/ic_qr_dummy.svg');
 
-  /// File path: assets/svg/ic_rabbit_linepay.svg
-  SvgGenImage get icRabbitLinepay =>
-      const SvgGenImage('assets/svg/ic_rabbit_linepay.svg');
-
   /// File path: assets/svg/ic_refresh.svg
   SvgGenImage get icRefresh => const SvgGenImage('assets/svg/ic_refresh.svg');
 
@@ -465,10 +511,6 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_shop_active.svg
   SvgGenImage get icShopActive =>
       const SvgGenImage('assets/svg/ic_shop_active.svg');
-
-  /// File path: assets/svg/ic_shopeepay.svg
-  SvgGenImage get icShopeepay =>
-      const SvgGenImage('assets/svg/ic_shopeepay.svg');
 
   /// File path: assets/svg/ic_speech.svg
   SvgGenImage get icSpeech => const SvgGenImage('assets/svg/ic_speech.svg');
@@ -492,10 +534,6 @@ class $AssetsSvgGen {
   SvgGenImage get icTpWallet =>
       const SvgGenImage('assets/svg/ic_tp_wallet.svg');
 
-  /// File path: assets/svg/ic_truemoney.svg
-  SvgGenImage get icTruemoney =>
-      const SvgGenImage('assets/svg/ic_truemoney.svg');
-
   /// File path: assets/svg/ic_unchecked.svg
   SvgGenImage get icUnchecked =>
       const SvgGenImage('assets/svg/ic_unchecked.svg');
@@ -511,16 +549,12 @@ class $AssetsSvgGen {
   SvgGenImage get icWashRoundedGreen =>
       const SvgGenImage('assets/svg/ic_wash_rounded_green.svg');
 
-  /// File path: assets/svg/ic_wechat.svg
-  SvgGenImage get icWechat => const SvgGenImage('assets/svg/ic_wechat.svg');
-
   /// File path: assets/svg/scan_icon.svg
   SvgGenImage get scanIcon => const SvgGenImage('assets/svg/scan_icon.svg');
 
   /// List of all assets
   List<SvgGenImage> get values => [
     arrowRight,
-    icAlipay,
     icArrowBackward,
     icArrowDown,
     icArrowForward,
@@ -583,7 +617,6 @@ class $AssetsSvgGen {
     icPromptpay,
     icPromptpayText,
     icQrDummy,
-    icRabbitLinepay,
     icRefresh,
     icScan,
     icScan2,
@@ -591,19 +624,16 @@ class $AssetsSvgGen {
     icShare,
     icShop,
     icShopActive,
-    icShopeepay,
     icSpeech,
     icTicket,
     icTicketActive,
     icTicketFilled,
     icTitleInvitFriend,
     icTpWallet,
-    icTruemoney,
     icUnchecked,
     icUpload,
     icWalletRoundedGreen,
     icWashRoundedGreen,
-    icWechat,
     scanIcon,
   ];
 }
@@ -611,6 +641,7 @@ class $AssetsSvgGen {
 class Assets {
   const Assets._();
 
+  static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();
   static const $AssetsPngGen png = $AssetsPngGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();

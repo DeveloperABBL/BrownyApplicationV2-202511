@@ -3,7 +3,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 
-mixin HomeDataSourceMixin {
+mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   Future<RepoResult<BannerResponse>> fetchBanner();
 }
 

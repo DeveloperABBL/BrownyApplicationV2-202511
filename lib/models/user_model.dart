@@ -7,7 +7,7 @@ part 'user_model.g.dart';
 
 // **************************************************************************
 // เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal
-// ´
+// dart run build_runner build --delete-conflicting-outputs
 // **************************************************************************
 
 @JsonSerializable()
@@ -26,6 +26,7 @@ class UserModel extends CustomerProfileData {
     required super.creditBalance,
     required super.brownyCoin,
     required super.avatars,
+    required super.totalCoupons,
     List<AvatarData>? avatarDataList,
   }) : avatarDataList = avatarDataList ?? [];
 
@@ -41,6 +42,7 @@ class UserModel extends CustomerProfileData {
     id: '',
     creditBalance: '',
     brownyCoin: '',
+    totalCoupons: 0,
     avatars: [],
     avatarDataList: [],
     isGuest: true,
@@ -71,6 +73,7 @@ class UserModel extends CustomerProfileData {
       loginPlatform: loginPlatform,
       isFriendRewardOn: isFriendRewardOn,
       isGuest: false,
+      totalCoupons: data.totalCoupons,
     );
   }
 
@@ -110,6 +113,7 @@ class UserModel extends CustomerProfileData {
       brownyCoin: brownyCoin ?? this.brownyCoin,
       avatars: avatars ?? this.avatars,
       avatarDataList: avatarDataList ?? this.avatarDataList,
+      totalCoupons: totalCoupons ?? this.totalCoupons,
     );
   }
 

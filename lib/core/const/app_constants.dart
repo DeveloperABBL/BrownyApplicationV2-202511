@@ -34,7 +34,7 @@ String formatCurrency({
     if (string != null) {
       return '$mLeadSing${NumberFormat(
         formatCurrentcy,
-      ).format(num.parse(string.replaceAll(',', ''))).toString()}$mTrailingSign';
+      ).format(num.parse(string.commaReplacer())).toString()}$mTrailingSign';
     }
   } catch (ignore) {
     print(ignore);
@@ -68,7 +68,7 @@ String formatDistance({
     if (string != null) {
       return '$mLeadSing${NumberFormat(
         formatCurrentcy,
-      ).format(num.parse(string.replaceAll(',', ''))).toString()}$mTrailingSign';
+      ).format(num.parse(string.commaReplacer())).toString()}$mTrailingSign';
     }
   } catch (ignore) {
     print(ignore);

@@ -1015,7 +1015,7 @@ abstract class AppLocalizations {
   /// No description provided for @dateTime.
   ///
   /// In en, this message translates to:
-  /// **'Date/Time'**
+  /// **'Date / Time'**
   String get dateTime;
 
   /// No description provided for @saveTheReceipt.

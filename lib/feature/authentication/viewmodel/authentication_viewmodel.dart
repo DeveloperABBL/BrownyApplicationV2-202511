@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -496,8 +498,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     // _verifyOTPMessageErrorNotifier.value = null;
     // await onSignUp();
     // return UiResult.success(data: true);
-    _otpButtonNextNotifier.value = true;
-    return UiResult.success(data: true);
+    // _otpButtonNextNotifier.value = true;
+    // return UiResult.success(data: true);
 
     _verifyOTPMessageErrorNotifier.value = null;
     _otpButtonNextNotifier.value = false;
@@ -564,9 +566,9 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     if (currentProcess == AuthenProcess.signupOTP) {
       // TODO เอาจุดออกเวลาใช้จริง
       // ลงทะเบียนสำเร็จ จะ fetch Profile มาเก็บเอาไว้ใช้
-      final profileMockResult = await customerDataRepo.fetchProfile(
-        '019b683f-9ea2-7242-82e1-6b27d2cf721d',
-      );
+      // final profileMockResult = await customerDataRepo.fetchProfile(
+      //   '019b683f-9ea2-7242-82e1-6b27d2cf721d',
+      // );
       // if (profileMockResult.isEmpty) {
       //   // handle ถ้าไม่สามารถ fetch Profile ได้
       //   return UiResult.empty(error: profileMockResult.error);
@@ -576,10 +578,10 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       //   return UiResult.error(error: profileMockResult.error);
       // }
 
-      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
-        profileMockResult.data.data,
-      );
-      return UiResult.success(data: null);
+      // currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+      //   profileMockResult.data.data,
+      // );
+      // return UiResult.success(data: null);
 
       final response = await customerDataRepo.register(
         CustomerCredential(
@@ -642,9 +644,9 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     // ขั้นตอน Resetpassword
     if (currentProcess == AuthenProcess.forgotPasswordNewPassword) {
       // สำหรับทดสอบต้องปิด
-      return UiResult.success(
-        data: null,
-      );
+      // return UiResult.success(
+      //   data: null,
+      // );
 
       final updateResulse = await customerDataRepo.updatePassword({
         "id": currentCustomerProvider.current.id.orEmpty,
@@ -704,6 +706,181 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     return UiResult.empty();
   }
 
+  Future<UiResult<LoginCustomerData>> socialLogin(
+    SocialLoginType provider,
+  ) async {
+    await Future.wait([
+      SocialAuthHelper.signOutGoogle(),
+      SocialAuthHelper.signOutLINE(),
+      SocialAuthHelper.signOutFacebook(),
+    ]);
+
+    UiResult<LoginCustomerData> result;
+    switch (provider) {
+      case SocialLoginType.FACEBOOK:
+        {
+          try {
+            final userCredential = await SocialAuthHelper.signInWithFacebook();
+            if (userCredential == null) {
+              return UiResult.empty();
+            }
+
+            if (userCredential.user == null) {
+              return UiResult.empty();
+            }
+            final userData = userCredential.user!;
+            final socialLoginResult = await customerDataRepo.socialLogin(
+              SocialLoginRequest(
+                provider: 'facebook',
+                appId: userData.uid,
+                name: userData.displayName!,
+                email: userData.email!,
+                profileImage: userData.photoURL.orEmpty,
+              ),
+            );
+
+            if (socialLoginResult.isEmpty || socialLoginResult.hasError) {
+              return UiResult.empty(error: socialLoginResult.error);
+            }
+            if (socialLoginResult.data.data == null) {
+              return UiResult.empty();
+            }
+
+            result = UiResult.success(data: socialLoginResult.data.data!);
+            break;
+          } on Exception catch (e) {
+            return UiResult.error(error: e);
+          }
+        }
+      case SocialLoginType.GOOGLE:
+        {
+          try {
+            final userCredential = await SocialAuthHelper.signInWithGoogle();
+            if (userCredential == null) {
+              return UiResult.empty();
+            }
+
+            if (userCredential.user == null) {
+              return UiResult.empty();
+            }
+            final userData = userCredential.user!;
+            final socialLoginResult = await customerDataRepo.socialLogin(
+              SocialLoginRequest(
+                provider: 'google',
+                appId: userData.uid,
+                name: userData.displayName!,
+                email: userData.email!,
+                profileImage: userData.photoURL.orEmpty,
+              ),
+            );
+
+            if (socialLoginResult.isEmpty || socialLoginResult.hasError) {
+              return UiResult.empty(error: socialLoginResult.error);
+            }
+            if (socialLoginResult.data.data == null) {
+              return UiResult.empty();
+            }
+
+            result = UiResult.success(data: socialLoginResult.data.data!);
+            break;
+          } on Exception catch (e) {
+            return UiResult.error(error: e);
+          }
+        }
+
+      case SocialLoginType.Apple:
+        {
+          try {
+            bool available = await SocialAuthHelper.isAppleSignInAvailable();
+
+            if (!available) {
+              return UiResult.error(
+                error: Unprocessable('ไม่รองรับ'),
+              );
+            }
+
+            final userCredential = await SocialAuthHelper.signInWithApple();
+            if (userCredential == null) {
+              return UiResult.empty();
+            }
+
+            if (userCredential.user == null) {
+              return UiResult.empty();
+            }
+            final userData = userCredential.user!;
+            final socialLoginResult = await customerDataRepo.socialLogin(
+              SocialLoginRequest(
+                provider: 'apple',
+                appId: userData.uid,
+                name: userData.displayName!,
+                email: userData.email!,
+                profileImage: userData.photoURL.orEmpty,
+              ),
+            );
+
+            if (socialLoginResult.isEmpty || socialLoginResult.hasError) {
+              return UiResult.empty(error: socialLoginResult.error);
+            }
+            if (socialLoginResult.data.data == null) {
+              return UiResult.empty();
+            }
+
+            result = UiResult.success(data: socialLoginResult.data.data!);
+          } on Exception catch (e) {
+            return UiResult.error(error: e);
+          }
+        }
+      case SocialLoginType.LINE:
+        {
+          try {
+            final userCredential = await SocialAuthHelper.signInWithLINE();
+            if (userCredential == null) {
+              return UiResult.empty();
+            }
+
+            if (userCredential.userProfile == null) {
+              return UiResult.empty();
+            }
+            if (userCredential.accessToken.email == null) {
+              return UiResult.error(
+                error: UserConsentTermOfPolicy('Email is required!'),
+              );
+            }
+
+            final userData = userCredential.userProfile!;
+            final socialLoginResult = await customerDataRepo.socialLogin(
+              SocialLoginRequest(
+                provider: 'line',
+                appId: userData.userId,
+                name: userData.displayName,
+                email: userCredential.accessToken.email.orEmpty,
+                profileImage: userData.pictureUrl.orEmpty,
+              ),
+            );
+
+            if (socialLoginResult.isEmpty || socialLoginResult.hasError) {
+              return UiResult.empty(error: socialLoginResult.error);
+            }
+            if (socialLoginResult.data.data == null) {
+              return UiResult.empty();
+            }
+
+            result = UiResult.success(data: socialLoginResult.data.data!);
+          } on Exception catch (e) {
+            return UiResult.error(error: e);
+          }
+        }
+    }
+
+    final profileResult = await _fetchProfileAfterLogin();
+
+    if (!context.mounted || profileResult == null) return UiResult.empty();
+
+    // เปลี่ยนข้อมูล User เป็นที่ Login เข้ามา
+    currentCustomerProvider.newUser = profileResult;
+    return result;
+  }
+
   Future<UiResult<LoginCustomerData>> onLogin() async {
     if (formKeyLogin.currentState?.validate() == true) {
       final loginResult = await customerDataRepo.login(
@@ -719,22 +896,29 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         return UiResult.error(error: loginResult.error);
       }
 
-      final profileResult = await customerDataRepo.fetchProfile(
-        loginResult.data.data!.customerId!,
-      );
+      final profileResult = await _fetchProfileAfterLogin();
 
-      if (!context.mounted) return UiResult.empty();
+      if (!context.mounted || profileResult == null) return UiResult.empty();
 
       // เปลี่ยนข้อมูล User เป็นที่ Login เข้ามา
-      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
-        profileResult.data.data,
-      );
+      currentCustomerProvider.newUser = profileResult;
 
       return UiResult.success(
         data: loginResult.data.data!,
       );
     }
     return UiResult.empty();
+  }
+
+  Future<UserModel?> _fetchProfileAfterLogin() async {
+    final profileResult = await customerDataRepo.customerProfileData();
+
+    if (!context.mounted) return null;
+
+    // เปลี่ยนข้อมูล User เป็นที่ Login เข้ามา
+    return UserModel.fromCustomerProfileData(
+      profileResult.data,
+    );
   }
 
   // =========== OTP Timer Methods ===========
@@ -769,13 +953,13 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   /// ถ้า [_otpTimer] active อยู่ จะไม่ส่งซ้ำ
   Future<void> _otpProcess() async {
     // TODO เอาจุดออกเวลาใช้จริง
-    print('OTP Requested');
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(
-      SnackBar(content: Text('OTP Requested')),
-    );
-    return;
+    // print('OTP Requested');
+    // ScaffoldMessenger.of(
+    //   context,
+    // ).showSnackBar(
+    //   SnackBar(content: Text('OTP Requested')),
+    // );
+    // return;
 
     final requestOTPResult = await otpDataRepo.requestOTP(
       RequestOTP(username: usernameController.text),

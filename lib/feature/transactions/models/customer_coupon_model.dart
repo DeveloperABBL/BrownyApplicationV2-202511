@@ -83,7 +83,7 @@ class CustomerCouponModel extends CouponData {
   String expireDateDisplay(BuildContext context) {
     final locale = context.languageCode;
     if (expiryDate != null) {
-      int dif = DateTime.now().difference(expiryDate!).inDays;
+      int dif = (DateTime.now().difference(expiryDate!).inDays * -1);
       switch (locale) {
         case 'en':
           return '$dif days left';

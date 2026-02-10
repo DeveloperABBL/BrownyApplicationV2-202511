@@ -1,5 +1,6 @@
 // ignore_for_file: unused_element_parameter
 
+import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -11,7 +12,7 @@ import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
-import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
+import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -332,7 +333,7 @@ class _SignUpWidget extends StatelessWidget {
                   AppDims.vericalPadding_20,
 
                   // ปุ่ม Social Login (Facebook, Google, Apple, Line)
-                  contentSocialLogin(),
+                  contentSocialLogin(context),
                   AppDims.vericalPadding_20,
 
                   // ข้อความชวนสมัครสมาชิก (แสดงเฉพาะหน้า Login)
@@ -366,39 +367,67 @@ class _SignUpWidget extends StatelessWidget {
   /// - แสดงเป็นแถวเดียว 4 ปุ่ม
   /// - กดแล้วยังไม่มีการทำงาน (TODO)
   @protected
-  Widget contentSocialLogin() {
+  Widget contentSocialLogin(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          onPressed: () {}, // TODO: Implement Facebook login
+          onPressed: () async {
+            await _socialLogin(context, SocialLoginType.FACEBOOK);
+          },
           icon: Assets.png.icFacebook.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {}, // TODO: Implement Google login
+          onPressed: () async {
+            await _socialLogin(context, SocialLoginType.GOOGLE);
+          },
           icon: Assets.png.icGoogle.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {}, // TODO: Implement Apple login
+          onPressed: () async {
+            await _socialLogin(context, SocialLoginType.Apple);
+          },
           icon: Assets.png.icApple.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
         IconButton(
-          onPressed: () {}, // TODO: Implement Line login
+          onPressed: () async {
+            await _socialLogin(context, SocialLoginType.LINE);
+          },
           icon: Assets.png.icLine.image(
             width: AppDims.size_26.w,
             height: AppDims.size_26.h,
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _socialLogin(BuildContext context, SocialLoginType type) async {
+    AppOverlays.showLoading(context);
+    final loginResult = await viewmodel(context).socialLogin(type);
+    if (!context.mounted) return;
+
+    if (loginResult.isEmpty || loginResult.hasError) {
+      _showErrorDialog(context, loginResult.error);
+      return;
+    }
+
+    AppOverlays.hideLoading();
+    context.pushReplacementNamed(
+      CreateAppPinPage.pageName,
+      extra: {
+        CreateAppPinPage.kImplementBackButton: false,
+        CreateAppPinPage.kFirstSignup: false,
+      },
     );
   }
 
@@ -607,6 +636,7 @@ class _SignUpWidget extends StatelessWidget {
   /// - ถ้าเป็น AuthenExceptions → แสดงข้อความที่ถูกต้อง
   /// - ถ้าไม่ใช่ → แสดงข้อความ error ทั่วไป
   void _showErrorDialog(BuildContext context, dynamic error) {
+    AppOverlays.hideLoading();
     final message = error is AuthenExceptions
         ? error.toUiMessage(context)
         : context.wording.errorUi;
@@ -661,7 +691,7 @@ class _SignUpWidget extends StatelessWidget {
 ///
 /// **การทำงาน:**
 /// - แสดงหลังจากผู้ใช้สมัครสมาชิกหรือลืมรหัสผ่าน
-/// - เริ่ม OTP Timer ทันทีที่หน้าแสดง (WidgetsBinding.addPostFrameCallback)
+/// - เริ่ม OTP Timer ทันทีที่หน้าแสดง (วทีing.addPostFrameCallback)
 /// - ให้ผู้ใช้กรอก PIN 6 หลัก (ใช้ Pinput widget)
 /// - แสดง username ที่ปิดบัง (เช่น "09****1234")
 /// - มีปุ่มขอ OTP ใหม่ (เปิดใช้งานเมื่อ Timer หมด)
@@ -1253,7 +1283,14 @@ class _LoginWidget extends _SignUpWidget {
 
               // สำเร็จ → ออกจากหน้า Authentication
               if (result.isSuccess) {
-                context.pop();
+                context.pushReplacementNamed(
+                  CreateAppPinPage.pageName,
+                  extra: {
+                    CreateAppPinPage.kImplementBackButton: false,
+                    CreateAppPinPage.kFirstSignup: false,
+                  },
+                );
+                // context.pop();
               }
             },
             child: AppText(context.wording.login),
@@ -1440,7 +1477,7 @@ class _ReferralWidget extends _SignUpWidget {
       );
 
   @override
-  Widget contentSocialLogin() => const SizedBox();
+  Widget contentSocialLogin(BuildContext context) => const SizedBox();
 
   @override
   Widget contentSignUpCheering(BuildContext context) => const SizedBox();
@@ -1517,7 +1554,7 @@ class _ForgotPasswordWidget extends _SignUpWidget {
 
   /// ไม่แสดง Social Login
   @override
-  Widget contentSocialLogin() => SizedBox();
+  Widget contentSocialLogin(BuildContext context) => SizedBox();
 
   /// ไม่แสดง Separator
   @override
@@ -1795,7 +1832,7 @@ class _ResetPasswordWidget extends _SignUpWidget {
 
   /// reset password
   @override
-  Widget contentSocialLogin() => SizedBox();
+  Widget contentSocialLogin(BuildContext context) => SizedBox();
 }
 
 /// Checkbox สำหรับยอมรับข้อตกลงและนโยบายความเป็นส่วนตัว

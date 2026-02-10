@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/coupon_e_voucher_card_widget.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -24,6 +25,7 @@ class CouponVoucherPage extends StatelessWidget {
       create: (context) => TransactionsViewmodel(
         context: context,
         couponRepo: CouponVoucherRepo(),
+        transactionRepo: TransactionRepo(),
       ),
       child: const _CouponVoucherWidget(),
     );
@@ -67,7 +69,10 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             color: Colors.grey.withValues(alpha: 0.5), // Shadow color
             spreadRadius: 1, // How much the shadow should spread
             blurRadius: 10, // How soft the shadow should be
-            offset: Offset(0, -5), // Negative dy value moves the shadow upwards
+            offset: Offset(
+              0,
+              -5,
+            ), // Negative dy value moves the shadow upwards
           ),
         ],
       ),
@@ -778,6 +783,11 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
 
                 final evoucherForSellList =
                     allStoreResult.data?.getActivePackages() ?? [];
+
+                if (evoucherForSellList.isEmpty) {
+                  // ไม่พบข้อมูลอะไร
+                  return _buidlNotFoundData(context);
+                }
 
                 final lengthList = evoucherForSellList.length;
 

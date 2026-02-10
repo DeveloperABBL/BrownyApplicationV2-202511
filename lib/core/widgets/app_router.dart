@@ -1,10 +1,13 @@
+import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
-import 'package:browny_applications_new/feature/authentication/screen/create_app_pin_page.dart';
+import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
@@ -19,6 +22,7 @@ import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class AppRouter {
   AppRouter({
@@ -83,7 +87,16 @@ class AppRouter {
       GoRoute(
         path: BiometricPage.pagePath,
         name: BiometricPage.pageName,
-        builder: (context, state) => const BiometricPage(),
+        builder: (context, state) {
+          bool isFirstSignup = false;
+          try {
+            final extra = state.extra as Map<String, dynamic>?;
+            isFirstSignup = extra?[BiometricPage.kFirstSignup];
+          } catch (_) {}
+          return BiometricPage(
+            isFirstSignup: isFirstSignup,
+          );
+        },
       ),
       GoRoute(
         path: WalletPage.pagePath,
@@ -126,7 +139,14 @@ class AppRouter {
       GoRoute(
         path: CouponVoucherPage.pagePath,
         name: CouponVoucherPage.pageName,
-        builder: (context, state) => const CouponVoucherPage(),
+        builder: (context, state) {
+          if (context.read<CustomerProvider>().current.isGuest) {
+            return AuthenticationPage(
+              authenProcess: AuthenProcess.login,
+            );
+          }
+          return const CouponVoucherPage();
+        },
       ),
       GoRoute(
         path: PurchaseCouponVoucherPage.pagePath,
@@ -149,11 +169,36 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: ReceiptPage.pagePath,
+        name: ReceiptPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as TransactionsViewmodel;
+          return ReceiptPage(
+            viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
         path: MapPage.pagePath,
         name: MapPage.pageName,
         builder: (context, state) {
           return MapPage();
         },
+      ),
+      GoRoute(
+        path: AvailablePaymentMethodPage.pagePath,
+        name: AvailablePaymentMethodPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as TransactionsViewmodel;
+          return AvailablePaymentMethodPage(
+            viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: TransactionAuthenPage.pagePath,
+        name: TransactionAuthenPage.pageName,
+        builder: (context, state) => TransactionAuthenPage(),
       ),
     ],
   );

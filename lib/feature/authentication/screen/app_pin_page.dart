@@ -15,6 +15,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+part 'transaction_authen_page.dart';
+
 /// หน้าสร้างรหัส PIN 6 หลักสำหรับเข้าแอป
 ///
 /// **การทำงาน:**
@@ -51,6 +53,7 @@ class CreateAppPinPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
+      // ถ้าไม่แสดงปุ่มกลับ แสดงว่าจะไม่รองรับการ wipe ออกเหมือนกัน
       canPop: implementBackButton,
       child: ChangeNotifierProvider(
         create: (context) => PinBiometricViewModel(
@@ -86,7 +89,6 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
   void initState() {
     super.initState();
     _viewModel = context.read();
-    _viewModel.attachContext(context);
     // Listen เมื่อบันทึก PIN สำเร็จ
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   final viewModel = context.read<PinViewModel>();
@@ -214,9 +216,7 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
   Widget _buildTitle() {
     return Consumer<PinBiometricViewModel>(
       builder: (context, viewModel, _) {
-        final title = viewModel.step == 1
-            ? context.wording.createNewPin
-            : context.wording.confirmNewPin;
+        final title = _getTitleText(context, viewModel);
 
         return AppText(
           title,
@@ -227,6 +227,13 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
         );
       },
     );
+  }
+
+  /// Get title text - สามารถ override ได้
+  String _getTitleText(BuildContext context, PinBiometricViewModel viewModel) {
+    return viewModel.step == 1
+        ? context.wording.createNewPin
+        : context.wording.confirmNewPin;
   }
 
   /// แสดง Error Message
@@ -351,15 +358,26 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
 
                   if (available) {
                     // รองรับ Biometric → ไปหน้า Biometric
-                    context.pushNamed(BiometricPage.pageName);
-                  } else {
-                    // ไม่รองรับ → ไป Profile ทันที
-                    context.pushNamedAndClear(
-                      ProfilePage.pageName,
+                    context.pushReplacementNamed(
+                      BiometricPage.pageName,
                       extra: {
-                        ProfilePage.kFirstSignup: widget.isFirstSignup,
+                        BiometricPage.kFirstSignup: widget.isFirstSignup,
                       },
                     );
+                  } else {
+                    // ถ้ามาจากการสมัครสมาชิก จะไปหน้า setup profile ต่อ แต่ถ้ามาจาก Login
+                    // จะ pop ออก
+                    if (widget.isFirstSignup) {
+                      // ไม่รองรับ → ไป Profile ทันที
+                      context.pushNamedAndClear(
+                        ProfilePage.pageName,
+                        extra: {
+                          ProfilePage.kFirstSignup: widget.isFirstSignup,
+                        },
+                      );
+                    } else {
+                      context.pop();
+                    }
                   }
                 });
               }),

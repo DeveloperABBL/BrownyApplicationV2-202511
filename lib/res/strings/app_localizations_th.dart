@@ -474,7 +474,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get numberOfCoupon => 'จำนวนคูปอง';
 
   @override
-  String get dateTime => 'วันที่/เวลา';
+  String get dateTime => 'วัน / เวลา';
 
   @override
   String get saveTheReceipt => 'บันทึกใบเสร็จ';

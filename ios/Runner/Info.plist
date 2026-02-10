@@ -67,6 +67,36 @@
 	<string>This app needs access to speech recognition to search for stores by voice.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to your microphone to enable voice search.</string>
+	<key>GIDClientID</key>
+	<!-- TODO Replace this value: -->
+	<!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
+	<string>261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<!-- Google Sign-In URL Scheme -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Google Sign-In URL Scheme -->
+				<!-- Replace with your REVERSED_CLIENT_ID from GoogleService-Info.plist -->
+				<string>com.googleusercontent.apps.261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq</string>
+		        <!-- LINE Login URL Scheme -->
+				<!-- Specify URL scheme to use when returning from LINE to your app. -->
+				<string>line3rdp.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				<!-- Facebook Login URL Scheme -->
+				<!-- Replace with your Facebook App ID -->
+				<string>fb909604355579723</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>909604355579723</string>
+	<key>FacebookClientToken</key>
+	<string>1d6250d26a1b986306c6f37620b89fe1</string>
+	<key>FacebookDisplayName</key>
+	<string>Browny</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>
@@ -75,10 +105,14 @@
 		<string>sms</string>
 		<string>mailto</string>
 		<string>fb</string>
+		<string>fbauth2</string>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
 		<string>instagram</string>
 		<string>twitter</string>
 		<string>whatsapp</string>
 		<string>line</string>
+		<string>lineauth2</string>
 	</array>
 </dict>
 </plist>

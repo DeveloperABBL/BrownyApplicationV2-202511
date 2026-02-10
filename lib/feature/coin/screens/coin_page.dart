@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
+import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/coin/models/coin_data_model.dart';
@@ -13,6 +14,7 @@ import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -42,17 +44,17 @@ class _CoinContent extends StatefulWidget {
 }
 
 class __CoinContentState extends State<_CoinContent> {
-  late final CoinViewmModel _viewmModel;
+  late final CoinViewmModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewmModel = context.read();
-    _viewmModel.attachContext(context);
+    _viewModel = context.read();
+    _viewModel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // โหลดข้อมูล CoinClaim
-      await _viewmModel.fetchCoinCliamData();
+      await _viewModel.fetchCoinCliamData();
     });
   }
 
@@ -120,7 +122,7 @@ class __CoinContentState extends State<_CoinContent> {
                             ),
                           ),
                           child: ValueListenableBuilder(
-                            valueListenable: _viewmModel.coinClaimDataNotifier,
+                            valueListenable: _viewModel.coinClaimDataNotifier,
                             builder: (context, result, child) {
                               if (result.isLoading) {
                                 return CircularProgressIndicator();
@@ -267,7 +269,9 @@ class __CoinContentState extends State<_CoinContent> {
       children: [
         Spacer(),
         TextButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            _showCondition(context);
+          },
           style: context.appTheme.textButtonTheme.style!.copyWith(
             minimumSize: WidgetStatePropertyAll(
               Size(
@@ -297,9 +301,115 @@ class __CoinContentState extends State<_CoinContent> {
     );
   }
 
+  Future<void> _showCondition(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: AppDims.size_32.w),
+          child: FractionallySizedBox(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => dialogContext.pop(),
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: Assets.svg.icUnchecked.svg(
+                            width: 20.w,
+                            height: 20.h,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AppContainerRadius(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.popupGradient,
+                          borderRadius: BorderRadius.circular(24.r),
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              // AppDims.vericalPadding_16,
+                              SizedBox(
+                                height: 200.h,
+                              ),
+
+                              // AppDims.vericalPadding_16,
+                              Padding(
+                                padding: EdgeInsets.all(AppDims.size_16),
+                                child: Column(
+                                  children: [
+                                    AppText(
+                                      'Browny Coin',
+                                      textAlign: TextAlign.center,
+                                      style: context.textTheme.headlineLarge!
+                                          .copyWith(
+                                            fontSize: AppDims.size_24.sp,
+                                            color: AppColors.primary,
+                                          ),
+                                    ),
+                                    AppDims.vericalPadding_10,
+
+                                    AppText(
+                                      _viewModel.descriptionPopupCondition(
+                                        context,
+                                      ),
+                                      textAlign: TextAlign.start,
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.gray600,
+                                          ),
+                                    ),
+                                    AppDims.vericalPadding_16,
+
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        dialogContext.pop();
+                                      },
+                                      child: AppText(
+                                        context.wording.acknowledge,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Positioned(
+                  top: -35.w,
+                  right: 10.w,
+                  child: Assets.png.brownyCoinclaimCondition.image(
+                    width: 330.w,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _onCoinClaiming() async {
     AppOverlays.showLoading(context);
-    final result = await _viewmModel.coinClaiming();
+    final result = await _viewModel.coinClaiming();
 
     AppOverlays.hideLoading();
     if (mounted) {
@@ -355,7 +465,7 @@ class __CoinContentState extends State<_CoinContent> {
 
   ValueListenableBuilder<UiResult<String>> _buildTextToDay() {
     return ValueListenableBuilder(
-      valueListenable: _viewmModel.toDayDataNotifier,
+      valueListenable: _viewModel.toDayDataNotifier,
       builder: (context, value, child) {
         return TextButton.icon(
           onPressed: null,

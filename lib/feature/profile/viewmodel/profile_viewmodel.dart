@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
+import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
@@ -360,6 +361,12 @@ Terms and Conditions
 
   FutureOr<UiResult<UserModel>> logout() async {
     final logoutResult = await repo.logout();
+    // if necessary
+    await Future.wait([
+      SocialAuthHelper.signOutGoogle(),
+      SocialAuthHelper.signOutLINE(),
+      SocialAuthHelper.signOutFacebook(),
+    ]);
 
     if (!context.mounted) return UiResult.empty();
 

@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/api_configs.dart
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
+import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/core/viewmodels/app_preferences.dart';
 import 'package:browny_applications_new/core/widgets/app_router.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
@@ -36,6 +37,9 @@ class DevEnvironment extends AppEvnironment {
     AppClient.init(
       apiConfig,
     );
+
+    // LINE Channel ID : 2009026542
+    SocialAuthHelper.initLineSDK('2009026542');
 
     // สร้าง local storage
     appPreferences = AppPreferences();

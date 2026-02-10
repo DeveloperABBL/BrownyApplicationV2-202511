@@ -6,7 +6,6 @@ import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
-import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/models/referral_reward_model.dart';
 import 'package:browny_applications_new/feature/invit_friend/repository/invit_friend_repo.dart';
 import 'package:browny_applications_new/feature/invit_friend/viewmodel/invit_friend_viewmodel.dart';

@@ -1,5 +1,15 @@
 # CHANGELOG
 ---
+### DONG 2026-02-08
+* เพิ่มการ login ด้วย Social GOOGLE, Apple, LINE, FACEBOOK
+* เพิ่ม Popup เงื่อนไขในหน้า claim coin (mockup ข้อมูล ตาม Design)
+* เพิ่ม Popup เงื่อนไขวันเกิดในหน้า Profile Initial (mockup ข้อมูล ตาม Design)
+* เพิ่ม Process การตั้งค่า PIN, Biometric หลังจากที่มีการ Login เข้าใช้งาน
+* ปรับ UI หน้าซื้อ E-Voucher ด้วย Design UX/UI ใหม่
+  - ขึ้น UI Reciept และ function การ Share, Save
+  - เก็บ Logic การสั่งซื้อ E-Voucher
+
+---
 ### DONG 2026-02-01
 * ปรับ UI หน้าซื้อ E-Voucher ด้วย Design UX/UI ใหม่
   - เก็บ Logic การสั่งซื้อ E-Voucher (ยังไม่เสร็จ)

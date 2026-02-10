@@ -8,7 +8,7 @@ part of 'coupon_order_response.dart';
 
 CouponOrderResponse _$CouponOrderResponseFromJson(Map<String, dynamic> json) =>
     CouponOrderResponse(
-      success: json['success'] as bool,
+      success: json['success'] as bool?,
       message: json['message'] as String?,
       data: json['data'] == null
           ? null
@@ -39,9 +39,15 @@ CouponOrderData _$CouponOrderDataFromJson(Map<String, dynamic> json) =>
       couponPackageId: (json['coupon_package_id'] as num?)?.toInt(),
       quantity: (json['quantity'] as num?)?.toInt(),
       price: json['price'] as String?,
-      totalPrice: json['total_price'] as String?,
+      totalPrice: json['total_price'],
       paymentMethod: json['payment_method'] as String?,
       paymentStatus: json['payment_status'] as String?,
+      paymentRef: json['payment_ref'] as String?,
+      gatewayTransactionId: json['gateway_transaction_id'] as String?,
+      responsePayload: json['response_payload'],
+      respondedAt: json['responded_at'] as String?,
+      receiptNo: json['receipt_no'] as String?,
+      receiptAt: json['receipt_at'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
     );
@@ -57,6 +63,12 @@ Map<String, dynamic> _$CouponOrderDataToJson(CouponOrderData instance) =>
       'total_price': instance.totalPrice,
       'payment_method': instance.paymentMethod,
       'payment_status': instance.paymentStatus,
+      'payment_ref': instance.paymentRef,
+      'gateway_transaction_id': instance.gatewayTransactionId,
+      'response_payload': instance.responsePayload,
+      'responded_at': instance.respondedAt,
+      'receipt_no': instance.receiptNo,
+      'receipt_at': instance.receiptAt,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
     };

@@ -70,6 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '261060252828',
     projectId: 'brownyapplication',
     storageBucket: 'brownyapplication.firebasestorage.app',
+    androidClientId: '261060252828-cja0m2dsg7d8ubumfsk809uhfge7bgrk.apps.googleusercontent.com',
+    iosClientId: '261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq.apps.googleusercontent.com',
     iosBundleId: 'com.brownywash.brownyapplications',
   );
 

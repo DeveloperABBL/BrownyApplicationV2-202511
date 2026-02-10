@@ -127,7 +127,8 @@ class PermissionHelper {
   /// Returns [handler.PermissionStatus] สถานะของ permission ที่ขอ
   static Future<handler.PermissionStatus> requestLocationPermission() async {
     try {
-      return await handler.Permission.location.request();
+      final granted = await handler.Permission.location.request();
+      return granted;
     } catch (e) {
       return handler.PermissionStatus.denied;
     }

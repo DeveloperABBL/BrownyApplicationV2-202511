@@ -465,7 +465,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get numberOfCoupon => '优惠券编号';
 
   @override
-  String get dateTime => '日期/时间';
+  String get dateTime => '日期 / 时间';
 
   @override
   String get saveTheReceipt => '保存收据';

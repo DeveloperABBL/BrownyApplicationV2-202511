@@ -1,6 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
-import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';

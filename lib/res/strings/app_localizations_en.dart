@@ -473,7 +473,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get numberOfCoupon => 'Number of coupon';
 
   @override
-  String get dateTime => 'Date/Time';
+  String get dateTime => 'Date / Time';
 
   @override
   String get saveTheReceipt => 'Save the receipt';

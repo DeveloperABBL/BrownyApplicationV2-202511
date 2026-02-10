@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
@@ -48,6 +49,13 @@ mixin CustomerDataSourceMixin {
     required String username, // ชื่อผู้ใช้ที่ต้องการเข้าสู่ระบบ
     required String password, // รหัสผ่านของผู้ใช้
   });
+
+  /// ฟังก์ชันเข้าสู่ระบบด้วย Social Login (Google, Facebook)
+  /// [request] - SocialLoginRequest ที่มีข้อมูล provider, appId, name, email, profileImage
+  /// คืนค่าเป็น Future ของ RepoResult ที่มี LoginCustomerResponse
+  Future<RepoResult<LoginCustomerResponse>> socialLogin(
+    SocialLoginRequest request,
+  );
 
   Future<RepoResult<LoginCustomerResponse>> register(
     CustomerCredential credential,
@@ -261,36 +269,34 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
         mId = profileDataLocal.id!;
       }
 
-      if (profileDataLocal != null) {
-        try {
-          // ถ้า fetch profile ได้ จะ fetch coin มาด้วย
-          final creditData = await fetchCustomerCredit(mId);
+      try {
+        // ถ้า fetch profile ได้ จะ fetch coin มาด้วย
+        final creditData = await fetchCustomerCredit(mId);
 
-          if (creditData.isSuccess) {
-            profileDataLocal = profileDataLocal.copyWith(
-              creditBalance: creditData.data.creditBalance,
-              brownyCoin: creditData.data.brownyCoin,
-            );
-          }
-
-          // fetch coupon available count
-          final couponCountData = await fetchCouponAvailableCount(mId);
-
-          if (couponCountData.isSuccess) {
-            profileDataLocal = profileDataLocal.copyWith(
-              couponsRedemption: couponCountData.data.coupons?.redemption,
-              couponsDiscount: couponCountData.data.coupons?.discount,
-              couponsEVoucher: couponCountData.data.coupons?.eVoucher,
-              totalCoupons: couponCountData.data.total,
-            );
-          }
-        } finally {
-          saveLocalProfile(profileDataLocal!);
+        if (creditData.isSuccess) {
+          profileDataLocal = profileDataLocal.copyWith(
+            creditBalance: creditData.data.creditBalance,
+            brownyCoin: creditData.data.brownyCoin,
+          );
         }
+
+        // fetch coupon available count
+        final couponCountData = await fetchCouponAvailableCount(mId);
+
+        if (couponCountData.isSuccess) {
+          profileDataLocal = profileDataLocal.copyWith(
+            couponsRedemption: couponCountData.data.coupons?.redemption,
+            couponsDiscount: couponCountData.data.coupons?.discount,
+            couponsEVoucher: couponCountData.data.coupons?.eVoucher,
+            totalCoupons: couponCountData.data.total,
+          );
+        }
+      } finally {
+        saveLocalProfile(profileDataLocal!);
       }
 
       // คืนค่าตามข้อมูลที่ได้รับจาก response
-      return RepoResult.dependOn(profileDataLocal!.copyWith());
+      return RepoResult.dependOn(profileDataLocal.copyWith());
     } on DioException catch (dioEx) {
       // ถ้าไม่พบผู้ใช้
       if (dioEx.response!.isNotFound) {
@@ -340,6 +346,60 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
 
         if (fetchProfileResult.isSuccess) {
           // เขียนข้อมูลผู้ใช้ลง local storage เฉพาะ login, fetch profile ผ่านเท่านั้น
+          saveLocalLoginCustomerData(response.data!.data!);
+
+          // คืนค่าความสำเร็จพร้อมข้อมูล
+          return RepoResult.success(data: response.data!);
+        }
+      }
+
+      // คืนค่าตามข้อมูลที่ได้รับจาก response
+      return RepoResult.dependOn(response.data);
+    } catch (e) {
+      // กรณีเกิดข้อผิดพลาดจาก DioException
+      if (e is DioException) {
+        // ถ้าไม่พบผู้ใช้
+        if (e.response!.isNotFound) {
+          return RepoResult.empty(
+            error: UserNotFound(),
+          );
+        }
+
+        // ถ้าผู้ใช้ไม่ได้รับอนุญาต
+        if (e.response!.isUnauthorized) {
+          return RepoResult.empty(
+            error: UserUnauthorized(),
+          );
+        }
+      }
+      // คืนค่าข้อผิดพลาดอื่น ๆ
+      return RepoResult.error(
+        error: Exception('Unknown error occurred'),
+      );
+    }
+  }
+
+  /// ฟังก์ชันเข้าสู่ระบบด้วย Social Login (Google, Facebook)
+  /// [request] - SocialLoginRequest ที่มีข้อมูล provider, appId, name, email, profileImage
+  /// คืนค่าเป็น Future ของ RepoResult ที่มี LoginCustomerResponse
+  @override
+  Future<RepoResult<LoginCustomerResponse>> socialLogin(
+    SocialLoginRequest request,
+  ) async {
+    try {
+      // เรียกใช้งาน remote เพื่อเข้าสู่ระบบด้วย Social Login
+      final response = await requireRemote.socialLogin(request);
+
+      // ถ้าเข้าสู่ระบบสำเร็จ
+      if (response.isSuccessful) {
+        // fetch profile มาเก็บไว้
+        final fetchProfileResult = await fetchProfile(
+          // ใช้ customer id จากการ login
+          response.data!.data!.customerId!,
+        );
+
+        if (fetchProfileResult.isSuccess) {
+          // เขียนข้อมูลผู้ใช้ลง local storage
           saveLocalLoginCustomerData(response.data!.data!);
 
           // คืนค่าความสำเร็จพร้อมข้อมูล

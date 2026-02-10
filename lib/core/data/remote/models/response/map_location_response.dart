@@ -1,6 +1,5 @@
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 

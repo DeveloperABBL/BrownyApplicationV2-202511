@@ -1,21 +1,23 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'coupon_payment_check_response.dart';
+part of 'payment_status_check_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-CouponPaymentCheckResponse _$CouponPaymentCheckResponseFromJson(
+PaymentStatusCheckResponse _$PaymentStatusCheckResponseFromJson(
   Map<String, dynamic> json,
-) => CouponPaymentCheckResponse(
+) => PaymentStatusCheckResponse(
   status: json['status'] as String,
   redirect: json['redirect'] as String?,
+  orderId: json['order_id'] as int?,
 );
 
-Map<String, dynamic> _$CouponPaymentCheckResponseToJson(
-  CouponPaymentCheckResponse instance,
+Map<String, dynamic> _$PaymentStatusCheckResponseToJson(
+  PaymentStatusCheckResponse instance,
 ) => <String, dynamic>{
   'status': instance.status,
   'redirect': instance.redirect,
+  'order_id': instance.orderId,
 };

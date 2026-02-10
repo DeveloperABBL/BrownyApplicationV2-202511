@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -5,10 +6,11 @@ import 'package:flutter/material.dart';
 /// - สร้าง PIN ใหม่
 /// - ตรวจสอบ PIN
 /// - จัดการ State ของหน้า Create PIN
-class PinBiometricViewModel extends ChangeNotifier {
+class PinBiometricViewModel extends AppViewModel {
   final PinBioMetricRepository _repository;
 
   PinBiometricViewModel({
+    required super.context,
     required PinBioMetricRepository repository,
   }) : _repository = repository;
 
@@ -43,7 +45,7 @@ class PinBiometricViewModel extends ChangeNotifier {
   // ========== Methods ==========
 
   /// เพิ่มตัวเลขเข้า PIN
-  void addDigit(String digit) {
+  void addDigit(String digit, [VoidCallback? onSaved]) {
     if (_step == 1) {
       // ขั้นตอนที่ 1: กรอก PIN
       if (_pin.length < pinLength) {
@@ -65,7 +67,11 @@ class PinBiometricViewModel extends ChangeNotifier {
 
         // ถ้ากรอกครบ 6 หลัก → ตรวจสอบความตรงกัน
         if (_confirmPin.length == pinLength) {
-          _validateAndSavePin();
+          _validateAndSavePin().then((success) {
+            if (success && onSaved != null) {
+              onSaved();
+            }
+          });
         }
       }
     }
@@ -99,7 +105,7 @@ class PinBiometricViewModel extends ChangeNotifier {
   }
 
   /// ตรวจสอบความตรงกันและบันทึก PIN
-  Future<void> _validateAndSavePin() async {
+  Future<bool> _validateAndSavePin() async {
     if (_pin != _confirmPin) {
       // PIN ไม่ตรงกัน → กลับไปขั้นตอนที่ 1
       await Future.delayed(Duration(milliseconds: 300));
@@ -108,11 +114,11 @@ class PinBiometricViewModel extends ChangeNotifier {
       _pin = '';
       _confirmPin = '';
       notifyListeners();
-      return;
+      return false;
     }
 
     // PIN ตรงกัน → บันทึก
-    await _savePinToRepository();
+    return await _savePinToRepository();
   }
 
   /// บันทึก PIN ลง Repository
@@ -223,6 +229,71 @@ class PinBiometricViewModel extends ChangeNotifier {
       }
       return false;
     } catch (e) {
+      return false;
+    }
+  }
+
+  /// ตรวจสอบว่าอุปกรณ์รองรับ Biometric หรือไม่
+  Future<bool> isBiometricAvailable() async {
+    try {
+      final result = await _repository.isBiometricAvailable();
+      if (result.isSuccess) {
+        return result.data;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// ทำการ Authenticate ด้วย Biometric
+  Future<bool> authenticateWithBiometric({String? reason}) async {
+    try {
+      final result = await _repository.authenticateWithBiometric(
+        reason: reason,
+      );
+      if (result.isSuccess) {
+        return result.data.isSuccess;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// ตรวจสอบ PIN สำหรับ Authentication (ใช้กับ TransactionAuthenPage)
+  /// - กรอกครบ 6 หลักแล้ว verify ทันที
+  /// - คืนค่า true ถ้าถูกต้อง, false ถ้าไม่ถูกต้อง
+  Future<bool> verifyPinForAuth() async {
+    if (_pin.length != pinLength) {
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _repository.verifyPin(_pin);
+
+      _isLoading = false;
+
+      if (result.isSuccess && result.data == true) {
+        // PIN ถูกต้อง
+        notifyListeners();
+        return true;
+      } else {
+        // PIN ไม่ถูกต้อง - รีเซ็ต
+        _errorMessage = 'PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง';
+        _pin = '';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      _pin = '';
+      notifyListeners();
       return false;
     }
   }

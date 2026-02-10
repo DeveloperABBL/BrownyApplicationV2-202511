@@ -12,7 +12,7 @@ void main() async {
   // if (PlatformUtils.isWeb) {
   // usePathUrlStrategy();
   // }
-  // LINE Channel ID : 2009026542
+
   WidgetsFlutterBinding.ensureInitialized();
   // https://firebase.google.com/docs/flutter/setup
   await Firebase.initializeApp(

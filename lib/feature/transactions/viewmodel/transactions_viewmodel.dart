@@ -1,12 +1,18 @@
+import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
+import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_list_model.dart';
+import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -23,10 +29,13 @@ class TransactionsViewmodel extends AppViewModel
   TransactionsViewmodel({
     required super.context,
     required CouponVoucherDataSourceMixin couponRepo,
-  }) : _couponRepo = couponRepo;
+    required TransactionDataSourceMixin transactionRepo,
+  }) : _couponRepo = couponRepo,
+       _transactionRepo = transactionRepo;
 
   // ========== Repository ==========
   final CouponVoucherDataSourceMixin _couponRepo;
+  final TransactionDataSourceMixin _transactionRepo;
   @override
   CouponVoucherDataSourceMixin get repoDelegate => _couponRepo;
 
@@ -35,9 +44,12 @@ class TransactionsViewmodel extends AppViewModel
 
   @override
   void dispose() {
+    _paymentMethodNotifier.dispose();
     _showNearbyStoresNotifier.dispose();
     _evoucherForSellNotifier.dispose();
     _evoucherNotifier.dispose();
+    _paymentStatusNotifier.dispose();
+    _couponReceiptNotifier.dispose();
     super.dispose();
   }
 
@@ -63,6 +75,24 @@ class TransactionsViewmodel extends AppViewModel
   ValueListenable<UiResult<CouponListModel>> get evoucherForSellNotifier =>
       _evoucherForSellNotifier;
 
+  late final ValueNotifier<UiResult<List<PaymentMethodModel>>>
+  _paymentMethodNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<PaymentMethodModel>>>
+  get paymentMethodNotifier => _paymentMethodNotifier;
+  PaymentMethodModel? _paymentSelected;
+  // เก็บค่า payment ก่อนที่จะเข้าหน้าแก้ไข (สำหรับ cancel)
+  PaymentMethodModel? _paymentSelectedBeforeEdit;
+
+  late final ValueNotifier<UiResult<PaymentStatusCheckResponse>>
+  _paymentStatusNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<PaymentStatusCheckResponse>>
+  get paymentStatusNotifier => _paymentStatusNotifier;
+
+  late final ValueNotifier<UiResult<CouponReceiptModel>>
+  _couponReceiptNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<CouponReceiptModel>> get couponReceiptNotifier =>
+      _couponReceiptNotifier;
+
   // ========== function, Logic ==========
   late CouponPackageItem _selectedCoupon;
   @override
@@ -71,9 +101,152 @@ class TransactionsViewmodel extends AppViewModel
   void goPurchasePage(BuildContext context, CouponPackageItem selected) {
     _selectedCoupon = selected;
     storeListNotifier = ValueNotifier(UiResult.loading());
-    context.pushNamed(
-      PurchaseCouponVoucherPage.pageName,
-      extra: this,
+    context
+        .pushNamed(
+          PurchaseCouponVoucherPage.pageName,
+          extra: this,
+        )
+        .then((_) async {
+          if (!context.mounted) return;
+
+          AppOverlays.showLoading(context);
+          await initializeLocationAndFetchCoupons();
+          AppOverlays.hideLoading();
+        });
+  }
+
+  /// ดึงข้อมูล Payment Methods ที่มีให้เลือก
+  ///
+  /// [fetchAll] = true: แสดงทั้งหมด, false: แสดงแค่ 3 ตัวแรก
+  ///
+  /// กลไก:
+  /// - ดึง payment methods จาก couponDetail
+  /// - ถ้ามีการเลือกไว้แล้ว (_paymentSelected != null) จะเอาตัวที่เลือกมาไว้ index 0
+  /// - ถ้ายังไม่เคยเลือก จะเลือกตัวแรกเป็น default
+  Future<void> fetchPaymentMethod(
+    BuildContext context, {
+    bool fetchAll = false,
+  }) async {
+    // Set loading state ถ้ายังไม่ได้ loading อยู่
+    if (!_paymentMethodNotifier.value.isLoading) {
+      _paymentMethodNotifier.value = UiResult.loading();
+    }
+
+    // ตรวจสอบว่า couponDetail พร้อมใช้งานหรือยัง
+    if (!couponDetailNotifier!.value.isSuccess) {
+      _paymentMethodNotifier.value = UiResult.empty(
+        error: couponDetailNotifier!.value.error,
+      );
+      return;
+    }
+
+    // ดึง payment methods จาก couponDetail ตามภาษาปัจจุบัน
+    final listPayment = couponDetailNotifier!.value.data!
+        .paymentMethodsAvailable(context.languageCode);
+
+    // ถ้าไม่มี payment method ให้เลือก
+    if (listPayment.isEmpty) {
+      _paymentMethodNotifier.value = UiResult.empty();
+      return;
+    }
+
+    // Fetch ข้อมูล profile เพื่ออัพเดท credit balance (สำหรับ TP Wallet)
+    final profileResult = await repoDelegate.fetchProfile('');
+    if (profileResult.isEmpty || profileResult.isError) {
+      _paymentMethodNotifier.value = UiResult.empty();
+      return;
+    }
+
+    final userModel = UserModel.fromCustomerProfileData(
+      profileResult.data.data,
+    );
+    // อัพเดทข้อมูล user ใหม่ใน provider
+    currentCustomerProvider.newUser = userModel;
+
+    // Copy list เพื่อไม่ให้กระทบ original
+    var finalList = listPayment.toList();
+
+    // ถ้ามีการเลือก payment ไว้แล้วก่อนหน้านี้
+    if (_paymentSelected != null) {
+      // หาตำแหน่งของ payment ที่เลือกไว้
+      final selectedIndex = finalList.indexWhere(
+        (e) => e.method == _paymentSelected!.method,
+      );
+
+      if (selectedIndex != -1) {
+        // Mark ทั้งหมดเป็น unselected ก่อน
+        finalList = finalList
+            .map((e) => e.copyWith(isSelected: false))
+            .toList();
+
+        // เอาตัวที่เลือกออกจาก list
+        final selected = finalList.removeAt(selectedIndex);
+
+        // ใส่กลับไปที่ index 0 และ mark เป็น selected
+        finalList.insert(0, selected.copyWith(isSelected: true));
+      }
+    } else {
+      // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
+      finalList = finalList.asMap().entries.map((entry) {
+        // ตัวแรก (index 0) จะถูก mark เป็น selected
+        return entry.value.copyWith(isSelected: entry.key == 0);
+      }).toList();
+      // เก็บตัวแรกไว้ใน _paymentSelected
+      if (finalList.isNotEmpty) {
+        _paymentSelected = finalList.first;
+      }
+    }
+
+    // Update notifier พร้อมจำกัดจำนวนตามค่า fetchAll
+    // fetchAll = true: ส่งทั้งหมด, false: ส่งแค่ 3 ตัว
+    _paymentMethodNotifier.value = UiResult.success(
+      data: finalList.take(fetchAll ? finalList.length : 3).toList(),
+    );
+  }
+
+  /// เรียกเมื่อ User เลือก payment method
+  ///
+  /// [payment]: payment ที่เลือก
+  /// [fetchAll]: true = อัพเดทแสดงทั้งหมด, false = แสดงแค่ 3 ตัว
+  ///
+  /// กลไก:
+  /// - ดึง payment methods ทั้งหมดจาก couponDetail (ไม่ใช่จาก notifier เพราะอาจมีแค่ 3 ตัว)
+  /// - เอา payment ที่เลือกมาไว้ index 0 และ mark เป็น selected
+  /// - payment อื่นๆ จะถูก mark เป็น unselected
+  void onPaymentChanged(
+    PaymentMethodModel payment, {
+    bool fetchAll = false,
+  }) {
+    // ตรวจสอบว่า couponDetail พร้อมใช้งาน
+    if (!couponDetailNotifier!.value.isSuccess) return;
+
+    // ดึง payment methods ทั้งหมดจาก couponDetail (ไม่ดึงจาก notifier เพราะอาจมีแค่ 3 ตัว)
+    final fullList = couponDetailNotifier!.value.data!.paymentMethodsAvailable(
+      context.languageCode,
+    );
+
+    // Mark ทุกตัวเป็น unselected ก่อน
+    var newList = fullList.map((e) => e.copyWith(isSelected: false)).toList();
+
+    // หาตำแหน่งของ payment ที่เลือก
+    final selectedIndex = newList.indexWhere((e) => e.method == payment.method);
+
+    if (selectedIndex != -1) {
+      // เอา payment ที่เลือกออกจาก list
+      final selected = newList.removeAt(selectedIndex);
+
+      // ใส่กลับไปที่ index 0 และ mark เป็น selected
+      newList.insert(0, selected.copyWith(isSelected: true));
+
+      // เก็บค่าไว้ใน _paymentSelected เพื่อใช้ตอน fetch ครั้งถัดไป
+      _paymentSelected = newList.first;
+    }
+
+    // Update notifier พร้อมจำกัดจำนวนตาม fetchAll
+    // fetchAll = true: ส่งทั้งหมด (ใช้ใน available_payment_method_page)
+    // fetchAll = false: ส่งแค่ 3 ตัว (ใช้ใน transaction_selected_page)
+    _paymentMethodNotifier.value = UiResult.success(
+      data: newList.take(fetchAll ? newList.length : 3).toList(),
     );
   }
 
@@ -100,10 +273,10 @@ class TransactionsViewmodel extends AppViewModel
             await initializeLocationAndFetchCoupons();
           },
           cancelText: context.wording.cancel,
-          onCancel: () {
+          onCancel: () async {
             // User cancelled - fetch without location
             _showNearbyStoresNotifier.value = false;
-            fetchCouponPackageListDependsOn(currentLocation: null);
+            await fetchCouponPackageListDependsOn(currentLocation: null);
           },
         );
         return;
@@ -188,5 +361,181 @@ class TransactionsViewmodel extends AppViewModel
           )
           .toList(),
     );
+  }
+
+  void disposeTransaction() {
+    _paymentMethodNotifier.value = UiResult.loading();
+    _paymentSelected = null;
+    _paymentSelectedBeforeEdit = null;
+  }
+
+  /// เริ่มต้นการแก้ไข payment method (เก็บค่าเดิมไว้สำหรับ cancel)
+  void startEditingPaymentMethod() {
+    _paymentSelectedBeforeEdit = _paymentSelected;
+  }
+
+  /// ยืนยันการเลือก payment method ใหม่ (ไม่ต้องทำอะไร เพราะค่าถูกเก็บไว้แล้วใน onPaymentChanged)
+  void confirmPaymentMethodEdit() {
+    _paymentSelectedBeforeEdit = null;
+  }
+
+  /// ยกเลิกการเลือก payment method - restore ค่าเดิมกลับมา
+  Future<void> cancelPaymentMethodEdit(BuildContext context) async {
+    if (_paymentSelectedBeforeEdit != null) {
+      _paymentSelected = _paymentSelectedBeforeEdit;
+      _paymentSelectedBeforeEdit = null;
+      // Fetch ใหม่เพื่อให้ payment เดิมกลับมาเป็น index 0
+      await fetchPaymentMethod(context, fetchAll: false);
+    }
+  }
+
+  /// สร้างคำสั่งซื้อคูปอง
+  ///
+  /// Returns:
+  /// - UiResult.success: สำเร็จ พร้อม CouponOrderResponse
+  /// - UiResult.error: เกิด error
+  /// - UiResult.empty: ไม่มี payment method ที่เลือก หรือ API ไม่สำเร็จ
+  Future<UiResult<CouponOrderResponse>> createCouponOrder() async {
+    // ตรวจสอบว่ามี payment method ที่เลือกหรือไม่
+    if (_paymentSelected == null) {
+      return UiResult.empty(
+        error: Exception('กรุณาเลือกวิธีชำระเงิน'),
+      );
+    }
+
+    // ตรวจสอบว่ามี customer ID หรือไม่
+    final customerId = currentCustomerProvider.current.id;
+    if (customerId == null || customerId.isEmpty) {
+      return UiResult.error(
+        error: Exception('ไม่พบข้อมูลผู้ใช้'),
+      );
+    }
+
+    if (_selectedCoupon.data.packageId == null) {
+      return UiResult.error(
+        error: Exception(
+          'เกิดข้อผิดพลาดในการสร้างคำสั่งซื้อ: ไม่พบ package id',
+        ),
+      );
+    }
+
+    try {
+      // สร้าง request
+      final request = CouponOrderRequest(
+        customerId: customerId,
+        couponPackageId: selectedPackageNotifier?.value?.packageId ?? 0,
+        quantity: 1,
+        paymentMethod: _paymentSelected!.method,
+      );
+
+      // เรียก API
+      final result = await _transactionRepo.createCouponOrder(request);
+
+      // Handle result
+      if (result.isSuccess) {
+        return UiResult.success(data: result.data);
+      } else if (result.isEmpty) {
+        return UiResult.empty(error: result.error);
+      } else {
+        return UiResult.error(error: result.error);
+      }
+    } catch (e) {
+      return UiResult.error(
+        error: Exception('เกิดข้อผิดพลาดในการสร้างคำสั่งซื้อ: ${e.toString()}'),
+      );
+    }
+  }
+
+  /// ตรวจสอบสถานะการชำระเงิน
+  ///
+  /// Returns:
+  /// - UiResult.success: สำเร็จ พร้อม PaymentStatusCheckResponse
+  /// - UiResult.error: เกิด error
+  /// - UiResult.empty: API ไม่สำเร็จ
+  Future<UiResult<PaymentStatusCheckResponse>> checkPaymentStatus(
+    CouponOrderData orderData,
+  ) async {
+    try {
+      final result = await _transactionRepo.checkPaymentStatus(orderData);
+
+      if (result.isSuccess) {
+        // เก็บ response ไว้ใช้งาน orderId ต่อ
+        _paymentStatusNotifier.value = UiResult.success(data: result.data);
+        return UiResult.success(data: result.data);
+      } else if (result.isEmpty) {
+        _paymentStatusNotifier.value = UiResult.empty(error: result.error);
+        return UiResult.empty(error: result.error);
+      } else {
+        _paymentStatusNotifier.value = UiResult.error(error: result.error);
+        return UiResult.error(error: result.error);
+      }
+    } catch (e) {
+      final exception = Exception(
+        'เกิดข้อผิดพลาดในการตรวจสอบสถานะ: ${e.toString()}',
+      );
+      _paymentStatusNotifier.value = UiResult.error(error: exception);
+      return UiResult.error(error: exception);
+    }
+  }
+
+  /// ดึงข้อมูลใบเสร็จคูปอง/e-voucher
+  ///
+  /// ใช้ orderId จาก PaymentStatusCheckResponse ที่เก็บไว้
+  ///
+  /// Returns:
+  /// - UiResult.success: สำเร็จ พร้อม CouponReceiptResponse
+  /// - UiResult.error: เกิด error
+  /// - UiResult.empty: ไม่มี orderId หรือ API ไม่สำเร็จ
+  Future<UiResult<CouponReceiptModel>> fetchCouponReceipt() async {
+    // ตรวจสอบว่ามี payment status response หรือไม่
+    if (!_paymentStatusNotifier.value.isSuccess) {
+      final error = Exception('ไม่พบข้อมูลการชำระเงิน กรุณาตรวจสอบสถานะก่อน');
+      _couponReceiptNotifier.value = UiResult.empty(error: error);
+      return UiResult.empty(error: error);
+    }
+
+    final orderId = _paymentStatusNotifier.value.data?.orderId;
+
+    // ตรวจสอบว่ามี orderId หรือไม่
+    if (orderId == null) {
+      final error = Exception('ไม่พบ Order ID');
+      _couponReceiptNotifier.value = UiResult.empty(error: error);
+      return UiResult.empty(error: error);
+    }
+
+    try {
+      _couponReceiptNotifier.value = UiResult.loading();
+
+      final result = await _transactionRepo.fetchCouponReceipt(
+        orderId.toString(),
+      );
+
+      if (result.isSuccess) {
+        _couponReceiptNotifier.value = UiResult.success(
+          // แปลงเป็น model สำหรับนำไปแสดงผล
+          data: CouponReceiptModel.fromCouponReceiptData(
+            result.data.data!,
+          ),
+        );
+        return UiResult.success(
+          // แปลงเป็น model สำหรับนำไปแสดงผล
+          data: CouponReceiptModel.fromCouponReceiptData(
+            result.data.data!,
+          ),
+        );
+      } else if (result.isEmpty) {
+        _couponReceiptNotifier.value = UiResult.empty(error: result.error);
+        return UiResult.empty(error: result.error);
+      } else {
+        _couponReceiptNotifier.value = UiResult.error(error: result.error);
+        return UiResult.error(error: result.error);
+      }
+    } catch (e) {
+      final exception = Exception(
+        'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ: ${e.toString()}',
+      );
+      _couponReceiptNotifier.value = UiResult.error(error: exception);
+      return UiResult.error(error: exception);
+    }
   }
 }

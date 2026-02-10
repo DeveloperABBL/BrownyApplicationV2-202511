@@ -25,8 +25,14 @@ import 'package:provider/provider.dart';
 /// - ต้องมี PIN ตั้งไว้ก่อนถึงจะเปิด Biometric ได้
 /// - บันทึกลง Secure Storage
 class BiometricPage extends StatelessWidget {
-  const BiometricPage({super.key});
+  const BiometricPage({
+    super.key,
+    this.isFirstSignup = false,
+  });
 
+  final bool isFirstSignup;
+
+  static final kFirstSignup = 'first_signup';
   static final pagePath = '/biometric';
   static final pageName = 'biometric';
 
@@ -37,13 +43,19 @@ class BiometricPage extends StatelessWidget {
         context: context,
         repository: PinBioMetricRepository(),
       ),
-      child: const _BiometricContent(),
+      child: _BiometricContent(
+        isFirstSignup: isFirstSignup,
+      ),
     );
   }
 }
 
 class _BiometricContent extends StatefulWidget {
-  const _BiometricContent();
+  const _BiometricContent({
+    this.isFirstSignup = false,
+  });
+
+  final bool isFirstSignup;
 
   @override
   State<_BiometricContent> createState() => _BiometricContentState();
@@ -74,15 +86,21 @@ class _BiometricContentState extends State<_BiometricContent> {
         final authenBiometricResult = await _viewModel
             .authenticateWithBiometric();
 
+        if (!context.mounted) return;
+
         if (authenBiometricResult.isSuccess) {
           // Navigate to Profile
           // context.pushNamedAndClear(ProfilePage.pageName);
-          context.pushNamed(
-            ProfilePage.pageName,
-            extra: {
-              ProfilePage.kFirstSignup: true,
-            },
-          );
+          if (widget.isFirstSignup) {
+            context.pushNamed(
+              ProfilePage.pageName,
+              extra: {
+                ProfilePage.kFirstSignup: true,
+              },
+            );
+          } else {
+            context.pop();
+          }
         }
       } else {
         // แสดง Error
@@ -109,7 +127,11 @@ class _BiometricContentState extends State<_BiometricContent> {
 
   /// ข้ามการตั้งค่า Biometric
   void _skipBiometric() {
-    context.pushNamedAndClear(ProfilePage.pageName);
+    if (widget.isFirstSignup) {
+      context.pushNamedAndClear(ProfilePage.pageName);
+    } else {
+      context.pop();
+    }
   }
 
   @override

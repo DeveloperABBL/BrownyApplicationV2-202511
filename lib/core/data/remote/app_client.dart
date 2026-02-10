@@ -1,25 +1,31 @@
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/coupon_payment_check_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_payment_check_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_receipt_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
@@ -60,18 +66,68 @@ abstract class AppClient {
       );
   }
 
+  /// DONG 2026-02-09
+  ///
+  /// API fetch home menu items
+  @GET('/home-menu')
+  Future<HttpResponse<HomeMenuResponse>> fetchHomeMenu();
+
+  /// DONG 2026-02-09
+  ///
+  /// API fetch Browny Live status and link
+  @GET('/browny-live')
+  Future<HttpResponse<BrownyLiveResponse>> fetchBrownyLive();
+
+  /// DONG 2026-02-09
+  ///
+  /// API fetch customer notifications
+  @GET('/customer-notifications/{uuid}')
+  Future<HttpResponse<CustomerNotificationResponse>> fetchCustomerNotifications(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-02-09
+  ///
+  /// API fetch customer notification preferences
+  @GET('/customer/{uuid}/notification-preferences')
+  Future<HttpResponse<NotificationPreferencesResponse>>
+  fetchNotificationPreferences(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-02-09
+  ///
+  /// API fetch contact information (social media links)
+  @GET('/contact')
+  Future<HttpResponse<ContactResponse>> fetchContact();
+
+  /// DONG 2026-02-08
+  ///
+  /// API Social Login (Google, Facebook)
+  ///
+  /// Body parameters:
+  /// - provider: String (facebook, google, apple, line)
+  /// - app_id: String
+  /// - name: String
+  /// - email: String
+  /// - profile_image: String
+  @POST('/customer/social-login')
+  Future<HttpResponse<LoginCustomerResponse?>> socialLogin(
+    @Body() SocialLoginRequest body,
+  );
+
   /// DONG 2026-01-28
   ///
   /// API fetch map locations (สาขาทั้งหมดบนแผนที่)
   @GET('/map/locations')
   Future<HttpResponse<MapLocationResponse>> fetchMapLocations();
 
-  /// DONG 2026-01-24
+  /// DONG 2026-02-09
   ///
-  /// API ตรวจสอบสถานะการชำระเงินคูปอง/e-voucher
-  @POST('/payment/coupon-evorcher/check')
-  Future<HttpResponse<CouponPaymentCheckResponse>> checkCouponPaymentStatus(
-    @Body() CouponPaymentCheckRequest body,
+  /// API fetch ใบเสร็จรับเงินคูปอง/e-voucher ตาม order_id
+  @GET('/payment/coupon-evorcher/receipt/{order_id}')
+  Future<HttpResponse<CouponReceiptResponse>> fetchCouponReceipt(
+    @Path('order_id') String orderId,
   );
 
   /// DONG 2026-01-24
@@ -79,6 +135,14 @@ abstract class AppClient {
   @POST('/coupon-orders')
   Future<HttpResponse<CouponOrderResponse>> createCouponOrder(
     @Body() CouponOrderRequest body,
+  );
+
+  /// DONG 2026-02-08
+  ///
+  /// API ตรวจสอบสถานะการชำระเงินคูปอง/e-voucher (ใช้ CouponOrderData ส่ง payment_ref)
+  @POST('/payment/coupon-evorcher/check')
+  Future<HttpResponse<PaymentStatusCheckResponse>> checkPaymentStatusByRef(
+    @Body() CouponOrderData body,
   );
 
   /// DONG 2026-01-24

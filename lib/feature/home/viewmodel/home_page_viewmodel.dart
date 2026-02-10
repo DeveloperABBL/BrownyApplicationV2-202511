@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
+import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 
 enum HomePageState { home, couponVoucher, scan, branches, brownyShop }
@@ -45,6 +46,16 @@ class HomePageViewmodel extends AppViewModel {
   }
 
   // ========== Logic ==========
+  Future<void> refresh() async {
+    await fetchBanners();
+    final profileResult = await _repo.fetchProfileInfo('');
+    if (profileResult.isSuccess) {
+      currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
+        profileResult.data,
+      );
+    }
+  }
+
   void onBannerSliding() {
     _bannerNotifier.value = UiResult.success(
       data: _bannerNotifier.value.data!,

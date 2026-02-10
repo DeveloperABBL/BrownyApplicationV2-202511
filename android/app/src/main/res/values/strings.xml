@@ -5,6 +5,6 @@
         TODO: Replace with your actual Facebook App ID and Client Token
         Get these values from: https://developers.facebook.com/apps/
     -->
-    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
-    <string name="facebook_client_token">YOUR_FACEBOOK_CLIENT_TOKEN</string>
+    <string name="facebook_app_id">909604355579723</string>
+    <string name="facebook_client_token">1d6250d26a1b986306c6f37620b89fe1</string>
 </resources>

@@ -207,9 +207,9 @@ class StoreData {
     if (needSymbol) {
       if (distanceRounded != distance) {
         if (distanceRounded > distance) {
-          symbol = "<";
+          symbol = "< ";
         } else {
-          symbol = ">";
+          symbol = "> ";
         }
       }
     }

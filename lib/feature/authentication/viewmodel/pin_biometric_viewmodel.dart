@@ -273,4 +273,41 @@ class PinBiometricViewModel extends AppViewModel {
       return UiResult.error(error: Exception(e.toString()));
     }
   }
+
+  /// ตรวจสอบ PIN สำหรับ Authentication (ใช้กับ TransactionAuthenPage)
+  /// - กรอกครบ 6 หลักแล้ว verify ทันที
+  /// - คืนค่า true ถ้าถูกต้อง, false ถ้าไม่ถูกต้อง
+  Future<bool> verifyPinForAuth() async {
+    if (_pin.length != pinLength) {
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _repository.verifyPin(_pin);
+
+      _isLoading = false;
+
+      if (result.isSuccess && result.data == true) {
+        // PIN ถูกต้อง
+        notifyListeners();
+        return true;
+      } else {
+        // PIN ไม่ถูกต้อง - รีเซ็ต
+        _errorMessage = 'PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง';
+        _pin = '';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      _pin = '';
+      notifyListeners();
+      return false;
+    }
+  }
 }

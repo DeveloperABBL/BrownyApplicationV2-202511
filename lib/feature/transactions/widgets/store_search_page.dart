@@ -337,37 +337,30 @@ class _StoreSearchPageState extends State<StoreSearchPage> {
 
             // Store Name and Distance
             Expanded(
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText(
-                    storeName,
-                    style: context.textTheme.bodyMedium!.copyWith(
-                      fontSize: AppDims.size_16.sp,
-                      color: AppColors.gray600,
+                  Expanded(
+                    child: AppText(
+                      storeName,
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        fontSize: AppDims.size_14.sp,
+                        color: AppColors.gray600,
+                      ),
                     ),
                   ),
                   if (package.store!.distanceMeters.orEmpty.isNotEmpty) ...[
                     AppDims.vericalPadding_4,
 
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14.w,
-                          color: AppColors.gray600,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          package.store!.getDistaceDisplay(
-                            context.languageCode,
-                          ),
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColors.gray600,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      package.store!.getDistaceDisplay(
+                        context.languageCode,
+                        needSymbol: true,
+                      ),
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        fontSize: AppDims.size_14.sp,
+                        color: AppColors.gray600,
+                      ),
                     ),
                   ],
                 ],

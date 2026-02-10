@@ -22,6 +22,7 @@ import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -200,189 +201,199 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: CustomScrollView(
-        slivers: [
-          // build AppBar
-          _buildMyAppBar(),
+    return RefreshIndicator(
+      edgeOffset: 10.h,
+      backgroundColor: AppColors.background,
+      onRefresh: () async {
+        await _viewmodel.refresh();
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: CustomScrollView(
+          slivers: [
+            // build AppBar
+            _buildMyAppBar(),
 
-          // ส่วนของ TP Wallet, Browny Coin
-          SliverToBoxAdapter(
-            child: _buildMyWalletAndCoinZone(),
-          ),
-          // _mySliverBox(
-          //   child: _buildMyWalletAndCoinZone(),
-          // ),
-
-          // icon shortcut
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              child: Container(
-                margin: EdgeInsets.only(
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                  top: AppDims.size_16.h,
-                ),
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_8.w,
-                          vertical: AppDims.size_8.h,
-                        ),
-                        child: Column(
-                          children: [
-                            Assets.iconShortcut.iscBrownyLive.image(
-                              width: AppDims.size_64.w,
-                              height: AppDims.size_32.h,
-                            ),
-                            AppText(
-                              'Browny\nLive',
-                              textAlign: TextAlign.center,
-                              style: context.textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_8.w,
-                          vertical: AppDims.size_8.h,
-                        ),
-                        child: Column(
-                          children: [
-                            Assets.iconShortcut.iscCoupon.image(
-                              width: AppDims.size_64.w,
-                              height: AppDims.size_32.h,
-                            ),
-                            AppText(
-                              'คูปอง',
-                              textAlign: TextAlign.center,
-                              style: context.textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_8.w,
-                          vertical: AppDims.size_8.h,
-                        ),
-                        child: Column(
-                          children: [
-                            Assets.iconShortcut.iscBrownyClub.image(
-                              width: AppDims.size_64.w,
-                              height: AppDims.size_32.h,
-                            ),
-                            AppText(
-                              'Browny\nClub',
-                              textAlign: TextAlign.center,
-                              style: context.textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            // ส่วนของ TP Wallet, Browny Coin
+            SliverToBoxAdapter(
+              child: _buildMyWalletAndCoinZone(),
             ),
-          ),
+            // _mySliverBox(
+            //   child: _buildMyWalletAndCoinZone(),
+            // ),
 
-          // เก็บ Coupon
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    child: ElevatedButton.icon(
-                      onPressed: null,
-                      icon: Assets.svg.icCouponRoundGreen.svg(),
-                      label: Column(
-                        children: [
-                          AppText(
-                            'เก็บคูปอง',
-                            style: context.textTheme.labelLarge,
-                          ),
-                        ],
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.transparent,
-                        foregroundColor: AppColors.primary,
-                        alignment: AlignmentDirectional.centerStart,
-                        padding: EdgeInsets.zero,
-                        disabledBackgroundColor: AppColors.transparent,
-                        overlayColor: AppColors.transparent,
-                      ),
-                    ),
+            // icon shortcut
+            SliverToBoxAdapter(
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: EdgeInsets.only(
+                    left: AppDims.size_16.w,
+                    right: AppDims.size_16.w,
+                    top: AppDims.size_16.h,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      if (_viewmodel.isProfileGuest()) {
-                        context.pushNamed(
-                          AuthenticationPage.pageName,
-                          extra: {
-                            AuthenProcess: AuthenProcess.login,
-                          },
-                        );
-                      } else {
-                        context.pushNamed(CouponVoucherPage.pageName);
-                      }
-
-                      // _showInvitBottomSheet();
-                    },
-                    // banner เก็บคูปอง
-                    child: Stack(
+                  child: IntrinsicHeight(
+                    child: Row(
                       children: [
-                        Opacity(
-                          opacity: 0.1,
-                          child: Assets.png.cardCouponEvoucher.image(
-                            color: AppColors.black,
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscBrownyLive.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'Browny\nLive',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
                           ),
                         ),
-                        ClipRect(
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 0.1, sigmaY: 0.1),
-                            child: Assets.png.cardCouponEvoucher.image(),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscCoupon.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'คูปอง',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_8.w,
+                            vertical: AppDims.size_8.h,
+                          ),
+                          child: Column(
+                            children: [
+                              Assets.iconShortcut.iscBrownyClub.image(
+                                width: AppDims.size_64.w,
+                                height: AppDims.size_32.h,
+                              ),
+                              AppText(
+                                'Browny\nClub',
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleSmall,
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
 
-          SliverFillRemaining(),
-        ],
-      ),
-      bottomNavigationBar: BrownyBottomNav(
-        currentIndex: 0,
-        onTap: (index) {
-          print(index.toString());
-          if (index == 1) {
-            context.pushNamed(CouponVoucherPage.pageName);
-            return;
-          }
+            // เก็บ Coupon
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      child: ElevatedButton.icon(
+                        onPressed: null,
+                        icon: Assets.svg.icCouponRoundGreen.svg(),
+                        label: Column(
+                          children: [
+                            AppText(
+                              'เก็บคูปอง',
+                              style: context.textTheme.labelLarge,
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.transparent,
+                          foregroundColor: AppColors.primary,
+                          alignment: AlignmentDirectional.centerStart,
+                          padding: EdgeInsets.zero,
+                          disabledBackgroundColor: AppColors.transparent,
+                          overlayColor: AppColors.transparent,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (_viewmodel.isProfileGuest()) {
+                          context.pushNamed(
+                            AuthenticationPage.pageName,
+                            extra: {
+                              AuthenProcess: AuthenProcess.login,
+                            },
+                          );
+                        } else {
+                          context.pushNamed(CouponVoucherPage.pageName);
+                        }
 
-          if (index == 2) {
-            context.pushNamed(MapPage.pageName);
-            return;
-          }
-        },
-        onCenterTap: () {
-          // ไปหน้า Scan
-          context.pushNamed(
-            ScannerPage.pageName,
-          );
-        },
+                        // _showInvitBottomSheet();
+                      },
+                      // banner เก็บคูปอง
+                      child: Stack(
+                        children: [
+                          Opacity(
+                            opacity: 0.1,
+                            child: Assets.png.cardCouponEvoucher.image(
+                              color: AppColors.black,
+                            ),
+                          ),
+                          ClipRect(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: 0.1,
+                                sigmaY: 0.1,
+                              ),
+                              child: Assets.png.cardCouponEvoucher.image(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SliverFillRemaining(),
+          ],
+        ),
+        bottomNavigationBar: BrownyBottomNav(
+          currentIndex: 0,
+          onTap: (index) {
+            print(index.toString());
+            if (index == 1) {
+              context.pushNamed(CouponVoucherPage.pageName);
+              return;
+            }
+
+            if (index == 2) {
+              context.pushNamed(MapPage.pageName);
+              return;
+            }
+          },
+          onCenterTap: () {
+            // ไปหน้า Scan
+            context.pushNamed(
+              ScannerPage.pageName,
+            );
+          },
+        ),
       ),
     );
   }
@@ -409,10 +420,47 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             return CarouselSlider.builder(
               itemCount: result.requireData.length,
               itemBuilder: (context, index, realIndex) {
-                return Image.network(
-                  result.requireData[index].imageDisplay(context),
-                  fit: BoxFit.cover,
+                final imageUrl = result.requireData[index].imageDisplay(
+                  context,
+                );
+                return CachedNetworkImage(
                   width: MediaQuery.of(context).size.width,
+                  // ใช้ ValueKey เพื่อให้ Flutter รู้ว่า widget เดิมยังคงเหมือนเดิม
+                  // ไม่ต้อง rebuild ใหม่ตอน slide carousel
+                  key: ValueKey(imageUrl),
+                  cacheKey: imageUrl,
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  // ตั้งเป็น Duration.zero เพื่อปิด fade animation
+                  // แสดงรูปจาก cache ได้ทันทีโดยไม่มี delay
+                  fadeInDuration: Duration.zero,
+                  fadeOutDuration: Duration.zero,
+                  // Cache รูปใน memory (RAM) โดยคูณด้วย devicePixelRatio
+                  // เพื่อให้รูปคมชัดบนหน้าจอความละเอียดสูง
+                  memCacheWidth:
+                      (MediaQuery.of(context).size.width *
+                              MediaQuery.of(context).devicePixelRatio)
+                          .round(),
+                  memCacheHeight:
+                      (200.h * MediaQuery.of(context).devicePixelRatio).round(),
+                  // Cache รูปใน disk (storage) เพื่อไม่ต้องโหลดซ้ำตอนเปิด app ใหม่
+                  maxWidthDiskCache: (MediaQuery.of(context).size.width * 2)
+                      .round(),
+                  maxHeightDiskCache: (200.h * 2).round(),
+                  // ใช้ placeholder แทน progressIndicatorBuilder
+                  // เพื่อแสดง loading เฉพาะตอนโหลดครั้งแรก
+                  // ไม่แสดงซ้ำเมื่อ slide กลับมาที่รูปเดิม
+                  placeholder: (context, url) => Container(
+                    color: AppColors.ci3,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: AppColors.ci3,
+                  ),
                 );
               },
               options: CarouselOptions(
@@ -435,7 +483,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
         //   fit: BoxFit.cover,
         // ),
         stretchModes: [
-          StretchMode.zoomBackground,
+          StretchMode.blurBackground,
         ],
         expandedTitleScale: 8,
         title: AppContainerRadius(
@@ -495,6 +543,14 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         // มีรูป Profile ให้ไปโหลดมา
                         : Image.network(
                             customer.current.image!,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Assets.svg.icPerson.svg(
+                                  // เปลี่ยนสี svg
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.primary,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
                           ),
                   ),
                 );
