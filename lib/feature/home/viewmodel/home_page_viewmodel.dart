@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
@@ -16,6 +17,7 @@ class HomePageViewmodel extends AppViewModel {
 
   // ========== Repo ==========
   final HomeDataSourceMixin _repo;
+  HomeDataSourceMixin get homeRepo => _repo;
 
   // ========== Dispose ==========
   @override
@@ -102,5 +104,38 @@ class HomePageViewmodel extends AppViewModel {
     } on Exception catch (e) {
       return UiResult.error(error: e);
     }
+  }
+
+  /// Fetch popups จาก API
+  ///
+  /// จะกรองเฉพาะ popup ที่:
+  /// - active = true
+  /// - อยู่ในช่วงเวลาที่กำหนด
+  /// - ไม่ถูก dismiss ไปแล้วในวันนี้
+  Future<UiResult<List<PopupData>>> fetchPopups() async {
+    try {
+      final result = await _repo.fetchPopups(showOn: 'home');
+      if (result.isEmpty) {
+        return UiResult.empty();
+      }
+
+      if (result.hasError) {
+        return UiResult.empty(error: result.error);
+      }
+
+      return UiResult.success(data: result.data);
+    } on Exception catch (e) {
+      return UiResult.error(error: e);
+    }
+  }
+
+  /// บันทึกว่า popup นี้ถูก dismiss สำหรับวันนี้
+  void dismissPopupForToday(int popupId) {
+    _repo.dismissPopupForToday(popupId);
+  }
+
+  /// บันทึกว่า popup list นี้ถูก dismiss สำหรับวันนี้
+  void dismissPopupsForToday(List<PopupData> popups) {
+    _repo.dismissPopupsForToday(popups);
   }
 }

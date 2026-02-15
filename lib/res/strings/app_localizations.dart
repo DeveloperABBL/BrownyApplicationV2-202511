@@ -1270,6 +1270,126 @@ abstract class AppLocalizations {
   /// **'See all'**
   String get seeAllPrize;
 
+  /// No description provided for @viewYourProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'View your profile'**
+  String get viewYourProfile;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get balance;
+
+  /// No description provided for @creditBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Balance'**
+  String get creditBalance;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @savedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Items'**
+  String get savedItems;
+
+  /// No description provided for @appSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get appSettings;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @thai.
+  ///
+  /// In en, this message translates to:
+  /// **'Thai'**
+  String get thai;
+
+  /// No description provided for @allowBiometricAuth.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Biometric Authentication'**
+  String get allowBiometricAuth;
+
+  /// No description provided for @autoSaveReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Save Receipt'**
+  String get autoSaveReceipt;
+
+  /// No description provided for @locationAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Access'**
+  String get locationAccess;
+
+  /// No description provided for @changeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Email'**
+  String get changeEmail;
+
+  /// No description provided for @generalNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'General Notifications'**
+  String get generalNotifications;
+
+  /// No description provided for @workOrderStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Work/Order Status'**
+  String get workOrderStatus;
+
+  /// No description provided for @termsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get termsAndConditions;
+
+  /// No description provided for @helpAndSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpAndSupport;
+
+  /// No description provided for @contactBrownyCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Browny Care'**
+  String get contactBrownyCare;
+
+  /// No description provided for @callPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Call 02-123-3661'**
+  String get callPhoneNumber;
+
+  /// No description provided for @contactViaLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Inquiry via LINE Browny Official'**
+  String get contactViaLine;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
   /// No description provided for @checkOut.
   ///
   /// In en, this message translates to:
@@ -1564,12 +1684,6 @@ abstract class AppLocalizations {
   /// **'Add phone number'**
   String get addPhoneNumber;
 
-  /// No description provided for @history.
-  ///
-  /// In en, this message translates to:
-  /// **'History'**
-  String get history;
-
   /// No description provided for @balanceRemaining.
   ///
   /// In en, this message translates to:
@@ -1743,12 +1857,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rewards'**
   String get rewardsTitle;
-
-  /// No description provided for @termsAndConditions.
-  ///
-  /// In en, this message translates to:
-  /// **'Terms and Conditions'**
-  String get termsAndConditions;
 
   /// No description provided for @referralCode.
   ///

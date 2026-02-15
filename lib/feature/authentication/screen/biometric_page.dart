@@ -173,45 +173,6 @@ class _BiometricContentState extends State<_BiometricContent> {
     );
   }
 
-  /// Header: ปุ่มย้อนกลับ (ซ้ายบน)
-  Widget _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDims.size_16.w,
-        vertical: AppDims.size_8.h,
-      ),
-      child: Row(
-        children: [
-          // ปุ่มย้อนกลับ
-          ElevatedButton.icon(
-            onPressed: () {
-              // ถ้ากดย้อนกลับให้ไปหน้า Profile ทันที (ข้าม Biometric)
-              _skipBiometric();
-            },
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              size: 16.sp,
-              color: AppColors.textPrimary,
-            ),
-            label: AppText(
-              context.wording.back,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              elevation: 0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Icon Biometric (Face ID + Fingerprint)
   Widget _buildBiometricIcon() {
     return Center(

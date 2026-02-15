@@ -368,18 +368,19 @@ class _WalletWidgetState extends State<WalletWidget> {
           AppOverlays.showLoading(
             context,
             timeout: Duration(seconds: 10),
+            progressColors: AppColors.walletBackground,
           );
           final result = await _viewModel.onSummitClick();
           AppOverlays.hideLoading();
 
-          if (result.hashData && mounted) {
+          if (result.hashData && context.mounted) {
             // Navigate to QR page with ViewModel
             _viewModel.clearValue();
             context.pushNamed(
               ShowQRPromptpayPage.pageName,
               extra: _viewModel,
             );
-          } else if (result.hasError && mounted) {
+          } else if (result.hasError && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: AppText(

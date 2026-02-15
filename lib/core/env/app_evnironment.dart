@@ -32,6 +32,14 @@ abstract class AppEvnironment extends ChangeNotifier {
 
   CustomerProvider get currentUser;
 
+  /// Laravel APP_KEY สำหรับ decrypt PIN ciphertext
+  ///
+  /// **Security Note:**
+  /// - แต่ละ environment ควรมี APP_KEY ต่างกัน (dev/staging/prod)
+  /// - ไม่ควร commit APP_KEY ลง git
+  /// - ควรใช้ environment variables หรือ secure build configs
+  String get laravelAppKey;
+
   void onLocaleChange(String localeCode) {
     appPreferences.setLanguage(localeCode);
     notifyListeners();

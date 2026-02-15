@@ -1,24 +1,10 @@
-import 'package:browny_applications_new/core/const/app_constants.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/location_helper.dart';
-import 'package:browny_applications_new/core/utils/permission_helper.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/core/widgets/coupon_e_voucher_card_widget.dart';
-import 'package:browny_applications_new/core/widgets/custom_dropdown.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/widgets/store_search_page.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 
 class PurchaseCouponVoucherPage extends StatefulWidget {
   const PurchaseCouponVoucherPage({
@@ -83,6 +69,7 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // รายละเอียด E-Voucher
         title: AppText(context.wording.eVoucherDetails),
         leading: BackButton(
           color: AppColors.textPrimary,
@@ -486,12 +473,6 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText(
-                  'รายละเอียด',
-                  style: context.textTheme.titleMedium!.copyWith(
-                    fontSize: AppDims.size_16.sp,
-                  ),
-                ),
                 Html(
                   data: couponData.couponDescriptionHTMLDisplay(context),
                   style: {

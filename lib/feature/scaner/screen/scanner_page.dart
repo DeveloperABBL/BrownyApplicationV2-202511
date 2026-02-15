@@ -116,79 +116,95 @@ class __ScannerWidgetState extends State<_ScannerWidget>
                 _buildScannerView(context),
 
                 // index 1 : QRCode
-                FutureBuilder(
-                  future: _viewModel.fetchCustomerQRCode(),
-                  builder: (context, snapshot) {
-                    return ValueListenableBuilder(
-                      valueListenable: _viewModel.qrNotifier,
-                      builder: (context, result, child) {
-                        if (result.isEmpty) {
-                          return SizedBox();
-                        }
-                        return Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
+                ValueListenableBuilder(
+                  valueListenable: _viewModel.qrNotifier,
+                  builder: (context, result, child) {
+                    if (result.isLoading) {
+                      Future.microtask(_viewModel.fetchCustomerQRCode);
 
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  AppColors.ci2.withValues(
-                                    alpha: 0.03,
-                                  ),
-                                  AppColors.background,
-                                ],
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (result.isEmpty) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            Spacer(),
+                            Assets.png.brownyError2.image(
+                              width: 145.w,
+                              height: 100.h,
+                            ),
+                            AppDims.vericalPadding_8,
+                            AppText('ไม่พบข้อมูล Browny ID'),
+                            Spacer(),
+                          ],
+                        ),
+                      );
+                    }
+                    return Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.centerRight,
+                            colors: [
+                              AppColors.ci2.withValues(
+                                alpha: 0.03,
                               ),
-                            ),
-                            child: Center(
-                              child: result.isLoading
-                                  ? CircularProgressIndicator()
-                                  : Container(
-                                      width: 292.w,
-                                      height: 427.h,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.white,
-                                        borderRadius: BorderRadius.circular(
-                                          16.r,
-                                        ),
-                                        border: BoxBorder.all(
-                                          color: AppColors.border,
-                                          width: 1,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                            blurRadius: 10.r,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      padding: EdgeInsets.all(
-                                        AppDims.size_24.w,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          // PromptPay Logo
-                                          Assets.png.brownyHorizaontal2.image(
-                                            height: 44.w,
-                                            width: 135.h,
-                                          ),
-                                          AppDims.vericalPadding_20,
-                                          Divider(),
-                                          AppDims.vericalPadding_16,
-
-                                          // QR Code
-                                          Image.network(result.data!.url!),
-                                        ],
-                                      ),
-                                    ),
-                            ),
+                              AppColors.background,
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                        child: Center(
+                          child: result.isLoading
+                              ? CircularProgressIndicator()
+                              : Container(
+                                  width: 292.w,
+                                  height: 427.h,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.circular(
+                                      16.r,
+                                    ),
+                                    border: BoxBorder.all(
+                                      color: AppColors.border,
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        blurRadius: 10.r,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: EdgeInsets.all(
+                                    AppDims.size_24.w,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      // PromptPay Logo
+                                      Assets.png.brownyHorizaontal2.image(
+                                        height: 44.w,
+                                        width: 135.h,
+                                      ),
+                                      AppDims.vericalPadding_20,
+                                      Divider(),
+                                      AppDims.vericalPadding_16,
+
+                                      // QR Code
+                                      Image.network(result.data!.url!),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
                     );
                   },
                 ),

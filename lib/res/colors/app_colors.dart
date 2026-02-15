@@ -180,6 +180,8 @@ class AppColors {
 
   static const Color textWhite = white; // #777777
 
+  static const Color textBare = Color(0xFF555555); // ##555555
+
   // ============================================================================
   // Border/Stroke Colors
   // ============================================================================

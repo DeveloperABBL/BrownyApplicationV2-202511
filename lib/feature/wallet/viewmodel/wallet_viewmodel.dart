@@ -137,9 +137,9 @@ class WalletViewModel extends AppViewModelObscureHandler {
       value.orEmpty.ifEmpty('0').commaReplacer(),
     ).toInt();
     String? ret;
-    // if (inputAmount < 100) {
-    //   ret = context.wording.minimumTopUpValidation;
-    // }
+    if (inputAmount < 100) {
+      ret = context.wording.minimumTopUpValidation;
+    }
 
     if (inputAmount > 2000) {
       ret = context.wording.maximumTopUpValidation;

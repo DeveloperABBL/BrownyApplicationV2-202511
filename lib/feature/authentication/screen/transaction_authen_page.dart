@@ -16,13 +16,15 @@ class TransactionAuthenPage extends StatelessWidget {
         context: context,
         repository: PinBioMetricRepository(),
       ),
-      child: _TransactionAuthenContent(),
+      child: _TransactionAuthenContent(
+        process: PinBiometricPross.verify,
+      ),
     );
   }
 }
 
 class _TransactionAuthenContent extends _CreateAppPinContent {
-  const _TransactionAuthenContent();
+  const _TransactionAuthenContent({required super.process});
 
   @override
   _CreateAppPinContentState createState() => __TransactionAuthenContentState();
@@ -58,10 +60,15 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
             if (context.mounted) {
               context
                   .pushNamed(
+                    // Transaction Create PIN
                     CreateAppPinPage.pageName,
                     extra: {
                       // ไม่ใช้การ signup ใหม่
                       CreateAppPinPage.kFirstSignup: false,
+                      // Map<Type, PinBiometricPross>
+                      CreateAppPinPage.kPinBiometricProcess: {
+                        PinBiometricPross: PinBiometricPross.create,
+                      },
                     },
                   )
                   .then((_) async {

@@ -603,6 +603,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seeAllPrize => 'See all';
 
   @override
+  String get viewYourProfile => 'View your profile';
+
+  @override
+  String get balance => 'Balance';
+
+  @override
+  String get creditBalance => 'Credit Balance';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get savedItems => 'Saved Items';
+
+  @override
+  String get appSettings => 'App Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get thai => 'Thai';
+
+  @override
+  String get allowBiometricAuth => 'Allow Biometric Authentication';
+
+  @override
+  String get autoSaveReceipt => 'Auto Save Receipt';
+
+  @override
+  String get locationAccess => 'Location Access';
+
+  @override
+  String get changeEmail => 'Change Email';
+
+  @override
+  String get generalNotifications => 'General Notifications';
+
+  @override
+  String get workOrderStatus => 'Work/Order Status';
+
+  @override
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get helpAndSupport => 'Help & Support';
+
+  @override
+  String get contactBrownyCare => 'Contact Browny Care';
+
+  @override
+  String get callPhoneNumber => 'Call 02-123-3661';
+
+  @override
+  String get contactViaLine => 'Inquiry via LINE Browny Official';
+
+  @override
+  String get version => 'Version';
+
+  @override
   String get checkOut => 'Check Out';
 
   @override
@@ -759,9 +819,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPhoneNumber => 'Add phone number';
 
   @override
-  String get history => 'History';
-
-  @override
   String get balanceRemaining => 'Balance Remaining';
 
   @override
@@ -851,9 +908,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rewardsTitle => 'Rewards';
-
-  @override
-  String get termsAndConditions => 'Terms and Conditions';
 
   @override
   String get referralCode => 'Referral Code';

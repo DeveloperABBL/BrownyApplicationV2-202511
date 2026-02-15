@@ -28,6 +28,7 @@ class AppOverlays {
     bool barrierDismissible = false,
     Duration? timeout,
     VoidCallback? onTimeout,
+    Color? progressColors,
   }) {
     // ถ้ามี loading อยู่แล้ว ไม่ต้องแสดงซ้ำ
     if (_loadingOverlay != null) return;
@@ -37,6 +38,7 @@ class AppOverlays {
         message: message,
         barrierDismissible: barrierDismissible,
         onDismiss: hideLoading,
+        progressColors: progressColors,
       ),
     );
 
@@ -270,11 +272,13 @@ class _LoadingOverlay extends StatelessWidget {
     this.message,
     required this.barrierDismissible,
     required this.onDismiss,
+    this.progressColors,
   });
 
   final String? message;
   final bool barrierDismissible;
   final VoidCallback onDismiss;
+  final Color? progressColors;
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +300,7 @@ class _LoadingOverlay extends StatelessWidget {
                 children: [
                   CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
+                      progressColors ?? AppColors.primary,
                     ),
                   ),
                   if (message != null) ...[
@@ -589,6 +593,8 @@ class _WalletDialog extends StatelessWidget {
                         confirmText,
                       ),
                     ),
+                    AppDims.vericalPadding_8,
+
                     OutlinedButton(
                       onPressed: onCancel,
                       style: OutlinedButton.styleFrom(

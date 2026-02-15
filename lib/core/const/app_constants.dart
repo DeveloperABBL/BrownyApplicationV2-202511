@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 const String kCustomerData = 'kCustomerData';
 const String kCustomerProfile = 'kCustomerProfile';
 
+// Key สำหรับ PIN
+const String serverKey = "base64:xrjcblphHL0JGPclO/kiBDSXVm0dnw4i+x6FLBV2I/s=";
+
 /// ใช้ในการจัดรูปแบบของข้อความที่เป็นประเภทตัวเลขให้มีรูปแบบเป็นCurrency number
 /// Example :
 /// ```dart

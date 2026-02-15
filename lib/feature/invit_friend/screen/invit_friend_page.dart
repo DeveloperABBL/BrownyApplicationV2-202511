@@ -6,6 +6,7 @@ import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
+import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/models/referral_reward_model.dart';
 import 'package:browny_applications_new/feature/invit_friend/repository/invit_friend_repo.dart';
 import 'package:browny_applications_new/feature/invit_friend/viewmodel/invit_friend_viewmodel.dart';
@@ -248,7 +249,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
           // }
           // context.pop({HomePageState: bypassState});
           if (index == 0) {
-            context.pop();
+            context.pushNamedAndClear(HomePage.pageName);
             return;
           }
 

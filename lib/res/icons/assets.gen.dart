@@ -52,6 +52,115 @@ class $AssetsIcPaymentGen {
   ];
 }
 
+class $AssetsIconProfilePreferencesGen {
+  const $AssetsIconProfilePreferencesGen();
+
+  /// File path: assets/icon_profile_preferences/facebook.png
+  AssetGenImage get facebook =>
+      const AssetGenImage('assets/icon_profile_preferences/facebook.png');
+
+  /// File path: assets/icon_profile_preferences/ic_announcement.svg
+  SvgGenImage get icAnnouncement =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_announcement.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_calling.svg
+  SvgGenImage get icCalling =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_calling.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_discount.svg
+  SvgGenImage get icDiscount =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_discount.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_face.svg
+  SvgGenImage get icFace =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_face.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_import.svg
+  SvgGenImage get icImport =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_import.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_line.svg
+  SvgGenImage get icLine =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_line.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_location.svg
+  SvgGenImage get icLocation =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_location.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_lock.svg
+  SvgGenImage get icLock =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_lock.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_login.svg
+  SvgGenImage get icLogin =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_login.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_logout.svg
+  SvgGenImage get icLogout =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_logout.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_notification.svg
+  SvgGenImage get icNotification =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_notification.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_page.svg
+  SvgGenImage get icPage =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_page.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_refresh_circular.svg
+  SvgGenImage get icRefreshCircular => const SvgGenImage(
+    'assets/icon_profile_preferences/ic_refresh_circular.svg',
+  );
+
+  /// File path: assets/icon_profile_preferences/ic_translate.svg
+  SvgGenImage get icTranslate =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_translate.svg');
+
+  /// File path: assets/icon_profile_preferences/instragram.png
+  AssetGenImage get instragram =>
+      const AssetGenImage('assets/icon_profile_preferences/instragram.png');
+
+  /// File path: assets/icon_profile_preferences/line.png
+  AssetGenImage get line =>
+      const AssetGenImage('assets/icon_profile_preferences/line.png');
+
+  /// File path: assets/icon_profile_preferences/mail.svg
+  SvgGenImage get mail =>
+      const SvgGenImage('assets/icon_profile_preferences/mail.svg');
+
+  /// File path: assets/icon_profile_preferences/tiktok.png
+  AssetGenImage get tiktok =>
+      const AssetGenImage('assets/icon_profile_preferences/tiktok.png');
+
+  /// File path: assets/icon_profile_preferences/youtube.png
+  AssetGenImage get youtube =>
+      const AssetGenImage('assets/icon_profile_preferences/youtube.png');
+
+  /// List of all assets
+  List<dynamic> get values => [
+    facebook,
+    icAnnouncement,
+    icCalling,
+    icDiscount,
+    icFace,
+    icImport,
+    icLine,
+    icLocation,
+    icLock,
+    icLogin,
+    icLogout,
+    icNotification,
+    icPage,
+    icRefreshCircular,
+    icTranslate,
+    instragram,
+    line,
+    mail,
+    tiktok,
+    youtube,
+  ];
+}
+
 class $AssetsIconShortcutGen {
   const $AssetsIconShortcutGen();
 
@@ -127,6 +236,10 @@ class $AssetsPngGen {
   AssetGenImage get bgPawnPattern =>
       const AssetGenImage('assets/png/bg_pawn_pattern.png');
 
+  /// File path: assets/png/bg_profile.png
+  AssetGenImage get bgProfile =>
+      const AssetGenImage('assets/png/bg_profile.png');
+
   /// File path: assets/png/browny_coin.png
   AssetGenImage get brownyCoin =>
       const AssetGenImage('assets/png/browny_coin.png');
@@ -191,9 +304,17 @@ class $AssetsPngGen {
   AssetGenImage get brownyWashy =>
       const AssetGenImage('assets/png/browny_washy.png');
 
+  /// File path: assets/png/card_coin_claim.png
+  AssetGenImage get cardCoinClaim =>
+      const AssetGenImage('assets/png/card_coin_claim.png');
+
   /// File path: assets/png/card_coupon_evoucher.png
   AssetGenImage get cardCouponEvoucher =>
       const AssetGenImage('assets/png/card_coupon_evoucher.png');
+
+  /// File path: assets/png/card_coupon_evoucher_2.png
+  AssetGenImage get cardCouponEvoucher2 =>
+      const AssetGenImage('assets/png/card_coupon_evoucher_2.png');
 
   /// File path: assets/png/card_ic_background.png
   AssetGenImage get cardIcBackground =>
@@ -210,6 +331,10 @@ class $AssetsPngGen {
   /// File path: assets/png/coin_coin_claim.png
   AssetGenImage get coinCoinClaim =>
       const AssetGenImage('assets/png/coin_coin_claim.png');
+
+  /// File path: assets/png/decorat_card_coin_claim.png
+  AssetGenImage get decoratCardCoinClaim =>
+      const AssetGenImage('assets/png/decorat_card_coin_claim.png');
 
   /// File path: assets/png/ic_apple.png
   AssetGenImage get icApple => const AssetGenImage('assets/png/ic_apple.png');
@@ -256,6 +381,7 @@ class $AssetsPngGen {
     bgMapBrownyPlus,
     bgMapCharger,
     bgPawnPattern,
+    bgProfile,
     brownyCoin,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
@@ -272,11 +398,14 @@ class $AssetsPngGen {
     brownySuccess,
     brownySuccess1,
     brownyWashy,
+    cardCoinClaim,
     cardCouponEvoucher,
+    cardCouponEvoucher2,
     cardIcBackground,
     cardInvitFriend,
     cardInvitTitle,
     coinCoinClaim,
+    decoratCardCoinClaim,
     icApple,
     icFacebook,
     icGoogle,
@@ -290,21 +419,51 @@ class $AssetsPngGen {
   ];
 }
 
+class $AssetsProfileQuickActionGen {
+  const $AssetsProfileQuickActionGen();
+
+  /// File path: assets/profile_quick_action/icCoupon.svg
+  SvgGenImage get icCoupon =>
+      const SvgGenImage('assets/profile_quick_action/icCoupon.svg');
+
+  /// File path: assets/profile_quick_action/ic_history.svg
+  SvgGenImage get icHistory =>
+      const SvgGenImage('assets/profile_quick_action/ic_history.svg');
+
+  /// File path: assets/profile_quick_action/ic_refresh_double.svg
+  SvgGenImage get icRefreshDouble =>
+      const SvgGenImage('assets/profile_quick_action/ic_refresh_double.svg');
+
+  /// File path: assets/profile_quick_action/ic_scan.svg
+  SvgGenImage get icScan =>
+      const SvgGenImage('assets/profile_quick_action/ic_scan.svg');
+
+  /// List of all assets
+  List<SvgGenImage> get values => [
+    icCoupon,
+    icHistory,
+    icRefreshDouble,
+    icScan,
+  ];
+}
+
 class $AssetsServicesGen {
   const $AssetsServicesGen();
 
-  /// File path: assets/services/charger.png
-  AssetGenImage get charger =>
-      const AssetGenImage('assets/services/charger.png');
+  /// File path: assets/services/a_washer.png
+  AssetGenImage get aWasher =>
+      const AssetGenImage('assets/services/a_washer.png');
 
-  /// File path: assets/services/dryer.png
-  AssetGenImage get dryer => const AssetGenImage('assets/services/dryer.png');
+  /// File path: assets/services/b_dryer.png
+  AssetGenImage get bDryer =>
+      const AssetGenImage('assets/services/b_dryer.png');
 
-  /// File path: assets/services/washer.png
-  AssetGenImage get washer => const AssetGenImage('assets/services/washer.png');
+  /// File path: assets/services/c_charger.png
+  AssetGenImage get cCharger =>
+      const AssetGenImage('assets/services/c_charger.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [charger, dryer, washer];
+  List<AssetGenImage> get values => [aWasher, bDryer, cCharger];
 }
 
 class $AssetsSvgGen {
@@ -371,6 +530,14 @@ class $AssetsSvgGen {
   SvgGenImage get icCalendarToday =>
       const SvgGenImage('assets/svg/ic_calendar_today.svg');
 
+  /// File path: assets/svg/ic_checkbox_checked_reg.svg
+  SvgGenImage get icCheckboxCheckedReg =>
+      const SvgGenImage('assets/svg/ic_checkbox_checked_reg.svg');
+
+  /// File path: assets/svg/ic_checkbox_reg.svg
+  SvgGenImage get icCheckboxReg =>
+      const SvgGenImage('assets/svg/ic_checkbox_reg.svg');
+
   /// File path: assets/svg/ic_checked.svg
   SvgGenImage get icChecked => const SvgGenImage('assets/svg/ic_checked.svg');
 
@@ -426,6 +593,21 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_edit.svg
   SvgGenImage get icEdit => const SvgGenImage('assets/svg/ic_edit.svg');
+
+  /// File path: assets/svg/ic_edit_reg.svg
+  SvgGenImage get icEditReg => const SvgGenImage('assets/svg/ic_edit_reg.svg');
+
+  /// File path: assets/svg/ic_evoucher_check_rounded_green.svg
+  SvgGenImage get icEvoucherCheckRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_evoucher_check_rounded_green.svg');
+
+  /// File path: assets/svg/ic_evoucher_cross_rounded_green.svg
+  SvgGenImage get icEvoucherCrossRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_evoucher_cross_rounded_green.svg');
+
+  /// File path: assets/svg/ic_evoucher_percent_rounded_green.svg
+  SvgGenImage get icEvoucherPercentRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_evoucher_percent_rounded_green.svg');
 
   /// File path: assets/svg/ic_face_id.svg
   SvgGenImage get icFaceId => const SvgGenImage('assets/svg/ic_face_id.svg');
@@ -629,6 +811,8 @@ class $AssetsSvgGen {
     icBrownySpeaker,
     icCalendarRoundedGreen,
     icCalendarToday,
+    icCheckboxCheckedReg,
+    icCheckboxReg,
     icChecked,
     icCopy,
     icCouponCheckRoundedGreen,
@@ -644,6 +828,10 @@ class $AssetsSvgGen {
     icDownload,
     icDryRoundedGreen,
     icEdit,
+    icEditReg,
+    icEvoucherCheckRoundedGreen,
+    icEvoucherCrossRoundedGreen,
+    icEvoucherPercentRoundedGreen,
     icFaceId,
     icFlagEn,
     icFlagTh,
@@ -703,8 +891,12 @@ class Assets {
   const Assets._();
 
   static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
+  static const $AssetsIconProfilePreferencesGen iconProfilePreferences =
+      $AssetsIconProfilePreferencesGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();
   static const $AssetsPngGen png = $AssetsPngGen();
+  static const $AssetsProfileQuickActionGen profileQuickAction =
+      $AssetsProfileQuickActionGen();
   static const $AssetsServicesGen services = $AssetsServicesGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
 }

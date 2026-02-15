@@ -1,8 +1,11 @@
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/device_log_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/pin_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
@@ -21,15 +24,20 @@ import 'package:browny_applications_new/core/data/remote/models/response/coupon_
 import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/device_log_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/get_pin_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/update_notification_preferences_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/verify_pin_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
 import 'package:dio/dio.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
@@ -66,6 +74,71 @@ abstract class AppClient {
       );
   }
 
+  /// DONG 2026-02-13
+  ///
+  /// API ตั้งค่า PIN สำหรับลูกค้า
+  ///
+  /// Body parameters:
+  /// - id: String (customer_id)
+  /// - pin: String (6 หลัก)
+  @POST('/customer/set-pin')
+  Future<HttpResponse<BaseResponse>> setPin(
+    @Body() PinRequest body,
+  );
+
+  /// DONG 2026-02-13
+  ///
+  /// API ดึงข้อมูล PIN ที่เข้ารหัสของลูกค้า
+  @GET('/customer/{uuid}/get-pin')
+  Future<HttpResponse<GetPinResponse>> getPin(
+    @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-02-13
+  ///
+  /// API ยืนยัน PIN
+  ///
+  /// Body parameters:
+  /// - id: String (customer_id)
+  /// - pin: String (6 หลัก)
+  ///
+  /// Response HTTP Codes:
+  /// - 200: PIN ถูกต้อง (returns token and expire)
+  /// - 422: ข้อมูลไม่ถูกต้อง (validation error)
+  /// - 401: PIN ไม่ถูกต้อง (error_type: "invalid_pin")
+  @POST('/customer/verify-pin')
+  Future<HttpResponse<VerifyPinResponse>> verifyPin(
+    @Body() PinRequest body,
+  );
+
+  /// DONG 2026-02-12
+  ///
+  /// API fetch popups สำหรับแสดงในแต่ละหน้า
+  ///
+  /// Response: List of PopupData
+  /// - แสดงตามช่วงเวลา (start_date, end_date)
+  /// - แสดงตามหน้า (show_on: ["home", "program"])
+  /// - แสดงตามสถานะ (active: "true" or "false")
+  @GET('/popups')
+  Future<HttpResponse<List<PopupData>>> fetchPopups();
+
+  /// DONG 2026-02-11
+  ///
+  /// API บันทึกข้อมูลอุปกรณ์เข้า backend
+  ///
+  /// Body parameters:
+  /// - device_identity_id: String (required)
+  /// - device_model: String (required)
+  /// - device_platform: String (required) - "IOS" or "ANDROID"
+  /// - transaction_token: String? (optional)
+  /// - notification_token: String? (optional)
+  /// - app_version: String (required)
+  /// - customer_id: String? (optional)
+  @POST('/device-log')
+  Future<HttpResponse<DeviceLogResponse>> saveDeviceLog(
+    @Body() DeviceLogRequest body,
+  );
+
   /// DONG 2026-02-09
   ///
   /// API fetch home menu items
@@ -93,6 +166,21 @@ abstract class AppClient {
   Future<HttpResponse<NotificationPreferencesResponse>>
   fetchNotificationPreferences(
     @Path('uuid') String uuid,
+  );
+
+  /// DONG 2026-02-14
+  ///
+  /// API อัพเดทการตั้งค่าการแจ้งเตือนของลูกค้า
+  ///
+  /// Body parameters:
+  /// - notify_machine_done: bool
+  /// - notify_news: bool
+  /// - notify_promotion: bool
+  @PATCH('/customer/{uuid}/notification-preferences')
+  Future<HttpResponse<UpdateNotificationPreferencesResponse>>
+  updateNotificationPreferences(
+    @Path('uuid') String uuid,
+    @Body() UpdateNotificationPreferencesRequest body,
   );
 
   /// DONG 2026-02-09
@@ -319,7 +407,7 @@ abstract class AppClient {
   /// DONG 2026-01-27
   ///
   /// API อัพเดทรหัสผ่านของ User
-  @PUT('/update-password')
+  @PUT('/customer/update-password')
   Future<HttpResponse<BaseResponse>> updatePassword(
     @Body() Map<String, String> body,
   );

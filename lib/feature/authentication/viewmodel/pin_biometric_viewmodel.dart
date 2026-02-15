@@ -1,9 +1,22 @@
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/data/cache/biometric_helper.dart';
+import 'package:browny_applications_new/core/env/app_evnironment.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/pin_decryption_util.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
+import 'package:provider/provider.dart';
+
+enum PinBiometricPross {
+  // Process การสร้าง PIN
+  create,
+  // Process การ verify PIN ที่กรอกเข้ามา
+  verify,
+  // Process การลืม PIN
+  forgot,
+}
 
 /// ViewModel สำหรับจัดการ PIN
 /// - สร้าง PIN ใหม่
@@ -130,7 +143,10 @@ class PinBiometricViewModel extends AppViewModel {
     notifyListeners();
 
     try {
-      final result = await _repository.savePin(_pin);
+      final result = await _repository.savePin(
+        _pin,
+        customerId: currentCustomerProvider.current.id.orEmpty,
+      );
 
       _isLoading = false;
 
@@ -195,6 +211,92 @@ class PinBiometricViewModel extends AppViewModel {
       }
       return false;
     } catch (e) {
+      return false;
+    }
+  }
+
+  /// ตรวจสอบว่า Server มี PIN ของ User นี้หรือไม่ และบันทึกลง Local Storage
+  /// - ใช้เมื่อ Login/Register เพื่อ sync PIN จาก server ลงมา local
+  /// - Decrypt ciphertext กลับเป็น PIN จริง แล้ว save เพื่อสร้าง hash + salt ที่ถูกต้อง
+  /// - ถ้ามี → บันทึก PIN จริงลง secure storage เพื่อ offline verification
+  /// - ถ้าไม่มี → ให้ user สร้าง PIN ใหม่
+  ///
+  /// Returns:
+  /// - true: มี PIN บน server แล้ว และบันทึกลง local สำเร็จ
+  /// - false: ไม่มี PIN หรือเกิด error
+  Future<bool> getPinFromServer() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final customerId = currentCustomerProvider.current.id.orEmpty;
+      if (customerId.isEmpty) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      // 1. ดึง PIN จาก server
+      final result = await _repository.getPinFromServer(customerId: customerId);
+
+      if (!result.isSuccess) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final ciphertext = result.data['ciphertext'];
+      final cipher = result.data['cipher'];
+
+      // 2. ถ้าไม่มี ciphertext แสดงว่าไม่มี PIN
+      if (ciphertext == null || ciphertext.isEmpty) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      // 3. Decrypt ciphertext กลับเป็น PIN จริง
+      String? decryptedPin;
+      try {
+        // ดึง APP_KEY จาก AppEnvironment แทน hardcode
+        final env = context.read<AppEvnironment>();
+        final appKey = env.laravelAppKey;
+
+        decryptedPin = PinDecryptionUtil.decryptLaravelCiphertext(
+          ciphertextB64: ciphertext,
+          appKey: appKey,
+        );
+      } catch (e) {
+        // Decrypt failed - อาจเป็นเพราะ APP_KEY ไม่ถูกต้อง
+        // ⚠️ ควร log error และแจ้ง admin แทนที่จะให้ user สร้าง PIN ใหม่
+        // เพราะถ้าให้สร้างใหม่จะทำให้ PIN local กับ server ไม่ตรงกัน
+        _isLoading = false;
+        _errorMessage =
+            'Cannot sync PIN from server. Please contact support or try again later.';
+        notifyListeners();
+
+        // TODO: Log error to analytics/monitoring service
+        // Analytics.logError('PIN_DECRYPT_FAILED', error: e.toString());
+
+        return false;
+      }
+
+      // 4. บันทึก PIN จริงลง secure storage
+      // ตอนนี้จะสร้าง hash + salt ที่ถูกต้องจาก PIN จริง
+      await _repository.requireSecureStorage.savePin(
+        decryptedPin,
+        ciphertext: ciphertext,
+        cipherMethod: cipher,
+      );
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
       return false;
     }
   }

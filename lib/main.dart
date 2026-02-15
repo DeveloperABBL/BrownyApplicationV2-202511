@@ -1,5 +1,7 @@
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/env/dev_environment.dart';
+import 'package:browny_applications_new/core/utils/crashlytics_helper.dart';
+import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/res/strings/app_localizations.dart';
 import 'package:browny_applications_new/res/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +16,35 @@ void main() async {
   // }
 
   WidgetsFlutterBinding.ensureInitialized();
-  // https://firebase.google.com/docs/flutter/setup
+
+  // ==================== Firebase Setup ====================
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize Crashlytics
+  await CrashlyticsHelper.initialize(
+    enableInDebugMode: false, // เปิดเป็น true ถ้าต้องการ test ใน debug mode
   );
 
   // Initialize AppEnvironment (สร้างครั้งเดียว)
   final appEnvironment = DevEnvironment();
   await appEnvironment.loadEnv();
+
+  // Initialize Notifications
+  await NotificationHelper.initialize(onTokenRefresh: (token) {});
+
+  // Setup notification tap handler
+  NotificationHelper.onNotificationTap((message) {
+    debugPrint('📲 User tapped notification with data: ${message.data}');
+    // TODO: Handle navigation based on message.data
+    // Example:
+    // final screen = message.data['screen'];
+    // if (screen != null) {
+    //   navigatorKey.currentState?.pushNamed(screen);
+    // }
+  });
 
   runApp(BrownyApp(appEnvironment: appEnvironment));
 }

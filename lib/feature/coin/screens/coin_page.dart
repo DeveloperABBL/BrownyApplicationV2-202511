@@ -83,109 +83,135 @@ class __CoinContentState extends State<_CoinContent> {
                   // AppBar
                   _buildAppBar(context),
 
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: AppDims.size_16,
-                      right: AppDims.size_16,
-                      bottom: AppDims.size_16,
-                    ),
-                    child: Column(
-                      // Main container - จัดเรียงแนวตั้ง
-                      children: [
-                        // แถวบน
-                        Row(
-                          // จัดเรียง 2 กล่องแนวนอน
-                          crossAxisAlignment:
-                              CrossAxisAlignment.end, // จัดชิดด้านล่าง
+                  ValueListenableBuilder(
+                    valueListenable: _viewModel.coinClaimDataNotifier,
+                    builder: (context, result, child) {
+                      if (result.isLoading) {
+                        return CircularProgressIndicator();
+                      }
+                      if (!result.isSuccess) {
+                        return Column(
                           children: [
-                            // กล่องซ้ายบน (เล็ก) - 50% ความกว้าง
-                            _buildCoinBalance(),
+                            Assets.png.brownyError2.image(),
+                            AppDims.vericalPadding_12,
 
-                            // SizedBox(width: 16.w), // ช่องว่างระหว่างกล่อง
-                            // กล่องขวาบน (ใหญ่) - 50% ความกว้าง
-                            Assets.png.brownyCoinClaimTitle.image(
-                              width: 190.w,
+                            AppText(context.wording.errorUi),
+                          ],
+                        );
+                      }
+
+                      // ข้อมูลสำหรับ Display ทั้งหมด
+                      final coinData = result.data!;
+                      return Container(
+                        padding: EdgeInsets.only(
+                          left: AppDims.size_16,
+                          right: AppDims.size_16,
+                          bottom: AppDims.size_16,
+                        ),
+                        child: Column(
+                          // Main container - จัดเรียงแนวตั้ง
+                          children: [
+                            // แถวบน
+                            Row(
+                              // จัดเรียง 2 กล่องแนวนอน
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.end, // จัดชิดด้านล่าง
+                              children: [
+                                // กล่องซ้ายบน (เล็ก) - 50% ความกว้าง
+                                _buildCoinBalance(),
+
+                                // SizedBox(width: 16.w), // ช่องว่างระหว่างกล่อง
+                                // กล่องขวาบน (ใหญ่) - 50% ความกว้าง
+                                Assets.png.brownyCoinClaimTitle.image(
+                                  width: 190.w,
+                                ),
+                              ],
+                            ),
+
+                            // กล่องล่าง (กว้างเต็มพื้นที่)
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 24,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    boxShadow: AppColors.defatultShadow,
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(16.r),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      // text title
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            // แสดง day ที่เป็นวันปัจจุบัน
+                                            _buildTextToDay(),
+                                            // ปุ่ม ประวัติ
+                                            _buildHistory(context),
+                                          ],
+                                        ),
+                                      ),
+                                      AppDims.vericalPadding_16,
+
+                                      // Claim Coin
+                                      _buildListClaimCoinProgress(coinData),
+                                      // Row(
+                                      //   mainAxisAlignment:
+                                      //       MainAxisAlignment.spaceBetween,
+                                      //   children: List.generate(
+                                      //     coinData.maxDay!,
+                                      //     (index) {
+                                      //       // สร้าง item สำหรับ Claim Coin
+                                      //       return _buildItemCoinClaim(
+                                      //         coinData.streaksDisplay[index],
+                                      //         context,
+                                      //       );
+                                      //     },
+                                      //   ),
+                                      // ),
+                                      AppDims.vericalPadding_4,
+
+                                      // แถวเงื่อนไข
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        child: _buildButtonCondition(context),
+                                      ),
+                                      AppDims.vericalPadding_16,
+
+                                      // Button Get Coin
+                                      _buildButtonClaimCoin(
+                                        coinData,
+                                        context,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 12.w,
+                                  top: -14,
+                                  child: Assets.png.decoratCardCoinClaim.image(
+                                    width: AppDims.size_84.w,
+                                    height: AppDims.size_25.h,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-
-                        // กล่องล่าง (กว้างเต็มพื้นที่)
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 24,
-                            horizontal: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(16.r),
-                            ),
-                          ),
-                          child: ValueListenableBuilder(
-                            valueListenable: _viewModel.coinClaimDataNotifier,
-                            builder: (context, result, child) {
-                              if (result.isLoading) {
-                                return CircularProgressIndicator();
-                              }
-                              if (!result.isSuccess) {
-                                return Column(
-                                  children: [
-                                    Assets.png.brownyError2.image(),
-                                    AppDims.vericalPadding_12,
-
-                                    AppText(context.wording.errorUi),
-                                  ],
-                                );
-                              }
-
-                              // ข้อมูลสำหรับ Display ทั้งหมด
-                              final coinData = result.data!;
-                              return Column(
-                                children: [
-                                  // text title
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // แสดง day ที่เป็นวันปัจจุบัน
-                                      _buildTextToDay(),
-                                      // ปุ่ม ประวัติ
-                                      _buildHistory(context),
-                                    ],
-                                  ),
-                                  AppDims.vericalPadding_16,
-
-                                  // Claim Coin
-                                  _buildListClaimCoinProgress(coinData),
-                                  // Row(
-                                  //   mainAxisAlignment:
-                                  //       MainAxisAlignment.spaceBetween,
-                                  //   children: List.generate(
-                                  //     coinData.maxDay!,
-                                  //     (index) {
-                                  //       // สร้าง item สำหรับ Claim Coin
-                                  //       return _buildItemCoinClaim(
-                                  //         coinData.streaksDisplay[index],
-                                  //         context,
-                                  //       );
-                                  //     },
-                                  //   ),
-                                  // ),
-                                  AppDims.vericalPadding_4,
-
-                                  // แถวเงื่อนไข
-                                  _buildButtonCondition(context),
-                                  AppDims.vericalPadding_16,
-
-                                  // Button Get Coin
-                                  _buildButtonClaimCoin(coinData, context),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -204,7 +230,7 @@ class __CoinContentState extends State<_CoinContent> {
         padding: EdgeInsets.only(
           top: 10.h,
           left: AppDims.size_4.w,
-          right: AppDims.size_10.w,
+          right: AppDims.size_4.w,
         ),
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
@@ -604,11 +630,11 @@ class __CoinContentState extends State<_CoinContent> {
           clipBehavior: Clip.none, // ✅ ให้วงกลมยื่นออกนอกขอบได้
           children: [
             Container(
-              width: 38.w,
-              height: 65.h,
+              width: 35.w,
+              height: 60.h,
               padding: EdgeInsets.only(
-                left: 3,
-                right: 3,
+                left: 2,
+                right: 2,
                 bottom: 2,
               ),
               decoration: BoxDecoration(
@@ -680,7 +706,7 @@ class __CoinContentState extends State<_CoinContent> {
 
         AppText(
           item.isToday ? 'วันนี้' : item.dayDisplay,
-          style: context.textTheme.titleSmall!.copyWith(
+          style: context.textTheme.labelSmall!.copyWith(
             color: AppColors.textPrimary,
           ),
         ),

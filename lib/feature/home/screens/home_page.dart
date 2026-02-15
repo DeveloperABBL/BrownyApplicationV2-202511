@@ -1,37 +1,22 @@
+import 'dart:async';
 import 'dart:ui';
 
-import 'package:browny_applications_new/core/const/app_constants.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
-import 'package:browny_applications_new/core/providers/customer_provider.dart';
-import 'package:browny_applications_new/core/utils/launch_helper.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
-import 'package:browny_applications_new/core/widgets/app_toggle_widget.dart';
+import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/utils/notification_helper.dart';
+import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
+import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
-import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:browny_applications_new/res/styles/app_text_style.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
-import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -60,147 +45,90 @@ class HomePageWidget extends StatefulWidget {
   State<HomePageWidget> createState() => _HomePageWidgetState();
 }
 
-class _HomePageWidgetState extends State<HomePageWidget> {
+class _HomePageWidgetState extends State<HomePageWidget>
+    with WidgetsBindingObserver {
   HomePageViewmodel get _viewmodel => context.read<HomePageViewmodel>();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _viewmodel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewmodel.fetchBanners();
 
       if (mounted) {
-        await _showInvitBottomSheet();
+        await InvitBottomSheetDialog.showInvitBottomSheet(
+          context,
+          _viewmodel,
+        );
+
+        if (!mounted) return;
+        await _fetchPopups(context);
       }
     });
   }
 
-  Future<dynamic> _showInvitBottomSheet() {
-    return showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: false,
-      backgroundColor: AppColors.transparent,
-      useRootNavigator: true,
-      builder: (dialogContext) {
-        return FractionallySizedBox(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  onPressed: () => dialogContext.pop(),
-                  icon: CircleAvatar(
-                    backgroundColor: AppColors.background.withValues(
-                      alpha: 0.5,
-                    ),
-                    child: Icon(
-                      Icons.close_rounded,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: AppContainerRadius(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24.r),
-                    topRight: Radius.circular(24.r),
-                  ),
-                  child: SafeArea(
-                    child: Column(
-                      children: [
-                        AppDims.vericalPadding_16,
-                        Assets.png.cardInvitFriend.image(fit: BoxFit.fill),
+  Future<void> _fetchPopups(BuildContext context) async {
+    final popupResult = await _viewmodel.fetchPopups();
 
-                        // AppDims.vericalPadding_16,
-                        Padding(
-                          padding: EdgeInsets.all(AppDims.size_16),
-                          child: Column(
-                            children: [
-                              AppText(
-                                'เชิญเพื่อนมาใช้ Browny\nสะสมแต้มแลกคูปอง!',
-                                style: context.textTheme.titleLarge!.copyWith(
-                                  fontSize: AppDims.size_24,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              AppDims.vericalPadding_10,
+    if (popupResult.isSuccess && popupResult.data.orEmpty.isNotEmpty) {
+      if (!context.mounted) return;
+      await PopupDialog.show(
+        context: context,
+        popups: popupResult.data ?? [],
+        locale: context.languageCode,
+        onDismiss: (dismissPopupForToday) {
+          if (dismissPopupForToday) {
+            _viewmodel.dismissPopupsForToday(popupResult.data ?? []);
+          }
+        },
+        onPopupImagePressed: (popup) {
+          // TODO: Handle popup action based on programAction and autoClickTarget
+          debugPrint('Popup pressed: ${popup.name}');
+          debugPrint('Program action: ${popup.programAction}');
+          debugPrint('Auto click target: ${popup.autoClickTarget}');
+        },
+      );
+    }
+  }
 
-                              AppText(
-                                'เพียงแค่ส่งลิงก์ให้เพื่อน หรือให้เพื่อนกรอกเบอร์โทรศัพท์ของคุณ! ก็สะสมแต้ม และนำไปแลกคูปองได้อีกเพียบ',
-                                style: context.textTheme.bodyMedium!.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              AppDims.vericalPadding_16,
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-                              ElevatedButton(
-                                onPressed: () {
-                                  dialogContext.pop();
-                                  context
-                                      .pushNamed<Map<Type, HomePageState>>(
-                                        InvitFriendPage.pageName,
-                                      )
-                                      .then((bypass) {
-                                        if (context.mounted && bypass != null) {
-                                          switch (bypass.values.first) {
-                                            case HomePageState.home:
-                                              break;
-                                            case HomePageState.couponVoucher:
-                                              context.pushNamed(
-                                                CouponVoucherPage.pageName,
-                                              );
-                                              break;
-                                            case HomePageState.scan:
-                                              // ไปหน้า Scan
-                                              context.pushNamed(
-                                                ScannerPage.pageName,
-                                              );
-                                              break;
-                                            case HomePageState.branches:
-                                              context.pushNamed(
-                                                MapPage.pageName,
-                                              );
-                                              break;
-                                            case HomePageState.brownyShop:
-                                              break;
-                                          }
-                                        }
-                                      });
-                                },
-                                child: AppText(
-                                  'เชิญเพื่อนเลย',
-                                ),
-                              ),
-                              AppDims.vericalPadding_8,
-                              ElevatedButton(
-                                onPressed: () => dialogContext.pop(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.ci3,
-                                  foregroundColor: AppColors.primary,
-                                ),
-                                child: AppText(
-                                  'รับทราบ',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App is visible and responding to user input (e.g., app comes to foreground)
+        debugPrint('AppLifecycleState.resumed');
+        // if (mounted) {
+        //   unawaited(_fetchPopups(context));
+        // }
+        break;
+      case AppLifecycleState.inactive:
+        // App is in an inactive state (e.g., user opens app switcher or receives a call)
+        debugPrint('AppLifecycleState.inactive');
+        break;
+      case AppLifecycleState.hidden:
+        // All views of the app are hidden (e.g., app is minimized)
+        debugPrint('AppLifecycleState.hidden');
+        break;
+      case AppLifecycleState.paused:
+        // App is not visible and not responding to user input
+        debugPrint('AppLifecycleState.paused');
+        break;
+      case AppLifecycleState.detached:
+        // The Flutter engine is running but detached from any host views (e.g., app termination)
+        debugPrint('AppLifecycleState.detached');
+        break;
+    }
   }
 
   @override
@@ -222,6 +150,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             SliverToBoxAdapter(
               child: _buildMyWalletAndCoinZone(),
             ),
+
             // _mySliverBox(
             //   child: _buildMyWalletAndCoinZone(),
             // ),
@@ -245,7 +174,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             final hasData =
                                 snapshot.hasData &&
                                 snapshot.requireData.isSuccess;
-                            if (snapshot.requireData.data!.enabled == false) {
+                            if (!hasData ||
+                                snapshot.requireData.data!.enabled == false) {
                               return SizedBox();
                             }
                             return GestureDetector(
@@ -607,7 +537,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               ),
             ),
             SliverToBoxAdapter(
-              child: AppDims.vericalPadding_64,
+              child: AppDims.vericalPadding_46,
             ),
           ],
         ),
@@ -740,7 +670,15 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               backgroundColor: AppColors.background,
               child: IconButton(
                 onPressed: () async {
-                  await _showInvitBottomSheet();
+                  // await InvitBottomSheetDialog.showInvitBottomSheet(
+                  //   context,
+                  //   _viewmodel,
+                  // );
+
+                  NotificationHelper.showTestNotification(
+                    title: 'In-App Test Notification',
+                    body: 'body',
+                  );
                 },
                 icon: Assets.svg.icNotification.svg(
                   // เปลี่ยนสี svg
@@ -766,7 +704,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                           },
                         );
                       } else {
-                        context.pushNamed(ProfilePage.pageName);
+                        // context.pushNamed(ProfilePage.pageName);
+                        context.pushNamed(MyProfileAndPreferencesPage.pageName);
                       }
                     },
                     icon: customer.current.image.orEmpty.isEmpty
@@ -1177,15 +1116,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  SliverToBoxAdapter _mySliverBox({required Widget child}) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-        child: child,
       ),
     );
   }

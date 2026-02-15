@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element_parameter
 
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
+import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -423,10 +424,15 @@ class _SignUpWidget extends StatelessWidget {
 
     AppOverlays.hideLoading();
     context.pushReplacementNamed(
+      // Signup
       CreateAppPinPage.pageName,
       extra: {
         CreateAppPinPage.kImplementBackButton: false,
         CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
+        // Map<Type, PinBiometricPross>
+        CreateAppPinPage.kPinBiometricProcess: {
+          PinBiometricPross: PinBiometricPross.create,
+        },
         // CreateAppPinPage.kFirstSignup: true,
       },
     );
@@ -604,6 +610,7 @@ class _SignUpWidget extends StatelessWidget {
                     ? () async {
                         FocusManager.instance.primaryFocus?.unfocus();
                         AppOverlays.showLoading(context);
+                        // Signup
                         vm.onSummitForm().then((result) {
                           if (!context.mounted) return;
                           AppOverlays.hideLoading();
@@ -885,7 +892,7 @@ class _OTPContent extends _SignUpWidget {
 
     if (validateResult.hasError) {
       AppOverlays.hideLoading();
-      _showErrorDialog(context, validateResult.error!);
+      // _showErrorDialog(context, validateResult.error!);
       return;
     }
     AppOverlays.hideLoading();
@@ -895,6 +902,7 @@ class _OTPContent extends _SignUpWidget {
 
   Future<void> _summitOtp(BuildContext context) async {
     AppOverlays.showLoading(context);
+    // OTP Request
     viewmodel(context).onSummitForm().then((
       result,
     ) {
@@ -1285,10 +1293,15 @@ class _LoginWidget extends _SignUpWidget {
               // สำเร็จ → ออกจากหน้า Authentication
               if (result.isSuccess) {
                 context.pushReplacementNamed(
+                  // Login
                   CreateAppPinPage.pageName,
                   extra: {
                     CreateAppPinPage.kImplementBackButton: false,
                     CreateAppPinPage.kFirstSignup: false,
+                    // Map<Type, PinBiometricPross>
+                    CreateAppPinPage.kPinBiometricProcess: {
+                      PinBiometricPross: PinBiometricPross.create,
+                    },
                   },
                 );
                 // context.pop();
@@ -1373,15 +1386,34 @@ class _ReferralWidget extends _SignUpWidget {
                 onPressed: isValid
                     ? () async {
                         AppOverlays.showLoading(context);
+                        // Save Referral
                         final result = await vm.onSummitForm();
                         AppOverlays.hideLoading();
                         if (context.mounted && result.isSuccess) {
                           FocusManager.instance.primaryFocus?.unfocus();
+                          AppOverlays.showBrownyDialog(
+                            context,
+                            imageAsset: Assets.png.brownySuccess1.path,
+                            title: context.wording.numberOfSuccessfulReferrals,
+                            message: 'บันทึกชวนเพื่อนสำเร็จ',
+                            onConfirm: () {
+                              goToProcess(
+                                context,
+                                AuthenProcess.login,
+                                animate: false,
+                              );
+                            },
+                          );
                           context.pushNamed(
+                            // Save Referral summit
                             CreateAppPinPage.pageName,
                             extra: {
                               CreateAppPinPage.kImplementBackButton: false,
                               CreateAppPinPage.kFirstSignup: true,
+                              // Map<Type, PinBiometricPross>
+                              CreateAppPinPage.kPinBiometricProcess: {
+                                PinBiometricPross: PinBiometricPross.create,
+                              },
                             },
                           );
                         }
@@ -1403,10 +1435,15 @@ class _ReferralWidget extends _SignUpWidget {
       child: TextButton(
         onPressed: () {
           context.pushReplacementNamed(
+            // Save Referral Skip
             CreateAppPinPage.pageName,
             extra: {
               CreateAppPinPage.kImplementBackButton: false,
               CreateAppPinPage.kFirstSignup: true,
+              // Map<Type, PinBiometricPross>
+              CreateAppPinPage.kPinBiometricProcess: {
+                PinBiometricPross: PinBiometricPross.create,
+              },
             },
           );
         },

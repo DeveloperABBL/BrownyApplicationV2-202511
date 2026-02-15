@@ -1,15 +1,20 @@
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
+import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
@@ -22,6 +27,9 @@ import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_pag
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -69,19 +77,47 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: MyProfileAndPreferencesPage.pagePath,
+        name: MyProfileAndPreferencesPage.pageName,
+        builder: (context, state) {
+          return MyProfileAndPreferencesPage();
+        },
+      ),
+      GoRoute(
         path: CreateAppPinPage.pagePath,
         name: CreateAppPinPage.pageName,
         builder: (context, state) {
           bool implementBackButton = false;
           bool isFirstSignup = false;
+          PinBiometricPross process;
           try {
             final extra = state.extra as Map<String, dynamic>?;
             implementBackButton = extra?[CreateAppPinPage.kImplementBackButton];
             isFirstSignup = extra?[CreateAppPinPage.kFirstSignup];
           } catch (ignore) {}
+          try {
+            final extra = state.extra as Map<String, dynamic>?;
+            // {String, Map<Type, PinBiometricPross>}
+            process =
+                extra?[CreateAppPinPage
+                    .kPinBiometricProcess][PinBiometricPross];
+          } catch (ignore) {
+            return Scaffold(
+              body: Center(
+                child: AppText(
+                  'PIN Page needs PinBiometricPross',
+                  style: context.textTheme.labelLarge!.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
+              ),
+            );
+          }
+
           return CreateAppPinPage(
             implementBackButton: implementBackButton,
             isFirstSignup: isFirstSignup,
+            process: process,
           );
         },
       ),
@@ -149,13 +185,17 @@ class AppRouter {
           return const CouponVoucherPage();
         },
       ),
-      // GoRoute(
-      //   path: CouponVoucherSelected.pagePath,
-      //   name: CouponVoucherSelected.pageName,
-      //   builder: (context, state) {
-      //     return CouponVoucherSelected();
-      //   },
-      // ),
+      GoRoute(
+        path: CouponVoucherSelected.pagePath,
+        name: CouponVoucherSelected.pageName,
+        builder: (context, state) {
+          final viewModel =
+              state.extra as CouponVoucherSelectedViewmodelDelegate;
+          return CouponVoucherSelected(
+            viewmodel: viewModel,
+          );
+        },
+      ),
       GoRoute(
         path: PurchaseCouponVoucherPage.pagePath,
         name: PurchaseCouponVoucherPage.pageName,

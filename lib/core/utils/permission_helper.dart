@@ -165,4 +165,61 @@ class PermissionHelper {
       );
     }
   }
+
+  /// ขอ Permission สำหรับ Notifications
+  ///
+  /// รองรับทั้ง iOS และ Android 13+ (API 33+)
+  /// สำหรับ Android 12 และต่ำกว่า จะได้รับ permission อัตโนมัติ
+  ///
+  /// Returns [handler.PermissionStatus] สถานะของ permission ที่ขอ
+  static Future<handler.PermissionStatus>
+  requestNotificationPermission() async {
+    try {
+      final status = await handler.Permission.notification.request();
+      return status;
+    } catch (e) {
+      return handler.PermissionStatus.denied;
+    }
+  }
+
+  /// ตรวจสอบว่า Notification Permission ได้รับอนุญาตแล้วหรือยัง
+  ///
+  /// รองรับทั้ง iOS และ Android 13+
+  static Future<bool> hasNotificationPermission() async {
+    try {
+      final status = await handler.Permission.notification.status;
+      return status.isGranted || status.isProvisional;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// ขอ Permission สำหรับ Exact Alarms (Android 14+ / API 34+)
+  ///
+  /// จำเป็นสำหรับการตั้งเวลา notification ที่แม่นยำ
+  /// บน Android 14+ ต้องขอ permission นี้ก่อนจะใช้ scheduled notifications
+  ///
+  /// หมายเหตุ: iOS ไม่ต้องขอ permission นี้
+  ///
+  /// Returns [handler.PermissionStatus] สถานะของ permission
+  static Future<handler.PermissionStatus> requestExactAlarmPermission() async {
+    try {
+      final status = await handler.Permission.scheduleExactAlarm.request();
+      return status;
+    } catch (e) {
+      return handler.PermissionStatus.denied;
+    }
+  }
+
+  /// ตรวจสอบว่า Exact Alarm Permission ได้รับอนุญาตแล้วหรือยัง
+  ///
+  /// สำหรับ Android 14+ เท่านั้น
+  static Future<bool> hasExactAlarmPermission() async {
+    try {
+      final status = await handler.Permission.scheduleExactAlarm.status;
+      return status.isGranted;
+    } catch (e) {
+      return false;
+    }
+  }
 }

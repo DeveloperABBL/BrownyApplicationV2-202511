@@ -594,6 +594,66 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seeAllPrize => '查看全部奖品';
 
   @override
+  String get viewYourProfile => '查看您的个人资料';
+
+  @override
+  String get balance => '余额';
+
+  @override
+  String get creditBalance => '账户余额';
+
+  @override
+  String get history => '历史记录';
+
+  @override
+  String get savedItems => '已保存的商品';
+
+  @override
+  String get appSettings => '应用设置';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get thai => '泰语';
+
+  @override
+  String get allowBiometricAuth => '允许生物识别认证';
+
+  @override
+  String get autoSaveReceipt => '自动保存收据';
+
+  @override
+  String get locationAccess => '位置访问';
+
+  @override
+  String get changeEmail => '更改电子邮件';
+
+  @override
+  String get generalNotifications => '常规通知';
+
+  @override
+  String get workOrderStatus => '工作/订单状态';
+
+  @override
+  String get termsAndConditions => '条款和服务';
+
+  @override
+  String get helpAndSupport => '帮助与支持';
+
+  @override
+  String get contactBrownyCare => '联系布朗尼客服';
+
+  @override
+  String get callPhoneNumber => '致电 02-123-3661';
+
+  @override
+  String get contactViaLine => '通过 LINE 布朗尼官方咨询';
+
+  @override
+  String get version => '版本';
+
+  @override
   String get checkOut => '结账';
 
   @override
@@ -741,9 +801,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addPhoneNumber => '添加电话号码';
 
   @override
-  String get history => '历史记录';
-
-  @override
   String get balanceRemaining => '余额';
 
   @override
@@ -829,9 +886,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get rewardsTitle => '奖励';
-
-  @override
-  String get termsAndConditions => '条款和服务';
 
   @override
   String get referralCode => '推荐码';

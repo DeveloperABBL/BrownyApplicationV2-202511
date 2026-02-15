@@ -14,6 +14,7 @@ import 'package:browny_applications_new/feature/transactions/models/coupon_recei
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
@@ -108,6 +109,22 @@ class TransactionsViewmodel extends AppViewModel
     context
         .pushNamed(
           PurchaseCouponVoucherPage.pageName,
+          extra: this,
+        )
+        .then((_) async {
+          if (!context.mounted) return;
+
+          AppOverlays.showLoading(context);
+          await initializeLocationAndFetchCoupons();
+          AppOverlays.hideLoading();
+        });
+  }
+
+  void goSelectedPage(BuildContext context, CustomerCouponModel selected) {
+    setCustomerCouponSelectedDelegate = selected;
+    context
+        .pushNamed(
+          CouponVoucherSelected.pageName,
           extra: this,
         )
         .then((_) async {

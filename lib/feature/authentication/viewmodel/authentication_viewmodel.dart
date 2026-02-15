@@ -138,7 +138,10 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           // do nothing
           break;
         case AuthenProcess.forgotPasswordOTP:
-          // do nothing
+          // clear error verify otp
+          _verifyOTPMessageErrorNotifier.value = null;
+          // cancel Timer
+          _otpTimer?.cancel();
           break;
         case AuthenProcess.signupOTP:
           _verifyOTPMessageErrorNotifier.value = null;
@@ -520,7 +523,9 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         );
         // เกิด Error ขึ้น จะ notfi ไปแสดงที่ UI ด้วย
         _verifyOTPMessageErrorNotifier.value = message;
-        return UiResult.empty();
+        return UiResult.empty(
+          error: validateResult.error,
+        );
       }
 
       return UiResult.error(error: validateResult.error);
@@ -925,7 +930,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
 
   Future<void> startOtpTimer() async {
     if (_otpTimer == null || !_otpTimer!.isActive || _otpRequestResend) {
-      await _otpProcess();
+      await _requestOTP();
 
       _remainingSecondsNotifier.value = 60;
       _canResendOtpNotifier.value = false;
@@ -951,7 +956,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
 
   /// Call API เพื่อส่ง OTP ไปตาม username ที่กรอกเข้ามา
   /// ถ้า [_otpTimer] active อยู่ จะไม่ส่งซ้ำ
-  Future<void> _otpProcess() async {
+  Future<void> _requestOTP() async {
     // TODO เอาจุดออกเวลาใช้จริง
     // print('OTP Requested');
     // ScaffoldMessenger.of(

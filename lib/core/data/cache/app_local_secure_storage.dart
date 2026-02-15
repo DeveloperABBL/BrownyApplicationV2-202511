@@ -97,21 +97,44 @@ class AppLocalSecureStorage with AppLocalSecureStoreMixin {
 
   // ========== Helper Methods สำหรับ PIN ==========
 
-  /// บันทึก PIN (Hashed + Salt)
-  /// - ไม่เก็บ PIN จริง เก็บเฉพาะ Hash
-  /// - ใช้ SHA-256 + Salt
-  Future<void> savePin(String pin) async {
-    // สร้าง Salt ใหม่ทุกครั้งที่ตั้ง PIN (หรือ reuse ถ้ามีอยู่แล้ว)
-    String salt = await readSecure(key: _pinSaltKey) ?? _generateSalt();
+  /// บันทึก PIN (Hybrid Security Approach)
+  /// - เก็บ Hash + Salt สำหรับ offline verify
+  /// - เก็บ Ciphertext จาก server สำหรับ use case อื่นๆ
+  ///
+  /// Parameters:
+  /// - pin: PIN ที่ user กรอก (สำหรับ hash)
+  /// - ciphertext: Encrypted PIN จาก server (optional)
+  /// - cipherMethod: Cipher method ที่ใช้ (optional)
+  Future<void> savePin(
+    String pin, {
+    String? ciphertext,
+    String? cipherMethod,
+  }) async {
+    // 1. สร้าง Salt ใหม่ทุกครั้งที่ตั้ง PIN
+    String salt = _generateSalt();
+
+    // 2. Hash PIN ด้วย Salt สำหรับ offline verify
     String hashedPin = _hashPin(pin, salt);
 
+    // 3. บันทึก Hash + Salt
     await writeSecure(key: _pinHashKey, value: hashedPin);
     await writeSecure(key: _pinSaltKey, value: salt);
+
+    // 4. บันทึก Ciphertext จาก server (ถ้ามี) สำหรับ use case อื่นๆ
+    if (ciphertext != null) {
+      await writeSecure(key: _pinCiphertextKey, value: ciphertext);
+    }
+
+    // 5. บันทึก Cipher method (ถ้ามี)
+    if (cipherMethod != null) {
+      await writeSecure(key: _pinCipherMethodKey, value: cipherMethod);
+    }
   }
 
-  /// ตรวจสอบ PIN
+  /// ตรวจสอบ PIN (Offline Verify)
   /// - Hash PIN ที่กรอกด้วย Salt เดียวกัน
   /// - เทียบกับ Hash ที่เก็บไว้
+  /// - ไม่ต้อง call API, verify offline ได้ทันที
   Future<bool> verifyPin(String pin) async {
     String? storedHash = await readSecure(key: _pinHashKey);
     String? salt = await readSecure(key: _pinSaltKey);
@@ -127,10 +150,22 @@ class AppLocalSecureStorage with AppLocalSecureStoreMixin {
     return await containsKeySecure(_pinHashKey);
   }
 
-  /// ลบ PIN
+  /// ดึง Ciphertext ที่เก็บไว้ (สำหรับ use case อื่นๆ)
+  Future<String?> getPinCiphertext() async {
+    return await readSecure(key: _pinCiphertextKey);
+  }
+
+  /// ดึง Cipher method ที่ใช้
+  Future<String?> getPinCipherMethod() async {
+    return await readSecure(key: _pinCipherMethodKey);
+  }
+
+  /// ลบ PIN และข้อมูลที่เกี่ยวข้องทั้งหมด
   Future<void> clearPin() async {
     await deleteSecure(_pinHashKey);
     await deleteSecure(_pinSaltKey);
+    await deleteSecure(_pinCiphertextKey);
+    await deleteSecure(_pinCipherMethodKey);
   }
 
   // ========== Helper Methods สำหรับ Biometric ==========
@@ -176,5 +211,7 @@ class AppLocalSecureStorage with AppLocalSecureStoreMixin {
 
   static const String _pinHashKey = 'app_pin_hash';
   static const String _pinSaltKey = 'app_pin_salt';
+  static const String _pinCiphertextKey = 'app_pin_ciphertext';
+  static const String _pinCipherMethodKey = 'app_pin_cipher_method';
   static const String _biometricEnabledKey = 'biometric_enabled';
 }

@@ -180,6 +180,7 @@ class ScannerViewModel extends AppViewModel {
 
     if (result.isEmpty || result.hasError) {
       _qrNotifier.value = UiResult.empty();
+      return;
     }
 
     _qrNotifier.value = UiResult.success(data: result.data);

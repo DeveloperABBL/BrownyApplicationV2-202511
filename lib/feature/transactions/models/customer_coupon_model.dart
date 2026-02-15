@@ -123,6 +123,23 @@ class CustomerCouponModel extends CouponData {
     }
   }
 
+  String dateLeftDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    if (expiryDate != null) {
+      int dif = (DateTime.now().difference(expiryDate!).inDays * -1);
+      switch (locale) {
+        case 'en':
+          return '$dif days';
+        case 'zh':
+          return '$dif 天';
+        default:
+          return '$dif วัน';
+      }
+    } else {
+      return '';
+    }
+  }
+
   /// ตัวช่วยตรวจสอบว่าคูปองใช้ได้หรือไม่
   bool get canUse => (isAvailable ?? false) && !(isExpired ?? true);
 
@@ -180,6 +197,22 @@ class CustomerCouponModel extends CouponData {
       default:
         return 'ซัก $washer / อบ $dryer ครั้ง';
     }
+  }
+
+  /// แสดงจำนวนการใช้งาน Washer/Dryer
+  String get washRemainDisplay {
+    final washer = qtyWasherCount;
+    final remain = remainWasher;
+
+    return '$washer / $remain';
+  }
+
+  /// แสดงจำนวนการใช้งาน Washer/Dryer
+  String get dryRemainDisplay {
+    final dryer = qtyDryerCount;
+    final remain = remainDryer;
+
+    return '$dryer / $remain';
   }
 
   /// แสดงจำนวนที่เหลือของ Washer/Dryer

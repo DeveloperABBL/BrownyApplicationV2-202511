@@ -1,4 +1,29 @@
 # CHANGELOG
+### DONG 2026-02-16
+* แก้ไข QR หน้าเติมเงิน บันทึกรูปภาพจากปุ่มบันทึกไม่ได้
+
+---
+### DONG 2026-02-15
+* แก้ไข Browny Coin UI แสดงไม่ครบขาดห่วงไป
+* แก้ไข เติมเงินขั้นต่ำ 100 แต่กรอกเลขเอง 1 บาทได้
+* แก้ไข กรอกู OTP ไม่ถูก แต่เข้าได้
+* แก้ไข Forgot password กำหนด endpoint ไม่ถูกต้อง
+* ปรับปรุง Process การ save PIN ให้ call API เพื่อ savePIN และ Logic การ verify PIN
+
+---
+### DONG 2026-02-14
+* เก็บ UI หน้า User Preferences ตาม Design
+  - เพิ่ม function Logout, invit friend
+
+---
+### DONG 2026-02-12
+* เพิ่มหน้า User Preferences (Draft)
+* เพิ่มการแสดง Popup ในหน้าแรก
+* เพิ่มหน้าสำหรับดู E-Voucher ของลูกค้าที่ซื้อเอาไว้
+* Setup App Notification
+  - Firebase-crashlytics สำหรับ Tracking Bug
+  - Firebase-Messaging สำหรับ getToken และรอรับ Notification จาก firebase
+
 ---
 ### DONG 2026-02-11
 * เพิ่ม Assets Menu หน้า home page (ยังไม่ implement การทำงาน)

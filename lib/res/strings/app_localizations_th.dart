@@ -604,6 +604,66 @@ class AppLocalizationsTh extends AppLocalizations {
   String get seeAllPrize => 'ดูรางวัลทั้งหมด';
 
   @override
+  String get viewYourProfile => 'ดูโปรไฟล์ของคุณ';
+
+  @override
+  String get balance => 'ยอดเงินคงเหลือ';
+
+  @override
+  String get creditBalance => 'ยอดเงินคงเหลือ';
+
+  @override
+  String get history => 'ประวัติ';
+
+  @override
+  String get savedItems => 'สินค้าที่บันทึกไว้';
+
+  @override
+  String get appSettings => 'ตั้งค่าแอปพลิเคชัน';
+
+  @override
+  String get language => 'ภาษา';
+
+  @override
+  String get thai => 'ไทย';
+
+  @override
+  String get allowBiometricAuth => 'อนุญาตการใช้งานด้วย Biometric';
+
+  @override
+  String get autoSaveReceipt => 'บันทึกสลิปอัตโนมัติ';
+
+  @override
+  String get locationAccess => 'การเข้าถึงตำแหน่ง';
+
+  @override
+  String get changeEmail => 'เปลี่ยน e-mail';
+
+  @override
+  String get generalNotifications => 'การแจ้งเตือนทั่วไป';
+
+  @override
+  String get workOrderStatus => 'สถานะการทำงาน/การสั่งซื้อ';
+
+  @override
+  String get termsAndConditions => 'เงื่อนไขและการให้บริการ';
+
+  @override
+  String get helpAndSupport => 'ความช่วยเหลือ/แจ้งปัญหาการใช้งาน';
+
+  @override
+  String get contactBrownyCare => 'ติดต่อ Browny Care';
+
+  @override
+  String get callPhoneNumber => 'โทร 02-123-3661';
+
+  @override
+  String get contactViaLine => 'สอบถามผ่าน LINE Browny Official';
+
+  @override
+  String get version => 'เวอร์ชัน';
+
+  @override
   String get checkOut => 'จัดการคำสั่งซื้อ';
 
   @override
@@ -756,9 +816,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get addPhoneNumber => 'เพิ่มเบอร์โทรศัพท์';
 
   @override
-  String get history => 'ประวัติ';
-
-  @override
   String get balanceRemaining => 'ยอดเงินคงเหลือ';
 
   @override
@@ -847,9 +904,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get rewardsTitle => 'รางวัล';
-
-  @override
-  String get termsAndConditions => 'เงื่อนไขและการให้บริการ';
 
   @override
   String get referralCode => 'รหัสชวนเพื่อน';

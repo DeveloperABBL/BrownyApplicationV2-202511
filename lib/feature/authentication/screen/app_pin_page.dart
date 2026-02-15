@@ -38,30 +38,34 @@ part 'transaction_authen_page.dart';
 class CreateAppPinPage extends StatelessWidget {
   const CreateAppPinPage({
     super.key,
+    required this.process,
     this.implementBackButton = true,
     this.isFirstSignup = false,
   });
 
   final bool implementBackButton;
   final bool isFirstSignup;
+  final PinBiometricPross process;
 
   static final pagePath = '/create_app_pin';
   static final pageName = 'create_app_pin';
   static final kImplementBackButton = 'kImplementBackButton';
+  static final kPinBiometricProcess = 'kPinBiometricProcess';
   static final kFirstSignup = 'first_signup';
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       // ถ้าไม่แสดงปุ่มกลับ แสดงว่าจะไม่รองรับการ wipe ออกเหมือนกัน
-      canPop: implementBackButton,
+      canPop: process != PinBiometricPross.create,
       child: ChangeNotifierProvider(
         create: (context) => PinBiometricViewModel(
           context: context,
           repository: PinBioMetricRepository(),
         ),
         child: _CreateAppPinContent(
-          implementBackButton: implementBackButton,
+          process: process,
+          implementBackButton: process != PinBiometricPross.create,
           isFirstSignup: isFirstSignup,
         ),
       ),
@@ -71,12 +75,14 @@ class CreateAppPinPage extends StatelessWidget {
 
 class _CreateAppPinContent extends StatefulWidget {
   const _CreateAppPinContent({
+    required this.process,
     this.implementBackButton = true,
     this.isFirstSignup = false,
   });
 
   final bool implementBackButton;
   final bool isFirstSignup;
+  final PinBiometricPross process;
 
   @override
   State<_CreateAppPinContent> createState() => _CreateAppPinContentState();
@@ -84,16 +90,57 @@ class _CreateAppPinContent extends StatefulWidget {
 
 class _CreateAppPinContentState extends State<_CreateAppPinContent> {
   late final PinBiometricViewModel _viewModel;
+  bool _isCheckingExistingPin = true;
 
   @override
   void initState() {
     super.initState();
     _viewModel = context.read();
-    // Listen เมื่อบันทึก PIN สำเร็จ
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   final viewModel = context.read<PinViewModel>();
-    //   viewModel.addListener(_onViewModelChanged);
+
+    // ถ้าเป็น Login/Register → เช็ค PIN จาก server ก่อน
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // if (widget.isFirstSignup) {
+      if (widget.process == PinBiometricPross.create) {
+        Future.delayed(Duration(seconds: 1), _checkExistingPinFromServer);
+        return;
+      }
+      setState(() {
+        _isCheckingExistingPin = false;
+      });
+    });
+  }
+
+  /// ตรวจสอบว่า server มี PIN หรือไม่ (สำหรับ Login/Register)
+  Future<void> _checkExistingPinFromServer() async {
+    // setState(() {
+    //   _isCheckingExistingPin = true;
     // });
+
+    try {
+      // ดึง PIN จาก server
+      final hasPin = await _viewModel.getPinFromServer();
+
+      if (!mounted) return;
+
+      if (hasPin) {
+        // มี PIN จาก server แล้ว → ไปหน้า Biometric ทันที
+        // _navigateToBiometric();
+        _onSavedPin();
+      } else {
+        // ไม่มี PIN → ให้ user สร้าง PIN ใหม่
+        setState(() {
+          _isCheckingExistingPin = false;
+        });
+      }
+    } catch (e) {
+      // เกิด error → ให้ user สร้าง PIN ใหม่
+      if (mounted) {
+        setState(() {
+          _isCheckingExistingPin = false;
+        });
+      }
+    }
   }
 
   @override
@@ -105,6 +152,18 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
 
   @override
   Widget build(BuildContext context) {
+    // แสดง Loading ถ้ากำลังเช็ค PIN จาก server
+    if (_isCheckingExistingPin) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -348,39 +407,7 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
           // ปุ่มตัวเลข
           return Expanded(
             child: _buildNumpadButton(
-              onTap: () => viewModel.addDigit(number, () {
-                // on Saved - ตรวจสอบว่า Device รองรับ Biometric หรือไม่
-                AppOverlays.showLoading(context);
-                _viewModel.isBiometricAvailable().then((available) {
-                  AppOverlays.hideLoading();
-
-                  if (!mounted) return;
-
-                  if (available) {
-                    // รองรับ Biometric → ไปหน้า Biometric
-                    context.pushReplacementNamed(
-                      BiometricPage.pageName,
-                      extra: {
-                        BiometricPage.kFirstSignup: widget.isFirstSignup,
-                      },
-                    );
-                  } else {
-                    // ถ้ามาจากการสมัครสมาชิก จะไปหน้า setup profile ต่อ แต่ถ้ามาจาก Login
-                    // จะ pop ออก
-                    if (widget.isFirstSignup) {
-                      // ไม่รองรับ → ไป Profile ทันที
-                      context.pushNamedAndClear(
-                        ProfilePage.pageName,
-                        extra: {
-                          ProfilePage.kFirstSignup: widget.isFirstSignup,
-                        },
-                      );
-                    } else {
-                      context.pop();
-                    }
-                  }
-                });
-              }),
+              onTap: () => viewModel.addDigit(number, _onSavedPin),
               child: AppText(
                 number,
                 style: AppTextNumberStyles.headlineLarge.copyWith(
@@ -393,6 +420,40 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
         }
       }).toList(),
     );
+  }
+
+  void _onSavedPin() {
+    // on Saved - ตรวจสอบว่า Device รองรับ Biometric หรือไม่
+    AppOverlays.showLoading(context);
+    _viewModel.isBiometricAvailable().then((available) {
+      AppOverlays.hideLoading();
+
+      if (!mounted) return;
+
+      if (available) {
+        // รองรับ Biometric → ไปหน้า Biometric
+        context.pushReplacementNamed(
+          BiometricPage.pageName,
+          extra: {
+            BiometricPage.kFirstSignup: widget.isFirstSignup,
+          },
+        );
+      } else {
+        // ถ้ามาจากการสมัครสมาชิก จะไปหน้า setup profile ต่อ แต่ถ้ามาจาก Login
+        // จะ pop ออก
+        if (widget.isFirstSignup) {
+          // ไม่รองรับ → ไป Profile ทันที
+          context.pushNamedAndClear(
+            ProfilePage.pageName,
+            extra: {
+              ProfilePage.kFirstSignup: widget.isFirstSignup,
+            },
+          );
+        } else {
+          context.pop();
+        }
+      }
+    });
   }
 
   /// สร้างปุ่ม Numpad (วงกลมใส, กดแล้วมี ripple effect สีเขียว)

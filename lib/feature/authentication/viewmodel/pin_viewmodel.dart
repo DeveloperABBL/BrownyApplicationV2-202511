@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
 import 'package:flutter/material.dart';
@@ -128,7 +129,10 @@ class PinBiometricViewModel extends AppViewModel {
     notifyListeners();
 
     try {
-      final result = await _repository.savePin(_pin);
+      final result = await _repository.savePin(
+        _pin,
+        customerId: currentCustomerProvider.current.id.orEmpty,
+      );
 
       _isLoading = false;
 

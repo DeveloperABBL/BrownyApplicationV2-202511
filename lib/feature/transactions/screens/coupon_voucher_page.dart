@@ -1,16 +1,7 @@
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/core/widgets/coupon_e_voucher_card_widget.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 class CouponVoucherPage extends StatelessWidget {
   const CouponVoucherPage({super.key});
@@ -680,7 +671,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
             // Title EVoucher ที่ Customer มีอยู่
             ElevatedButton.icon(
               onPressed: null,
-              icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
+              icon: Assets.svg.icEvoucherCheckRoundedGreen.svg(),
               label: AppText(
                 'E-Voucher ของฉัน',
                 style: context.textTheme.labelLarge!.copyWith(
@@ -723,15 +714,29 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                     ...evoucherList
                         .take(_myEVoucherExpanded ? lengthList : 2)
                         .map(
-                          (e) => CouponEVoucherCardWidget(
-                            icon: Image.network(
-                              e.imageUrlDisplay(context),
-                              errorBuilder: (_, _, _) => _onImageError(),
+                          (customerEVoucher) => GestureDetector(
+                            onTap: () => widget._viewModel.goSelectedPage(
+                              context,
+                              customerEVoucher,
                             ),
-                            title: e.packageNameDisplay(context),
-                            description: e.storeNameDisplay(context),
-                            detailUsing: e.usageLabelDisplay(context),
-                            expired: e.expireDateDisplay(context),
+                            child: CouponEVoucherCardWidget(
+                              icon: Image.network(
+                                customerEVoucher.imageUrlDisplay(context),
+                                errorBuilder: (_, _, _) => _onImageError(),
+                              ),
+                              title: customerEVoucher.packageNameDisplay(
+                                context,
+                              ),
+                              description: customerEVoucher.storeNameDisplay(
+                                context,
+                              ),
+                              detailUsing: customerEVoucher.usageLabelDisplay(
+                                context,
+                              ),
+                              expired: customerEVoucher.expireDateDisplay(
+                                context,
+                              ),
+                            ),
                           ),
                         ),
 
@@ -771,7 +776,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
             // ),
             ElevatedButton.icon(
               onPressed: null, //() => _viewModel.goPurchasePage(context),
-              icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
+              icon: Assets.svg.icEvoucherPercentRoundedGreen.svg(),
               label: AppText(
                 'เลือกซื้อแพ็คเกจ E-Voucher',
                 style: context.textTheme.labelLarge!.copyWith(

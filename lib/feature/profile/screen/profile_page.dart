@@ -74,6 +74,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       AppOverlays.showLoading(context);
       await _viewModel.fetchProfileData();
+
+      if (mounted && widget.isFirstSignup) {
+        await _showBirthDayOffers(context);
+      }
     });
   }
 

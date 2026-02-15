@@ -33,6 +33,7 @@ class CustomDropdown<T> extends StatefulWidget {
   final VoidCallback? onNoItemsFound;
   final VoidCallback? onLocationTap;
   final bool isInteractive;
+  final bool showDisableDecoration;
 
   const CustomDropdown({
     super.key,
@@ -43,6 +44,7 @@ class CustomDropdown<T> extends StatefulWidget {
     this.onNoItemsFound,
     this.onLocationTap,
     this.isInteractive = true,
+    this.showDisableDecoration = false,
   });
 
   @override
@@ -261,7 +263,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                     horizontal: 8,
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: widget.showDisableDecoration
+                      ? AppColors.bareBackground
+                      : AppColors.white,
                   border: OutlineInputBorder(
                     borderRadius: _mainRadius,
                     borderSide: BorderSide(
@@ -334,7 +338,10 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             AppDims.horizonPadding_4,
             // Container Icon
             Material(
-              color: Colors.white,
+              color: widget.showDisableDecoration
+                  ? AppColors.bareBackground
+                  : AppColors.white,
+              borderRadius: _mainRadius,
               child: InkWell(
                 onTap: widget.onLocationTap,
                 borderRadius: _mainRadius,
@@ -349,7 +356,12 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(8.0.w),
-                    child: Assets.svg.icLocation.svg(),
+                    child: Assets.svg.icLocation.svg(
+                      colorFilter: ColorFilter.mode(
+                        AppColors.gray500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
               ),

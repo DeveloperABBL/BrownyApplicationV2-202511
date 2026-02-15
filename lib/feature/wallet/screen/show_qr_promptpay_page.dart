@@ -16,6 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ShowQRPromptpayPage extends StatefulWidget {
@@ -37,39 +38,73 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
   final GlobalKey _qrKey = GlobalKey();
   late WebViewController controller;
   String? _qrCodeData;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
-    if (_qrCodeData != null) {
-      widget.viewModel.startPaymentStatusCheck(() {
-        if (mounted) {
-          context.pushReplacementNamed(
-            PaymentSuccessPage.pageName,
-            extra: widget.viewModel,
-          );
-        }
-      });
-    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+      if (_qrCodeData != null) {
+        widget.viewModel.startPaymentStatusCheck(() {
+          if (mounted) {
+            context.pushReplacementNamed(
+              PaymentSuccessPage.pageName,
+              extra: widget.viewModel,
+            );
+          }
+        });
+      }
+    });
   }
 
   void _initializeData() {
     final topupResponse = widget.viewModel.topupResponse;
     if (topupResponse != null) {
-      _qrCodeData = topupResponse.qrCodeData;
+      // _qrCodeData = topupResponse.qrCodeData;
+      _qrCodeData = _extractQRDataFromUrl(topupResponse.qrCodeData);
     }
 
-    controller = WebViewController()
-      ..setJavaScriptMode(
-        JavaScriptMode.unrestricted,
-      )
-      ..setBackgroundColor(
-        const Color(0x00000000),
-      )
-      ..loadRequest(
-        Uri.parse(_qrCodeData.orEmpty),
-      );
+    // controller = WebViewController()
+    //   ..setJavaScriptMode(
+    //     JavaScriptMode.unrestricted,
+    //   )
+    //   ..setBackgroundColor(
+    //     const Color(0x00000000),
+    //   )
+    //   ..loadRequest(
+    //     Uri.parse(_qrCodeData.orEmpty),
+    //   );
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  /// DONG 2026-02-15
+  /// เปลี่ยนวิธีการแสดง QRCode เพราะมีปัญหาเรื่องการ capture Image ที่แสดงผ่าน ​WebView ไม่ได้
+  /// Extract QR code data string from URL
+  /// Example: https://dev.abgroup.co.th/pay/wallet/00020101021...
+  /// Returns: 00020101021...
+  String? _extractQRDataFromUrl(String? url) {
+    if (url == null || url.isEmpty) return null;
+
+    final uri = Uri.tryParse(url);
+    if (uri == null) return url;
+
+    // Get the last segment of the path
+    final segments = uri.pathSegments;
+    if (segments.isEmpty) return url;
+
+    final qrData = segments.last;
+
+    // Validate if it looks like PromptPay QR data (starts with 00020101)
+    if (qrData.startsWith('00020101')) {
+      return qrData;
+    }
+
+    // If not, return the original URL (might be direct QR string)
+    return url;
   }
 
   Future<void> _captureAndSaveQR() async {
@@ -196,145 +231,159 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
           },
         );
       },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: AppColors.darkBlue,
-          title: AppText(
-            context.wording.payment,
-            style: context.textTheme.titleLarge!.copyWith(
-              color: AppColors.white,
-            ),
-          ),
-          centerTitle: true,
-        ),
-
-        bottomSheet: Padding(
-          padding: EdgeInsets.only(
-            left: AppDims.size_24.w,
-            right: AppDims.size_24.w,
-            bottom: AppDims.size_24.w,
-            top: AppDims.size_8.w,
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: context.appTheme.elevatedButtonTheme.style!.copyWith(
-              backgroundColor: WidgetStatePropertyAll(
-                AppColors.walletBackground,
+      // ถ้า loading อยู่ให้แสดง CircularProgressIndicator ก่อน
+      child: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: AppColors.walletBackground,
               ),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.hovered)) {
-                    return AppColors.walletBackgroundHover.withValues(
-                      alpha: 0.1,
-                    );
-                  }
-                  if (states.contains(WidgetState.pressed)) {
-                    return AppColors.walletBackgroundClicked.withValues(
-                      alpha: 0.7,
-                    );
-                  }
-                  return null;
-                },
-              ),
-            ),
-            child: AppText(
-              context.wording.backToHome,
-              style: context.textTheme.labelLarge!.copyWith(
-                color: AppColors.white,
-              ),
-            ),
-          ),
-        ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.centerRight,
-              colors: [
-                AppColors.walletBackgroundHover.withValues(alpha: 0.1),
-                AppColors.background,
-              ],
-            ),
-          ),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_24.w,
-                  vertical: AppDims.size_32.h,
+            )
+          : Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                backgroundColor: AppColors.darkBlue,
+                title: AppText(
+                  context.wording.payment,
+                  style: context.textTheme.titleLarge!.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // QR Code Section
-                    RepaintBoundary(
-                      key: _qrKey,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(16.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 10.r,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        padding: EdgeInsets.all(AppDims.size_24.w),
-                        child: Column(
-                          children: [
-                            // PromptPay Logo
-                            Assets.png.promptpayBadgeNoLine.image(
-                              height: 73.w,
-                              width: 228.h,
-                            ),
-                            AppDims.vericalPadding_16,
-
-                            // QR Code
-                            if (_qrCodeData.orEmpty.isNotEmpty)
-                              SizedBox(
-                                width: 228.w,
-                                height: 228.h,
-                                child: WebViewWidget(
-                                  controller: controller,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
+                centerTitle: true,
+              ),
+              bottomSheet: Padding(
+                padding: EdgeInsets.only(
+                  left: AppDims.size_24.w,
+                  right: AppDims.size_24.w,
+                  bottom: AppDims.size_24.w,
+                  top: AppDims.size_8.w,
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: context.appTheme.elevatedButtonTheme.style!.copyWith(
+                    backgroundColor: WidgetStatePropertyAll(
+                      AppColors.walletBackground,
                     ),
-
-                    AppDims.vericalPadding_24,
-
-                    // ปุ่มบันทึกรูปภาพ
-                    GestureDetector(
-                      onTap: _captureAndSaveQR,
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return AppColors.walletBackgroundHover.withValues(
+                            alpha: 0.1,
+                          );
+                        }
+                        if (states.contains(WidgetState.pressed)) {
+                          return AppColors.walletBackgroundClicked.withValues(
+                            alpha: 0.7,
+                          );
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  child: AppText(
+                    context.wording.backToHome,
+                    style: context.textTheme.labelLarge!.copyWith(
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ),
+              body: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.walletBackgroundHover.withValues(alpha: 0.1),
+                      AppColors.background,
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_24.w,
+                        vertical: AppDims.size_32.h,
+                      ),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Assets.svg.icDownStorage.svg(),
-                          AppDims.vericalPadding_8,
-                          AppText(
-                            context.wording.save,
-                            style: context.textTheme.labelLarge!.copyWith(
-                              color: AppColors.textBlack,
+                          // QR Code Section
+                          RepaintBoundary(
+                            key: _qrKey,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(16.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 10.r,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: EdgeInsets.all(AppDims.size_24.w),
+                              child: Column(
+                                children: [
+                                  // PromptPay Logo
+                                  Assets.png.promptpayBadgeNoLine.image(
+                                    height: 73.w,
+                                    width: 228.h,
+                                  ),
+                                  AppDims.vericalPadding_16,
+
+                                  // QR Code using qr_flutter
+                                  if (_qrCodeData.orEmpty.isNotEmpty)
+                                    // SizedBox(
+                                    //   width: 228.w,
+                                    //   height: 228.h,
+                                    //   child: WebViewWidget(
+                                    //     controller: controller,
+                                    //   ),
+                                    // ),
+                                    QrImageView(
+                                      data: _qrCodeData!,
+                                      version: QrVersions.auto,
+                                      size: 228.w,
+                                      backgroundColor: Colors.white,
+                                      errorCorrectionLevel:
+                                          QrErrorCorrectLevel.M,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          AppDims.vericalPadding_24,
+
+                          // ปุ่มบันทึกรูปภาพ
+                          GestureDetector(
+                            onTap: _captureAndSaveQR,
+                            child: Column(
+                              children: [
+                                Assets.svg.icDownStorage.svg(),
+                                AppDims.vericalPadding_8,
+                                AppText(
+                                  context.wording.save,
+                                  style: context.textTheme.labelLarge!.copyWith(
+                                    color: AppColors.textBlack,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

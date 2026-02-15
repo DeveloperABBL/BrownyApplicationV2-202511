@@ -60,6 +60,16 @@ class PinNotSet extends PinExceptions {
   }
 }
 
+/// Validation error จาก server (HTTP 422)
+class ValidationPinError extends PinExceptions {
+  ValidationPinError([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return message ?? 'ข้อมูล PIN ไม่ถูกต้อง';
+  }
+}
+
 // ========== Biometric Exceptions ==========
 
 sealed class BiometricExceptions implements Exception {
