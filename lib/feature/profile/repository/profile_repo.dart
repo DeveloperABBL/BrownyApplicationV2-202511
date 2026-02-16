@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
-import 'package:browny_applications_new/core/data/cache/biometric_helper.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -49,7 +48,7 @@ class ProfileRepo extends CustomerDataRepo with ProfileDataSourceMixin {
           'HTTP ${response.response.statusCode}: ${response.response.statusMessage}',
         ),
       );
-    } on DioException catch (dio) {
+    } on DioException catch (_) {
       return RepoResult.empty(error: Unprocessable());
     } catch (e) {
       return RepoResult.error(error: Exception(e.toString()));

@@ -9,7 +9,9 @@ import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/core/widgets/store_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/feature/map/repository/map_repo.dart';
+import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/map/viewmodel/map_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -172,20 +174,48 @@ class _MapContentState extends State<MapContent> {
         markerId: MarkerId('${store.type}#${store.id.toString()}'),
         position: LatLng(store.latitudeValue, store.longitudeValue),
         icon: store.markerIconActive ?? BitmapDescriptor.defaultMarker,
-        infoWindow: InfoWindow(
-          title: store.getLocalizedName(context.languageCode),
-          snippet: store.getLocalizedAddress(context.languageCode),
-        ),
-        onTap: () {
-          _onMarkerTapped(store);
+        // infoWindow: InfoWindow(
+        //   title: store.getLocalizedName(context.languageCode),
+        //   snippet: store.getLocalizedAddress(context.languageCode),
+        // ),
+        onTap: () async {
+          await _onMarkerTapped(store);
         },
       );
     }).toSet();
   }
 
   /// Handle marker tap
-  void _onMarkerTapped(StoreLocationItem store) {
-    print('Store tapped: ${store.getLocalizedName('th')}');
+  Future<void> _onMarkerTapped(StoreLocationItem store) async {
+    AppOverlays.showLoading(context);
+    final storeResult = await _viewmodel.fetchStoreDetail(
+      storeId: store.id?.toString() ?? '',
+      latitude: _currentPosition?.latitude.toString(),
+      longitude: _currentPosition?.longitude.toString(),
+    );
+
+    AppOverlays.hideLoading();
+    if (!mounted) return;
+
+    if (storeResult.isEmpty || storeResult.hasError) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: 'ไม่พบข้อมูล',
+        message: context.wording.errorUi,
+      );
+      return;
+    }
+    // print('Store tapped: ${store.getLocalizedName('th')}');
+    StoreBottomSheetDialog.showDialog(
+      context,
+      storeResult.data!,
+      (heroTag) {
+        context.pushNamed(
+          StoreDetailPage.pageName,
+          extra: storeResult.data!,
+        );
+      },
+    );
   }
 
   /// Start listening to voice input
@@ -231,9 +261,7 @@ class _MapContentState extends State<MapContent> {
       listenFor: const Duration(seconds: 10),
       pauseFor: const Duration(seconds: 3),
       // ตาม Local
-      localeId: Locale.fromSubtags(
-        scriptCode: context.languageCode,
-      ).countryCode,
+      localeId: context.languageCode,
     );
   }
 
@@ -320,7 +348,7 @@ class _MapContentState extends State<MapContent> {
                             optionsBuilder:
                                 (TextEditingValue textEditingValue) {
                                   if (textEditingValue.text.isEmpty) {
-                                    return List.empty();
+                                    return _viewmodel.storeList.take(4);
                                   }
                                   return _viewmodel.storeList.where(
                                     (item) => item
@@ -330,12 +358,15 @@ class _MapContentState extends State<MapContent> {
                                         ),
                                   );
                                 },
+                            // สิ่งที่จะเอาแสดง
                             displayStringForOption: (option) {
                               return option.getLocalizedName(
                                 context.languageCode,
                               );
                             },
+                            // List drop จากช่อง Search
                             optionsViewBuilder: _buildOptionsViewBuilder,
+                            // ช่อง Search
                             fieldViewBuilder: _buildFieldViewBuilder,
                             onSelected: (option) => unawaited(
                               _onFilterSelected(option),
@@ -571,27 +602,32 @@ class _MapContentState extends State<MapContent> {
         itemBuilder: (context, i) {
           final data = options.toList()[i];
 
-          // TODO Mockup
+          // TODO เหลือเงื่อนไขปิดปรับปรุง
           String subTitle;
           TextStyle subTitleStyle;
-          if (i == 2) {
-            subTitle = 'เต็ม';
-            subTitleStyle = context.textTheme.labelLarge!.copyWith(
-              color: AppColors.error,
-            );
-          } else if (i == 3) {
-            subTitle = 'ปิดปรับปรุง';
-            subTitleStyle = context.textTheme.labelLarge!.copyWith(
-              color: AppColors.yellow2,
-            );
-          } else {
+          if (data.isMachineAvailable) {
             subTitle = 'ว่าง';
             subTitleStyle = context.textTheme.labelLarge!.copyWith(
               color: AppColors.primary,
             );
+          } else {
+            subTitle = 'เต็ม';
+            subTitleStyle = context.textTheme.labelLarge!.copyWith(
+              color: AppColors.error,
+            );
           }
+          // if (i == 3) {
+          //   subTitle = 'ปิดปรับปรุง';
+          //   subTitleStyle = context.textTheme.labelLarge!.copyWith(
+          //     color: AppColors.yellow2,
+          //   );
+          // }
           return ListTile(
-            leading: Assets.svg.icLocation.svg(),
+            // leading: Assets.svg.icLocation.svg(),
+            leading: Image.network(
+              width: AppDims.size_40.w,
+              data.icon.orEmpty,
+            ),
             title: AppText(
               data.getLocalizedName(
                 context.languageCode,
@@ -635,9 +671,10 @@ class _MapContentState extends State<MapContent> {
   Widget _buildCardFilterServices({
     required StoreLocationItem service,
     required AssetGenImage image,
+    int width = 115,
   }) {
     return Container(
-      width: 115.w,
+      width: width.w,
       padding: EdgeInsets.only(
         top: AppDims.size_40.h,
         bottom: AppDims.size_48.h,
@@ -695,11 +732,13 @@ class _MapContentState extends State<MapContent> {
     _searchController.text = service.getLocalizedName(
       context.languageCode,
     );
-
-    await _moveCameraTo(
-      LatLng(
-        service.latitudeValue,
-        service.longitudeValue,
+    await _onMarkerTapped(service);
+    unawaited(
+      _moveCameraTo(
+        LatLng(
+          service.latitudeValue,
+          service.longitudeValue,
+        ),
       ),
     );
   }

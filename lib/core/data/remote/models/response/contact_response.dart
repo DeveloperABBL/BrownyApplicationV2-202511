@@ -24,12 +24,20 @@ class ContactResponse {
   @JsonKey(name: 'tiktok_link')
   final String? tiktokLink;
 
+  @JsonKey(name: 'register_terms_link')
+  final String? registerTermsLink;
+
+  @JsonKey(name: 'browny_care_contact')
+  final String? brownyCareContact;
+
   ContactResponse({
     this.problemLink,
     this.facebookLink,
     this.lineLink,
     this.youtubeLink,
     this.tiktokLink,
+    this.registerTermsLink,
+    this.brownyCareContact,
   });
 
   factory ContactResponse.fromJson(Map<String, dynamic> json) =>

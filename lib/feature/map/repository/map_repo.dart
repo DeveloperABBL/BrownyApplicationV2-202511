@@ -1,5 +1,7 @@
 import 'package:browny_applications_new/core/data/remote/models/converters/marker_icon_converter.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/store_location_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/location_helper.dart';
@@ -12,6 +14,13 @@ mixin MapDataSourceMixin {
   /// Fetch map locations พร้อม marker icons
   Future<RepoResult<List<StoreLocationItem>>> fetchMapLocations({
     LatLng? currentPosition,
+  });
+
+  /// Fetch ข้อมูลร้านค้าแบบละเอียดตาม storeId และตำแหน่งปัจจุบัน
+  Future<RepoResult<StoreDataDetail>> fetchStoreDetail({
+    required String storeId,
+    required String? latitude,
+    required String? longitude,
   });
 }
 
@@ -111,6 +120,34 @@ class MapRepo extends AppRepository with MapDataSourceMixin {
     } finally {
       // ปิด Dio instance ของ converter
       converter.dispose();
+    }
+  }
+
+  @override
+  Future<RepoResult<StoreDataDetail>> fetchStoreDetail({
+    required String storeId,
+    required String? latitude,
+    required String? longitude,
+  }) async {
+    try {
+      // สร้าง request body
+      final request = StoreLocationRequest(
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      // เรียก API
+      final response = await requireRemote.fetchStoreDetail(storeId, request);
+
+      if (!response.isSuccessful || response.data.data == null) {
+        return RepoResult.empty();
+      }
+
+      return RepoResult.success(data: response.data.data!);
+    } on DioException catch (dioEx) {
+      return RepoResult.error(error: dioEx);
+    } on Object catch (e) {
+      return RepoResult.error(error: e as Exception);
     }
   }
 }

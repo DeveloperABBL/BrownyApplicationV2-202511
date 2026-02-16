@@ -177,7 +177,7 @@ class AppOverlays {
         confirmText: confirmText,
         cancelText: cancelText,
         image: image,
-        imageAsset: imageAsset ?? Assets.png.brownyError2.path,
+        imageAsset: imageAsset ?? Assets.png.brownyError1.path,
         onConfirm: () {
           onConfirm?.call();
           dismiss(true);
@@ -462,7 +462,7 @@ class _BrownyDialog extends StatelessWidget {
                         confirmText,
                       ),
                     ),
-                    AppDims.vericalPadding_12,
+                    AppDims.vericalPadding_8,
 
                     OutlinedButton(
                       onPressed: onCancel,

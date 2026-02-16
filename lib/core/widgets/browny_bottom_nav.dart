@@ -81,7 +81,12 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
         label: context.wording.branch,
       ),
       BottomNavigationBarItem(
-        icon: Assets.svg.icShop.svg(),
+        icon: Assets.svg.icShop.svg(
+          colorFilter: ColorFilter.mode(
+            AppColors.gray500,
+            BlendMode.srcIn,
+          ),
+        ),
         activeIcon: Assets.svg.icShopActive.svg(),
         label: context.wording.shop,
       ),
@@ -98,12 +103,14 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
       }
       final bool selected = i == widget.currentIndex;
       final item = items[i];
+      bool enable = item.label != context.wording.shop;
       itemWidgets.add(
         _NavItem(
           icon: selected ? item.activeIcon : item.icon,
           label: item.label ?? '',
           selected: selected,
           showLabel: widget.showLabels,
+          enable: enable,
           onTap: () => widget.onTap(i),
         ),
       );
@@ -232,12 +239,14 @@ class _NavItem extends StatelessWidget {
     required this.selected,
     required this.showLabel,
     required this.onTap,
+    this.enable = true,
   });
 
   final Widget icon;
   final String label;
   final bool selected;
   final bool showLabel;
+  final bool enable;
   final VoidCallback onTap;
 
   @override
@@ -246,9 +255,9 @@ class _NavItem extends StatelessWidget {
       builder: (context, constraints) {
         final bool canShowLabel =
             showLabel && label.trim().isNotEmpty && constraints.maxHeight >= 48;
-        final Color iconColor = selected
-            ? AppColors.primary
-            : AppColors.textSecondary;
+        final Color iconColor = enable
+            ? (selected ? AppColors.primary : AppColors.textSecondary)
+            : AppColors.gray500;
         final double iconSize = canShowLabel ? 24 : 28;
 
         Widget iconWidget = IconTheme(
@@ -280,7 +289,7 @@ class _NavItem extends StatelessWidget {
                         fontSize: 10.sp,
                         height: 1.1,
                         letterSpacing: 0.3,
-                        color: AppColors.primary,
+                        color: enable ? AppColors.primary : AppColors.gray500,
                       ),
                     ),
                 ],

@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
@@ -7,6 +8,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
@@ -29,7 +31,6 @@ import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -231,6 +232,13 @@ class AppRouter {
         name: MapPage.pageName,
         builder: (context, state) {
           return MapPage();
+        },
+      ),
+      GoRoute(
+        path: StoreDetailPage.pagePath,
+        name: StoreDetailPage.pageName,
+        builder: (context, state) {
+          return StoreDetailPage(storeDetail: state.extra as StoreDataDetail);
         },
       ),
       GoRoute(

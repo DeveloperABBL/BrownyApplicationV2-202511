@@ -529,7 +529,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                             ),
                         separatorBuilder: (context, index) =>
                             AppDims.horizonPadding_8,
-                        itemCount: Assets.services.values.length,
+                        itemCount: Assets.services.values.take(2).length,
                       ),
                     ),
                   ],

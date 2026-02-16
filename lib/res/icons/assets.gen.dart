@@ -462,8 +462,31 @@ class $AssetsServicesGen {
   AssetGenImage get cCharger =>
       const AssetGenImage('assets/services/c_charger.png');
 
+  /// File path: assets/services/ic_dryer.svg
+  SvgGenImage get icDryer => const SvgGenImage('assets/services/ic_dryer.svg');
+
+  /// File path: assets/services/ic_washer.svg
+  SvgGenImage get icWasher =>
+      const SvgGenImage('assets/services/ic_washer.svg');
+
+  /// File path: assets/services/store_dryer.png
+  AssetGenImage get storeDryer =>
+      const AssetGenImage('assets/services/store_dryer.png');
+
+  /// File path: assets/services/store_washer.png
+  AssetGenImage get storeWasher =>
+      const AssetGenImage('assets/services/store_washer.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [aWasher, bDryer, cCharger];
+  List<dynamic> get values => [
+    aWasher,
+    bDryer,
+    cCharger,
+    icDryer,
+    icWasher,
+    storeDryer,
+    storeWasher,
+  ];
 }
 
 class $AssetsSvgGen {
@@ -624,6 +647,10 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_headset.svg
   SvgGenImage get icHeadset => const SvgGenImage('assets/svg/ic_headset.svg');
 
+  /// File path: assets/svg/ic_heart_rounded_green.svg
+  SvgGenImage get icHeartRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_heart_rounded_green.svg');
+
   /// File path: assets/svg/ic_history.svg
   SvgGenImage get icHistory => const SvgGenImage('assets/svg/ic_history.svg');
 
@@ -674,6 +701,10 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_magnify.svg
   SvgGenImage get icMagnify => const SvgGenImage('assets/svg/ic_magnify.svg');
+
+  /// File path: assets/svg/ic_maps_arrow.svg
+  SvgGenImage get icMapsArrow =>
+      const SvgGenImage('assets/svg/ic_maps_arrow.svg');
 
   /// File path: assets/svg/ic_my_location_reg_white.svg
   SvgGenImage get icMyLocationRegWhite =>
@@ -837,6 +868,7 @@ class $AssetsSvgGen {
     icFlagTh,
     icFlagZh,
     icHeadset,
+    icHeartRoundedGreen,
     icHistory,
     icHistory2,
     icHome,
@@ -851,6 +883,7 @@ class $AssetsSvgGen {
     icLocationRoundedGreen,
     icLogin,
     icMagnify,
+    icMapsArrow,
     icMyLocationRegWhite,
     icNotification,
     icObscureOff,

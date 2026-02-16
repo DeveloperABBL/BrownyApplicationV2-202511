@@ -1320,14 +1320,12 @@ class _LoginWidget extends _SignUpWidget {
   /// - อื่นๆ: ข้อผิดพลาดทั่วไป
   void _showLoginErrorDialog(BuildContext context, dynamic error) {
     String message;
-    String imageAsset;
+    String imageAsset = Assets.png.brownyError1.path;
 
     if (error is UserNotFound || error is UserUnauthorized) {
       message = (error as AuthenExceptions).toUiMessage(context);
-      imageAsset = Assets.png.brownyError1.path;
     } else {
       message = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
-      imageAsset = Assets.png.brownyError2.path;
     }
 
     AppOverlays.showBrownyDialog(

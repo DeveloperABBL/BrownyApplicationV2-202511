@@ -41,6 +41,7 @@ StoreLocationItem _$StoreLocationItemFromJson(Map<String, dynamic> json) =>
             ),
       markerIconActiveUrl: json['marker_icon_active'] as String?,
       markerIconInactiveUrl: json['marker_icon_inactive'] as String?,
+      icon: json['icon'] as String?,
     );
 
 Map<String, dynamic> _$StoreLocationItemToJson(StoreLocationItem instance) =>
@@ -60,4 +61,5 @@ Map<String, dynamic> _$StoreLocationItemToJson(StoreLocationItem instance) =>
       'address': instance.address,
       'marker_icon_active': instance.markerIconActiveUrl,
       'marker_icon_inactive': instance.markerIconInactiveUrl,
+      'icon': instance.icon,
     };

@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -98,6 +99,9 @@ class StoreLocationItem {
   @JsonKey(name: 'marker_icon_inactive')
   final String? markerIconInactiveUrl;
 
+  @JsonKey(name: 'icon')
+  final String? icon;
+
   /// BitmapDescriptor สำหรับ marker icon active (ไม่ได้จาก JSON)
   @JsonKey(includeFromJson: false, includeToJson: false)
   BitmapDescriptor? markerIconActive;
@@ -105,10 +109,6 @@ class StoreLocationItem {
   /// BitmapDescriptor สำหรับ marker icon inactive (ไม่ได้จาก JSON)
   @JsonKey(includeFromJson: false, includeToJson: false)
   BitmapDescriptor? markerIconInactive;
-
-  // เก็บ Icon สำหรับแสดงตอน Search
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  final String? icon;
 
   // เก็บระยะห่างจากจุดมาถึง latlong ของ store
   // คำนวณแบบกระจัด
@@ -162,6 +162,9 @@ class StoreLocationItem {
 
   /// Helper: แปลง vacant_dryer เป็น int
   int get vacantDryerValue => int.tryParse(vacantDryer ?? '') ?? 0;
+
+  bool get isMachineAvailable =>
+      vacantDryer.orEmpty != '0' || vacantWasher.orEmpty != '0';
 
   /// Helper: ดึงชื่อตาม locale
   String getLocalizedName(String locale) {
@@ -239,38 +242,71 @@ class StoreLocationItem {
   }
 
   String getTypeToTypeName(String locale) {
-    if (type == 'browny') {
-      switch (locale) {
-        case 'zh':
-          return 'บริการซักอบ';
-        case 'en':
-          return 'บริการซักอบ';
-        default:
-          return 'บริการซักอบ';
-      }
+    switch (type) {
+      case 'browny':
+        switch (locale) {
+          case 'zh':
+            return '洗烘服务';
+          case 'en':
+            return 'Laundry Service';
+          default:
+            return 'บริการซักอบ';
+        }
+      case 'browny_plus':
+        switch (locale) {
+          case 'zh':
+            return '洗烘折叠服务';
+          case 'en':
+            return 'Laundry Fold Service';
+          default:
+            return 'บริการซัก อบ พับ';
+        }
+      case 'charging_station':
+        switch (locale) {
+          case 'zh':
+            return '电动车充电站';
+          case 'en':
+            return 'EV Charging Station';
+          default:
+            return 'บริการชาร์จ EV';
+        }
+      default:
+        return '';
     }
-    if (type == 'browny_plus') {
-      switch (locale) {
-        case 'zh':
-          return 'บริการซัก อบ พับ';
-        case 'en':
-          return 'บริการซัก อบ พับ';
-        default:
-          return 'บริการซัก อบ พับ';
-      }
-    }
-    if (type == 'charging_station') {
-      switch (locale) {
-        case 'zh':
-          return 'บริการชาร์จ EV';
-        case 'en':
-          return 'บริการชาร์จ EV';
-        default:
-          return 'บริการชาร์จ EV';
-      }
-    }
+  }
 
-    return '';
+  String getTypeToTypeNameWithType(String locale) {
+    switch (type) {
+      case 'browny':
+        switch (locale) {
+          case 'zh':
+            return 'Browny 洗烘服务';
+          case 'en':
+            return 'Browny Laundry Service';
+          default:
+            return 'Browny บริการซักอบ';
+        }
+      case 'browny_plus':
+        switch (locale) {
+          case 'zh':
+            return 'Browny+ 洗烘折叠服务';
+          case 'en':
+            return 'Browny+ Laundry Fold Service';
+          default:
+            return 'Browny+ บริการซัก อบ พับ';
+        }
+      case 'charging_station':
+        switch (locale) {
+          case 'zh':
+            return 'Charging Station 电动车充电站';
+          case 'en':
+            return 'Charging Station EV Charging';
+          default:
+            return 'Charging Station บริการชาร์จ EV';
+        }
+      default:
+        return '';
+    }
   }
 
   /// Helper: ดึง address ตาม locale

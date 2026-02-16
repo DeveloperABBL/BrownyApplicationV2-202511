@@ -74,6 +74,9 @@
 	<!-- TODO Replace this value: -->
 	<!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
 	<string>261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq.apps.googleusercontent.com</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<!-- Google Sign-In URL Scheme -->
@@ -116,6 +119,7 @@
 		<string>whatsapp</string>
 		<string>line</string>
 		<string>lineauth2</string>
+		<string>comgooglemaps</string>
 	</array>
 </dict>
 </plist>

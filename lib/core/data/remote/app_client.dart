@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/device_l
 import 'package:browny_applications_new/core/data/remote/models/request/pin_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/store_location_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
@@ -34,6 +35,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/payment
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/update_notification_preferences_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
@@ -73,6 +75,22 @@ abstract class AppClient {
         () => 'Bearer ${config.token}',
       );
   }
+
+  /// DONG 2026-02-15
+  ///
+  /// API fetch ข้อมูลร้านค้าตาม location (latitude, longitude)
+  ///
+  /// Body parameters:
+  /// - latitude: String
+  /// - longitude: String
+  ///
+  /// Response:
+  /// - StoreDetailResponse with store info, services, machines status
+  @GET('/{storeId}/store')
+  Future<HttpResponse<StoreDetailResponse>> fetchStoreDetail(
+    @Path('storeId') String storeId,
+    @Body() StoreLocationRequest body,
+  );
 
   /// DONG 2026-02-13
   ///

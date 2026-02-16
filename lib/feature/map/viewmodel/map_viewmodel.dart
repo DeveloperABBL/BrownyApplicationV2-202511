@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -55,5 +56,31 @@ class MapViewModel extends AppViewModel {
     }
 
     return UiResult.success(data: _storeList);
+  }
+
+  /// Fetch รายละเอียดร้านค้าตาม storeId และตำแหน่งปัจจุบัน
+  ///
+  /// Parameters:
+  /// - storeId: ID ของร้านค้า
+  /// - latitude: ละติจูดของตำแหน่งปัจจุบัน
+  /// - longitude: ลองจิจูดของตำแหน่งปัจจุบัน
+  ///
+  /// Returns: UiResult&lt;StoreData&gt; ที่มีข้อมูลร้านค้าละเอียด รวมถึงสถานะเครื่องซัก/อบ
+  Future<UiResult<StoreDataDetail>> fetchStoreDetail({
+    required String storeId,
+    required String? latitude,
+    required String? longitude,
+  }) async {
+    final result = await repo.fetchStoreDetail(
+      storeId: storeId,
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    if (result.isEmpty || result.hasError) {
+      return UiResult.empty();
+    }
+
+    return UiResult.success(data: result.data);
   }
 }
