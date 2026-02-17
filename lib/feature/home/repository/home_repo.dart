@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
@@ -11,6 +12,9 @@ import 'package:browny_applications_new/feature/authentication/repository/custom
 mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   /// ดึงข้อมูล Banner สำหรับแสดงในหน้าหลัก
   Future<RepoResult<BannerResponse>> fetchBanner();
+
+  /// ดึงข้อมูล Banner Highlight สำหรับแสดงในหน้าหลัก
+  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight();
 
   /// ดึงข้อมูล Home Menu Items (รายการเมนูหน้าหลัก)
   Future<RepoResult<HomeMenuResponse>> fetchHomeMenu();
@@ -26,11 +30,19 @@ mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   /// - ไม่ถูก dismiss ไปแล้วในวันนี้
   Future<RepoResult<List<PopupData>>> fetchPopups({String? showOn});
 
+  /// DONG 2026-02-17
+  ///
+  /// ดึงข้อมูลว่า Popup inivit Friend วันนี้แสดงไปแล้วหรือยัง
+  Future<RepoResult<bool>> fetchPopupInvitFriend();
+
   /// บันทึกว่า popup นี้ถูก dismiss สำหรับวันนี้
   void dismissPopupForToday(int popupId);
 
   /// บันทึกว่า popup list นี้ถูก dismiss สำหรับวันนี้
   void dismissPopupsForToday(List<PopupData> popups);
+
+  /// บันทึกว่า popup InvitFriend นี้ถูก dismiss สำหรับวันนี้
+  void dismissInvitFriendForToday();
 }
 
 class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
@@ -46,6 +58,29 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
     try {
       // fetch data จาก api
       final response = await requireRemote.fetchBanners();
+
+      // ถ้าไม่ใช้ CODE Success จะ return Unknown error
+      if (!response.isSuccessful) {
+        return RepoResult.error(
+          error: Exception('Unknown error.'),
+        );
+      }
+
+      if (response.data == null) {
+        return RepoResult.empty();
+      }
+
+      return RepoResult.dependOn(response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight() async {
+    try {
+      // fetch data จาก api
+      final response = await requireRemote.fetchBannersHighlight();
 
       // ถ้าไม่ใช้ CODE Success จะ return Unknown error
       if (!response.isSuccessful) {
@@ -135,6 +170,11 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   }
 
   @override
+  Future<RepoResult<bool>> fetchPopupInvitFriend() async {
+    return RepoResult.success(data: !_popupCache.isInvitFriendDismissedToday());
+  }
+
+  @override
   void dismissPopupForToday(int popupId) {
     _popupCache.markPopupAsDismissedToday(popupId);
   }
@@ -142,5 +182,10 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   @override
   void dismissPopupsForToday(List<PopupData> popups) {
     _popupCache.markAsDismissedToday(popups);
+  }
+
+  @override
+  void dismissInvitFriendForToday() {
+    _popupCache.markInvitFriendAsDismissedToday();
   }
 }

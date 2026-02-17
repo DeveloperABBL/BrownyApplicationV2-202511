@@ -1,7 +1,8 @@
-import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
+import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -24,6 +25,8 @@ class HomePageViewmodel extends AppViewModel {
   void dispose() {
     _homePageStateNotifier.dispose();
     _bannerNotifier.dispose();
+    _bannerHighlightNotifier.dispose();
+    _categoriesNotifier.dispose();
     super.dispose();
   }
 
@@ -44,13 +47,45 @@ class HomePageViewmodel extends AppViewModel {
   ValueListenable<UiResult<List<BannerModel>>> get bannerNotifier =>
       _bannerNotifier;
 
+  /// Notifier fetch banner highlight
+  final ValueNotifier<UiResult<List<BannerHighLightModel>>>
+  _bannerHighlightNotifier = ValueNotifier(
+    UiResult.loading(),
+  );
+  ValueListenable<UiResult<List<BannerHighLightModel>>>
+  get bannerHighlightNotifier => _bannerHighlightNotifier;
+
+  /// Notifier fetch categories
+  final ValueNotifier<UiResult<List<CategoryData>>> _categoriesNotifier =
+      ValueNotifier(
+        UiResult.loading(),
+      );
+  ValueListenable<UiResult<List<CategoryData>>> get categoriesNotifier =>
+      _categoriesNotifier;
+
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
+  }
+
+  // ========== Variables ==========
+  BannerHighLightModel? _highlighSelected;
+  BannerHighLightModel? get highlighSelected => _highlighSelected;
+  void onBannerHighLightSelected(
+    BuildContext context, {
+    required BannerHighLightModel? highlight,
+  }) {
+    _highlighSelected = highlight;
+
+    context.pushNamed(
+      ArticlesPage.pageName,
+      extra: this,
+    );
   }
 
   // ========== Logic ==========
   Future<void> refresh() async {
     await fetchBanners();
+    await fetchBannersHighlight();
     final profileResult = await _repo.fetchProfileInfo('');
     if (profileResult.isSuccess) {
       currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
@@ -83,12 +118,37 @@ class HomePageViewmodel extends AppViewModel {
     final response = await _repo.fetchBanner();
     if (response.isEmpty || response.hasError) {
       _bannerNotifier.value = UiResult.empty();
+      _categoriesNotifier.value = UiResult.empty();
       return;
     }
 
     _bannerNotifier.value = UiResult.success(
       data: response.data.data!
           .map((e) => BannerModel.fromBannerResponse(e))
+          .toList(),
+    );
+
+    // เก็บ categories จาก response
+    if (response.data.categories != null &&
+        response.data.categories!.isNotEmpty) {
+      _categoriesNotifier.value = UiResult.success(
+        data: response.data.categories!,
+      );
+    } else {
+      _categoriesNotifier.value = UiResult.empty();
+    }
+  }
+
+  Future<void> fetchBannersHighlight() async {
+    final response = await _repo.fetchBannerHighlight();
+    if (response.isEmpty || response.hasError) {
+      _bannerHighlightNotifier.value = UiResult.empty();
+      return;
+    }
+
+    _bannerHighlightNotifier.value = UiResult.success(
+      data: (response.data.data ?? [])
+          .map((e) => BannerHighLightModel.fromBannerResponse(e))
           .toList(),
     );
   }
@@ -129,9 +189,21 @@ class HomePageViewmodel extends AppViewModel {
     }
   }
 
+  /// ใช้เช็คว่าวันนี้มีการแสดง popup ชวนเพื่อนไปแล้วหรือยัง
+  Future<UiResult<bool>> fetchPopupInivitFriendForToday() async {
+    final showToday = await _repo.fetchPopupInvitFriend();
+    return UiResult.success(
+      data: showToday.data,
+    );
+  }
+
   /// บันทึกว่า popup นี้ถูก dismiss สำหรับวันนี้
   void dismissPopupForToday(int popupId) {
     _repo.dismissPopupForToday(popupId);
+  }
+
+  void dismissInvitFriendForToday() {
+    _repo.dismissInvitFriendForToday();
   }
 
   /// บันทึกว่า popup list นี้ถูก dismiss สำหรับวันนี้

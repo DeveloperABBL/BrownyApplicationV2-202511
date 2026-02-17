@@ -142,6 +142,8 @@ extension ResponseExtension on Response {
   bool get isNotFoundData => statusCode != null && (statusCode! == 410);
 
   bool get isUnprocessable => statusCode != null && (statusCode! == 422);
+
+  bool get isGone => statusCode != null && (statusCode! == 410);
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย
@@ -372,7 +374,7 @@ extension DateTimeAppFormat on DateTime {
         mPattern = pattern;
         break;
       default:
-        dateTimeData = thYear
+        dateTimeData = (thYear || locale == 'th')
             ? dateTimeData.copyWith(year: dateTimeData.year + 543)
             : dateTimeData;
         mPattern = '$pattern น.';
@@ -396,7 +398,7 @@ extension DateTimeAppFormat on DateTime {
         mPattern = pattern;
         break;
       default:
-        dateTimeData = thYear
+        dateTimeData = (thYear || locale == 'th')
             ? dateTimeData.copyWith(year: dateTimeData.year + 543)
             : dateTimeData;
         mPattern = pattern;

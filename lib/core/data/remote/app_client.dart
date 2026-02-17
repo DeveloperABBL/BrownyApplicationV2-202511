@@ -9,6 +9,8 @@ import 'package:browny_applications_new/core/data/remote/models/request/topup_re
 import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/wallet_history_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
@@ -40,6 +42,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/topup_r
 import 'package:browny_applications_new/core/data/remote/models/response/update_notification_preferences_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/verify_pin_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
 import 'package:dio/dio.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
@@ -349,6 +352,20 @@ abstract class AppClient {
     @Path('uuid') String uuid,
   );
 
+  /// DONG 2026-02-16
+  ///
+  /// API fetch ประวัติการทำธุรกรรม wallet
+  ///
+  /// Body parameters:
+  /// - customer_id: String
+  ///
+  /// Response:
+  /// - WalletHistoryResponse with history list
+  @GET('/wallet/history')
+  Future<HttpResponse<WalletHistoryResponse>> fetchWalletHistory(
+    @Body() WalletHistoryRequest body,
+  );
+
   /// DONG 2026-01-10
   ///
   /// สำหรับเช็คข้อมูล Receipt ตาม [paymentRef]
@@ -461,6 +478,12 @@ abstract class AppClient {
   /// API Fetch รูป Banners
   @GET('/banners')
   Future<HttpResponse<BannerResponse?>> fetchBanners();
+
+  /// DONG 2026-02-17
+  ///
+  /// API Fetch รูป Banners Highlight
+  @GET('/banners/highlight')
+  Future<HttpResponse<BannerHighlightResponse?>> fetchBannersHighlight();
 
   /// DONG 2025-11-10
   ///

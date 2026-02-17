@@ -884,6 +884,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get transactionNumber => 'เลขที่รายการ';
 
   @override
+  String get transactionHistory => 'ประวัติการทำรายการ';
+
+  @override
+  String get noTransactionHistory => 'ไม่มีประวัติการทำรายการ';
+
+  @override
   String get topUpFailed => 'เติมเงินไม่สำเร็จ';
 
   @override

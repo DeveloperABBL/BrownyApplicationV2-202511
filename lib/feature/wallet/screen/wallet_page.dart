@@ -6,7 +6,7 @@ import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart'
 import 'package:browny_applications_new/feature/wallet/models/wallet_model.dart';
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/topup_widget.dart';
-import 'package:browny_applications_new/feature/wallet/screen/wallet_history.dart';
+import 'package:browny_applications_new/feature/wallet/screen/wallet_history_page.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -136,7 +136,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                       // TODO: Handle this case.
                       throw UnimplementedError();
                     case WalletProcessState.history:
-                      return WalletHistory(
+                      return WalletHistoryPage(
                         viewModel: _viewModel,
                         result: result,
                       );

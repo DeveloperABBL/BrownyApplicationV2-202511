@@ -1,9 +1,10 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 
-part 'banner_response.g.dart';
+part 'banner_highlight_response.g.dart';
 
 // **************************************************************************
 // เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal
@@ -11,29 +12,26 @@ part 'banner_response.g.dart';
 // **************************************************************************
 
 @JsonSerializable()
-class BannerResponse extends BaseModelResponse {
+class BannerHighlightResponse extends BaseModelResponse {
   @JsonKey(name: 'data')
-  final List<BannerData>? data;
+  final List<BannerHighlightData>? data;
 
-  @JsonKey(name: 'categories')
-  final List<CategoryData>? categories;
-
-  BannerResponse({
+  BannerHighlightResponse({
     super.success,
     super.errorType,
     super.message,
     this.data,
-    this.categories,
   });
 
-  factory BannerResponse.fromJson(Map<String, dynamic> json) =>
-      _$BannerResponseFromJson(json);
-  Map<String, dynamic> toJson() => baseToJson(_$BannerResponseToJson(this));
+  factory BannerHighlightResponse.fromJson(Map<String, dynamic> json) =>
+      _$BannerHighlightResponseFromJson(json);
+  Map<String, dynamic> toJson() =>
+      baseToJson(_$BannerHighlightResponseToJson(this));
 }
 
 @JsonSerializable()
-class BannerData {
-  BannerData({
+class BannerHighlightData {
+  BannerHighlightData({
     this.id,
     this.name,
     this.type,
@@ -73,25 +71,7 @@ class BannerData {
   @JsonKey(name: 'date_time')
   final DateTime? dateTime;
 
-  factory BannerData.fromJson(Map<String, dynamic> json) =>
-      _$BannerDataFromJson(json);
-  Map<String, dynamic> toJson() => _$BannerDataToJson(this);
-}
-
-@JsonSerializable()
-class CategoryData {
-  CategoryData({
-    this.id,
-    this.name,
-  });
-
-  @JsonKey(name: 'id')
-  final int? id;
-
-  @JsonKey(name: 'name')
-  final ContentLocalizeData? name;
-
-  factory CategoryData.fromJson(Map<String, dynamic> json) =>
-      _$CategoryDataFromJson(json);
-  Map<String, dynamic> toJson() => _$CategoryDataToJson(this);
+  factory BannerHighlightData.fromJson(Map<String, dynamic> json) =>
+      _$BannerHighlightDataFromJson(json);
+  Map<String, dynamic> toJson() => _$BannerHighlightDataToJson(this);
 }

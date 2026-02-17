@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -42,6 +43,7 @@ class WalletViewModel extends AppViewModelObscureHandler {
     _procesStateNotfier.dispose();
     _recieptDataNotifier.dispose();
     _walletDataNotifier.dispose();
+    _walletHistoryNotifier.dispose();
     _statusCheckTimer?.cancel();
     super.dispose();
   }
@@ -66,6 +68,13 @@ class WalletViewModel extends AppViewModelObscureHandler {
       );
   ValueListenable<UiResult<WalletModel>> get walletNotifier =>
       _walletDataNotifier;
+
+  final ValueNotifier<UiResult<WalletHistoryResponse>> _walletHistoryNotifier =
+      ValueNotifier(
+        UiResult.loading(),
+      );
+  ValueListenable<UiResult<WalletHistoryResponse>> get walletHistoryNotifier =>
+      _walletHistoryNotifier;
 
   TextEditingController amountController = TextEditingController();
 
@@ -202,18 +211,24 @@ class WalletViewModel extends AppViewModelObscureHandler {
       _walletDataNotifier.value = UiResult.empty();
       return;
     }
-    final amountBadgeRestul = await repo.fetchAmountBadge();
+
+    final amountBadgeResult = await repo.fetchAmountBadge();
 
     _walletDataNotifier.value = UiResult.success(
       data:
           WalletModel.fromCustomerProfileData(
             result.data,
           ).copyWith(
-            amountBadge: amountBadgeRestul.data,
-            selectedAmount: amountBadgeRestul.data.indexOf(
+            amountBadge: amountBadgeResult.data,
+            selectedAmount: amountBadgeResult.data.indexOf(
               oldWalletData?.selectedAmount ?? 0,
             ),
           ),
+    );
+    // update ข้อมูล User ด้วย
+    currentCustomerProvider.newUser = currentCustomerProvider.current.copyWith(
+      creditBalance: result.data.creditBalance,
+      brownyCoin: result.data.brownyCoin,
     );
   }
 
@@ -268,5 +283,32 @@ class WalletViewModel extends AppViewModelObscureHandler {
     if (currentState == toState) return;
 
     _procesStateNotfier.value = toState;
+  }
+
+  /// Fetch wallet transaction history
+  Future<void> fetchWalletHistory() async {
+    if (!_walletHistoryNotifier.value.isLoading) {
+      _walletHistoryNotifier.value = UiResult.loading();
+    }
+
+    final result = await repo.fetchWalletHistory(
+      currentCustomerProvider.current.id!,
+    );
+
+    if (result.hasError) {
+      _walletHistoryNotifier.value = UiResult.error(
+        error: result.error,
+      );
+      return;
+    }
+
+    if (result.isEmpty) {
+      _walletHistoryNotifier.value = UiResult.empty();
+      return;
+    }
+
+    _walletHistoryNotifier.value = UiResult.success(
+      data: result.data,
+    );
   }
 }

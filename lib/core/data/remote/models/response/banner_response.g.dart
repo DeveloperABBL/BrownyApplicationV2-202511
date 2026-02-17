@@ -14,6 +14,9 @@ BannerResponse _$BannerResponseFromJson(Map<String, dynamic> json) =>
       data: (json['data'] as List<dynamic>?)
           ?.map((e) => BannerData.fromJson(e as Map<String, dynamic>))
           .toList(),
+      categories: (json['categories'] as List<dynamic>?)
+          ?.map((e) => CategoryData.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$BannerResponseToJson(BannerResponse instance) =>
@@ -22,6 +25,7 @@ Map<String, dynamic> _$BannerResponseToJson(BannerResponse instance) =>
       'message': instance.message,
       'error_type': instance.errorType,
       'data': instance.data,
+      'categories': instance.categories,
     };
 
 BannerData _$BannerDataFromJson(Map<String, dynamic> json) => BannerData(
@@ -29,6 +33,9 @@ BannerData _$BannerDataFromJson(Map<String, dynamic> json) => BannerData(
   name: json['name'] as String?,
   type: json['type'] as String?,
   target: json['target'] as String?,
+  category: json['category'] == null
+      ? null
+      : CategoryData.fromJson(json['category'] as Map<String, dynamic>),
   image: json['image'] == null
       ? null
       : ContentLocalizeData.fromJson(json['image'] as Map<String, dynamic>),
@@ -38,6 +45,7 @@ BannerData _$BannerDataFromJson(Map<String, dynamic> json) => BannerData(
   subtitle: json['subtitle'] == null
       ? null
       : ContentLocalizeData.fromJson(json['subtitle'] as Map<String, dynamic>),
+  dateTime: const DateTimeConverter().fromJson(json['date_time'] as String?),
 );
 
 Map<String, dynamic> _$BannerDataToJson(BannerData instance) =>
@@ -46,7 +54,19 @@ Map<String, dynamic> _$BannerDataToJson(BannerData instance) =>
       'name': instance.name,
       'type': instance.type,
       'target': instance.target,
+      'category': instance.category,
       'image': instance.image,
       'title': instance.title,
       'subtitle': instance.subtitle,
+      'date_time': const DateTimeConverter().toJson(instance.dateTime),
     };
+
+CategoryData _$CategoryDataFromJson(Map<String, dynamic> json) => CategoryData(
+  id: (json['id'] as num?)?.toInt(),
+  name: json['name'] == null
+      ? null
+      : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
+);
+
+Map<String, dynamic> _$CategoryDataToJson(CategoryData instance) =>
+    <String, dynamic>{'id': instance.id, 'name': instance.name};

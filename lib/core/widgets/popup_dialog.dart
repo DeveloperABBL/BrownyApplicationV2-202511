@@ -107,7 +107,7 @@ class _PopupDialogState extends State<PopupDialog> {
                         ),
                         child: Image.network(
                           imageUrl,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                           width: double.infinity,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
@@ -231,7 +231,7 @@ class _CustomCheckboxTileState extends State<CustomCheckboxTile> {
             AppDims.horizonPadding_12,
             // ส่วนของข้อความ
             AppText(
-              'ปิดการแสดงหน้านสำหรับวันนี้',
+              'ปิดการแสดงหน้าสำหรับวันนี้',
               style: context.textTheme.labelMedium!.copyWith(
                 color: AppColors.primary,
               ),

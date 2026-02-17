@@ -1,4 +1,14 @@
 # CHANGELOG
+### DONG 2026-02-17
+* เพิ่มหน้า Browny Club และหน้าแสดงเนื้อหา
+* ปรับการแสดง Popup InvitFriend ในหน้าแรกให้แสดง 1 ครั้งต่อวัน
+
+---
+### DONG 2026-02-16
+* เพิ่มหน้า Wallet History
+* แก้ไขบัคจาก Review (15/02/2026)
+
+---
 ### DONG 2026-02-15
 * upgrade version v3.0.0(25)
 * แก้ไข Icon Error ของ App ให้ใช้ BrownyError1

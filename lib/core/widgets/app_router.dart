@@ -2,11 +2,15 @@ import 'package:browny_applications_new/core/data/remote/models/response/store_d
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
+import 'package:browny_applications_new/feature/articles/screens/article_detail_page.dart';
+import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
@@ -255,6 +259,26 @@ class AppRouter {
         path: TransactionAuthenPage.pagePath,
         name: TransactionAuthenPage.pageName,
         builder: (context, state) => TransactionAuthenPage(),
+      ),
+      GoRoute(
+        path: ArticlesPage.pagePath,
+        name: ArticlesPage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as HomePageViewmodel;
+          return ArticlesPage(
+            viewModel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: ArticleDetailPage.pagePath,
+        name: ArticleDetailPage.pageName,
+        builder: (context, state) {
+          final article = state.extra as ArticleDetailModel;
+          return ArticleDetailPage(
+            article: article,
+          );
+        },
       ),
     ],
   );

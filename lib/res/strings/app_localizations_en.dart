@@ -888,6 +888,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionNumber => 'Transaction Number';
 
   @override
+  String get transactionHistory => 'Transaction History';
+
+  @override
+  String get noTransactionHistory => 'No Transaction History';
+
+  @override
   String get topUpFailed => 'Top-up Failed';
 
   @override

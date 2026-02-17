@@ -118,6 +118,13 @@ class AppColors {
       offset: const Offset(0, 2),
     ),
   ];
+  static List<BoxShadow> get shadowOnlyTop => [
+    BoxShadow(
+      color: AppColors.black.withValues(alpha: 0.2), // Shadow color and opacity
+      blurRadius: 16, // The softness of the shadow
+      offset: Offset(0, -7), // Negative Y offset shifts the shadow upwards
+    ),
+  ];
 
   // ============================================================================
   // Primary CTA Colors

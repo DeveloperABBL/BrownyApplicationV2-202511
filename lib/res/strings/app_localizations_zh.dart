@@ -867,6 +867,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transactionNumber => '交易号码';
 
   @override
+  String get transactionHistory => '交易历史记录';
+
+  @override
+  String get noTransactionHistory => '暂无交易历史记录';
+
+  @override
   String get topUpFailed => '充值失败';
 
   @override

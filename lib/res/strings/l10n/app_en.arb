@@ -290,6 +290,8 @@
     "transactionSuccessful": "Transaction Successful",
     "youReceivedBonus": "You received a bonus",
     "transactionNumber": "Transaction Number",
+    "transactionHistory": "Transaction History",
+    "noTransactionHistory": "No Transaction History",
     "topUpFailed": "Top-up Failed",
     "topUpFailedMessage": "Due to a problem with the destination bank or insufficient account balance. Please check the transaction again.",
     "scanning": "Scanning",

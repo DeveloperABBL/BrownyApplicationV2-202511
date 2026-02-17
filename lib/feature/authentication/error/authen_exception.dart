@@ -10,6 +10,11 @@ sealed class AuthenExceptions implements Exception {
   String toUiMessage(BuildContext context) {
     return message.orEmpty;
   }
+
+  @override
+  String toString() {
+    return message ?? 'Exception';
+  }
 }
 
 class Unprocessable extends AuthenExceptions {
@@ -18,6 +23,11 @@ class Unprocessable extends AuthenExceptions {
   @override
   String toUiMessage(BuildContext context) {
     return context.wording.errorUi;
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'Unprocessable';
   }
 }
 
@@ -28,6 +38,11 @@ class UserNotFound extends AuthenExceptions {
   String toUiMessage(BuildContext context) {
     return context.wording.userNotFound;
   }
+
+  @override
+  String toString() {
+    return super.message ?? 'UserNotFound';
+  }
 }
 
 class UserUnauthorized extends AuthenExceptions {
@@ -36,6 +51,11 @@ class UserUnauthorized extends AuthenExceptions {
   @override
   String toUiMessage(BuildContext context) {
     return context.wording.userUnauthorized;
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'UserUnauthorized';
   }
 }
 
@@ -46,6 +66,11 @@ class UserDuplicated extends AuthenExceptions {
   String toUiMessage(BuildContext context) {
     return context.wording.userDuplicated;
   }
+
+  @override
+  String toString() {
+    return super.message ?? 'UserDuplicated';
+  }
 }
 
 class UserConsentTermOfPolicy extends AuthenExceptions {
@@ -54,6 +79,11 @@ class UserConsentTermOfPolicy extends AuthenExceptions {
   @override
   String toUiMessage(BuildContext context) {
     return context.wording.userDuplicated;
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'UserConsentTermOfPolicy';
   }
 }
 
@@ -64,6 +94,11 @@ class OTPUnauthorized extends AuthenExceptions {
   String toUiMessage(BuildContext context) {
     return context.wording.otpUnauthorizedError;
   }
+
+  @override
+  String toString() {
+    return super.message ?? 'OTPUnauthorized';
+  }
 }
 
 class OTPExpired extends AuthenExceptions {
@@ -71,6 +106,11 @@ class OTPExpired extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return context.wording.otpExpiredError;
+    return context.wording.otpUnauthorizedError;
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'OTPExpired';
   }
 }

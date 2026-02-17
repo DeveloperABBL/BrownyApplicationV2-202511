@@ -1,29 +1,11 @@
-import 'package:browny_applications_new/core/providers/customer_provider.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/launch_helper.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
-import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
-import 'package:browny_applications_new/core/widgets/app_overlays.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/core/widgets/browny_bottom_nav.dart';
-import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/invit_friend/models/referral_reward_model.dart';
 import 'package:browny_applications_new/feature/invit_friend/repository/invit_friend_repo.dart';
 import 'package:browny_applications_new/feature/invit_friend/viewmodel/invit_friend_viewmodel.dart';
-import 'package:browny_applications_new/feature/map/screens/map_page.dart';
-import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class InvitFriendPage extends StatelessWidget {
   const InvitFriendPage({super.key});
@@ -212,7 +194,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                           if (url != null) {
                             // เปิด URL ในเบราว์เซอร์
                             final success = await LaunchHelper.openUrl(url);
-                            if (!success && mounted) {
+                            if (!success && context.mounted) {
                               // แสดง error ถ้าเปิดไม่สำเร็จ
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -236,39 +218,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
       ),
       bottomNavigationBar: BrownyBottomNav(
         currentIndex: 0,
-        onTap: (index) {
-          // final HomePageState bypassState;
-          // if (index == 0) {
-          //   bypassState = HomePageState.home;
-          // } else if (index == 1) {
-          //   bypassState = HomePageState.couponVoucher;
-          // } else if (index == 2) {
-          //   bypassState = HomePageState.branches;
-          // } else {
-          //   bypassState = HomePageState.brownyShop;
-          // }
-          // context.pop({HomePageState: bypassState});
-          if (index == 0) {
-            context.pushNamedAndClear(HomePage.pageName);
-            return;
-          }
-
-          if (index == 1) {
-            context.pushNamed(CouponVoucherPage.pageName);
-            return;
-          }
-
-          if (index == 2) {
-            context.pushNamed(MapPage.pageName);
-            return;
-          }
-        },
-        onCenterTap: () {
-          // ไปหน้า Scan
-          context.pushNamed(
-            ScannerPage.pageName,
-          );
-        },
+        onTap: BrownyBottomNav.onTapAppDefault,
       ),
     );
   }

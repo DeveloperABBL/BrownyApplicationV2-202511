@@ -1816,6 +1816,18 @@ abstract class AppLocalizations {
   /// **'Transaction Number'**
   String get transactionNumber;
 
+  /// No description provided for @transactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction History'**
+  String get transactionHistory;
+
+  /// No description provided for @noTransactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Transaction History'**
+  String get noTransactionHistory;
+
   /// No description provided for @topUpFailed.
   ///
   /// In en, this message translates to:

@@ -423,19 +423,24 @@ class _SignUpWidget extends StatelessWidget {
     }
 
     AppOverlays.hideLoading();
-    context.pushReplacementNamed(
-      // Signup
-      CreateAppPinPage.pageName,
-      extra: {
-        CreateAppPinPage.kImplementBackButton: false,
-        CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
-        // Map<Type, PinBiometricPross>
-        CreateAppPinPage.kPinBiometricProcess: {
-          PinBiometricPross: PinBiometricPross.create,
+    // ถ้าเป็นการ Logic ครั้งแรก ต้องเข้าหน้ากรอกเพื่อนชวนเพื่อน
+    if (loginResult.data!.firstLogin == true) {
+      viewmodel(context).goToProcess(AuthenProcess.referral, animate: false);
+    } else {
+      context.pushReplacementNamed(
+        // Signup
+        CreateAppPinPage.pageName,
+        extra: {
+          CreateAppPinPage.kImplementBackButton: false,
+          CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
+          // Map<Type, PinBiometricPross>
+          CreateAppPinPage.kPinBiometricProcess: {
+            PinBiometricPross: PinBiometricPross.create,
+          },
+          // CreateAppPinPage.kFirstSignup: true,
         },
-        // CreateAppPinPage.kFirstSignup: true,
-      },
-    );
+      );
+    }
   }
 
   @protected
@@ -1389,11 +1394,20 @@ class _ReferralWidget extends _SignUpWidget {
                         AppOverlays.hideLoading();
                         if (context.mounted && result.isSuccess) {
                           FocusManager.instance.primaryFocus?.unfocus();
+                          if (result.hasError) {
+                            AppOverlays.showBrownyDialog(
+                              context,
+                              title: context.wording.errorOccurred,
+                              message: result.error!.toString(),
+                            );
+                            return;
+                          }
+
                           AppOverlays.showBrownyDialog(
                             context,
                             imageAsset: Assets.png.brownySuccess1.path,
-                            title: context.wording.numberOfSuccessfulReferrals,
-                            message: 'บันทึกชวนเพื่อนสำเร็จ',
+                            title: 'สำเร็จ',
+                            message: 'บันทึกชวนเพื่อนเรียบร้อยแล้ว',
                             onConfirm: () {
                               goToProcess(
                                 context,
@@ -1414,6 +1428,16 @@ class _ReferralWidget extends _SignUpWidget {
                               },
                             },
                           );
+                        } else {
+                          if (context.mounted) {
+                            AppOverlays.showBrownyDialog(
+                              context,
+                              title: context.wording.errorOccurred,
+                              message:
+                                  result.error?.toString() ??
+                                  context.wording.errorUi,
+                            );
+                          }
                         }
                       }
                     : null,
@@ -1430,8 +1454,8 @@ class _ReferralWidget extends _SignUpWidget {
   @override
   Widget contentButtonForgotPassword(BuildContext context) {
     return Center(
-      child: TextButton(
-        onPressed: () {
+      child: GestureDetector(
+        onTap: () {
           context.pushReplacementNamed(
             // Save Referral Skip
             CreateAppPinPage.pageName,
@@ -1447,9 +1471,7 @@ class _ReferralWidget extends _SignUpWidget {
         },
         child: AppText(
           '${context.wording.skip} ',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: context.textTheme.labelLarge?.copyWith(),
         ),
       ),
     );

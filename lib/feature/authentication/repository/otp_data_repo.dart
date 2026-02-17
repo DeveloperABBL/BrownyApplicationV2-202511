@@ -48,7 +48,7 @@ class OTPDataRepo extends AppRepository with OTPDataSourceMixin {
       if (dioEx.response!.isUnauthorized) {
         return RepoResult.empty(error: OTPUnauthorized());
       }
-      if (dioEx.response!.isNotFound) {
+      if (dioEx.response!.isNotFound || dioEx.response!.isGone) {
         return RepoResult.empty(error: OTPExpired());
       }
       return RepoResult.error(error: dioEx);

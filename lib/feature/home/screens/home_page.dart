@@ -6,9 +6,9 @@ import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
-import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
@@ -56,13 +56,18 @@ class _HomePageWidgetState extends State<HomePageWidget>
     _viewmodel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _viewmodel.fetchBanners();
+      await _viewmodel.fetchBannersHighlight();
 
       if (mounted) {
-        await InvitBottomSheetDialog.showInvitBottomSheet(
-          context,
-          _viewmodel,
-        );
+        final showInvitFriendToday = await _viewmodel
+            .fetchPopupInivitFriendForToday();
+        if (mounted && showInvitFriendToday.data!) {
+          await InvitBottomSheetDialog.showInvitBottomSheet(
+            context,
+            _viewmodel,
+          );
+          _viewmodel.dismissInvitFriendForToday();
+        }
 
         if (!mounted) return;
         await _fetchPopups(context);
@@ -157,202 +162,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
             // icon shortcut
             SliverToBoxAdapter(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  margin: EdgeInsets.only(
-                    left: AppDims.size_16.w,
-                    right: AppDims.size_16.w,
-                    top: AppDims.size_16.h,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        FutureBuilder<UiResult<BrownyLiveResponse>>(
-                          future: _viewmodel.fetchBrownyLive(),
-                          builder: (context, snapshot) {
-                            final hasData =
-                                snapshot.hasData &&
-                                snapshot.requireData.isSuccess;
-                            if (!hasData ||
-                                snapshot.requireData.data!.enabled == false) {
-                              return SizedBox();
-                            }
-                            return GestureDetector(
-                              onTap: hasData
-                                  ? () {
-                                      LaunchHelper.openUrlInBrowser(
-                                        snapshot.requireData.data!.link!,
-                                      );
-                                    }
-                                  : null,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppDims.size_8.w,
-                                  vertical: AppDims.size_8.h,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Assets.iconShortcut.iscBrownyLive.image(
-                                      width: AppDims.size_64.w,
-                                      height: AppDims.size_32.h,
-                                    ),
-                                    AppText(
-                                      'Browny\nLive',
-                                      textAlign: TextAlign.center,
-                                      style: context.textTheme.titleSmall,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscCoupon.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'คูปอง',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscBrownyClub.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'Browny\nClub',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscBrownyShop.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'Browny\nShop',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscLuckyScan.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'Lucky\nScan',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscTransactionHistory.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'ประวัติ\nการใช้งาน',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscContact.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'ติดต่อ\nสอบถาม',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppDims.size_8.w,
-                            vertical: AppDims.size_8.h,
-                          ),
-                          child: Column(
-                            children: [
-                              Assets.iconShortcut.iscBrownyId.image(
-                                width: AppDims.size_64.w,
-                                height: AppDims.size_32.h,
-                              ),
-                              AppText(
-                                'Browny ID',
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              child: _buildRishIcons(context),
             ),
 
             // เก็บ Coupon
@@ -543,8 +353,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
         ),
         bottomNavigationBar: BrownyBottomNav(
           currentIndex: 0,
-          onTap: (index) {
-            print(index.toString());
+          onTap: (context, index) {
+            debugPrint(index.toString());
             if (index == 1) {
               context.pushNamed(CouponVoucherPage.pageName);
               return;
@@ -555,15 +365,219 @@ class _HomePageWidgetState extends State<HomePageWidget>
               return;
             }
           },
-          onCenterTap: () {
-            // ไปหน้า Scan
-            context.pushNamed(
-              ScannerPage.pageName,
-            );
-          },
         ),
       ),
     );
+  }
+
+  Widget _buildRishIcons(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        margin: EdgeInsets.only(
+          left: AppDims.size_16.w,
+          right: AppDims.size_16.w,
+          top: AppDims.size_16.h,
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              FutureBuilder<UiResult<BrownyLiveResponse>>(
+                future: _viewmodel.fetchBrownyLive(),
+                builder: (context, snapshot) {
+                  final hasData =
+                      snapshot.hasData && snapshot.requireData.isSuccess;
+                  if (!hasData || snapshot.requireData.data!.enabled == false) {
+                    return SizedBox();
+                  }
+                  return GestureDetector(
+                    onTap: hasData
+                        ? () {
+                            LaunchHelper.openUrlInBrowser(
+                              snapshot.requireData.data!.link!,
+                            );
+                          }
+                        : null,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_8.w,
+                        vertical: AppDims.size_8.h,
+                      ),
+                      child: Column(
+                        children: [
+                          Assets.iconShortcut.iscBrownyLive.image(
+                            width: AppDims.size_64.w,
+                            height: AppDims.size_32.h,
+                          ),
+                          AppText(
+                            'Browny\nLive',
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.titleSmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscCoupon.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'คูปอง',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: GestureDetector(
+                  onTap: () => onBrownyClubClick(highlight: null),
+                  child: Column(
+                    children: [
+                      Assets.iconShortcut.iscBrownyClub.image(
+                        width: AppDims.size_64.w,
+                        height: AppDims.size_32.h,
+                      ),
+                      AppText(
+                        'Browny\nClub',
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscBrownyShop.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'Browny\nShop',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscLuckyScan.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'Lucky\nScan',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscTransactionHistory.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'ประวัติ\nการใช้งาน',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscContact.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'ติดต่อ\nสอบถาม',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_8.h,
+                ),
+                child: Column(
+                  children: [
+                    Assets.iconShortcut.iscBrownyId.image(
+                      width: AppDims.size_64.w,
+                      height: AppDims.size_32.h,
+                    ),
+                    AppText(
+                      'Browny ID',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void onBrownyClubClick({
+    required BannerHighLightModel? highlight,
+  }) {
+    _viewmodel.onBannerHighLightSelected(context, highlight: highlight);
+    // context.pushNamed(
+    //   ArticlesPage.pageName,
+    //   extra: _viewmodel,
+    // );
   }
 
   Widget _buildMyAppBar() {
@@ -577,7 +591,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       flexibleSpace: FlexibleSpaceBar(
         // FlexibleSpaceBar: ส่วนที่ยืด-หดได้ของ AppBar=
         background: ValueListenableBuilder(
-          valueListenable: _viewmodel.bannerNotifier,
+          valueListenable: _viewmodel.bannerHighlightNotifier,
           builder: (context, result, child) {
             if (!result.isSuccess) {
               return Container(
@@ -591,43 +605,51 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 final imageUrl = result.requireData[index].imageDisplay(
                   context,
                 );
-                return CachedNetworkImage(
-                  width: MediaQuery.of(context).size.width,
-                  // ใช้ ValueKey เพื่อให้ Flutter รู้ว่า widget เดิมยังคงเหมือนเดิม
-                  // ไม่ต้อง rebuild ใหม่ตอน slide carousel
-                  key: ValueKey(imageUrl),
-                  cacheKey: imageUrl,
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  // ตั้งเป็น Duration.zero เพื่อปิด fade animation
-                  // แสดงรูปจาก cache ได้ทันทีโดยไม่มี delay
-                  fadeInDuration: Duration.zero,
-                  fadeOutDuration: Duration.zero,
-                  // Cache รูปใน memory (RAM) โดยคูณด้วย devicePixelRatio
-                  // เพื่อให้รูปคมชัดบนหน้าจอความละเอียดสูง
-                  memCacheWidth:
-                      (MediaQuery.of(context).size.width *
-                              MediaQuery.of(context).devicePixelRatio)
-                          .round(),
-                  memCacheHeight:
-                      (200.h * MediaQuery.of(context).devicePixelRatio).round(),
-                  // Cache รูปใน disk (storage) เพื่อไม่ต้องโหลดซ้ำตอนเปิด app ใหม่
-                  maxWidthDiskCache: (MediaQuery.of(context).size.width * 2)
-                      .round(),
-                  maxHeightDiskCache: (200.h * 2).round(),
-                  // ใช้ placeholder แทน progressIndicatorBuilder
-                  // เพื่อแสดง loading เฉพาะตอนโหลดครั้งแรก
-                  // ไม่แสดงซ้ำเมื่อ slide กลับมาที่รูปเดิม
-                  placeholder: (context, url) => Container(
-                    color: AppColors.ci3,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                return GestureDetector(
+                  onTap: () {
+                    if (result.requireData[index].type == 'article') {
+                      onBrownyClubClick(highlight: result.requireData[index]);
+                    }
+                  },
+                  child: CachedNetworkImage(
+                    width: MediaQuery.of(context).size.width,
+                    // ใช้ ValueKey เพื่อให้ Flutter รู้ว่า widget เดิมยังคงเหมือนเดิม
+                    // ไม่ต้อง rebuild ใหม่ตอน slide carousel
+                    key: ValueKey(imageUrl),
+                    cacheKey: imageUrl,
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    // ตั้งเป็น Duration.zero เพื่อปิด fade animation
+                    // แสดงรูปจาก cache ได้ทันทีโดยไม่มี delay
+                    fadeInDuration: Duration.zero,
+                    fadeOutDuration: Duration.zero,
+                    // Cache รูปใน memory (RAM) โดยคูณด้วย devicePixelRatio
+                    // เพื่อให้รูปคมชัดบนหน้าจอความละเอียดสูง
+                    memCacheWidth:
+                        (MediaQuery.of(context).size.width *
+                                MediaQuery.of(context).devicePixelRatio)
+                            .round(),
+                    memCacheHeight:
+                        (200.h * MediaQuery.of(context).devicePixelRatio)
+                            .round(),
+                    // Cache รูปใน disk (storage) เพื่อไม่ต้องโหลดซ้ำตอนเปิด app ใหม่
+                    maxWidthDiskCache: (MediaQuery.of(context).size.width * 2)
+                        .round(),
+                    maxHeightDiskCache: (200.h * 2).round(),
+                    // ใช้ placeholder แทน progressIndicatorBuilder
+                    // เพื่อแสดง loading เฉพาะตอนโหลดครั้งแรก
+                    // ไม่แสดงซ้ำเมื่อ slide กลับมาที่รูปเดิม
+                    placeholder: (context, url) => Container(
+                      color: AppColors.ci3,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: AppColors.ci3,
+                    errorWidget: (context, url, error) => Container(
+                      color: AppColors.ci3,
+                    ),
                   ),
                 );
               },
@@ -928,7 +950,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       child: isGuest
                           ? null
                           : AppText(
-                              'เก็บได้ทุกวัน',
+                              'เก็บเพิ่มได้ทุกวัน',
                               style: context.textTheme.labelSmall!.copyWith(
                                 color: AppColors.white,
                               ),

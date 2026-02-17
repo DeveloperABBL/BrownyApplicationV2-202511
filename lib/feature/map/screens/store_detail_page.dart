@@ -569,7 +569,7 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           fit: BoxFit.cover,
         ),
         stretchModes: [
-          StretchMode.blurBackground,
+          StretchMode.zoomBackground,
         ],
         expandedTitleScale: 8,
         title: AppContainerRadius(

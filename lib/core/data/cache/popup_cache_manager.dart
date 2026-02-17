@@ -6,6 +6,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/popup_r
 /// ใช้เก็บข้อมูลว่า popup ไหนถูก dismiss ไปแล้วในวันนี้
 class PopupCacheManager {
   static const String _keyPrefixPopups = 'popup_dismissed_';
+  static const String _keyInviteFriend = 'invit_friend_dismissed_';
 
   final AppLocalStorage _storage;
 
@@ -31,6 +32,11 @@ class PopupCacheManager {
     _storage.write<String>(key: key, value: today);
   }
 
+  void markInvitFriendAsDismissedToday() {
+    final today = _getTodayKey();
+    _storage.write<String>(key: _keyInviteFriend, value: today);
+  }
+
   /// ตรวจสอบว่า popup นี้ถูก dismiss ไปแล้วในวันนี้หรือยัง
   ///
   /// [popupId] - ID ของ popup
@@ -39,6 +45,17 @@ class PopupCacheManager {
   bool isDismissedToday(int popupId) {
     final key = _getDismissKey(popupId);
     final dismissedDate = _storage.read<String>(key);
+
+    if (dismissedDate == null) {
+      return false;
+    }
+
+    final today = _getTodayKey();
+    return dismissedDate == today;
+  }
+
+  bool isInvitFriendDismissedToday() {
+    final dismissedDate = _storage.read<String>(_keyInviteFriend);
 
     if (dismissedDate == null) {
       return false;

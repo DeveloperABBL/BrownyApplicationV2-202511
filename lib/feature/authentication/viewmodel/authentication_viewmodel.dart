@@ -116,8 +116,9 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           break;
 
         case AuthenProcess.referral:
+          _validations.clear();
           _validations.add(SignUpRequiredConditions.valideEmalOrPhone);
-          _onValidatorTriggle();
+          _validatorTriggleNotifier.value = false;
           _otpTimer?.cancel();
           _otpTimer = null;
           usernameController.text = '';
@@ -490,9 +491,13 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   }
 
   void _onValidatorTriggle() {
-    _validatorTriggleNotifier.value = !_validations.contains(
-      SignUpRequiredConditions.acceptTermOfPolicy,
-    );
+    if (currentProcess == AuthenProcess.signup) {
+      _validatorTriggleNotifier.value = !_validations.contains(
+        SignUpRequiredConditions.acceptTermOfPolicy,
+      );
+    } else {
+      _validatorTriggleNotifier.value = _validations.isEmpty;
+    }
   }
 
   Future<UiResult<bool>> verifyOTP(String otp) async {
@@ -676,7 +681,16 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           return UiResult.error(error: customerProfile.error);
         }
 
-        if (!customerProfile.hasData) {}
+        if (!customerProfile.hasData) {
+          return UiResult.empty();
+        }
+        if (customerProfile.data.phone.orEmpty.isNotEmpty &&
+            (usernameController.text == customerProfile.data.phone)) {
+          return UiResult.error(
+            error: OTPUnauthorized('ไม่สามารถกรอกเบอร์ตัวเองได้'),
+          );
+        }
+
         final saveReferralResult = await customerDataRepo.saveReferral(
           CustomerCredential(
             referrerContact: usernameController.text,

@@ -1,12 +1,8 @@
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../res/colors/app_colors.dart';
+import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/home/screens/home_page.dart';
+import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
 
 /// BrownyBottomNav - Navigation Bar แบบกำหนดเองสำหรับแอป Browny
 ///
@@ -24,6 +20,9 @@ import '../../res/colors/app_colors.dart';
 /// - centerIndex: ตำแหน่งที่จะสำรองไว้สำหรับปุ่มกลาง (ค่าเริ่มต้น: ตรงกลาง)
 /// - showLabels: แสดงข้อความใต้ไอคอนหรือไม่ (ค่าเริ่มต้น: true)
 /// - backgroundRadius, centerSize, margin: ปรับแต่งรูปแบบการแสดงผล
+
+typedef OnBrownyBottomNavTab = Function(BuildContext context, int index);
+
 class BrownyBottomNav extends StatefulWidget {
   const BrownyBottomNav({
     super.key,
@@ -39,7 +38,7 @@ class BrownyBottomNav extends StatefulWidget {
   });
 
   final int currentIndex; // ตำแหน่งปุ่มที่เลือกอยู่
-  final ValueChanged<int> onTap; // ฟังก์ชันเมื่อกดปุ่ม
+  final OnBrownyBottomNavTab onTap; // ฟังก์ชันเมื่อกดปุ่ม
 
   /// ฟังก์ชันสำหรับปุ่มกลาง - ถ้ากำหนดค่าจะแสดงปุ่มลอยตัวพร้อม gradient
   final VoidCallback? onCenterTap;
@@ -57,6 +56,23 @@ class BrownyBottomNav extends StatefulWidget {
   final EdgeInsets margin;
   @override
   State<BrownyBottomNav> createState() => _BrownyBottomNavState();
+
+  static onTapAppDefault(BuildContext context, int index) {
+    if (index == 0) {
+      context.pushNamedAndClear(HomePage.pageName);
+      return;
+    }
+
+    if (index == 1) {
+      context.pushNamed(CouponVoucherPage.pageName);
+      return;
+    }
+
+    if (index == 2) {
+      context.pushNamed(MapPage.pageName);
+      return;
+    }
+  }
 }
 
 class _BrownyBottomNavState extends State<BrownyBottomNav> {
@@ -91,13 +107,21 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
         label: context.wording.shop,
       ),
     ];
-    final hasCenter = widget.onCenterTap != null;
+    VoidCallback mOnCenterTap =
+        widget.onCenterTap ??
+        () {
+          // Default ไปหน้า Scan
+          context.pushNamed(
+            ScannerPage.pageName,
+          );
+        };
+    // final hasCenter = mOnCenterTap != null;
     final int cIndex = widget.centerIndex ?? (items.length ~/ 2);
 
     // สร้างรายการ widget ของแต่ละปุ่ม พร้อมสำรองพื้นที่สำหรับปุ่มกลาง
     List<Widget> itemWidgets = [];
     for (int i = 0; i < items.length; i++) {
-      if (hasCenter && i == cIndex) {
+      if (i == cIndex) {
         // สำรองพื้นที่ว่างไว้ใต้ปุ่มกลางที่ยกสูง
         itemWidgets.add(const SizedBox(width: 0));
       }
@@ -111,7 +135,7 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
           selected: selected,
           showLabel: widget.showLabels,
           enable: enable,
-          onTap: () => widget.onTap(i),
+          onTap: () => widget.onTap(context, i),
         ),
       );
     }
@@ -121,7 +145,7 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
       // maintainBottomViewPadding: true,
       minimum: EdgeInsets.only(bottom: AppDims.size_12.h),
       child: SizedBox(
-        height: _barHeight(hasCenter),
+        height: _barHeight(true),
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
@@ -149,10 +173,10 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
                     ],
                   ),
                   child: _ItemsRow(
-                    hasCenter: hasCenter,
+                    hasCenter: true,
                     children: _withCenterSpacer(
                       itemWidgets,
-                      hasCenter,
+                      true,
                       cIndex,
                     ),
                   ),
@@ -165,7 +189,7 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
             Positioned(
               bottom: _centerBottomOffset(),
               child: GestureDetector(
-                onTap: widget.onCenterTap,
+                onTap: mOnCenterTap,
                 child: Assets.svg.scanIcon.svg(
                   width: 106.w,
                   height: 100.h,
