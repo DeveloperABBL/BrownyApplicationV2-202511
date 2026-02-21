@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/launch_helper.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
@@ -60,22 +61,32 @@ class _WallHistoryContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Text แจ้งปัญหา
-              TextButton(
-                onPressed: () {},
-                style: context.appTheme.textButtonTheme.style!.copyWith(
-                  overlayColor: WidgetStatePropertyAll(
-                    AppColors.transparent,
-                  ),
-                ),
-                child: AppText(
-                  context.wording.reportIssueOrRefundMessage,
-                  style: context.textTheme.titleSmall!.copyWith(
-                    fontSize: AppDims.size_10.sp,
-                    color: AppColors.cocoaBrown,
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.cocoaBrown,
-                  ),
-                ),
+              FutureBuilder(
+                future: viewModel.fetchTermsLink(),
+                builder: (context, asyncSnapshot) {
+                  return TextButton(
+                    onPressed: !asyncSnapshot.hasData
+                        ? null
+                        : () async {
+                            final link = asyncSnapshot.data?.data?.problemLink;
+                            await LaunchHelper.openUrlInBrowser(link.orEmpty);
+                          },
+                    style: context.appTheme.textButtonTheme.style!.copyWith(
+                      overlayColor: WidgetStatePropertyAll(
+                        AppColors.transparent,
+                      ),
+                    ),
+                    child: AppText(
+                      context.wording.reportIssueOrRefundMessage,
+                      style: context.textTheme.titleSmall!.copyWith(
+                        fontSize: AppDims.size_10.sp,
+                        color: AppColors.cocoaBrown,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.cocoaBrown,
+                      ),
+                    ),
+                  );
+                },
               ),
 
               // Header
@@ -160,7 +171,7 @@ class _WallHistoryContent extends StatelessWidget {
                                 pattern: 'dd MMM yyyy - HH:mm:ss',
                               ) ??
                               '',
-                          amount: history.amountValue.toString(),
+                          amount: history.getAmountDisplay,
                           isIncome: !history.isPurchase && !history.isRefund,
                         );
                       },

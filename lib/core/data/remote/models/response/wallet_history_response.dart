@@ -56,7 +56,14 @@ class WalletHistoryItem {
   /// แปลง amount เป็น double
   double get amountValue {
     if (amount == null || amount!.isEmpty) return 0.0;
-    return double.tryParse(amount!)?.abs() ?? 0.0;
+    return double.tryParse(
+          amount.ifNullOrEmpty('0').replaceAll(',', ''),
+        )?.abs() ??
+        0.0;
+  }
+
+  String get getAmountDisplay {
+    return amount.ifNullOrEmpty('0.0');
   }
 
   /// Format amount สำหรับแสดงผล (e.g., "200.00 ฿")

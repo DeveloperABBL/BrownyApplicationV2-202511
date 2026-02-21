@@ -27,6 +27,7 @@ class AppDims {
   static final double size_26 = 26.0;
   static final double size_28 = 28.0;
   static final double size_30 = 30.0;
+  static final double size_33 = 33.0;
   static final double size_32 = 32.0;
   static final double size_35 = 35.0;
   static final double size_36 = 36.0;

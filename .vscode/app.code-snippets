@@ -111,4 +111,20 @@
 			"AppColors.$1",
 		]
 	},
+	"Auto util function route to pageName": {
+		"prefix": "gotopage",
+		"body": [
+			"/// util function route to pageName",
+			"static Future<T?> goToPage<T>(BuildContext context) async {",
+			"return await context.pushNamed($1.pageName);",
+			"}"
+		]
+	},
+
+	"Auto addPostFrameCallback": {
+		"prefix": "postframcallback",
+		"body": [
+			"WidgetsBinding.instance.addPostFrameCallback((_) async {$1});"
+		]
+	},
 }

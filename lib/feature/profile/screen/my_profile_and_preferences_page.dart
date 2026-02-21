@@ -1,6 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
@@ -22,6 +23,7 @@ class MyProfileAndPreferencesPage extends StatelessWidget {
       create: (context) => ProfileViewModel(
         context: context,
         repo: ProfileRepo(),
+        contactRepo: ContactRepo(),
       ),
       child: MyProfileAndPreferencesContent(),
     );
@@ -48,6 +50,10 @@ class _MyProfileAndPreferencesContentState
     super.initState();
     _viewModel = context.read();
     _viewModel.attachContext(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _viewModel.fetchContactAndSupportLink();
+    });
   }
 
   @override
@@ -114,6 +120,10 @@ class _MyProfileAndPreferencesContentState
                     image: Assets.png.bgProfile.provider(),
                     fit: BoxFit.cover,
                   ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(32.r),
+                    bottomRight: Radius.circular(32.r),
+                  ),
                 ),
                 padding: EdgeInsets.only(
                   top: MediaQuery.of(context).padding.top + AppDims.size_6.h,
@@ -130,22 +140,22 @@ class _MyProfileAndPreferencesContentState
                       children: [
                         // Profile Icon
                         CircleAvatar(
-                          radius: AppDims.size_24.r,
-                          backgroundColor: AppColors.white,
-                          child: customer.image.orEmpty.isEmpty
-                              // ถ้าไม่มีรูป Profile ใช้รูป Default
-                              ? ClipOval(
-                                  child: Assets.svg.icPerson.svg(
+                          radius: AppDims.size_24.w,
+                          backgroundColor: AppColors.background,
+                          child: IconButton(
+                            onPressed: null,
+                            icon: customer.image.orEmpty.isEmpty
+                                // ถ้าไม่มีรูป Profile ใช้รูป Default
+                                ? Assets.svg.icPerson.svg(
+                                    width: AppDims.size_26.w,
                                     // เปลี่ยนสี svg
                                     colorFilter: ColorFilter.mode(
                                       AppColors.primary,
                                       BlendMode.srcIn,
                                     ),
-                                  ),
-                                )
-                              // มีรูป Profile ให้ไปโหลดมา
-                              : ClipOval(
-                                  child: Image.network(
+                                  )
+                                // มีรูป Profile ให้ไปโหลดมา
+                                : Image.network(
                                     customer.image!,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
@@ -157,7 +167,7 @@ class _MyProfileAndPreferencesContentState
                                               ),
                                             ),
                                   ),
-                                ),
+                          ),
                         ),
                         AppDims.horizonPadding_12,
 
@@ -166,128 +176,187 @@ class _MyProfileAndPreferencesContentState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Builder(
+                                builder: (context) {
+                                  if (isGuest) {
+                                    final label = provider.current.isGuest
+                                        ? context.wording.login
+                                        : context.wording.topup;
+
+                                    return ElevatedButton.icon(
+                                      icon: Assets.svg.icLogin.svg(
+                                        width: AppDims.size_16.w,
+                                        colorFilter: ColorFilter.mode(
+                                          AppColors.primary,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      // icon: Icon(Icons.login),
+                                      iconAlignment: IconAlignment.end,
+                                      onPressed: () {
+                                        _goAuthenPage(context);
+                                      },
+                                      style: context
+                                          .appTheme
+                                          .elevatedButtonTheme
+                                          .style!
+                                          .copyWith(
+                                            shape: WidgetStatePropertyAll(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      AppDims.size_4,
+                                                    ),
+                                              ),
+                                            ),
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                            padding: WidgetStatePropertyAll(
+                                              EdgeInsets.symmetric(
+                                                vertical: AppDims.size_4.h,
+                                                horizontal: AppDims.size_8.w,
+                                              ),
+                                            ),
+                                            minimumSize: WidgetStatePropertyAll(
+                                              Size(70.w, 22.h),
+                                            ),
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                  AppColors.background,
+                                                ),
+                                          ),
+                                      label: AppText(
+                                        label,
+                                        style: context.textTheme.titleSmall!
+                                            .copyWith(
+                                              color: AppColors.primary,
+                                            ),
+                                      ),
+                                    );
+                                  }
+                                  return AppText(
+                                    provider.current.name ?? '',
+                                    style: context.textTheme.labelLarge!
+                                        .copyWith(
+                                          color: AppColors.white,
+                                          fontSize: AppDims.size_16.sp,
+                                        ),
+                                  );
+                                },
+                              ),
+                              AppDims.vericalPadding_4,
                               AppText(
-                                isGuest
-                                    ? context.wording.login
-                                    : provider.current.name ?? '',
-                                style: context.textTheme.titleLarge!.copyWith(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.bold,
+                                // provider.current.phone ?? '',
+                                context.wording.viewYourProfile,
+                                style: context.textTheme.titleMedium!.copyWith(
+                                  color: AppColors.white.withValues(),
                                 ),
                               ),
-                              if (!isGuest) ...[
-                                AppDims.vericalPadding_4,
-                                AppText(
-                                  // provider.current.phone ?? '',
-                                  context.wording.viewYourProfile,
-                                  style: context.textTheme.titleMedium!
-                                      .copyWith(
-                                        color: AppColors.white.withValues(),
-                                      ),
-                                ),
-                              ],
                             ],
                           ),
                         ),
 
                         // QR Code and Edit buttons
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: Assets.svg.icQrDummy.svg(
-                                width: AppDims.size_24.h,
-                                colorFilter: ColorFilter.mode(
-                                  AppColors.white,
-                                  BlendMode.srcIn,
+                        // ต้องไม่ใช่ Guest
+                        if (!isGuest)
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  _showQrCustomer(context);
+                                },
+                                child: Assets.svg.icQrDummy.svg(
+                                  width: AppDims.size_24.h,
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.white,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
-                            ),
-                            AppDims.horizonPadding_8,
+                              AppDims.horizonPadding_8,
 
-                            GestureDetector(
-                              onTap: () {
-                                context.pushNamed(ProfilePage.pageName);
-                              },
-                              child: Assets.svg.icEditReg.svg(
-                                width: AppDims.size_24.h,
-                                colorFilter: ColorFilter.mode(
-                                  AppColors.white,
-                                  BlendMode.srcIn,
+                              GestureDetector(
+                                onTap: () {
+                                  context.pushNamed(ProfilePage.pageName);
+                                },
+                                child: Assets.svg.icEditReg.svg(
+                                  width: AppDims.size_24.h,
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.white,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
 
-                    if (!isGuest) ...[
-                      AppDims.vericalPadding_16,
+                    AppDims.vericalPadding_16,
 
-                      // Balance Section
-                      Row(
-                        children: [
-                          // Wallet Balance
-                          Expanded(
-                            child: Column(
-                              children: [
-                                AppText(
-                                  formatCurrency(
-                                    leadingSign: '฿',
-                                    string: provider.current.creditBalance,
-                                  ),
-                                  style: context.textTheme.headlineLarge!
-                                      .copyWith(
-                                        color: AppColors.white,
-                                        fontSize: AppDims.size_24.sp,
-                                      ),
+                    // Balance Section
+                    Row(
+                      children: [
+                        // Wallet Balance
+                        Expanded(
+                          child: Column(
+                            children: [
+                              AppText(
+                                formatCurrency(
+                                  leadingSign: '฿',
+                                  string: provider.current.creditBalance,
                                 ),
-                                AppDims.vericalPadding_4,
-                                AppText(
-                                  context.wording.creditBalance,
-                                  style: context.textTheme.labelMedium!
-                                      .copyWith(color: AppColors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Coin Balance
-                          Expanded(
-                            child: Column(
-                              children: [
-                                AppText(
-                                  formatCurrency(
-                                    string: provider.current.brownyCoin,
-                                  ),
-                                  style: context.textTheme.headlineLarge!
-                                      .copyWith(
-                                        color: AppColors.white,
-                                        fontSize: AppDims.size_24.sp,
-                                      ),
-                                ),
-                                AppDims.vericalPadding_4,
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Assets.png.brownyCoin.image(
-                                      width: AppDims.size_20.w,
+                                style: context.textTheme.headlineLarge!
+                                    .copyWith(
+                                      color: AppColors.white,
+                                      fontSize: AppDims.size_24.sp,
                                     ),
-                                    AppDims.horizonPadding_8,
+                              ),
+                              AppDims.vericalPadding_4,
+                              AppText(
+                                context.wording.creditBalance,
+                                style: context.textTheme.labelMedium!.copyWith(
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Coin Balance
+                        Expanded(
+                          child: Column(
+                            children: [
+                              AppText(
+                                formatCurrency(
+                                  string: provider.current.brownyCoin,
+                                ),
+                                style: context.textTheme.headlineLarge!
+                                    .copyWith(
+                                      color: AppColors.white,
+                                      fontSize: AppDims.size_24.sp,
+                                    ),
+                              ),
+                              AppDims.vericalPadding_4,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Assets.png.brownyCoin.image(
+                                    width: AppDims.size_20.w,
+                                  ),
+                                  AppDims.horizonPadding_8,
 
-                                    AppText(
-                                      context.wording.coin,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(color: AppColors.white),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  AppText(
+                                    context.wording.coin,
+                                    style: context.textTheme.labelMedium!
+                                        .copyWith(color: AppColors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -313,7 +382,7 @@ class _MyProfileAndPreferencesContentState
                         ),
                         label: context.wording.rewards,
                         onTap: () {
-                          // TODO: Navigate to coupon page
+                          CouponVoucherPage.goToPage(context);
                         },
                       ),
                       _buildQuickActionButton(
@@ -322,7 +391,7 @@ class _MyProfileAndPreferencesContentState
                         ),
                         label: context.wording.scan,
                         onTap: () {
-                          // TODO: Navigate to scan page
+                          ScannerPage.goToPage(context);
                         },
                       ),
                       _buildQuickActionButton(
@@ -352,6 +421,96 @@ class _MyProfileAndPreferencesContentState
     );
   }
 
+  void _showQrCustomer(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return FutureBuilder(
+          future: _viewModel.fetchCustomerQRCode(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return SizedBox();
+            }
+
+            final result = snapshot.requireData;
+            if (result.isEmpty) {
+              return Center(
+                child: Column(
+                  children: [
+                    Spacer(),
+                    Assets.png.brownyError2.image(
+                      width: 145.w,
+                      height: 100.h,
+                    ),
+                    AppDims.vericalPadding_8,
+                    AppText(
+                      'ไม่พบข้อมูล Browny ID',
+                    ),
+                    Spacer(),
+                  ],
+                ),
+              );
+            }
+            return Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(16.r),
+                    right: Radius.circular(16.r),
+                  ),
+                ),
+                child: Center(
+                  child: result.isLoading
+                      ? CircularProgressIndicator()
+                      : Column(
+                          children: [
+                            AppDims.vericalPadding_20,
+                            // PromptPay Logo
+                            Assets.png.brownyHorizaontal2.image(
+                              height: 44.w,
+                              width: 135.h,
+                            ),
+                            AppDims.vericalPadding_20,
+                            Divider(
+                              indent: AppDims.size_16.w,
+                              endIndent: AppDims.size_16.w,
+                            ),
+                            AppDims.vericalPadding_16,
+
+                            // QR Code
+                            Expanded(
+                              child: Image.network(
+                                result.data!.url!,
+                              ),
+                            ),
+                            AppDims.vericalPadding_16,
+
+                            SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: AppDims.size_16.w,
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                  child: AppText(context.wording.close),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildQuickActionButton({
     required Widget icon,
     required String label,
@@ -366,7 +525,7 @@ class _MyProfileAndPreferencesContentState
           AppDims.vericalPadding_4,
           AppText(
             label,
-            style: context.textTheme.bodySmall!.copyWith(
+            style: context.textTheme.labelLarge!.copyWith(
               color: AppColors.primary,
             ),
           ),
@@ -387,8 +546,7 @@ class _MyProfileAndPreferencesContentState
             // E-Voucher Card
             GestureDetector(
               onTap: () {
-                // TODO: Navigate to E-Voucher page
-                debugPrint('E-Voucher card tapped');
+                CouponVoucherPage.goToPage(context);
               },
               child: Container(
                 margin: EdgeInsets.symmetric(
@@ -790,29 +948,40 @@ class _MyProfileAndPreferencesContentState
           right: AppDims.size_16.w,
           bottom: AppDims.size_8.h,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppText(
-              context.wording.termsAndConditions,
-              style: _defaultPreferencesTextStyle,
-            ),
-            AppDims.vericalPadding_8,
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icPage,
-              title: context.wording.termsOfUseAndPrivacy,
-              titleStyle: context.textTheme.labelLarge!.copyWith(
-                color: AppColors.textBare,
-                fontSize: AppDims.size_14.sp,
-              ),
-              suffixWidget: Assets.svg.icArrowForward.svg(),
-              onTap: () {
-                // TODO: Navigate to terms and conditions page
-              },
-            ),
-            AppDims.vericalPadding_12,
-            Divider(),
-          ],
+        child: ValueListenableBuilder(
+          valueListenable: _viewModel.contactAndSupportLinkNotifier,
+          builder: (context, result, child) {
+            // ข้อมูล Contact
+            final data = result.data;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  // เงื่อนไขและการให้บริการ
+                  context.wording.termsAndConditions,
+                  style: _defaultPreferencesTextStyle,
+                ),
+                AppDims.vericalPadding_8,
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icPage,
+                  title: context.wording.termsOfUseAndPrivacy,
+                  titleStyle: context.textTheme.labelLarge!.copyWith(
+                    color: AppColors.textBare,
+                    fontSize: AppDims.size_14.sp,
+                  ),
+                  suffixWidget: Assets.svg.icArrowForward.svg(),
+                  onTap: result.isSuccess
+                      ? () async {
+                          // เปิด Link Terms
+                          await _openLink(data!.registerTermsLink.orEmpty);
+                        }
+                      : null,
+                ),
+                AppDims.vericalPadding_12,
+                Divider(),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -828,50 +997,66 @@ class _MyProfileAndPreferencesContentState
           right: AppDims.size_16.w,
           bottom: AppDims.size_8.h,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppText(
-              context.wording.helpAndSupport,
-              style: _defaultPreferencesTextStyle,
-            ),
-            AppDims.vericalPadding_8,
+        child: ValueListenableBuilder(
+          valueListenable: _viewModel.contactAndSupportLinkNotifier,
+          builder: (context, result, child) {
+            // ข้อมูล Contact
+            final data = result.data;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  context.wording.helpAndSupport,
+                  style: _defaultPreferencesTextStyle,
+                ),
+                AppDims.vericalPadding_8,
 
-            // Phone Contact
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icCalling,
-              title: context.wording.contactBrownyCare,
-              subtitle: context.wording.callPhoneNumber,
-              titleStyle: context.textTheme.labelLarge!.copyWith(
-                color: AppColors.textBare,
-                fontSize: AppDims.size_14.sp,
-              ),
-              subtitleStyle: context.textTheme.labelMedium!.copyWith(
-                color: AppColors.gray500,
-                fontSize: AppDims.size_14.sp,
-              ),
-              suffixWidget: Assets.svg.icArrowForward.svg(),
-              onTap: () {
-                // TODO: Open phone dialer
-              },
-            ),
+                // Phone Contact
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icCalling,
+                  // ติดต่อ Browny Care
+                  title: context.wording.contactBrownyCare,
+                  subtitle:
+                      '${context.wording.callPhoneNumber} ${data?.brownyCareContact.orEmpty}',
+                  titleStyle: context.textTheme.labelLarge!.copyWith(
+                    color: AppColors.textBare,
+                    fontSize: AppDims.size_14.sp,
+                  ),
+                  subtitleStyle: context.textTheme.labelMedium!.copyWith(
+                    color: AppColors.gray500,
+                    fontSize: AppDims.size_14.sp,
+                  ),
+                  suffixWidget: Assets.svg.icArrowForward.svg(),
+                  onTap: result.isSuccess
+                      ? () async {
+                          // โทรออกเบอร์สายด่วน
+                          await _openCall(data!.brownyCareContact.orEmpty);
+                        }
+                      : null,
+                ),
 
-            // LINE Contact
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icLine,
-              title: context.wording.contactViaLine,
-              suffixWidget: Assets.svg.icArrowForward.svg(),
-              titleStyle: context.textTheme.labelLarge!.copyWith(
-                color: AppColors.textBare,
-                fontSize: AppDims.size_14.sp,
-              ),
-              onTap: () {
-                // TODO: Open LINE
-              },
-            ),
-            AppDims.vericalPadding_12,
-            Divider(),
-          ],
+                // LINE Contact
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icLine,
+                  // สอบถามผ่าน LINE Browny Official
+                  title: context.wording.contactViaLine,
+                  suffixWidget: Assets.svg.icArrowForward.svg(),
+                  titleStyle: context.textTheme.labelLarge!.copyWith(
+                    color: AppColors.textBare,
+                    fontSize: AppDims.size_14.sp,
+                  ),
+                  onTap: result.isSuccess
+                      ? () async {
+                          // เปิด App LINE
+                          await _openLink(data!.lineLink.orEmpty);
+                        }
+                      : null,
+                ),
+                AppDims.vericalPadding_12,
+                Divider(),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -899,12 +1084,7 @@ class _MyProfileAndPreferencesContentState
                   trailing: null,
                   onTap: () async {
                     if (customer.isGuest) {
-                      context.pushNamed(
-                        AuthenticationPage.pageName,
-                        extra: {
-                          AuthenProcess: AuthenProcess.login,
-                        },
-                      );
+                      _goAuthenPage(context);
                     } else {
                       await AppOverlays.showBrownyDialog(
                         context,
@@ -948,6 +1128,16 @@ class _MyProfileAndPreferencesContentState
     );
   }
 
+  void _goAuthenPage(BuildContext context) {
+    AuthenticationPage.goToPage(context, process: AuthenProcess.login);
+    // context.pushNamed(
+    //   AuthenticationPage.pageName,
+    //   extra: {
+    //     AuthenProcess: AuthenProcess.login,
+    //   },
+    // );
+  }
+
   // ========== Social Media Section ==========
   Widget _buildSocialMediaSection() {
     return SliverToBoxAdapter(
@@ -958,62 +1148,117 @@ class _MyProfileAndPreferencesContentState
           right: AppDims.size_16.w,
           bottom: AppDims.size_8.h,
         ),
-        child: Column(
-          children: [
-            AppDims.vericalPadding_8,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: ValueListenableBuilder(
+          valueListenable: _viewModel.contactAndSupportLinkNotifier,
+          builder: (context, result, child) {
+            // ข้อมูล Contact
+            final data = result.data;
+
+            return Column(
               children: [
-                _buildSocialMediaButton(
-                  icon: Assets.iconProfilePreferences.facebook.image(),
-                  onTap: () {
-                    // TODO: Open Facebook
-                  },
+                AppDims.vericalPadding_8,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildSocialMediaButton(
+                      icon: Assets.iconProfilePreferences.facebook.image(),
+                      onTap: result.isSuccess
+                          ? () async {
+                              // เปิด App LINE
+                              await _openLink(data!.facebookLink.orEmpty);
+                            }
+                          : null,
+                    ),
+                    AppDims.horizonPadding_9,
+                    _buildSocialMediaButton(
+                      icon: Assets.iconProfilePreferences.instragram.image(),
+                      onTap: result.isSuccess
+                          ? () async {
+                              // เปิด App IG
+                              // TODO บอกปาร์คว่าไม่มี LINK IG
+                              await _openLink(
+                                'https://www.instagram.com/brownywash?igsh=MTg0YmtvNDN4dnN1ZA==',
+                              );
+                            }
+                          : null,
+                    ),
+                    AppDims.horizonPadding_9,
+                    _buildSocialMediaButton(
+                      icon: Assets.iconProfilePreferences.line.image(
+                        width: AppDims.size_2.w,
+                      ),
+                      onTap: result.isSuccess
+                          ? () async {
+                              // เปิด App LINE
+                              await _openLink(data!.lineLink.orEmpty);
+                            }
+                          : null,
+                    ),
+                    AppDims.horizonPadding_9,
+                    _buildSocialMediaButton(
+                      icon: Assets.iconProfilePreferences.tiktok.image(),
+                      onTap: result.isSuccess
+                          ? () async {
+                              // เปิด App TikTok
+                              await _openLink(data!.tiktokLink.orEmpty);
+                            }
+                          : null,
+                    ),
+                    AppDims.horizonPadding_9,
+                    _buildSocialMediaButton(
+                      icon: Assets.iconProfilePreferences.youtube.image(),
+                      onTap: result.isSuccess
+                          ? () async {
+                              // เปิด App Youtube
+                              await _openLink(data!.youtubeLink.orEmpty);
+                            }
+                          : null,
+                    ),
+                  ],
                 ),
-                AppDims.horizonPadding_9,
-                _buildSocialMediaButton(
-                  icon: Assets.iconProfilePreferences.instragram.image(),
-                  onTap: () {
-                    // TODO: Open Instagram
-                  },
-                ),
-                AppDims.horizonPadding_9,
-                _buildSocialMediaButton(
-                  icon: Assets.iconProfilePreferences.line.image(
-                    width: AppDims.size_2.w,
-                  ),
-                  onTap: () {
-                    // TODO: Open LINE
-                  },
-                ),
-                AppDims.horizonPadding_9,
-                _buildSocialMediaButton(
-                  icon: Assets.iconProfilePreferences.tiktok.image(),
-                  onTap: () {
-                    // TODO: Open TikTok
-                  },
-                ),
-                AppDims.horizonPadding_9,
-                _buildSocialMediaButton(
-                  icon: Assets.iconProfilePreferences.youtube.image(),
-                  onTap: () {
-                    // TODO: Open YouTube
-                  },
-                ),
+                AppDims.vericalPadding_16,
+                Divider(),
               ],
-            ),
-            AppDims.vericalPadding_16,
-            Divider(),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
+  Future<void> _openLink(String source) async {
+    // เปิด LINK จาก Source ที่ส่งเข้ามา
+    final launched = await LaunchHelper.openUrlInBrowser(
+      source,
+    );
+
+    if (mounted && !launched) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+      );
+    }
+  }
+
+  Future<void> _openCall(String source) async {
+    // โทรออกเบอร์สายด่วน
+    final launched = await LaunchHelper.makePhoneCall(
+      source,
+    );
+    if (mounted && !launched) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+      );
+    }
+  }
+
   Widget _buildSocialMediaButton({
     // required IconData icon,
     required Widget icon,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return InkWell(
       onTap: onTap,

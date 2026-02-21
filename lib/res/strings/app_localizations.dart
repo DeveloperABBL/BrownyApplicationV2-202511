@@ -232,6 +232,12 @@ abstract class AppLocalizations {
   /// **'Rewards'**
   String get rewards;
 
+  /// No description provided for @scanPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scanPay;
+
   /// No description provided for @scan.
   ///
   /// In en, this message translates to:
@@ -1375,7 +1381,7 @@ abstract class AppLocalizations {
   /// No description provided for @callPhoneNumber.
   ///
   /// In en, this message translates to:
-  /// **'Call 02-123-3661'**
+  /// **'Call'**
   String get callPhoneNumber;
 
   /// No description provided for @contactViaLine.
@@ -1989,6 +1995,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recent'**
   String get recent;
+
+  /// No description provided for @myCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'My Coins'**
+  String get myCoins;
+
+  /// No description provided for @availableCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Coins'**
+  String get availableCoins;
+
+  /// No description provided for @noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No Data'**
+  String get noData;
+
+  /// No description provided for @allHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'All History'**
+  String get allHistory;
+
+  /// No description provided for @received.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get received;
+
+  /// No description provided for @used.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get used;
+
+  /// No description provided for @usageStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage Status'**
+  String get usageStatus;
+
+  /// No description provided for @loveAnyoneDoLaundry.
+  ///
+  /// In en, this message translates to:
+  /// **'#LoveAnyoneDoLaundry'**
+  String get loveAnyoneDoLaundry;
+
+  /// No description provided for @services.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get services;
+
+  /// No description provided for @usageHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction\nHistory'**
+  String get usageHistory;
+
+  /// No description provided for @contactInquiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact\nUs'**
+  String get contactInquiry;
+
+  /// No description provided for @collectMoreDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect Daily'**
+  String get collectMoreDaily;
 }
 
 class _AppLocalizationsDelegate

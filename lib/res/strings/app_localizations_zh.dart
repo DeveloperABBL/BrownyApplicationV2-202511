@@ -75,6 +75,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rewards => '奖励';
 
   @override
+  String get scanPay => '扫描';
+
+  @override
   String get scan => '扫描';
 
   @override
@@ -645,7 +648,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contactBrownyCare => '联系布朗尼客服';
 
   @override
-  String get callPhoneNumber => '致电 02-123-3661';
+  String get callPhoneNumber => '致电';
 
   @override
   String get contactViaLine => '通过 LINE 布朗尼官方咨询';
@@ -952,4 +955,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get recent => '最近';
+
+  @override
+  String get myCoins => '我的硬币';
+
+  @override
+  String get availableCoins => '可用积分';
+
+  @override
+  String get noData => '无数据';
+
+  @override
+  String get allHistory => '全部历史';
+
+  @override
+  String get received => '已收到';
+
+  @override
+  String get used => '已使用';
+
+  @override
+  String get usageStatus => '使用状态';
+
+  @override
+  String get loveAnyoneDoLaundry => '#爱就帮TA洗衣服';
+
+  @override
+  String get services => '服务';
+
+  @override
+  String get usageHistory => '使用\n历史';
+
+  @override
+  String get contactInquiry => '联系\n咨询';
+
+  @override
+  String get collectMoreDaily => '每天多收集';
 }

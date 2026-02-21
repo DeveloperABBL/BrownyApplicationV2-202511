@@ -439,7 +439,7 @@ class _BrownyDialog extends StatelessWidget {
                   // Message
                   AppText(
                     message,
-                    style: context.textTheme.bodyMedium!.copyWith(
+                    style: context.textTheme.labelLarge!.copyWith(
                       color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,

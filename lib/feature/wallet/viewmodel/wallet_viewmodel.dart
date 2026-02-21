@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/wallet/error/wallet_exception.dart';
 import 'package:browny_applications_new/feature/wallet/models/receipt_data_model.dart';
 import 'package:browny_applications_new/feature/wallet/models/wallet_model.dart';
@@ -28,12 +30,15 @@ class WalletViewModel extends AppViewModelObscureHandler {
     required super.context,
     super.initIsObscure = false,
     WalletDataSourceMixin? walletRepo,
+    ContactDataSourceMixin? contactRepo,
   }) {
     repo = walletRepo ?? WalletRepo();
+    _contactRepo = contactRepo ?? ContactRepo();
   }
 
   // ========= repo =========
   late WalletDataSourceMixin repo;
+  late ContactDataSourceMixin _contactRepo;
 
   // ========= dispose =========
   Timer? _statusCheckTimer;
@@ -84,6 +89,22 @@ class WalletViewModel extends AppViewModelObscureHandler {
   // เก็บ Response จากที่ Request ชำระ
   TopupRequestResponse? _topupResponse;
   TopupRequestResponse? get topupResponse => _topupResponse;
+
+  /// DONG 2026-02-21
+  ///
+  /// fetch ข้อมูลช่องทางการติดต่อต่างๆ
+  Future<UiResult<ContactResponse>> fetchTermsLink() async {
+    try {
+      final result = await _contactRepo.fetchContact();
+      if (result.hasError || result.isEmpty) {
+        return UiResult.empty();
+      }
+
+      return UiResult.success(data: result.data);
+    } catch (_) {
+      return UiResult.empty();
+    }
+  }
 
   Future<UiResult<TopupRequestResponse>> onSummitClick() async {
     if (_amountValidNotifier) {
@@ -226,10 +247,7 @@ class WalletViewModel extends AppViewModelObscureHandler {
           ),
     );
     // update ข้อมูล User ด้วย
-    currentCustomerProvider.newUser = currentCustomerProvider.current.copyWith(
-      creditBalance: result.data.creditBalance,
-      brownyCoin: result.data.brownyCoin,
-    );
+    currentCustomerProvider.updateCreditAndCoinBalance(result.data);
   }
 
   Future<void> fetchReceiptData(BuildContext context) async {

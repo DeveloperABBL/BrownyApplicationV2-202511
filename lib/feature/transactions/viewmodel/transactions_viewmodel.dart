@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/coupon_o
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/transactions/models/payment_transaction_state.dart';
 import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
@@ -86,6 +87,7 @@ class TransactionsViewmodel extends AppViewModel
   ValueListenable<UiResult<List<PaymentMethodModel>>>
   get paymentMethodNotifier => _paymentMethodNotifier;
   PaymentMethodModel? _paymentSelected;
+  PaymentMethodModel? get paymentSelected => _paymentSelected;
   // เก็บค่า payment ก่อนที่จะเข้าหน้าแก้ไข (สำหรับ cancel)
   PaymentMethodModel? _paymentSelectedBeforeEdit;
 
@@ -611,6 +613,44 @@ class TransactionsViewmodel extends AppViewModel
         ),
       );
       return UiResult.error(error: exception);
+    }
+  }
+
+  Future<UiResult<void>> verifyOrder() async {
+    try {
+      if (paymentSelected?.isTpWallet == true) {
+        final result = await _couponRepo.fetchCustomerCredit(
+          currentCustomerProvider.current.id!,
+        );
+
+        if (result.isEmpty || result.hasError) {
+          try {
+            return UiResult.error(
+              error: Unprocessable(result.error.toString()),
+            );
+          } catch (_) {
+            return UiResult.error(error: Unprocessable());
+          }
+        }
+        // update ข้อมูล User ด้วย
+        currentCustomerProvider.updateCreditAndCoinBalance(result.data);
+        final tpWalletBalance = double.tryParse(
+          result.data.creditBalance!.replaceAll(',', ''),
+        )!;
+
+        final packgaePrice = double.tryParse(
+          selectedPackageNotifier!.value!.price!.replaceAll(',', ''),
+        )!;
+        if (tpWalletBalance >= packgaePrice) {
+          return UiResult.success(data: null);
+        }
+
+        return UiResult.empty();
+      } else {
+        return UiResult.success(data: null);
+      }
+    } catch (e) {
+      return UiResult.error(error: Unprocessable(e.toString()));
     }
   }
 }

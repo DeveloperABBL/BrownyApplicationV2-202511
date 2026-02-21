@@ -26,28 +26,31 @@ class WalletHistoryDetailPage extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: historyGroups.isEmpty
-          ? Center(
-              child: AppText(
-                // ไม่มีประวัติการทำรายการ
-                context.wording.noTransactionHistory,
-                style: context.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
+      body: SafeArea(
+        top: false,
+        child: historyGroups.isEmpty
+            ? Center(
+                child: AppText(
+                  // ไม่มีประวัติการทำรายการ
+                  context.wording.noTransactionHistory,
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
+              )
+            : ListView.separated(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_16.w,
+                  vertical: AppDims.size_16.h,
+                ),
+                itemCount: historyGroups.length,
+                separatorBuilder: (context, index) => AppDims.vericalPadding_24,
+                itemBuilder: (context, groupIndex) {
+                  final group = historyGroups[groupIndex];
+                  return _buildGroupSection(context, group);
+                },
               ),
-            )
-          : ListView.separated(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDims.size_16.w,
-                vertical: AppDims.size_16.h,
-              ),
-              itemCount: historyGroups.length,
-              separatorBuilder: (context, index) => AppDims.vericalPadding_24,
-              itemBuilder: (context, groupIndex) {
-                final group = historyGroups[groupIndex];
-                return _buildGroupSection(context, group);
-              },
-            ),
+      ),
     );
   }
 
@@ -77,7 +80,7 @@ class WalletHistoryDetailPage extends StatelessWidget {
                   pattern: 'dd MMM yyyy - HH:mm:ss',
                 ) ??
                 '',
-            amount: history.amountValue.toString(),
+            amount: history.getAmountDisplay,
             isIncome: !history.isPurchase && !history.isRefund,
           );
         }),

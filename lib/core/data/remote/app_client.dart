@@ -1,54 +1,8 @@
-import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/device_log_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/pin_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/store_location_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/topup_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/wallet_history_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_receipt_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/device_log_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/get_pin_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/update_notification_preferences_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/verify_otp_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/verify_pin_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
-import 'package:dio/dio.dart';
-import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:retrofit/retrofit.dart';
+import 'package:dio/dio.dart';
 
 part 'app_client.g.dart';
 
@@ -333,6 +287,46 @@ abstract class AppClient {
   /// API fetch coin claim data ตาม customer_id
   @GET('/coin')
   Future<HttpResponse<CoinClaimResponse>> getCoinClaimData(
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-02-19
+  ///
+  /// API fetch ประวัติ Browny Coin (รับ/ใช้/หมดอายุ)
+  ///
+  /// Body parameters:
+  /// - customer_id: String
+  ///
+  /// Response:
+  /// - CoinHistoryResponse with coin balance, expire info, and history
+  @GET('/coin/history')
+  Future<HttpResponse<CoinHistoryResponse>> fetchCoinHistory(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// DONG 2026-02-20
+  ///
+  /// API fetch รายละเอียดเครื่อง (machine detail)
+  ///
+  /// Response:
+  /// - MachineDetailResponse with machine info, status, remaining time
+  @GET('/machines/{id}')
+  Future<HttpResponse<MachineDetailResponse>> fetchMachineDetail(
+    @Path('id') String machineId,
+  );
+
+  /// DONG 2026-02-20
+  ///
+  /// API fetch โปรแกรมของเครื่อง (machine programs)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid)
+  ///
+  /// Response:
+  /// - MachineProgramsResponse with programs, available coupons, payment methods
+  @GET('/machine/{id}/programs')
+  Future<HttpResponse<MachineProgramsResponse>> fetchMachinePrograms(
+    @Path('id') String machineId,
     @Query('customer_id') String customerId,
   );
 

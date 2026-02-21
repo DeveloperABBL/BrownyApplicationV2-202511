@@ -78,6 +78,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewards => 'Rewards';
 
   @override
+  String get scanPay => 'Scan';
+
+  @override
   String get scan => 'Scan';
 
   @override
@@ -654,7 +657,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactBrownyCare => 'Contact Browny Care';
 
   @override
-  String get callPhoneNumber => 'Call 02-123-3661';
+  String get callPhoneNumber => 'Call';
 
   @override
   String get contactViaLine => 'Inquiry via LINE Browny Official';
@@ -974,4 +977,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recent => 'Recent';
+
+  @override
+  String get myCoins => 'My Coins';
+
+  @override
+  String get availableCoins => 'Available Coins';
+
+  @override
+  String get noData => 'No Data';
+
+  @override
+  String get allHistory => 'All History';
+
+  @override
+  String get received => 'Received';
+
+  @override
+  String get used => 'Used';
+
+  @override
+  String get usageStatus => 'Usage Status';
+
+  @override
+  String get loveAnyoneDoLaundry => '#LoveAnyoneDoLaundry';
+
+  @override
+  String get services => 'Services';
+
+  @override
+  String get usageHistory => 'Transaction\nHistory';
+
+  @override
+  String get contactInquiry => 'Contact\nUs';
+
+  @override
+  String get collectMoreDaily => 'Collect Daily';
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -41,6 +42,7 @@ class ProfilePage extends StatelessWidget {
       create: (context) => ProfileViewModel(
         context: context,
         repo: ProfileRepo(),
+        contactRepo: ContactRepo(),
       ),
       child: ProfileWidget(
         isFirstSignup: isFirstSignup,

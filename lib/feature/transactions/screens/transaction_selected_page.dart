@@ -2,29 +2,17 @@
 
 import 'dart:async';
 
-import 'package:browny_applications_new/core/const/app_constants.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
-import 'package:browny_applications_new/core/providers/customer_provider.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/widgets/app_overlays.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/core/widgets/coupon_e_voucher_card_widget.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class TransactionSelectedPage extends StatefulWidget {
@@ -170,7 +158,18 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
     }
   }
 
-  void onPurchaseClicked() {
+  void onPurchaseClicked() async {
+    final result = await _viewmodel.verifyOrder();
+    if (!mounted) return;
+
+    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: 'TP+ Wallet เงินไม่เพียงพอ',
+        message: 'กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน',
+      );
+      return;
+    }
     context.pushNamed(TransactionAuthenPage.pageName).then((
       result,
     ) async {
@@ -288,7 +287,9 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
         actions: [
           // แจ้งปัญหา
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              ContactPage.goToPage(context, ContactProvider.helpAndProblemNoti);
+            },
             icon: Assets.svg.icHeadset.svg(),
           ),
         ],

@@ -20,6 +20,11 @@ class ScannerPage extends StatelessWidget {
   static final pagePath = '/scanner';
   static final pageName = 'scannerPage';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(BuildContext context) async {
+    return await context.pushNamed(ScannerPage.pageName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

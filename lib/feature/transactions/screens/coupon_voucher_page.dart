@@ -9,6 +9,11 @@ class CouponVoucherPage extends StatelessWidget {
   static final pagePath = '/coupon_voucher';
   static final pageName = 'CouponVoucherPage';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(BuildContext context) async {
+    return await context.pushNamed(CouponVoucherPage.pageName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

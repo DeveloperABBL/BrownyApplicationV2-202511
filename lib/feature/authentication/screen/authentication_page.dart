@@ -1,7 +1,9 @@
 // ignore_for_file: unused_element_parameter
 
+import 'package:browny_applications_new/core/utils/launch_helper.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -37,6 +39,19 @@ class AuthenticationPage extends StatelessWidget {
   static final pagePath = '/authentication_page';
   static final pageName = 'authentication';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    required AuthenProcess process,
+  }) async {
+    return await context.pushNamed(
+      AuthenticationPage.pageName,
+      extra: {
+        AuthenProcess: process,
+      },
+    );
+  }
+
   final AuthenProcess _authenProcess;
 
   @override
@@ -47,6 +62,7 @@ class AuthenticationPage extends StatelessWidget {
         context: context,
         authenProcess: _authenProcess,
         customerDataRepo: CustomerDataRepo(),
+        contactRepo: ContactRepo(),
       ),
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -668,9 +684,33 @@ class _SignUpWidget extends StatelessWidget {
   Widget contentCheckboxTermOfPolicy(BuildContext context) {
     return Consumer<AuthenticationViewModel>(
       builder: (context, vm, _) {
-        return _CheckBoxTermOfPolicy(
-          initialValue: vm.checkBoxTermOfPolicy,
-          onChanged: vm.checkboxTermOfPolicyChanged,
+        return FutureBuilder(
+          future: vm.fetchTermsLink(),
+          builder: (context, snapShot) {
+            if (!snapShot.hasData) {
+              return SizedBox(
+                width: AppDims.size_12.w,
+                child: CircularProgressIndicator(),
+              );
+            }
+            final link = snapShot.data?.data?.registerTermsLink;
+            return _CheckBoxTermOfPolicy(
+              initialValue: vm.checkBoxTermOfPolicy,
+              onChanged: vm.checkboxTermOfPolicyChanged,
+              onTermsTap: () async {
+                final launched = await LaunchHelper.openUrlInWebView(
+                  link.orEmpty,
+                );
+                if (context.mounted && !launched) {
+                  AppOverlays.showBrownyDialog(
+                    context,
+                    title: context.wording.errorOccurred,
+                    message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+                  );
+                }
+              },
+            );
+          },
         );
       },
     );
@@ -1905,10 +1945,12 @@ class _ResetPasswordWidget extends _SignUpWidget {
 class _CheckBoxTermOfPolicy extends StatefulWidget {
   const _CheckBoxTermOfPolicy({
     required this.onChanged,
+    this.onTermsTap,
     this.initialValue = false,
   });
 
   final ValueChanged<bool?> onChanged;
+  final VoidCallback? onTermsTap;
   final bool initialValue;
 
   @override
@@ -1946,13 +1988,7 @@ class _CheckBoxTermOfPolicyState extends State<_CheckBoxTermOfPolicy> {
           children: [
             TextSpan(
               text: context.wording.termsOfUseAndPrivacyPolicy,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  // TODO: เปิดหน้า Terms & Privacy Policy
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: AppText('tap')),
-                  );
-                },
+              recognizer: TapGestureRecognizer()..onTap = widget.onTermsTap,
               style: context.textTheme.labelMedium!.copyWith(
                 color: AppColors.primary,
               ),

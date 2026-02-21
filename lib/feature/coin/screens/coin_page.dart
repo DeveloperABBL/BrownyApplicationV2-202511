@@ -7,6 +7,7 @@ import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/coin/models/coin_data_model.dart';
 import 'package:browny_applications_new/feature/coin/repository/coin_claim_repo.dart';
+import 'package:browny_applications_new/feature/coin/screens/coin_history_page.dart';
 import 'package:browny_applications_new/feature/coin/viewmodel/coin_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -459,7 +460,9 @@ class __CoinContentState extends State<_CoinContent> {
 
   TextButton _buildHistory(BuildContext context) {
     return TextButton.icon(
-      onPressed: () {},
+      onPressed: () {
+        context.pushNamed(CoinHistoryPage.pageName, extra: _viewModel);
+      },
       style: context.appTheme.textButtonTheme.style!.copyWith(
         minimumSize: WidgetStatePropertyAll(
           Size(

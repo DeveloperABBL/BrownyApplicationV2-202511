@@ -158,6 +158,8 @@ class PaymentMethodModel {
     isSelected: isSelected ?? this.isSelected,
     isActive: isActive ?? this.isActive,
   );
+
+  bool get isTpWallet => method == 'tp_wallet';
 }
 
 /// Helper class สำหรับ CouponData พร้อม display methods

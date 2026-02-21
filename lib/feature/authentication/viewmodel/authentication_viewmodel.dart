@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
@@ -7,6 +8,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/verify_o
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -45,9 +47,11 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     required super.context,
     required this.authenProcess,
     required this.customerDataRepo,
+    required this.contactRepo,
   });
 
   final CustomerDataSourceMixin customerDataRepo;
+  final ContactDataSourceMixin contactRepo;
   OTPDataSourceMixin get otpDataRepo => customerDataRepo as OTPDataSourceMixin;
 
   final AuthenProcess authenProcess;
@@ -551,7 +555,24 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
 
     return UiResult.success(data: true);
   }
+
   // =========== event login, logout, regist ===========
+
+  /// DONG 2026-02-21
+  ///
+  /// fetch ข้อมูลช่องทางการติดต่อต่างๆ
+  Future<UiResult<ContactResponse>> fetchTermsLink() async {
+    try {
+      final result = await contactRepo.fetchContact();
+      if (result.hasError || result.isEmpty) {
+        return UiResult.empty();
+      }
+
+      return UiResult.success(data: result.data);
+    } catch (_) {
+      return UiResult.empty();
+    }
+  }
 
   Future<UiResult<void>> onSummitForm() async {
     // ขั้นตอนการสมัครสมาชิก

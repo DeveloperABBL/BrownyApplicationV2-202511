@@ -2,6 +2,8 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/wallet/models/wallet_model.dart';
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
@@ -348,7 +350,12 @@ class _WalletWidgetState extends State<WalletWidget> {
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            ContactPage.goToPage(
+              context,
+              ContactProvider.helpAndProblemNoti,
+            );
+          },
           icon: Assets.svg.icHeadset.svg(),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coin_history_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -21,6 +22,8 @@ class CoinViewmModel extends AppViewModel {
   void dispose() {
     _toDayDataNotifier.dispose();
     _coinClaimDataNotifier.dispose();
+    _coinHistoryNotifier.dispose();
+    _coinHistoryGroupsNotifier.dispose();
     super.dispose();
   }
 
@@ -37,6 +40,21 @@ class CoinViewmModel extends AppViewModel {
       );
   ValueListenable<UiResult<CoinDataModel>> get coinClaimDataNotifier =>
       _coinClaimDataNotifier;
+  // ข้อมูลประวัติ Browny Coin
+  late final ValueNotifier<UiResult<CoinHistoryResponse>> _coinHistoryNotifier =
+      ValueNotifier(
+        UiResult.loading(),
+      );
+  ValueListenable<UiResult<CoinHistoryResponse>> get coinHistoryNotifier =>
+      _coinHistoryNotifier;
+
+  // ข้อมูลประวัติ Browny Coin ที่ถูกจัดกลุ่มตามเดือน
+  late final ValueNotifier<UiResult<List<CoinHistoryGroup>>>
+  _coinHistoryGroupsNotifier = ValueNotifier(
+    UiResult.loading(),
+  );
+  ValueListenable<UiResult<List<CoinHistoryGroup>>>
+  get coinHistoryGroupsNotifier => _coinHistoryGroupsNotifier;
 
   // ========== Logic ==========
   Future<UiResult<CoinClaimedResponse>> coinClaiming() async {
@@ -97,6 +115,33 @@ class CoinViewmModel extends AppViewModel {
         data: data,
       );
     }
+  }
+
+  Future<void> fetchCoinHistory() async {
+    _coinHistoryNotifier.value = UiResult.loading();
+    _coinHistoryGroupsNotifier.value = UiResult.loading();
+
+    String id = currentCustomerProvider.current.id!;
+    final result = await _repo.fetchCoinHistory(id);
+
+    if (result.isEmpty) {
+      _coinHistoryNotifier.value = UiResult.empty();
+      _coinHistoryGroupsNotifier.value = UiResult.empty();
+      return;
+    }
+
+    if (result.hasError) {
+      _coinHistoryNotifier.value = UiResult.error(error: result.error);
+      _coinHistoryGroupsNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    _coinHistoryNotifier.value = UiResult.success(data: result.data);
+
+    // จัดกลุ่มประวัติตามเดือน
+    final history = result.data.data?.history ?? [];
+    final groups = history.groupByMonth();
+    _coinHistoryGroupsNotifier.value = UiResult.success(data: groups);
   }
 
   String descriptionPopupCondition(BuildContext context) {

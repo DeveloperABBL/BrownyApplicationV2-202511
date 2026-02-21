@@ -252,6 +252,10 @@ class $AssetsPngGen {
   AssetGenImage get brownyCoinClaimed =>
       const AssetGenImage('assets/png/browny_coin_claimed.png');
 
+  /// File path: assets/png/browny_coin_inactive.png
+  AssetGenImage get brownyCoinInactive =>
+      const AssetGenImage('assets/png/browny_coin_inactive.png');
+
   /// File path: assets/png/browny_coinclaim_condition.png
   AssetGenImage get brownyCoinclaimCondition =>
       const AssetGenImage('assets/png/browny_coinclaim_condition.png');
@@ -385,6 +389,7 @@ class $AssetsPngGen {
     brownyCoin,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
+    brownyCoinInactive,
     brownyCoinclaimCondition,
     brownyCreatePin,
     brownyError1,

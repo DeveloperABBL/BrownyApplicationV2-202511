@@ -9,7 +9,11 @@ import 'package:browny_applications_new/feature/authentication/screen/biometric_
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
+import 'package:browny_applications_new/feature/coin/screens/coin_history_page.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/coin/viewmodel/coin_viewmodel.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
@@ -166,7 +170,14 @@ class AppRouter {
       GoRoute(
         path: ScannerPage.pagePath,
         name: ScannerPage.pageName,
-        builder: (context, state) => const ScannerPage(),
+        builder: (context, state) {
+          if (context.read<CustomerProvider>().current.isGuest) {
+            return AuthenticationPage(
+              authenProcess: AuthenProcess.login,
+            );
+          }
+          return const ScannerPage();
+        },
       ),
       GoRoute(
         path: InvitFriendPage.pagePath,
@@ -177,6 +188,14 @@ class AppRouter {
         path: CoinPage.pagePath,
         name: CoinPage.pageName,
         builder: (context, state) => const CoinPage(),
+      ),
+      GoRoute(
+        path: CoinHistoryPage.pagePath,
+        name: CoinHistoryPage.pageName,
+        builder: (context, state) {
+          final viewmodel = state.extra as CoinViewmModel;
+          return CoinHistoryPage(viewmodel: viewmodel);
+        },
       ),
       GoRoute(
         path: CouponVoucherPage.pagePath,
@@ -277,6 +296,19 @@ class AppRouter {
           final article = state.extra as ArticleDetailModel;
           return ArticleDetailPage(
             article: article,
+          );
+        },
+      ),
+      GoRoute(
+        path: ContactPage.pagePath,
+        name: ContactPage.pageName,
+        builder: (context, state) {
+          List<ContactProvider>? filter;
+          try {
+            filter = state.extra as List<ContactProvider>;
+          } catch (_) {}
+          return ContactPage(
+            provider: filter,
           );
         },
       ),

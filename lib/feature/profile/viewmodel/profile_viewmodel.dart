@@ -4,7 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
+import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
@@ -22,10 +25,12 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
   ProfileViewModel({
     required super.context,
     required this.repo,
+    required this.contactRepo,
   });
 
   // ========== Repository ==========
   final ProfileRepo repo;
+  final ContactDataSourceMixin contactRepo;
 
   // ========== Notifier, Controller ==========
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -107,6 +112,11 @@ Terms and Conditions
         }),
       );
 
+  late final ValueNotifier<UiResult<ContactResponse>>
+  _contactAndSupportLinkNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<ContactResponse>>
+  get contactAndSupportLinkNotifier => _contactAndSupportLinkNotifier;
+
   late final ValueNotifier<int> _currentSliderIndexNotifier = ValueNotifier(0);
   ValueListenable<int> get currentSliderIndexNotifier =>
       _currentSliderIndexNotifier;
@@ -124,6 +134,38 @@ Terms and Conditions
   final ImagePicker _imagePicker = ImagePicker();
 
   // ========== Function, Logic  ==========
+  /// DONG 2026-02-21
+  ///
+  /// fetch ข้อมูลช่องทางการติดต่อต่างๆ
+  Future<void> fetchContactAndSupportLink() async {
+    try {
+      final result = await contactRepo.fetchContact();
+      if (result.hasError || result.isEmpty) {
+        _contactAndSupportLinkNotifier.value = UiResult.empty();
+      }
+
+      _contactAndSupportLinkNotifier.value = UiResult.success(
+        data: result.data,
+      );
+    } catch (_) {
+      _contactAndSupportLinkNotifier.value = UiResult.empty();
+    }
+  }
+
+  /// DONG 2026-02-21
+  ///
+  /// Fetch ข้อมูล QRCode ของลูกค้า
+  Future<UiResult<CustomerQRResponse>> fetchCustomerQRCode() async {
+    final result = await repo.fetchCustomerQR(
+      currentCustomerProvider.current.id!,
+    );
+
+    if (result.isEmpty || result.hasError) {
+      return UiResult.empty();
+    }
+
+    return UiResult.success(data: result.data);
+  }
 
   /// หา index ของ avatar ท้ ตรงกับ imageUrl จาก avatarDataList
   /// จะข้าม picked image เพราะเป็น file ไม่ใช่ URL
@@ -382,6 +424,7 @@ Terms and Conditions
   // ============ dispose ============
   @override
   void dispose() {
+    _contactAndSupportLinkNotifier.dispose();
     _currentSliderIndexNotifier.dispose();
     _profileDataNotifier.dispose();
     phoneController.dispose();

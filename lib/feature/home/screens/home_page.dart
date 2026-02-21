@@ -6,6 +6,8 @@ import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
@@ -183,7 +185,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         label: Column(
                           children: [
                             AppText(
-                              'เก็บคูปอง',
+                              // เก็บคูปอง
+                              context.wording.collectCoupon,
                               style: context.textTheme.labelLarge,
                             ),
                           ],
@@ -257,7 +260,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         label: Column(
                           children: [
                             AppText(
-                              'สถานะการใช้งาน',
+                              // สถานะการใช้งาน
+                              context.wording.usageStatus,
                               style: context.textTheme.labelLarge,
                             ),
                           ],
@@ -288,7 +292,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
                     Align(
                       alignment: Alignment.center,
-                      child: AppText('#รักใครให้ซักผ้า'),
+                      // #รักใครให้ซักผ้า
+                      child: AppText(context.wording.loveAnyoneDoLaundry),
                     ),
                   ],
                 ),
@@ -313,7 +318,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         label: Column(
                           children: [
                             AppText(
-                              'บริการ',
+                              // บริการ
+                              context.wording.services,
                               style: context.textTheme.labelLarge,
                             ),
                           ],
@@ -433,7 +439,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       height: AppDims.size_32.h,
                     ),
                     AppText(
-                      'คูปอง',
+                      // คูปอง
+                      context.wording.rewards,
                       textAlign: TextAlign.center,
                       style: context.textTheme.titleSmall,
                     ),
@@ -516,7 +523,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       height: AppDims.size_32.h,
                     ),
                     AppText(
-                      'ประวัติ\nการใช้งาน',
+                      // ประวัติ\nการใช้งาน
+                      context.wording.usageHistory,
                       textAlign: TextAlign.center,
                       style: context.textTheme.titleSmall,
                     ),
@@ -524,23 +532,30 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
               ),
 
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+              GestureDetector(
+                onTap: () => ContactPage.goToPage(
+                  context,
+                  ContactProvider.contacts,
                 ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscContact.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      'ติดต่อ\nสอบถาม',
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDims.size_8.w,
+                    vertical: AppDims.size_8.h,
+                  ),
+                  child: Column(
+                    children: [
+                      Assets.iconShortcut.iscContact.image(
+                        width: AppDims.size_64.w,
+                        height: AppDims.size_32.h,
+                      ),
+                      AppText(
+                        // ติดต่อ\nสอบถาม
+                        context.wording.contactInquiry,
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -718,17 +733,17 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   backgroundColor: AppColors.background,
                   child: IconButton(
                     onPressed: () {
-                      if (_viewmodel.isProfileGuest()) {
-                        context.pushNamed(
-                          AuthenticationPage.pageName,
-                          extra: {
-                            AuthenProcess: AuthenProcess.login,
-                          },
-                        );
-                      } else {
-                        // context.pushNamed(ProfilePage.pageName);
-                        context.pushNamed(MyProfileAndPreferencesPage.pageName);
-                      }
+                      // if (_viewmodel.isProfileGuest()) {
+                      //   context.pushNamed(
+                      //     AuthenticationPage.pageName,
+                      //     extra: {
+                      //       AuthenProcess: AuthenProcess.login,
+                      //     },
+                      //   );
+                      // } else {
+                      // context.pushNamed(ProfilePage.pageName);
+                      context.pushNamed(MyProfileAndPreferencesPage.pageName);
+                      // }
                     },
                     icon: customer.current.image.orEmpty.isEmpty
                         // ถ้าไม่มีรูป Profile ใช้รูป Default
@@ -929,43 +944,13 @@ class _HomePageWidgetState extends State<HomePageWidget>
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Text เก็บได้ทุกวัน
+                  // Text เก็บได้ทุกวัน และ Icon browny
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: Container(
-                      padding: EdgeInsets.only(
-                        left: 8,
-                        top: 2,
-                        right: 8,
-                        bottom: 20,
-                      ),
-                      margin: EdgeInsets.only(top: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.r),
-                        // ถ้าเป็น Guest ไม่แสดง
-                        color: isGuest ? null : AppColors.error,
-                      ),
-                      // ถ้าเป็น Guest ไม่แสดง
-                      child: isGuest
-                          ? null
-                          : AppText(
-                              'เก็บเพิ่มได้ทุกวัน',
-                              style: context.textTheme.labelSmall!.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                    ),
+                    child: _buildDogAndBadgeGroup(isGuest),
                   ),
-                  // Icon browny
-                  Positioned(
-                    left: -28.w,
-                    right: -6,
-                    top: -2.w,
-                    child: isGuest
-                        ? SizedBox()
-                        : Assets.svg.icBrownySpeaker.svg(width: 35.w),
-                  ),
+
                   // Card แสดง Coin
                   InkWell(
                     borderRadius: BorderRadius.circular(8.r),
@@ -1100,6 +1085,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                               ),
                               AppDims.horizonPadding_8,
                               AppText(
+                                // คูปอง
                                 context.wording.rewards,
                                 style: context.textTheme.titleSmall!.copyWith(
                                   color: AppColors.textPrimary,
@@ -1139,6 +1125,49 @@ class _HomePageWidgetState extends State<HomePageWidget>
           );
         },
       ),
+    );
+  }
+
+  Widget _buildDogAndBadgeGroup(bool isGuest) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // ก้อนที่ 1 (ของกลุ่มย่อย): ป้ายแดง
+        Container(
+          padding: EdgeInsets.only(
+            left: 8,
+            top: 2,
+            right: 8,
+            bottom: 20,
+          ),
+          margin: EdgeInsets.only(top: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.r),
+            // ถ้าเป็น Guest ไม่แสดง
+            color: isGuest ? null : AppColors.error,
+          ),
+          // ถ้าเป็น Guest ไม่แสดง
+          child: isGuest
+              ? null
+              : AppText(
+                  // เก็บเพิ่มได้ทุกวัน
+                  context.wording.collectMoreDaily,
+                  style: context.textTheme.labelSmall!.copyWith(
+                    color: AppColors.white,
+                  ),
+                ),
+        ),
+
+        // ก้อนที่ 2 (ของกลุ่มย่อย): รูปตุ๊กตาหมา
+        // วางไว้ที่พิกัด 0,0 ของกลุ่มย่อยนี้ สุนัขจะทับป้ายแดงในองศาเดิมเสมอ
+        Positioned(
+          left: -27.w,
+          top: -2,
+          child: isGuest
+              ? SizedBox()
+              : Assets.svg.icBrownySpeaker.svg(width: 35.w),
+        ),
+      ],
     );
   }
 }

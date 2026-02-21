@@ -77,7 +77,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get rewards => 'คูปอง';
 
   @override
-  String get scan => 'สแกนจ่าย';
+  String get scanPay => 'สแกนจ่าย';
+
+  @override
+  String get scan => 'สแกน';
 
   @override
   String get stores => 'สาขา';
@@ -655,7 +658,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get contactBrownyCare => 'ติดต่อ Browny Care';
 
   @override
-  String get callPhoneNumber => 'โทร 02-123-3661';
+  String get callPhoneNumber => 'โทร';
 
   @override
   String get contactViaLine => 'สอบถามผ่าน LINE Browny Official';
@@ -970,4 +973,40 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get recent => 'ล่าสุด';
+
+  @override
+  String get myCoins => 'เหรียญของฉัน';
+
+  @override
+  String get availableCoins => 'คอยน์ที่ใช้ได้';
+
+  @override
+  String get noData => 'ไม่มีข้อมูล';
+
+  @override
+  String get allHistory => 'ประวัติทั้งหมด';
+
+  @override
+  String get received => 'ที่ได้รับ';
+
+  @override
+  String get used => 'ที่ถูกใช้';
+
+  @override
+  String get usageStatus => 'สถานะการใช้งาน';
+
+  @override
+  String get loveAnyoneDoLaundry => '#รักใครให้ซักผ้า';
+
+  @override
+  String get services => 'บริการ';
+
+  @override
+  String get usageHistory => 'ประวัติ\nการใช้งาน';
+
+  @override
+  String get contactInquiry => 'ติดต่อ\nสอบถาม';
+
+  @override
+  String get collectMoreDaily => 'เก็บเพิ่มได้ทุกวัน';
 }
