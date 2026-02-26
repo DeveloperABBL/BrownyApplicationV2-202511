@@ -331,5 +331,21 @@
   "services": "服务",
   "usageHistory": "使用\n历史",
   "contactInquiry": "联系\n咨询",
-  "collectMoreDaily": "每天多收集"
+  "collectMoreDaily": "每天多收集",
+  "pleaseTryAnotherMachine": "请尝试其他机器。",
+  "machineUnavailableAtTheMoment": "机器当前无法使用。",
+  "orderCompletedMessage": "您的订单已完成。",
+  "orderNotFoundTitle": "未找到订单",
+  "orderNotFoundMessage": "未找到此订单。",
+  "insufficientWalletBalanceTitle": "TP+ Wallet 余额不足",
+  "insufficientWalletBalanceMessage": "请充值或更换支付方式。",
+  "cannotCreateOrder": "无法创建订单。",
+  "paymentReferenceNotFound": "未找到支付参考号。",
+  "totalDiscount": "总折扣",
+  "machineDataLoadError": "未找到机器数据或发生错误。\n请检查后重试。",
+  "couponAndEVoucher": "优惠券 / E-Voucher",
+  "addOrSelect": "添加/选择",
+  "participatingStoresOnly": "仅限参与门店",
+  "select": "选择",
+  "startOperation": "开始运行"
 }

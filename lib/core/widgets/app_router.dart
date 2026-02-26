@@ -19,9 +19,12 @@ import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_selected_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_selected_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_status_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
+import 'package:browny_applications_new/feature/transactions/screens/receipt_machine_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
@@ -201,12 +204,19 @@ class AppRouter {
         path: CouponVoucherPage.pagePath,
         name: CouponVoucherPage.pageName,
         builder: (context, state) {
-          if (context.read<CustomerProvider>().current.isGuest) {
-            return AuthenticationPage(
-              authenProcess: AuthenProcess.login,
-            );
+          CouponVoucherState couponState = CouponVoucherState.purshasing;
+          List<int>? customerCouponAvailables;
+          try {
+            List<Object?> list = state.extra as List<Object?>;
+            couponState = list[0] as CouponVoucherState;
+            customerCouponAvailables = list[1] as List<int>?;
+          } catch (_) {
+            rethrow;
           }
-          return const CouponVoucherPage();
+          return CouponVoucherPage(
+            state: couponState,
+            customerCouponAvailables: customerCouponAvailables,
+          );
         },
       ),
       GoRoute(
@@ -247,6 +257,26 @@ class AppRouter {
           final viewModel = state.extra as TransactionsViewmodel;
           return ReceiptPage(
             viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: ReceiptMachinePage.pagePath,
+        name: ReceiptMachinePage.pageName,
+        builder: (context, state) {
+          final viewModel = state.extra as MachineTransactionViewmodel;
+          return ReceiptMachinePage(
+            viewmodel: viewModel,
+          );
+        },
+      ),
+      GoRoute(
+        path: MachineStatusPage.pagePath,
+        name: MachineStatusPage.pageName,
+        builder: (context, state) {
+          final machineId = state.extra as String;
+          return MachineStatusPage(
+            machineId: machineId,
           );
         },
       ),
@@ -309,6 +339,19 @@ class AppRouter {
           } catch (_) {}
           return ContactPage(
             provider: filter,
+          );
+        },
+      ),
+      GoRoute(
+        path: MachineTransactionPage2.pagePath,
+        name: MachineTransactionPage2.pageName,
+        builder: (context, state) {
+          String machineId = '';
+          try {
+            machineId = state.extra as String;
+          } catch (_) {}
+          return MachineTransactionPage2(
+            machineId: machineId,
           );
         },
       ),

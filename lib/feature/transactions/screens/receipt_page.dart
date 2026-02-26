@@ -1,22 +1,13 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/permission_helper.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 class ReceiptPage extends StatelessWidget {
   const ReceiptPage({
@@ -28,6 +19,24 @@ class ReceiptPage extends StatelessWidget {
 
   static final pagePath = '/receipt';
   static final pageName = 'receiptPage';
+
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    required TransactionsViewmodel viewmodel,
+  }) async {
+    return await context.pushNamed(ReceiptPage.pageName, extra: viewmodel);
+  }
+
+  static void goReplacementPage(
+    BuildContext context, {
+    required TransactionsViewmodel viewmodel,
+  }) {
+    context.pushReplacementNamed(
+      ReceiptPage.pageName,
+      extra: viewmodel,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +63,6 @@ class ReceiptWidget extends StatefulWidget {
 
 class _ReceiptWidgetState extends State<ReceiptWidget> {
   final GlobalKey _receiptKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    // TODO: Fetch receipt data if needed
-  }
 
   /// Capture widget เป็นรูปภาพ
   Future<Uint8List?> _captureWidget() async {

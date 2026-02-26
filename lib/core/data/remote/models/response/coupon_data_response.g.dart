@@ -7,8 +7,8 @@ part of 'coupon_data_response.dart';
 // **************************************************************************
 
 CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
-  couponId: json['coupon_id'],
-  customerCouponId: json['customer_coupon_id'],
+  couponId: (json['coupon_id'] as num?)?.toInt(),
+  customerCouponId: (json['customer_coupon_id'] as num?)?.toInt(),
   assignedQuantity: json['assigned_quantity'] as String?,
   usedQuantity: json['used_quantity'] as String?,
   remaining: json['remaining'] as String?,

@@ -22,7 +22,7 @@ class PaymentStatusCheckResponse {
 
   /// order_id สำหรับหา receipt
   @JsonKey(name: 'order_id')
-  final int? orderId;
+  final dynamic orderId;
 
   PaymentStatusCheckResponse({
     required this.status,

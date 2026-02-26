@@ -28,6 +28,14 @@ class DateTimeConverter implements JsonConverter<DateTime?, String?> {
 
     try {
       return DateFormat(
+        'yyyy-MM-dd / HH:mm',
+      ).parse(json);
+    } catch (e) {
+      // ถ้า parse ไม่ได้ ให้ลอง parse ด้วย format ข้างล่างต่อก่อน
+    }
+
+    try {
+      return DateFormat(
         'dd-MM-yyyy / HH:mm',
       ).parse(json);
     } catch (e) {

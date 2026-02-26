@@ -1013,4 +1013,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get collectMoreDaily => 'Collect Daily';
+
+  @override
+  String get pleaseTryAnotherMachine => 'Please try another machine.';
+
+  @override
+  String get machineUnavailableAtTheMoment =>
+      'Machine is currently unavailable.';
+
+  @override
+  String get orderCompletedMessage => 'Your order has been completed.';
+
+  @override
+  String get orderNotFoundTitle => 'Order not found';
+
+  @override
+  String get orderNotFoundMessage => 'This order was not found.';
+
+  @override
+  String get insufficientWalletBalanceTitle =>
+      'Insufficient TP+ Wallet balance';
+
+  @override
+  String get insufficientWalletBalanceMessage =>
+      'Please top up or change your payment method.';
+
+  @override
+  String get cannotCreateOrder => 'Unable to create order.';
+
+  @override
+  String get paymentReferenceNotFound => 'Payment reference not found.';
+
+  @override
+  String get totalDiscount => 'Total discount';
+
+  @override
+  String get machineDataLoadError =>
+      'Machine data not found or an error occurred.\nPlease check and try again.';
+
+  @override
+  String get couponAndEVoucher => 'Coupon / E-Voucher';
+
+  @override
+  String get addOrSelect => 'Add/Select';
+
+  @override
+  String get participatingStoresOnly => 'Participating stores only';
+
+  @override
+  String get select => 'Select';
+
+  @override
+  String get startOperation => 'Start operation';
 }

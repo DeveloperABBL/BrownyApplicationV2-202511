@@ -1009,4 +1009,55 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get collectMoreDaily => 'เก็บเพิ่มได้ทุกวัน';
+
+  @override
+  String get pleaseTryAnotherMachine => 'กรุณาลองเครื่องอื่น';
+
+  @override
+  String get machineUnavailableAtTheMoment =>
+      'เครื่องไม่สามารถใช้งานได้ในขณะนี้';
+
+  @override
+  String get orderCompletedMessage => 'คำสั่งซื้อของคุณเสร็จสิ้น';
+
+  @override
+  String get orderNotFoundTitle => 'ไม่พบรายการ';
+
+  @override
+  String get orderNotFoundMessage => 'ไม่พบรายการสั่งซื้อนี้';
+
+  @override
+  String get insufficientWalletBalanceTitle => 'TP+ Wallet เงินไม่เพียงพอ';
+
+  @override
+  String get insufficientWalletBalanceMessage =>
+      'กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน';
+
+  @override
+  String get cannotCreateOrder => 'ไม่สามารถสร้างคำสั่งซื้อได้';
+
+  @override
+  String get paymentReferenceNotFound => 'ไม่พบข้อมูล Payment Reference';
+
+  @override
+  String get totalDiscount => 'ส่วนลดทั้งหมด';
+
+  @override
+  String get machineDataLoadError =>
+      'ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง';
+
+  @override
+  String get couponAndEVoucher => 'คูปอง / E-Voucher';
+
+  @override
+  String get addOrSelect => 'เพิ่ม/เลือก';
+
+  @override
+  String get participatingStoresOnly => 'เฉพาะสาขาที่ร่วมรายการ';
+
+  @override
+  String get select => 'เลือก';
+
+  @override
+  String get startOperation => 'เริ่มต้นทำงาน';
 }

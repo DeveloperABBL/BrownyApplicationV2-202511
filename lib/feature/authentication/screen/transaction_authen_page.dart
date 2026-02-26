@@ -9,6 +9,11 @@ class TransactionAuthenPage extends StatelessWidget {
   static final pagePath = '/transaction_authen_page';
   static final pageName = 'TransactionAuthenPage';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(BuildContext context) async {
+    return await context.pushNamed(TransactionAuthenPage.pageName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

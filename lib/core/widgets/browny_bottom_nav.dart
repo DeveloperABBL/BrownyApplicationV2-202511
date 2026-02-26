@@ -2,7 +2,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 
 /// BrownyBottomNav - Navigation Bar แบบกำหนดเองสำหรับแอป Browny
 ///
@@ -64,7 +64,10 @@ class BrownyBottomNav extends StatefulWidget {
     }
 
     if (index == 1) {
-      context.pushNamed(CouponVoucherPage.pageName);
+      // context.pushNamed(CouponVoucherPage.pageName);
+      CouponVoucherPage.goToPage(
+        context,
+      );
       return;
     }
 

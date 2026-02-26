@@ -991,4 +991,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get collectMoreDaily => '每天多收集';
+
+  @override
+  String get pleaseTryAnotherMachine => '请尝试其他机器。';
+
+  @override
+  String get machineUnavailableAtTheMoment => '机器当前无法使用。';
+
+  @override
+  String get orderCompletedMessage => '您的订单已完成。';
+
+  @override
+  String get orderNotFoundTitle => '未找到订单';
+
+  @override
+  String get orderNotFoundMessage => '未找到此订单。';
+
+  @override
+  String get insufficientWalletBalanceTitle => 'TP+ Wallet 余额不足';
+
+  @override
+  String get insufficientWalletBalanceMessage => '请充值或更换支付方式。';
+
+  @override
+  String get cannotCreateOrder => '无法创建订单。';
+
+  @override
+  String get paymentReferenceNotFound => '未找到支付参考号。';
+
+  @override
+  String get totalDiscount => '总折扣';
+
+  @override
+  String get machineDataLoadError => '未找到机器数据或发生错误。\n请检查后重试。';
+
+  @override
+  String get couponAndEVoucher => '优惠券 / E-Voucher';
+
+  @override
+  String get addOrSelect => '添加/选择';
+
+  @override
+  String get participatingStoresOnly => '仅限参与门店';
+
+  @override
+  String get select => '选择';
+
+  @override
+  String get startOperation => '开始运行';
 }

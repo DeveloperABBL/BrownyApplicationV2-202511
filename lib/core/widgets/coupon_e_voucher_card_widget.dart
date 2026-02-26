@@ -45,6 +45,8 @@ class CouponEVoucherCardWidget extends StatefulWidget {
 
   final Color? borderColor;
 
+  final bool? initialChecked;
+
   const CouponEVoucherCardWidget({
     super.key,
     this.isDisabled = false,
@@ -60,6 +62,7 @@ class CouponEVoucherCardWidget extends StatefulWidget {
     this.onConditionTap,
     this.onTap,
     this.borderColor,
+    this.initialChecked,
   });
 
   @override
@@ -68,7 +71,19 @@ class CouponEVoucherCardWidget extends StatefulWidget {
 }
 
 class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
-  bool checked = false;
+  late bool checked;
+
+  @override
+  void initState() {
+    super.initState();
+    checked = widget.initialChecked ?? false;
+  }
+
+  @override
+  void didUpdateWidget(covariant CouponEVoucherCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    checked = widget.initialChecked ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +263,9 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
                   value: checked,
                   shape: CircleBorder(),
                   onChanged: (value) {
-                    setState(() {
-                      checked = value ?? false;
-                    });
+                    // setState(() {
+                    //   checked = value ?? false;
+                    // });
                     widget.onChanged?.call(value);
                   },
                 ),

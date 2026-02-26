@@ -118,24 +118,10 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
         if (_paymentProcessing && context.canPop()) {
           context.pop();
         }
-
-        // Show success dialog
-        // AppOverlays.showBrownyDialog(
-        //   context,
-        //   imageAsset: Assets.png.brownySuccess1.path,
-        //   title: 'ชำระเงินสำเร็จ',
-        //   message: 'คำสั่งซื้อของคุณเสร็จสมบูรณ์',
-        //   confirmText: 'ตกลง',
-        //   onConfirm: () {
-        //     if (context.mounted) {
-        //       context.pop();
-        //     }
-        //   },
-        // );
         await _viewmodel.fetchCouponReceipt();
-        context.pushReplacementNamed(
-          ReceiptPage.pageName,
-          extra: _viewmodel,
+        ReceiptPage.goReplacementPage(
+          context,
+          viewmodel: _viewmodel,
         );
       } else if (status.isNotFound) {
         // Order not found
@@ -170,7 +156,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
       );
       return;
     }
-    context.pushNamed(TransactionAuthenPage.pageName).then((
+    TransactionAuthenPage.goToPage(context).then((
       result,
     ) async {
       if (!context.mounted) return;

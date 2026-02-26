@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +28,16 @@ class CustomerCouponModel extends CouponData {
     super.redemptionLimit,
     super.redeemPrice,
     super.deliveryFee,
+    this.isSelected = false,
   });
 
+  final bool isSelected;
+
   /// Factory constructor สำหรับแปลง CouponData เป็น CustomerCouponModel
-  factory CustomerCouponModel.fromCouponData(CouponData data) {
+  factory CustomerCouponModel.fromCouponData(
+    CouponData data, [
+    bool isSelected = false,
+  ]) {
     return CustomerCouponModel(
       couponId: data.couponId,
       customerCouponId: data.customerCouponId,
@@ -55,6 +62,61 @@ class CustomerCouponModel extends CouponData {
       redemptionLimit: data.redemptionLimit,
       redeemPrice: data.redeemPrice,
       deliveryFee: data.deliveryFee,
+      isSelected: isSelected,
+    );
+  }
+
+  CustomerCouponModel copyWith({
+    int? couponId,
+    int? customerCouponId,
+    String? assignedQuantity,
+    String? usedQuantity,
+    String? remaining,
+    String? expiresAt,
+    bool? isExpired,
+    bool? isAvailable,
+    ContentLocalizeData? typeLabel,
+    ContentLocalizeData? usageLabel,
+    String? icon,
+    ContentLocalizeData? packageName,
+    ContentLocalizeData? description,
+    ContentLocalizeData? imageUrl,
+    CouponStoreData? store,
+    String? qtyWasher,
+    String? qtyDryer,
+    String? remainWasher,
+    String? remainDryer,
+    String? totalUses,
+    String? redemptionLimit,
+    String? redeemPrice,
+    String? deliveryFee,
+    bool? isSelected,
+  }) {
+    return CustomerCouponModel(
+      couponId: couponId ?? this.couponId,
+      customerCouponId: customerCouponId ?? this.customerCouponId,
+      assignedQuantity: assignedQuantity ?? this.assignedQuantity,
+      usedQuantity: usedQuantity ?? this.usedQuantity,
+      remaining: remaining ?? this.remaining,
+      expiresAt: expiresAt ?? this.expiresAt,
+      isExpired: isExpired ?? this.isExpired,
+      isAvailable: isAvailable ?? this.isAvailable,
+      typeLabel: typeLabel ?? this.typeLabel,
+      usageLabel: usageLabel ?? this.usageLabel,
+      icon: icon ?? this.icon,
+      packageName: packageName ?? this.packageName,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      store: store ?? this.store,
+      qtyWasher: qtyWasher ?? this.qtyWasher,
+      qtyDryer: qtyDryer ?? this.qtyDryer,
+      remainWasher: remainWasher ?? this.remainWasher,
+      remainDryer: remainDryer ?? this.remainDryer,
+      totalUses: totalUses ?? this.totalUses,
+      redemptionLimit: redemptionLimit ?? this.redemptionLimit,
+      redeemPrice: redeemPrice ?? this.redeemPrice,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 

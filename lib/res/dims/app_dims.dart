@@ -25,15 +25,18 @@ class AppDims {
   static final double size_24 = 24.0;
   static final double size_25 = 25.0;
   static final double size_26 = 26.0;
+  static final double size_29 = 29.0;
   static final double size_28 = 28.0;
   static final double size_30 = 30.0;
   static final double size_33 = 33.0;
   static final double size_32 = 32.0;
   static final double size_35 = 35.0;
   static final double size_36 = 36.0;
+  static final double size_39 = 39.0;
   static final double size_38 = 38.0;
   static final double size_40 = 40.0;
   static final double size_42 = 42.0;
+  static final double size_44 = 44.0;
   static final double size_47 = 47.0;
   static final double size_46 = 46.0;
   static final double size_48 = 48.0;
@@ -43,6 +46,8 @@ class AppDims {
   static final double size_60 = 60.0;
   static final double size_64 = 64.0;
   static final double size_65 = 65.0;
+  static final double size_77 = 77.0;
+  static final double size_85 = 85.0;
   static final double size_84 = 84.0;
   static final double size_90 = 90.0;
   static final double size_100 = 100.0;

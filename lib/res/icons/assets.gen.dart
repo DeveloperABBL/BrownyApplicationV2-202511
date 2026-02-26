@@ -52,6 +52,49 @@ class $AssetsIcPaymentGen {
   ];
 }
 
+class $AssetsIcReviewsGen {
+  const $AssetsIcReviewsGen();
+
+  /// File path: assets/ic_reviews/bg_review.png
+  AssetGenImage get bgReview =>
+      const AssetGenImage('assets/ic_reviews/bg_review.png');
+
+  /// File path: assets/ic_reviews/browny_review.png
+  AssetGenImage get brownyReview =>
+      const AssetGenImage('assets/ic_reviews/browny_review.png');
+
+  /// File path: assets/ic_reviews/ic_lv_1.png
+  AssetGenImage get icLv1 =>
+      const AssetGenImage('assets/ic_reviews/ic_lv_1.png');
+
+  /// File path: assets/ic_reviews/ic_lv_2.png
+  AssetGenImage get icLv2 =>
+      const AssetGenImage('assets/ic_reviews/ic_lv_2.png');
+
+  /// File path: assets/ic_reviews/ic_lv_3.png
+  AssetGenImage get icLv3 =>
+      const AssetGenImage('assets/ic_reviews/ic_lv_3.png');
+
+  /// File path: assets/ic_reviews/ic_lv_4.png
+  AssetGenImage get icLv4 =>
+      const AssetGenImage('assets/ic_reviews/ic_lv_4.png');
+
+  /// File path: assets/ic_reviews/ic_lv_5.png
+  AssetGenImage get icLv5 =>
+      const AssetGenImage('assets/ic_reviews/ic_lv_5.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [
+    bgReview,
+    brownyReview,
+    icLv1,
+    icLv2,
+    icLv3,
+    icLv4,
+    icLv5,
+  ];
+}
+
 class $AssetsIconProfilePreferencesGen {
   const $AssetsIconProfilePreferencesGen();
 
@@ -62,6 +105,10 @@ class $AssetsIconProfilePreferencesGen {
   /// File path: assets/icon_profile_preferences/ic_announcement.svg
   SvgGenImage get icAnnouncement =>
       const SvgGenImage('assets/icon_profile_preferences/ic_announcement.svg');
+
+  /// File path: assets/icon_profile_preferences/ic_call_out.svg
+  SvgGenImage get icCallOut =>
+      const SvgGenImage('assets/icon_profile_preferences/ic_call_out.svg');
 
   /// File path: assets/icon_profile_preferences/ic_calling.svg
   SvgGenImage get icCalling =>
@@ -124,6 +171,14 @@ class $AssetsIconProfilePreferencesGen {
   AssetGenImage get line =>
       const AssetGenImage('assets/icon_profile_preferences/line.png');
 
+  /// File path: assets/icon_profile_preferences/line_reg.png
+  AssetGenImage get lineRegPng =>
+      const AssetGenImage('assets/icon_profile_preferences/line_reg.png');
+
+  /// File path: assets/icon_profile_preferences/line_reg.svg
+  SvgGenImage get lineRegSvg =>
+      const SvgGenImage('assets/icon_profile_preferences/line_reg.svg');
+
   /// File path: assets/icon_profile_preferences/mail.svg
   SvgGenImage get mail =>
       const SvgGenImage('assets/icon_profile_preferences/mail.svg');
@@ -140,6 +195,7 @@ class $AssetsIconProfilePreferencesGen {
   List<dynamic> get values => [
     facebook,
     icAnnouncement,
+    icCallOut,
     icCalling,
     icDiscount,
     icFace,
@@ -155,6 +211,8 @@ class $AssetsIconProfilePreferencesGen {
     icTranslate,
     instragram,
     line,
+    lineRegPng,
+    lineRegSvg,
     mail,
     tiktok,
     youtube,
@@ -220,6 +278,10 @@ class $AssetsPngGen {
   AssetGenImage get bgCoinClaim =>
       const AssetGenImage('assets/png/bg_coin_claim.png');
 
+  /// File path: assets/png/bg_machine.png
+  AssetGenImage get bgMachine =>
+      const AssetGenImage('assets/png/bg_machine.png');
+
   /// File path: assets/png/bg_map_browny.png
   AssetGenImage get bgMapBrowny =>
       const AssetGenImage('assets/png/bg_map_browny.png');
@@ -239,6 +301,10 @@ class $AssetsPngGen {
   /// File path: assets/png/bg_profile.png
   AssetGenImage get bgProfile =>
       const AssetGenImage('assets/png/bg_profile.png');
+
+  /// File path: assets/png/bg_unselected_coupon_evoucher.png
+  AssetGenImage get bgUnselectedCouponEvoucher =>
+      const AssetGenImage('assets/png/bg_unselected_coupon_evoucher.png');
 
   /// File path: assets/png/browny_coin.png
   AssetGenImage get brownyCoin =>
@@ -292,6 +358,14 @@ class $AssetsPngGen {
   AssetGenImage get brownyLogoAndroid =>
       const AssetGenImage('assets/png/browny_logo_android.png');
 
+  /// File path: assets/png/browny_machine_error1.png
+  AssetGenImage get brownyMachineError1 =>
+      const AssetGenImage('assets/png/browny_machine_error1.png');
+
+  /// File path: assets/png/browny_machine_error2.png
+  AssetGenImage get brownyMachineError2 =>
+      const AssetGenImage('assets/png/browny_machine_error2.png');
+
   /// File path: assets/png/browny_promotion.png
   AssetGenImage get brownyPromotion =>
       const AssetGenImage('assets/png/browny_promotion.png');
@@ -343,6 +417,10 @@ class $AssetsPngGen {
   /// File path: assets/png/ic_apple.png
   AssetGenImage get icApple => const AssetGenImage('assets/png/ic_apple.png');
 
+  /// File path: assets/png/ic_discount.png
+  AssetGenImage get icDiscount =>
+      const AssetGenImage('assets/png/ic_discount.png');
+
   /// File path: assets/png/ic_facebook.png
   AssetGenImage get icFacebook =>
       const AssetGenImage('assets/png/ic_facebook.png');
@@ -352,6 +430,10 @@ class $AssetsPngGen {
 
   /// File path: assets/png/ic_line.png
   AssetGenImage get icLine => const AssetGenImage('assets/png/ic_line.png');
+
+  /// File path: assets/png/ic_paw_2_rounded_green.png
+  AssetGenImage get icPaw2RoundedGreen =>
+      const AssetGenImage('assets/png/ic_paw_2_rounded_green.png');
 
   /// File path: assets/png/launcher_icon.png
   AssetGenImage get launcherIcon =>
@@ -381,11 +463,13 @@ class $AssetsPngGen {
   List<AssetGenImage> get values => [
     bgAppBar,
     bgCoinClaim,
+    bgMachine,
     bgMapBrowny,
     bgMapBrownyPlus,
     bgMapCharger,
     bgPawnPattern,
     bgProfile,
+    bgUnselectedCouponEvoucher,
     brownyCoin,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
@@ -399,6 +483,8 @@ class $AssetsPngGen {
     brownyHorizaontal2,
     brownyLogo,
     brownyLogoAndroid,
+    brownyMachineError1,
+    brownyMachineError2,
     brownyPromotion,
     brownySuccess,
     brownySuccess1,
@@ -412,9 +498,11 @@ class $AssetsPngGen {
     coinCoinClaim,
     decoratCardCoinClaim,
     icApple,
+    icDiscount,
     icFacebook,
     icGoogle,
     icLine,
+    icPaw2RoundedGreen,
     launcherIcon,
     logoReferral,
     promptpayBadge,
@@ -568,6 +656,14 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_checked.svg
   SvgGenImage get icChecked => const SvgGenImage('assets/svg/ic_checked.svg');
+
+  /// File path: assets/svg/ic_checked_trans.svg
+  SvgGenImage get icCheckedTrans =>
+      const SvgGenImage('assets/svg/ic_checked_trans.svg');
+
+  /// File path: assets/svg/ic_clock_rounded_green.svg
+  SvgGenImage get icClockRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_clock_rounded_green.svg');
 
   /// File path: assets/svg/ic_copy.svg
   SvgGenImage get icCopy => const SvgGenImage('assets/svg/ic_copy.svg');
@@ -826,6 +922,10 @@ class $AssetsSvgGen {
   SvgGenImage get icWashRoundedGreen =>
       const SvgGenImage('assets/svg/ic_wash_rounded_green.svg');
 
+  /// File path: assets/svg/ic_wash_white_rounded_green.svg
+  SvgGenImage get icWashWhiteRoundedGreen =>
+      const SvgGenImage('assets/svg/ic_wash_white_rounded_green.svg');
+
   /// File path: assets/svg/scan_icon.svg
   SvgGenImage get scanIcon => const SvgGenImage('assets/svg/scan_icon.svg');
 
@@ -850,6 +950,8 @@ class $AssetsSvgGen {
     icCheckboxCheckedReg,
     icCheckboxReg,
     icChecked,
+    icCheckedTrans,
+    icClockRoundedGreen,
     icCopy,
     icCouponCheckRoundedGreen,
     icCouponDryRoundedGreen,
@@ -921,6 +1023,7 @@ class $AssetsSvgGen {
     icUpload,
     icWalletRoundedGreen,
     icWashRoundedGreen,
+    icWashWhiteRoundedGreen,
     scanIcon,
   ];
 }
@@ -929,6 +1032,7 @@ class Assets {
   const Assets._();
 
   static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
+  static const $AssetsIcReviewsGen icReviews = $AssetsIcReviewsGen();
   static const $AssetsIconProfilePreferencesGen iconProfilePreferences =
       $AssetsIconProfilePreferencesGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();

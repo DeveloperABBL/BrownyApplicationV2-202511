@@ -1,17 +1,51 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
+import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 
+enum CouponVoucherState {
+  using,
+  purshasing,
+  redeeming,
+  brownyShop,
+}
+
 class CouponVoucherPage extends StatelessWidget {
-  const CouponVoucherPage({super.key});
+  const CouponVoucherPage({
+    super.key,
+    required this.state,
+    this.customerCouponAvailables,
+  });
 
   static final pagePath = '/coupon_voucher';
   static final pageName = 'CouponVoucherPage';
+  final CouponVoucherState state;
+  final List<int>? customerCouponAvailables;
 
   /// util function route to pageName
-  static Future<T?> goToPage<T>(BuildContext context) async {
-    return await context.pushNamed(CouponVoucherPage.pageName);
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    CouponVoucherState state = CouponVoucherState.purshasing,
+    List<int>? customerCouponAvailables,
+  }) async {
+    if (context.read<CustomerProvider>().current.isGuest) {
+      return await AuthenticationPage.goToPage(
+        context,
+        process: AuthenProcess.login,
+      );
+    }
+    return await context.pushNamed(
+      CouponVoucherPage.pageName,
+      extra: [
+        state,
+        customerCouponAvailables,
+      ],
+    );
   }
 
   @override
@@ -22,13 +56,22 @@ class CouponVoucherPage extends StatelessWidget {
         couponRepo: CouponVoucherRepo(),
         transactionRepo: TransactionRepo(),
       ),
-      child: const _CouponVoucherWidget(),
+      child: _CouponVoucherWidget(
+        state: state,
+        customerCouponAvailables: customerCouponAvailables,
+      ),
     );
   }
 }
 
 class _CouponVoucherWidget extends StatefulWidget {
-  const _CouponVoucherWidget();
+  const _CouponVoucherWidget({
+    required this.state,
+    this.customerCouponAvailables,
+  });
+
+  final CouponVoucherState state;
+  final List<int>? customerCouponAvailables;
 
   @override
   State<_CouponVoucherWidget> createState() => _CouponVoucherWidgetState();
@@ -39,12 +82,49 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
   late TabController _tabController;
   late final TransactionsViewmodel _viewmodel;
 
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'using' (กำลังใช้งาน)
+  bool get isUsing => widget.state == CouponVoucherState.using;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'purshasing' (กำลังซื้อ)
+  bool get isPurshasing => widget.state == CouponVoucherState.purshasing;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'redeeming' (กำลังแลกของ)
+  bool get isRedeeming => widget.state == CouponVoucherState.redeeming;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'brownyShop' (ร้านค้า Browny)
+  bool get isBrownyShop => widget.state == CouponVoucherState.brownyShop;
+
+  /// คืนค่าดัชนีเริ่มต้นของ TabBar ตามสถานะปัจจุบันของ widget
+  /// - สำหรับ 'using' หรือ 'purshasing' จะคืนค่า 1
+  /// - สำหรับ 'redeeming' จะคืนค่า 0
+  /// - สำหรับ 'brownyShop' จะคืนค่า 2
+  int get initialIndexByState {
+    switch (widget.state) {
+      case CouponVoucherState.using:
+      case CouponVoucherState.purshasing:
+        return 1;
+      case CouponVoucherState.redeeming:
+        return 0;
+      case CouponVoucherState.brownyShop:
+        return 2;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _viewmodel = context.read();
     _viewmodel.attachContext(context);
-    _tabController = TabController(initialIndex: 1, length: 3, vsync: this);
+    // assign เก็บไว้สำหรับ fileter coupon ที่สามารถเลือกกดได้
+    // จะเป็นการมาจากหน้า MachineTransactionProgram
+    _viewmodel.customerCouponAvailablesFilter = widget.customerCouponAvailables;
+    // เก็บ State ปัจจุบันที่เปิดหน้า coupon
+    _viewmodel.couponState = widget.state;
+    _tabController = TabController(
+      initialIndex: initialIndexByState,
+      length: 3,
+      vsync: this,
+    );
   }
 
   @override
@@ -53,11 +133,9 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bareBackground,
-      persistentFooterDecoration: BoxDecoration(
+  BoxDecoration? _persistentFooterDecorationByState() {
+    if (widget.state == CouponVoucherState.purshasing) {
+      return BoxDecoration(
         color: AppColors.background,
         boxShadow: [
           BoxShadow(
@@ -70,8 +148,15 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             ), // Negative dy value moves the shadow upwards
           ),
         ],
-      ),
-      persistentFooterButtons: [
+      );
+    }
+
+    return null;
+  }
+
+  List<Widget>? _persistentFooterButtonsByState() {
+    if (widget.state == CouponVoucherState.purshasing) {
+      return [
         Container(
           padding: EdgeInsets.only(
             left: AppDims.size_24.w,
@@ -79,11 +164,24 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             top: AppDims.size_8.h,
           ),
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              context.pop();
+            },
             child: AppText('ดำเนินการต่อโดยไม่ใช้คูปอง'),
           ),
         ),
-      ],
+      ];
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.bareBackground,
+      persistentFooterDecoration: _persistentFooterDecorationByState(),
+      persistentFooterButtons: _persistentFooterButtonsByState(),
       body: NestedScrollView(
         physics: const ClampingScrollPhysics(),
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -100,6 +198,13 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                 style: context.textTheme.titleLarge!.copyWith(
                   color: AppColors.textWhite,
                 ),
+              ),
+              leading: BackButton(
+                onPressed: () {
+                  context.pop(
+                    _viewmodel.customerCouponModelSelected?.customerCouponId,
+                  );
+                },
               ),
               pinned: true,
               floating: false,
@@ -678,6 +783,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
               onPressed: null,
               icon: Assets.svg.icEvoucherCheckRoundedGreen.svg(),
               label: AppText(
+                // 'E-Voucher ของฉัน'
                 'E-Voucher ของฉัน',
                 style: context.textTheme.labelLarge!.copyWith(
                   fontSize: AppDims.size_16.sp,
@@ -719,29 +825,9 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                     ...evoucherList
                         .take(_myEVoucherExpanded ? lengthList : 2)
                         .map(
-                          (customerEVoucher) => GestureDetector(
-                            onTap: () => widget._viewModel.goSelectedPage(
-                              context,
-                              customerEVoucher,
-                            ),
-                            child: CouponEVoucherCardWidget(
-                              icon: Image.network(
-                                customerEVoucher.imageUrlDisplay(context),
-                                errorBuilder: (_, _, _) => _onImageError(),
-                              ),
-                              title: customerEVoucher.packageNameDisplay(
-                                context,
-                              ),
-                              description: customerEVoucher.storeNameDisplay(
-                                context,
-                              ),
-                              detailUsing: customerEVoucher.usageLabelDisplay(
-                                context,
-                              ),
-                              expired: customerEVoucher.expireDateDisplay(
-                                context,
-                              ),
-                            ),
+                          (customerEVoucher) => _buildCustomerEVoucher(
+                            context,
+                            customerEVoucher,
                           ),
                         ),
 
@@ -897,6 +983,67 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  GestureDetector _buildCustomerEVoucher(
+    BuildContext context,
+    CustomerCouponModel customerEVoucher,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        switch (widget._viewModel.couponState) {
+          case CouponVoucherState.using:
+            widget._viewModel.onCustomerEVoucherSelected(
+              customerEVoucher,
+            );
+            context.pop(
+              widget._viewModel.customerCouponModelSelected,
+            );
+            break;
+          case CouponVoucherState.purshasing:
+            widget._viewModel.goSelectedPage(
+              context,
+              customerEVoucher,
+            );
+          case CouponVoucherState.redeeming:
+            // TODO: Handle this case.
+            break;
+          case CouponVoucherState.brownyShop:
+            // TODO: Handle this case.
+            throw UnimplementedError();
+          default:
+            break;
+        }
+      },
+      child: CouponEVoucherCardWidget(
+        initialChecked: customerEVoucher.isSelected,
+        icon: Image.network(
+          customerEVoucher.imageUrlDisplay(context),
+          errorBuilder: (_, _, _) => _onImageError(),
+        ),
+        title: customerEVoucher.packageNameDisplay(
+          context,
+        ),
+        description: customerEVoucher.storeNameDisplay(
+          context,
+        ),
+        detailUsing: customerEVoucher.usageLabelDisplay(
+          context,
+        ),
+        expired: customerEVoucher.expireDateDisplay(
+          context,
+        ),
+        borderColor: customerEVoucher.isSelected ? AppColors.primary : null,
+        showCheckBox: widget._viewModel.couponState == CouponVoucherState.using,
+        // onChanged: widget._viewModel.couponState == CouponVoucherState.using
+        //     ? (value) {
+        //         widget._viewModel.onCustomerEVoucherSelected(
+        //           customerEVoucher,
+        //         );
+        //       }
+        //     : null,
       ),
     );
   }

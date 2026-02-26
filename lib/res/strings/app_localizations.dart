@@ -2067,6 +2067,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collect Daily'**
   String get collectMoreDaily;
+
+  /// No description provided for @pleaseTryAnotherMachine.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try another machine.'**
+  String get pleaseTryAnotherMachine;
+
+  /// No description provided for @machineUnavailableAtTheMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine is currently unavailable.'**
+  String get machineUnavailableAtTheMoment;
+
+  /// No description provided for @orderCompletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your order has been completed.'**
+  String get orderCompletedMessage;
+
+  /// No description provided for @orderNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found'**
+  String get orderNotFoundTitle;
+
+  /// No description provided for @orderNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This order was not found.'**
+  String get orderNotFoundMessage;
+
+  /// No description provided for @insufficientWalletBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient TP+ Wallet balance'**
+  String get insufficientWalletBalanceTitle;
+
+  /// No description provided for @insufficientWalletBalanceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please top up or change your payment method.'**
+  String get insufficientWalletBalanceMessage;
+
+  /// No description provided for @cannotCreateOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create order.'**
+  String get cannotCreateOrder;
+
+  /// No description provided for @paymentReferenceNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment reference not found.'**
+  String get paymentReferenceNotFound;
+
+  /// No description provided for @totalDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total discount'**
+  String get totalDiscount;
+
+  /// No description provided for @machineDataLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine data not found or an error occurred.\nPlease check and try again.'**
+  String get machineDataLoadError;
+
+  /// No description provided for @couponAndEVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon / E-Voucher'**
+  String get couponAndEVoucher;
+
+  /// No description provided for @addOrSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Add/Select'**
+  String get addOrSelect;
+
+  /// No description provided for @participatingStoresOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Participating stores only'**
+  String get participatingStoresOnly;
+
+  /// No description provided for @select.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get select;
+
+  /// No description provided for @startOperation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start operation'**
+  String get startOperation;
 }
 
 class _AppLocalizationsDelegate

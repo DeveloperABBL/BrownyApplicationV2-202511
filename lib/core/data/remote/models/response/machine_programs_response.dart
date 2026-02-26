@@ -1,5 +1,5 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'machine_programs_response.g.dart';
@@ -20,7 +20,7 @@ class MachineProgramsResponse {
     this.storeName,
     this.machineImage,
     this.programs,
-    this.addTime,
+    this.addTimes,
     this.availableCoupons,
     this.paymentMethods,
   });
@@ -50,13 +50,15 @@ class MachineProgramsResponse {
   final List<ProgramData>? programs;
 
   @JsonKey(name: 'add_time')
-  final String? addTime;
+  final List<ProgramData>? addTimes;
 
   @JsonKey(name: 'available_coupons')
   final List<AvailableCouponData>? availableCoupons;
 
   @JsonKey(name: 'payment_methods')
   final PaymentMethodsData? paymentMethods;
+
+  bool get hasAddTime => addTimes.orEmpty.isNotEmpty;
 
   /// ดึงชื่อเครื่องตาม locale
   String getMachineNameDisplay(String locale) {
@@ -89,6 +91,7 @@ class ProgramData {
     this.programCode,
     this.discount,
     this.net,
+    this.index,
   });
 
   @JsonKey(name: 'id')
@@ -112,6 +115,10 @@ class ProgramData {
   @JsonKey(name: 'net')
   final String? net;
 
+  /// Index ของ ProgramData ใน List (ไม่ได้มาจาก API)
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final int? index;
+
   /// ดึงชื่อโปรแกรมตาม locale
   String getProgramNameDisplay(String locale) {
     return name?.getByLocaleCode(locale) ?? '';
@@ -119,6 +126,29 @@ class ProgramData {
 
   /// เช็คว่ามีส่วนลดหรือไม่
   bool get hasDiscount => discount != null;
+
+  /// สร้าง copy ของ ProgramData พร้อมอัปเดต index
+  ProgramData copyWith({
+    int? id,
+    ContentLocalizeData? name,
+    String? image,
+    String? price,
+    String? programCode,
+    DiscountData? discount,
+    String? net,
+    int? index,
+  }) {
+    return ProgramData(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      image: image ?? this.image,
+      price: price ?? this.price,
+      programCode: programCode ?? this.programCode,
+      discount: discount ?? this.discount,
+      net: net ?? this.net,
+      index: index ?? this.index,
+    );
+  }
 
   factory ProgramData.fromJson(Map<String, dynamic> json) =>
       _$ProgramDataFromJson(json);
@@ -138,7 +168,7 @@ class DiscountData {
   });
 
   @JsonKey(name: 'id')
-  final int? id;
+  final String? id;
 
   @JsonKey(name: 'name')
   final ContentLocalizeData? name;
@@ -147,13 +177,13 @@ class DiscountData {
   final String? type;
 
   @JsonKey(name: 'value')
-  final int? value;
+  final String? value;
 
   @JsonKey(name: 'unit')
   final String? unit;
 
   @JsonKey(name: 'amount')
-  final double? amount;
+  final String? amount;
 
   /// ดึงชื่อส่วนลดตาม locale
   String getDiscountNameDisplay(String locale) {

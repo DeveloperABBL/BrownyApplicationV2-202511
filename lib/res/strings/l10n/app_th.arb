@@ -331,5 +331,21 @@
     "services": "บริการ",
     "usageHistory": "ประวัติ\nการใช้งาน",
     "contactInquiry": "ติดต่อ\nสอบถาม",
-    "collectMoreDaily": "เก็บเพิ่มได้ทุกวัน"
+    "collectMoreDaily": "เก็บเพิ่มได้ทุกวัน",
+    "pleaseTryAnotherMachine": "กรุณาลองเครื่องอื่น",
+    "machineUnavailableAtTheMoment": "เครื่องไม่สามารถใช้งานได้ในขณะนี้",
+    "orderCompletedMessage": "คำสั่งซื้อของคุณเสร็จสิ้น",
+    "orderNotFoundTitle": "ไม่พบรายการ",
+    "orderNotFoundMessage": "ไม่พบรายการสั่งซื้อนี้",
+    "insufficientWalletBalanceTitle": "TP+ Wallet เงินไม่เพียงพอ",
+    "insufficientWalletBalanceMessage": "กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน",
+    "cannotCreateOrder": "ไม่สามารถสร้างคำสั่งซื้อได้",
+    "paymentReferenceNotFound": "ไม่พบข้อมูล Payment Reference",
+    "totalDiscount": "ส่วนลดทั้งหมด",
+    "machineDataLoadError": "ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง",
+    "couponAndEVoucher": "คูปอง / E-Voucher",
+    "addOrSelect": "เพิ่ม/เลือก",
+    "participatingStoresOnly": "เฉพาะสาขาที่ร่วมรายการ",
+    "select": "เลือก",
+    "startOperation": "เริ่มต้นทำงาน"
 }

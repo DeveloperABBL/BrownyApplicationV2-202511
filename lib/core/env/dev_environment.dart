@@ -1,12 +1,11 @@
 import 'dart:async';
 
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/remote/app_client.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_configs.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/device_log_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
-import 'package:browny_applications_new/core/env/app_evnironment.dart';
-import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/core/utils/device_identifier_helper.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
@@ -16,7 +15,6 @@ import 'package:browny_applications_new/feature/authentication/repository/custom
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
 import 'package:browny_applications_new/models/user_model.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -34,12 +32,12 @@ class DevEnvironment extends AppEvnironment {
       // dev API
       // baseUrl: 'https://dev.abgroup.co.th/api',
       baseUrl: const String.fromEnvironment(
-        'baseUrl',
+        kBaseUrl,
       ),
       // dev token
       // token: '8074cac22d628c5d71dbb635504e25a7fc04e05a5e4b327f30a20674bead82eb',
       token: const String.fromEnvironment(
-        'token',
+        kToken,
       ),
     );
 
@@ -54,7 +52,7 @@ class DevEnvironment extends AppEvnironment {
     // LINE Channel ID : 2009026542
     SocialAuthHelper.initLineSDK(
       const String.fromEnvironment(
-        'LINE_Channel',
+        kLINEChannel,
       ),
     );
 

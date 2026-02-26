@@ -56,10 +56,13 @@ class MachineDetailResponse extends BaseModelResponse {
   }
 
   /// เช็คว่าเครื่องว่างหรือไม่
-  bool get isAvailable => status?.toLowerCase() == 'available';
+  bool get isAvailable => status?.toLowerCase() == 'vacant';
 
   /// เช็คว่าเครื่องกำลังทำงานหรือไม่
   bool get isBusy => status?.toLowerCase() == 'busy';
+
+  /// เช็คว่าเครื่องสามารถเชื่อมต่อได้หรือไม่
+  bool get isTimeOut => status?.toLowerCase() == 'timeout';
 
   factory MachineDetailResponse.fromJson(Map<String, dynamic> json) =>
       _$MachineDetailResponseFromJson(json);

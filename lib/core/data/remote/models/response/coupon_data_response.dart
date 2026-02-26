@@ -13,10 +13,10 @@ part 'coupon_data_response.g.dart';
 class CouponData {
   // ฟิลด์ร่วมกันทุกประเภท
   @JsonKey(name: 'coupon_id')
-  final dynamic couponId; // รองรับทั้ง int และ String
+  final int? couponId; // รองรับทั้ง int และ String
 
   @JsonKey(name: 'customer_coupon_id')
-  final dynamic customerCouponId;
+  final int? customerCouponId;
 
   @JsonKey(name: 'assigned_quantity')
   final String? assignedQuantity;

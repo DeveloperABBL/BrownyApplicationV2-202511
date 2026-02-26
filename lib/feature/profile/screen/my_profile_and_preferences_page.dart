@@ -9,7 +9,7 @@ import 'package:browny_applications_new/feature/profile/repository/profile_repo.
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:browny_applications_new/feature/profile/viewmodel/profile_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 
 class MyProfileAndPreferencesPage extends StatelessWidget {
   const MyProfileAndPreferencesPage({super.key});
@@ -382,7 +382,9 @@ class _MyProfileAndPreferencesContentState
                         ),
                         label: context.wording.rewards,
                         onTap: () {
-                          CouponVoucherPage.goToPage(context);
+                          CouponVoucherPage.goToPage(
+                            context,
+                          );
                         },
                       ),
                       _buildQuickActionButton(
@@ -546,7 +548,9 @@ class _MyProfileAndPreferencesContentState
             // E-Voucher Card
             GestureDetector(
               onTap: () {
-                CouponVoucherPage.goToPage(context);
+                CouponVoucherPage.goToPage(
+                  context,
+                );
               },
               child: Container(
                 margin: EdgeInsets.symmetric(
@@ -578,8 +582,11 @@ class _MyProfileAndPreferencesContentState
                           case HomePageState.home:
                             break;
                           case HomePageState.couponVoucher:
-                            context.pushNamed(
-                              CouponVoucherPage.pageName,
+                            // context.pushNamed(
+                            //   CouponVoucherPage.pageName,
+                            // );
+                            CouponVoucherPage.goToPage(
+                              context,
                             );
                             break;
                           case HomePageState.scan:

@@ -11,7 +11,9 @@ import 'package:browny_applications_new/feature/contacts/screens/contact_page.da
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_status_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
@@ -211,7 +213,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
                             },
                           );
                         } else {
-                          context.pushNamed(CouponVoucherPage.pageName);
+                          // context.pushNamed(CouponVoucherPage.pageName);
+                          CouponVoucherPage.goToPage(
+                            context,
+                          );
                         }
 
                         // _showInvitBottomSheet();
@@ -334,18 +339,34 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: AppDims.size_106.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) =>
-                            Assets.services.values[index].image(
-                              width: AppDims.size_109.w,
-                              height: AppDims.size_106.h,
-                            ),
-                        separatorBuilder: (context, index) =>
-                            AppDims.horizonPadding_8,
-                        itemCount: Assets.services.values.take(2).length,
+                    // TODO ต้องเอาออก
+                    GestureDetector(
+                      // onTap: () {
+                      //   final data = Uri.parse(
+                      //     'http://brownypay.com/wash/dry/18',
+                      //   );
+                      //   if (data.pathSegments.isNotEmpty) {
+                      //     MachineTransactionPage2.goToPage(
+                      //       context,
+                      //       machineId: data.pathSegments.last,
+                      //     );
+                      //   }
+
+                      //   // MachineStatusPage.goToPage(context, machineId: '13');
+                      // },
+                      child: SizedBox(
+                        height: AppDims.size_106.h,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) =>
+                              Assets.services.values[index].image(
+                                width: AppDims.size_109.w,
+                                height: AppDims.size_106.h,
+                              ),
+                          separatorBuilder: (context, index) =>
+                              AppDims.horizonPadding_8,
+                          itemCount: Assets.services.values.take(2).length,
+                        ),
                       ),
                     ),
                   ],
@@ -362,7 +383,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
           onTap: (context, index) {
             debugPrint(index.toString());
             if (index == 1) {
-              context.pushNamed(CouponVoucherPage.pageName);
+              // context.pushNamed(CouponVoucherPage.pageName);
+              CouponVoucherPage.goToPage(
+                context,
+              );
               return;
             }
 
@@ -1056,7 +1080,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       return null;
                     }),
                     onTap: () {
-                      context.pushNamed(CouponVoucherPage.pageName);
+                      // context.pushNamed(CouponVoucherPage.pageName);
+                      CouponVoucherPage.goToPage(
+                        context,
+                      );
                     },
                     child: Container(
                       // height: 84.h,

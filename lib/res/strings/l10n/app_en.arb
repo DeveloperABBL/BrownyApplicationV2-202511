@@ -331,5 +331,21 @@
     "services": "Services",
     "usageHistory": "Transaction\nHistory",
     "contactInquiry": "Contact\nUs",
-    "collectMoreDaily": "Collect Daily"
+    "collectMoreDaily": "Collect Daily",
+    "pleaseTryAnotherMachine": "Please try another machine.",
+    "machineUnavailableAtTheMoment": "Machine is currently unavailable.",
+    "orderCompletedMessage": "Your order has been completed.",
+    "orderNotFoundTitle": "Order not found",
+    "orderNotFoundMessage": "This order was not found.",
+    "insufficientWalletBalanceTitle": "Insufficient TP+ Wallet balance",
+    "insufficientWalletBalanceMessage": "Please top up or change your payment method.",
+    "cannotCreateOrder": "Unable to create order.",
+    "paymentReferenceNotFound": "Payment reference not found.",
+    "totalDiscount": "Total discount",
+    "machineDataLoadError": "Machine data not found or an error occurred.\nPlease check and try again.",
+    "couponAndEVoucher": "Coupon / E-Voucher",
+    "addOrSelect": "Add/Select",
+    "participatingStoresOnly": "Participating stores only",
+    "select": "Select",
+    "startOperation": "Start operation"
 }

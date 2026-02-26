@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
 import 'package:retrofit/retrofit.dart';
@@ -200,12 +201,30 @@ abstract class AppClient {
     @Body() CouponOrderRequest body,
   );
 
+  /// DONG 2026-02-24
+  ///
+  /// เปลี่ยนใช้ model request [PaymentCheck] แทน
   /// DONG 2026-02-08
   ///
   /// API ตรวจสอบสถานะการชำระเงินคูปอง/e-voucher (ใช้ CouponOrderData ส่ง payment_ref)
   @POST('/payment/coupon-evorcher/check')
   Future<HttpResponse<PaymentStatusCheckResponse>> checkPaymentStatusByRef(
-    @Body() CouponOrderData body,
+    @Body() PaymentCheck body,
+  );
+
+  /// DONG 2026-02-24
+  ///
+  /// API ตรวจสอบสถานะการชำระเงิน Machine Order
+  ///
+  /// Body parameters:
+  /// - payment_ref: String (รหัสอ้างอิงการชำระเงิน)
+  ///
+  /// Response:
+  /// - PaymentStatusCheckResponse with status, redirect url, and order_id
+  @POST('/payment/machine-order/payment/check')
+  Future<HttpResponse<PaymentStatusCheckResponse>>
+  checkMachineOrderPaymentStatus(
+    @Body() PaymentCheck body,
   );
 
   /// DONG 2026-01-24
@@ -328,6 +347,66 @@ abstract class AppClient {
   Future<HttpResponse<MachineProgramsResponse>> fetchMachinePrograms(
     @Path('id') String machineId,
     @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-02-24
+  ///
+  /// API สร้างคำสั่งซื้อเครื่องซัก/อบ (create machine order)
+  ///
+  /// Body parameters:
+  /// - customer_id: String? (uuid ของลูกค้า หรือ null)
+  /// - customer_phone: String (เบอร์โทรศัพท์)
+  /// - store_machine_id: int (รหัสเครื่อง)
+  /// - program_code: String (รหัสโปรแกรม เช่น WASH60)
+  /// - add_time_value: int? (เวลาเพิ่มเติม)
+  /// - payment_method: String (วิธีการชำระเงิน qr, tp_wallet, shopee_pay, etc.)
+  /// - coupon_customer_id: int? (รหัสคูปองที่ใช้)
+  /// - discount_id: String? (uuid ส่วนลด)
+  /// - notification_token: String? (FCM token)
+  ///
+  /// Response:
+  /// - MachineOrderResponse with order data, payment_ref, redirect_url
+  ///
+  /// Error States:
+  /// - Wallet insufficient: {"message": "ยอดเงินใน Wallet ไม่เพียงพอ", "wallet_balance": 10.00, "price_required": 30.00}
+  /// - Machine busy: {"status": "error", "message": "เครื่องไม่ว่าง...", "machine_status": "Busy"}
+  /// - General error: {"message": "เกิดข้อผิดพลาด", "error": "รายละเอียด"}
+  @POST('/machine-orders')
+  Future<HttpResponse<MachineOrderResponse>> createMachineOrder(
+    @Body() MachineOrderRequest body,
+  );
+
+  /// DONG 2026-02-25
+  ///
+  /// API fetch ใบเสร็จคำสั่งซื้อเครื่องซัก/อบ (machine order receipt)
+  ///
+  /// Path parameters:
+  /// - order_id: String (UUID ของคำสั่งซื้อ)
+  ///
+  /// Response:
+  /// - MachineOrderReceiptResponse with branch, machine info, payment, summary,
+  ///   support channels, lucky no, and review score
+  @GET('/machine-orders/{order_id}/receipt')
+  Future<HttpResponse<MachineOrderReceiptResponse>> fetchMachineOrderReceipt(
+    @Path('order_id') String orderId,
+  );
+
+  /// DONG 2026-02-26
+  ///
+  /// API ส่งคะแนนรีวิวคำสั่งซื้อเครื่องซัก/อบ
+  ///
+  /// Path parameters:
+  /// - order_id: String (UUID ของคำสั่งซื้อ)
+  ///
+  /// Body parameters:
+  /// - score: int (คะแนนรีวิว 1-5)
+  ///
+  /// Response:
+  /// - BaseResponse with success status and message
+  @POST('/machine-orders/{order_id}/review')
+  Future<HttpResponse<BaseResponse>> submitMachineOrderReview(
+    @Path('order_id') String orderId,
+    @Body() MachineOrderReviewRequest body,
   );
 
   /// DONG 2026-01-13

@@ -24,6 +24,17 @@ class AvailablePaymentMethodPage extends StatefulWidget {
   static final pagePath = '/AvailablePayments';
   static final pageName = 'AvailablePayments';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    required TransactionsViewmodel viewmodel,
+  }) async {
+    return await context.pushNamed(
+      AvailablePaymentMethodPage.pageName,
+      extra: viewmodel,
+    );
+  }
+
   @override
   State<AvailablePaymentMethodPage> createState() =>
       _AvailablePaymentMethodPageState();

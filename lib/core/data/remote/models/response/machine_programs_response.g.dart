@@ -31,7 +31,9 @@ MachineProgramsResponse _$MachineProgramsResponseFromJson(
   programs: (json['programs'] as List<dynamic>?)
       ?.map((e) => ProgramData.fromJson(e as Map<String, dynamic>))
       .toList(),
-  addTime: json['add_time'] as String?,
+  addTimes: (json['add_time'] as List<dynamic>?)
+      ?.map((e) => ProgramData.fromJson(e as Map<String, dynamic>))
+      .toList(),
   availableCoupons: (json['available_coupons'] as List<dynamic>?)
       ?.map((e) => AvailableCouponData.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -53,7 +55,7 @@ Map<String, dynamic> _$MachineProgramsResponseToJson(
   'store_name': instance.storeName,
   'machine_image': instance.machineImage,
   'programs': instance.programs,
-  'add_time': instance.addTime,
+  'add_time': instance.addTimes,
   'available_coupons': instance.availableCoupons,
   'payment_methods': instance.paymentMethods,
 };
@@ -84,14 +86,14 @@ Map<String, dynamic> _$ProgramDataToJson(ProgramData instance) =>
     };
 
 DiscountData _$DiscountDataFromJson(Map<String, dynamic> json) => DiscountData(
-  id: (json['id'] as num?)?.toInt(),
+  id: json['id'] as String?,
   name: json['name'] == null
       ? null
       : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
   type: json['type'] as String?,
-  value: (json['value'] as num?)?.toInt(),
+  value: json['value'] as String?,
   unit: json['unit'] as String?,
-  amount: (json['amount'] as num?)?.toDouble(),
+  amount: json['amount'] as String?,
 );
 
 Map<String, dynamic> _$DiscountDataToJson(DiscountData instance) =>

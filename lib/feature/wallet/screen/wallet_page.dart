@@ -25,6 +25,11 @@ class WalletPage extends StatelessWidget {
   static final pagePath = '/wallet';
   static final pageName = 'walletPage';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(BuildContext context) async {
+    return await context.pushNamed(WalletPage.pageName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

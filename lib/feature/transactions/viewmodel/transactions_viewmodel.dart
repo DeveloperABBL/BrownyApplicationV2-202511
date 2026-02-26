@@ -1,8 +1,18 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/machine_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/machine_order_review_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_order_receipt_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_order_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
+import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/payment_transaction_state.dart';
 import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/permission_helper.dart';
@@ -14,19 +24,25 @@ import 'package:browny_applications_new/feature/transactions/models/coupon_list_
 import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_selected_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/purchase_coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_selected_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/purchase_coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
+
+part 'machine_transaction_viewmodel.dart';
 
 class TransactionsViewmodel extends AppViewModel
     with
@@ -86,6 +102,20 @@ class TransactionsViewmodel extends AppViewModel
   _paymentMethodNotifier = ValueNotifier(UiResult.loading());
   ValueListenable<UiResult<List<PaymentMethodModel>>>
   get paymentMethodNotifier => _paymentMethodNotifier;
+
+  /// DONG 2026-02-23
+  ///
+  /// เก็บ State ที่เปิดหน้า coupon
+  /// จะไม่เป็น null แต่ทำเป็น nullable เพื่อไม่ให้ถูกบังคับส่งจาก constructor
+  CouponVoucherState? couponState;
+  CustomerCouponModel? customerCouponModelSelected;
+
+  /// DONG 2026-02-23
+  ///
+  /// เก็บ List customer_coupon_id ไว้สำหรับ filter แสดง
+  List<int>? customerCouponAvailablesFilter;
+
+  /// เก็บประเภทชำระที่เลือก
   PaymentMethodModel? _paymentSelected;
   PaymentMethodModel? get paymentSelected => _paymentSelected;
   // เก็บค่า payment ก่อนที่จะเข้าหน้าแก้ไข (สำหรับ cancel)
@@ -104,6 +134,25 @@ class TransactionsViewmodel extends AppViewModel
   late CouponPackageItem _selectedCoupon;
   @override
   CouponPackageItem get selectedCoupon => _selectedCoupon;
+
+  Future<UiResult<CustomerProfileData>> fetchCustomerCredit() async {
+    final resultCredit = await _couponRepo.fetchCustomerCredit(
+      currentCustomerProvider.current.id!,
+    );
+
+    if (resultCredit.isEmpty || resultCredit.hasError) {
+      try {
+        return UiResult.error(
+          error: Unprocessable(resultCredit.error.toString()),
+        );
+      } catch (_) {
+        return UiResult.error(error: Unprocessable());
+      }
+    }
+    // update ข้อมูล User ด้วย
+    currentCustomerProvider.updateCreditAndCoinBalance(resultCredit.data);
+    return UiResult.success(data: resultCredit.data);
+  }
 
   void goPurchasePage(BuildContext context, CouponPackageItem selected) {
     _selectedCoupon = selected;
@@ -379,13 +428,53 @@ class TransactionsViewmodel extends AppViewModel
 
     _evoucherNotifier.value = UiResult.success(
       data: result.data.data!
+          // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
+          // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
+          .where(
+            (e) =>
+                customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
+                true,
+          )
           .map(
-            (e) => CustomerCouponModel.fromCouponData(e),
+            (e) => CustomerCouponModel.fromCouponData(
+              e,
+              customerCouponModelSelected != null &&
+                  customerCouponModelSelected!.customerCouponId ==
+                      e.customerCouponId,
+            ),
           )
           .toList(),
     );
   }
 
+  void onCustomerEVoucherSelected(CustomerCouponModel customerEVoucher) {
+    customerCouponModelSelected = customerEVoucher;
+    final newCustomerEvoucher = _evoucherNotifier.value.data.orEmpty.map((e) {
+      return e.copyWith(isSelected: false);
+    });
+
+    _evoucherNotifier.value = UiResult.success(
+      data: newCustomerEvoucher
+          // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
+          // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
+          .where(
+            (e) =>
+                customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
+                true,
+          )
+          .map(
+            (e) => CustomerCouponModel.fromCouponData(
+              e,
+              customerCouponModelSelected != null &&
+                  customerCouponModelSelected!.customerCouponId ==
+                      e.customerCouponId,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  /// dispose สำหรับหน้า [transaction_selecte_page]
   void disposeTransaction() {
     _paymentMethodNotifier.value = UiResult.loading();
     _paymentSelected = null;
@@ -486,7 +575,12 @@ class TransactionsViewmodel extends AppViewModel
         data: PaymentTransactionState.checkingPayment(),
       );
 
-      final result = await _transactionRepo.checkPaymentStatus(orderData);
+      // สร้าง PaymentCheck จาก orderData.paymentRef
+      final paymentCheck = PaymentCheck(
+        paymentRef: orderData.paymentRef ?? '',
+      );
+
+      final result = await _transactionRepo.checkPaymentStatus(paymentCheck);
 
       if (result.isSuccess) {
         // อัพเดท state เป็น payment success
@@ -619,9 +713,7 @@ class TransactionsViewmodel extends AppViewModel
   Future<UiResult<void>> verifyOrder() async {
     try {
       if (paymentSelected?.isTpWallet == true) {
-        final result = await _couponRepo.fetchCustomerCredit(
-          currentCustomerProvider.current.id!,
-        );
+        final result = await fetchCustomerCredit();
 
         if (result.isEmpty || result.hasError) {
           try {
@@ -632,10 +724,9 @@ class TransactionsViewmodel extends AppViewModel
             return UiResult.error(error: Unprocessable());
           }
         }
-        // update ข้อมูล User ด้วย
-        currentCustomerProvider.updateCreditAndCoinBalance(result.data);
+
         final tpWalletBalance = double.tryParse(
-          result.data.creditBalance!.replaceAll(',', ''),
+          result.data!.creditBalance!.replaceAll(',', ''),
         )!;
 
         final packgaePrice = double.tryParse(

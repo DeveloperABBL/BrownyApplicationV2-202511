@@ -3,7 +3,7 @@ import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmod
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
-import 'package:browny_applications_new/feature/transactions/screens/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 
 class InvitBottomSheetDialog extends StatelessWidget {
   const InvitBottomSheetDialog({
@@ -82,8 +82,11 @@ class InvitBottomSheetDialog extends StatelessWidget {
                                         case HomePageState.home:
                                           break;
                                         case HomePageState.couponVoucher:
-                                          context.pushNamed(
-                                            CouponVoucherPage.pageName,
+                                          // context.pushNamed(
+                                          //   CouponVoucherPage.pageName,
+                                          // );
+                                          CouponVoucherPage.goToPage(
+                                            context,
                                           );
                                           break;
                                         case HomePageState.scan:

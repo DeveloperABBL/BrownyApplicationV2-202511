@@ -1,14 +1,12 @@
 import 'dart:async';
 
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
-import 'package:browny_applications_new/core/utils/permission_helper.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
@@ -20,6 +18,7 @@ class ScannerViewModel extends AppViewModel {
   }) : _repo = repo;
 
   final CustomerDataSourceMixin _repo;
+  final MachineTransactionDataSourceMixin _machRepo = MachineRepo();
 
   // ========= valueNotifier, controller =========
   late final ValueNotifier<UiResult<CustomerQRResponse>> _qrNotifier =
@@ -38,7 +37,7 @@ class ScannerViewModel extends AppViewModel {
   final ValueNotifier<int> selectedTab = ValueNotifier<int>(0);
 
   // Scanning state
-  final ValueNotifier<bool> isScanning = ValueNotifier<bool>(true);
+  bool _isScanning = true;
 
   // Image Picker
   final ImagePicker _imagePicker = ImagePicker();
@@ -77,14 +76,20 @@ class ScannerViewModel extends AppViewModel {
   /// Pick image from gallery and analyze QR code
   Future<void> pickImageAndScan() async {
     try {
+      // Stop scanning temporarily
+      _isScanning = false;
+
       // Request photos permission
       final hasPermission = await PermissionHelper.hasStoragePermission(
         context,
       );
+      if (!context.mounted) return;
+
       if (!hasPermission) {
         final status = await PermissionHelper.requestStoragePermission(context);
         if (status != handler.PermissionStatus.granted &&
             status != handler.PermissionStatus.limited) {
+          _resumeFlagScanning();
           return;
         }
       }
@@ -102,18 +107,18 @@ class ScannerViewModel extends AppViewModel {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                // ไม่พบ QR Code ในรูปภาพ
                 content: AppText(context.wording.qrCodeNotFoundInImage),
               ),
             );
           }
+          _resumeFlagScanning();
         } else {
           // Detech
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('detect'),
-              ),
-            );
+            // คืน flag. ทันที เพื่อให้เข้าเงื่อนไขใน onQRCodeDetected
+            _isScanning = true;
+            onQRCodeDetected(result);
           }
         }
       }
@@ -125,42 +130,128 @@ class ScannerViewModel extends AppViewModel {
             content: AppText(context.wording.errorOccurred),
           ),
         );
+        _resumeFlagScanning();
       }
     }
   }
 
   /// Handle QR code scan result
-  void onQRCodeDetected(BarcodeCapture capture) {
-    if (!isScanning.value) return;
+  void onQRCodeDetected(BarcodeCapture capture) async {
+    if (!_isScanning) return;
 
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       if (barcode.rawValue != null) {
         // Stop scanning temporarily
-        isScanning.value = false;
+        _isScanning = false;
 
         debugPrint('QR Code detected: ${barcode.rawValue}');
 
-        // TODO: Handle the scanned QR code data
         // Navigate to next page or process the data
+        if (barcode.rawValue.orEmpty.isEmpty) {
+          AppOverlays.showBrownyDialog(
+            context,
+            title: context.wording.errorOccurred,
+            message: context.wording.errorUi,
+          );
+          return;
+        }
 
         // Show result
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Scanned: ${barcode.rawValue}'),
-            ),
+          try {
+            // จะได้เป็น URL มา เอามา parse เป็น URI ไว้เช็คเงื่อนไข
+            final uri = Uri.parse(barcode.rawValue!);
+            if (uri.pathSegments.isNotEmpty) {
+              AppOverlays.showLoading(context);
+
+              final machineResult = await _machRepo.fetchMachineDetail(
+                uri.pathSegments.last,
+              );
+              if (!context.mounted) return;
+
+              AppOverlays.hideLoading();
+              if (machineResult.hasError || machineResult.isEmpty) {
+                await AppOverlays.showBrownyDialog(
+                  context,
+                  title: context.wording.errorOccurred,
+                  message: context.wording.errorUi,
+                  onConfirm: () {
+                    if (!context.mounted) return;
+                    context.pop();
+                    // Resume scanning after 2 seconds
+                    _resumeFlagScanning();
+                  },
+                );
+                return;
+              }
+
+              final machine = machineResult.data;
+
+              if (machine.isBusy) {
+                await AppOverlays.showBrownyDialog(
+                  context,
+                  // เครื่องกำลังทำงาน
+                  title: context.wording.theMachineIsWorking,
+                  // กรุณาลองเครื่องอื่น
+                  message: context.wording.pleaseTryAnotherMachine,
+                  onConfirm: () {
+                    if (!context.mounted) return;
+                    context.pop();
+                    // Resume scanning after 2 seconds
+                    _resumeFlagScanning();
+                  },
+                );
+                return;
+              }
+
+              if (machine.isTimeOut) {
+                await AppOverlays.showBrownyDialog(
+                  context,
+                  imageAsset: Assets.png.brownyMachineError1.path,
+                  // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                  title: context.wording.machineUnavailableAtTheMoment,
+                  // กรุณาลองเครื่องอื่น
+                  message: context.wording.pleaseTryAnotherMachine,
+                  onConfirm: () {
+                    if (!context.mounted) return;
+                    context.pop();
+                    // Resume scanning after 2 seconds
+                    _resumeFlagScanning();
+                  },
+                );
+                return;
+              }
+
+              MachineTransactionPage2.goReplacementPage(
+                context,
+                machineId: uri.pathSegments.last,
+              );
+              return;
+            }
+          } catch (_) {}
+
+          // Failed all case
+          AppOverlays.showBrownyDialog(
+            context,
+            title: context.wording.errorOccurred,
+            message: context.wording.errorUi,
           );
         }
 
         // Resume scanning after 2 seconds
-        Future.delayed(const Duration(seconds: 2), () {
-          isScanning.value = true;
-        });
+        _resumeFlagScanning();
 
         break;
       }
     }
+  }
+
+  /// Resume scanning after 2 seconds
+  void _resumeFlagScanning() {
+    Future.delayed(const Duration(seconds: 2), () {
+      _isScanning = true;
+    });
   }
 
   /// Change tab
@@ -188,11 +279,11 @@ class ScannerViewModel extends AppViewModel {
 
   @override
   void dispose() {
+    _isScanning = false;
     _qrNotifier.dispose();
     // cameraController.dispose(); ไป dispose จาก Widget
     isFlashOn.dispose();
     selectedTab.dispose();
-    isScanning.dispose();
     super.dispose();
   }
 }

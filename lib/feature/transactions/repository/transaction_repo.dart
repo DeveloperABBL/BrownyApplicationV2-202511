@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_receipt_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_order_receipt_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -34,7 +36,7 @@ mixin TransactionDataSourceMixin {
 
   /// ตรวจสอบสถานะการชำระเงินคูปอง/e-voucher
   ///
-  /// [orderData] ข้อมูลคำสั่งซื้อที่มี payment_ref สำหรับตรวจสอบสถานะ
+  /// [paymentCheck] ข้อมูล payment_ref สำหรับตรวจสอบสถานะ
   ///
   /// Returns:
   /// - RepoResult.success: สำเร็จ พร้อม PaymentStatusCheckResponse
@@ -43,7 +45,7 @@ mixin TransactionDataSourceMixin {
   /// - RepoResult.error: เกิด error
   /// - RepoResult.empty: API ไม่สำเร็จ
   FutureOr<RepoResult<PaymentStatusCheckResponse>> checkPaymentStatus(
-    CouponOrderData orderData,
+    PaymentCheck paymentCheck,
   );
 
   /// ดึงข้อมูลใบเสร็จคูปอง/e-voucher
@@ -63,6 +65,32 @@ mixin TransactionDataSourceMixin {
   /// - RepoResult.empty: API ไม่สำเร็จ
   Future<RepoResult<CouponReceiptResponse>> fetchCouponReceipt(
     String orderId,
+  );
+
+  /// ดึงข้อมูลใบเสร็จ machine order
+  ///
+  /// [orderId] รหัสคำสั่งซื้อ machine order
+  ///
+  /// Returns:
+  /// - RepoResult.success: สำเร็จ พร้อม MachineOrderReceiptResponse
+  /// - RepoResult.error: เกิด error
+  /// - RepoResult.empty: API ไม่สำเร็จ
+  Future<RepoResult<MachineOrderReceiptResponse>> fetchMachineOrderReceipt(
+    String orderId,
+  );
+
+  /// ตรวจสอบสถานะการชำระเงินเครื่องซัก/อบ
+  ///
+  /// [paymentCheck] ข้อมูล payment_ref สำหรับตรวจสอบสถานะ
+  ///
+  /// Returns:
+  /// - RepoResult.success: สำเร็จ พร้อม PaymentStatusCheckResponse
+  ///   - status: "paid" (ชำระสำเร็จ), "pending" (รอชำระ), "not_found" (ไม่พบ)
+  /// - RepoResult.error: เกิด error
+  /// - RepoResult.empty: API ไม่สำเร็จ
+  FutureOr<RepoResult<PaymentStatusCheckResponse>>
+  checkMachineOrderPaymentStatus(
+    PaymentCheck paymentCheck,
   );
 }
 
@@ -100,10 +128,12 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
 
   @override
   FutureOr<RepoResult<PaymentStatusCheckResponse>> checkPaymentStatus(
-    CouponOrderData orderData,
+    PaymentCheck paymentCheck,
   ) async {
     try {
-      final response = await requireRemote.checkPaymentStatusByRef(orderData);
+      final response = await requireRemote.checkPaymentStatusByRef(
+        paymentCheck,
+      );
 
       if (response.isSuccessful) {
         final data = response.data;
@@ -135,6 +165,70 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
   ) async {
     try {
       final response = await requireRemote.fetchCouponReceipt(orderId);
+
+      if (response.isSuccessful) {
+        final data = response.data;
+        return RepoResult.success(data: data);
+      }
+
+      return RepoResult.empty(
+        error: Exception(
+          'HTTP ${response.response.statusCode}: ${response.response.statusMessage}',
+        ),
+      );
+    } on DioException catch (dio) {
+      // Handle Dio exceptions (network errors, timeouts, etc.)
+      return RepoResult.error(
+        error: Exception(
+          dio.response?.data?['message'] ??
+              dio.message ??
+              'Network error occurred',
+        ),
+      );
+    } catch (e) {
+      return RepoResult.error(error: Exception(e.toString()));
+    }
+  }
+
+  @override
+  Future<RepoResult<MachineOrderReceiptResponse>> fetchMachineOrderReceipt(
+    String orderId,
+  ) async {
+    try {
+      final response = await requireRemote.fetchMachineOrderReceipt(orderId);
+
+      if (response.isSuccessful) {
+        final data = response.data;
+        return RepoResult.success(data: data);
+      }
+
+      return RepoResult.empty(
+        error: Exception(
+          'HTTP ${response.response.statusCode}: ${response.response.statusMessage}',
+        ),
+      );
+    } on DioException catch (dio) {
+      return RepoResult.error(
+        error: Exception(
+          dio.response?.data?['message'] ??
+              dio.message ??
+              'Network error occurred',
+        ),
+      );
+    } catch (e) {
+      return RepoResult.error(error: Exception(e.toString()));
+    }
+  }
+
+  @override
+  FutureOr<RepoResult<PaymentStatusCheckResponse>>
+  checkMachineOrderPaymentStatus(
+    PaymentCheck paymentCheck,
+  ) async {
+    try {
+      final response = await requireRemote.checkMachineOrderPaymentStatus(
+        paymentCheck,
+      );
 
       if (response.isSuccessful) {
         final data = response.data;
