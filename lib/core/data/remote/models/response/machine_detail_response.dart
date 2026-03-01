@@ -1,5 +1,10 @@
+import 'dart:ui';
+
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'machine_detail_response.g.dart';
@@ -13,12 +18,18 @@ part 'machine_detail_response.g.dart';
 class MachineDetailResponse extends BaseModelResponse {
   MachineDetailResponse({
     this.id,
+    this.orderId,
+    this.receiptNo,
     this.storeName,
     this.status,
+    this.startTime,
     this.finishDatatime,
     this.remainingTime,
     this.machineNo,
+    this.machineImage,
     this.name,
+    this.addTime,
+    this.programImage,
     super.success,
     super.message,
     super.errorType,
@@ -27,11 +38,20 @@ class MachineDetailResponse extends BaseModelResponse {
   @JsonKey(name: 'id')
   final int? id;
 
+  @JsonKey(name: 'order_id')
+  final String? orderId;
+
+  @JsonKey(name: 'receipt_no')
+  final String? receiptNo;
+
   @JsonKey(name: 'store_name')
   final ContentLocalizeData? storeName;
 
   @JsonKey(name: 'status')
   final String? status;
+
+  @JsonKey(name: 'startTime')
+  final String? startTime;
 
   @JsonKey(name: 'finish_datatime')
   final String? finishDatatime;
@@ -42,8 +62,17 @@ class MachineDetailResponse extends BaseModelResponse {
   @JsonKey(name: 'machine_no')
   final String? machineNo;
 
+  @JsonKey(name: 'machine_image')
+  final String? machineImage;
+
   @JsonKey(name: 'name')
   final ContentLocalizeData? name;
+
+  @JsonKey(name: 'addTime')
+  final List<ProgramData>? addTime;
+
+  @JsonKey(name: 'program_image')
+  final String? programImage;
 
   /// ดึงชื่อร้านตาม locale
   String getStoreNameDisplay(String locale) {
@@ -55,6 +84,38 @@ class MachineDetailResponse extends BaseModelResponse {
     return name?.getByLocaleCode(locale) ?? '';
   }
 
+  DateTime? getRemainigtime(String locale) {
+    return remainingTime.convertToDateTime('HH:mm:ss', locale);
+  }
+
+  String getRemainingTimeDisplay(String locale) {
+    return getRemainigtime(locale)?.formatForShow('HH:mm') ?? '-';
+  }
+
+  String getStatusDisplay(String locale) {
+    final statusLower = status.orEmpty.toLowerCase();
+    const statusMap = {
+      'en': {
+        'busy': 'In Use',
+        'vacant': 'Available',
+        'default': 'Failed',
+      },
+      'zh': {
+        'busy': '使用中',
+        'vacant': '可用',
+        'default': '故障',
+      },
+      'th': {
+        'busy': 'กำลังทำงาน',
+        'vacant': 'ว่าง',
+        'default': 'ขัดข้อง',
+      },
+    };
+
+    final localizedMap = statusMap[locale] ?? statusMap['th']!;
+    return localizedMap[statusLower] ?? localizedMap['default'] ?? '';
+  }
+
   /// เช็คว่าเครื่องว่างหรือไม่
   bool get isAvailable => status?.toLowerCase() == 'vacant';
 
@@ -63,6 +124,20 @@ class MachineDetailResponse extends BaseModelResponse {
 
   /// เช็คว่าเครื่องสามารถเชื่อมต่อได้หรือไม่
   bool get isTimeOut => status?.toLowerCase() == 'timeout';
+
+  /// เช็คว่าเครื่องเป็นสถานะ Failed หรือไม่
+  bool get isFailed => !isAvailable && !isBusy;
+
+  Color get getColorByStatus {
+    if (isFailed) {
+      return AppColors.error;
+    }
+    if (isAvailable) {
+      return AppColors.primary;
+    }
+
+    return AppColors.yellow3;
+  }
 
   factory MachineDetailResponse.fromJson(Map<String, dynamic> json) =>
       _$MachineDetailResponseFromJson(json);

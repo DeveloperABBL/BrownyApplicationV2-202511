@@ -9,15 +9,17 @@ part of 'update_notification_preferences_request.dart';
 UpdateNotificationPreferencesRequest
 _$UpdateNotificationPreferencesRequestFromJson(Map<String, dynamic> json) =>
     UpdateNotificationPreferencesRequest(
-      notifyMachineDone: json['notify_machine_done'] as bool,
+      notifyGeneral: json['notify_general'] as bool,
       notifyNews: json['notify_news'] as bool,
       notifyPromotion: json['notify_promotion'] as bool,
+      notifyMachineDone: json['notify_machine_done'] as bool,
     );
 
 Map<String, dynamic> _$UpdateNotificationPreferencesRequestToJson(
   UpdateNotificationPreferencesRequest instance,
 ) => <String, dynamic>{
-  'notify_machine_done': instance.notifyMachineDone,
+  'notify_general': instance.notifyGeneral,
   'notify_news': instance.notifyNews,
   'notify_promotion': instance.notifyPromotion,
+  'notify_machine_done': instance.notifyMachineDone,
 };

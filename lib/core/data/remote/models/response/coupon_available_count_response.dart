@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'coupon_available_count_response.g.dart';
@@ -56,13 +57,15 @@ class CouponsCount {
   final int? discount;
 
   @JsonKey(name: 'e_voucher')
-  final int? eVoucher;
+  final String? _eVoucher;
+
+  int get eVoucher => int.tryParse(_eVoucher.orEmpty.ifNullOrEmpty('0')) ?? 0;
 
   CouponsCount({
     this.redemption,
     this.discount,
-    this.eVoucher,
-  });
+    String? eVoucher,
+  }) : _eVoucher = eVoucher;
 
   factory CouponsCount.fromJson(Map<String, dynamic> json) =>
       _$CouponsCountFromJson(json);

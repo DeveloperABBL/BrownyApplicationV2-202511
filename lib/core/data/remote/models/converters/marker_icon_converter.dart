@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -66,7 +67,7 @@ class MarkerIconConverter {
       }
     } catch (e) {
       // DioError จะถูก catch ที่นี่
-      print("Dio Error loading marker: $e");
+      debugPrint("Dio Error loading marker: $e");
       return BitmapDescriptor.defaultMarker;
     }
   }
@@ -91,7 +92,7 @@ class MarkerIconConverter {
         'inactive': results[1],
       };
     } catch (e) {
-      print("Error loading marker icons: $e");
+      debugPrint("Error loading marker icons: $e");
       return {
         'active': BitmapDescriptor.defaultMarker,
         'inactive': BitmapDescriptor.defaultMarker,

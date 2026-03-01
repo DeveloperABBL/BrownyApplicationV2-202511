@@ -1,9 +1,12 @@
+import 'dart:ui' as ui;
+
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
+import 'package:flutter/services.dart';
 
 class MachineStatusPage extends StatelessWidget {
   const MachineStatusPage({
@@ -68,16 +71,10 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
   TextStyle get _textPrimary => context.textTheme.labelLarge!.copyWith(
     color: AppColors.textPrimary,
   );
-  TextStyle get _textPrimarySelected => context.textTheme.labelLarge!.copyWith(
-    color: AppColors.primary,
-  );
-  TextStyle get _textPrice => context.textTheme.headlineSmall!.copyWith(
-    fontSize: AppDims.size_16.sp,
-    color: AppColors.textPrimary,
-  );
 
   late final MachineTransactionViewmodel _viewmodel;
-  MachineProgramModel? _machineProgram;
+  ui.Image? _thumbImage;
+  bool _isImageLoading = true;
 
   @override
   void initState() {
@@ -87,7 +84,41 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewmodel.fetchMachinePrograms(widget.machineId);
+      await _loadThumbImage();
     });
+  }
+
+  @override
+  void dispose() {
+    // ViewModel จะจัดการ dispose timer เอง
+    super.dispose();
+  }
+
+  /// โหลด SVG/PNG asset และแปลงเป็น ui.Image สำหรับใช้ใน CustomThumbShape
+  Future<void> _loadThumbImage() async {
+    try {
+      // โหลดรูป corgi icon (ปรับตาม asset ที่มี)
+      final ByteData data = await rootBundle.load(
+        // 'assets/png/ic_paw_2_rounded_green.png',
+        Assets.png.brownyProgressCircle.path,
+      );
+      final Uint8List bytes = data.buffer.asUint8List();
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: 60,
+      );
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+
+      setState(() {
+        _thumbImage = frameInfo.image;
+        _isImageLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading thumb image: $e');
+      setState(() {
+        _isImageLoading = false;
+      });
+    }
   }
 
   @override
@@ -120,136 +151,215 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
           ),
         ),
       ],
-      body: ValueListenableBuilder(
-        valueListenable: _viewmodel.machineProgramsNotifier,
-        builder: (context, result, child) {
-          if (result.isLoading) {
+      body: FutureBuilder(
+        future: _viewmodel.fetchMachineDetail(widget.machineId),
+        builder: (context, snapshot) {
+          // ตรวจสอบ error
+          if (snapshot.hasError) {
+            return Center(
+              child: AppText(
+                context.wording.errorUi,
+              ),
+            );
+          }
+
+          final result = snapshot.data;
+          // ตรวจสอบ loading
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              !snapshot.hasData ||
+              result!.isLoading == true) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
 
+          // ตรวจสอบ empty
           if (result.hasError || result.isEmpty) {
             return Center(
               child: AppText(
-                // เดิม: ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง
                 context.wording.machineDataLoadError,
               ),
             );
           }
-          // assign value
-          _machineProgram = result.data!;
-          return Column(
-            children: [
-              // Scrollable Content
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      // Fixed Header with Machine Image
-                      _buildFixedHeader(),
 
-                      // Title เครื่องซัก, สาขา
-                      _mainTitle(),
+          // เรียก API ครั้งเดียว หลังจากนี้ใช้ ValueListenableBuilder
+          return RefreshIndicator(
+            onRefresh: () async {
+              // Refresh โดยเรียก API ใหม่
+              await _viewmodel.fetchMachineDetail(widget.machineId);
+            },
+            child: ValueListenableBuilder<MachineDetailResponse?>(
+              valueListenable: _viewmodel.machineDetailNotifier,
+              builder: (context, machineDetail, child) {
+                if (machineDetail == null) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                      // Program ของเครื่องซักที่มี
-                      // _programWidget(),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_16.w,
-                        ),
-                        child: Row(
+                return Column(
+                  children: [
+                    // Scrollable Content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
                           children: [
-                            Assets.svg.icPawRoundedGreen.svg(
-                              width: 30.w,
-                            ),
-                            Expanded(
-                              child: LinearProgressIndicator(
-                                value: 0.3,
-                                backgroundColor: AppColors.ci7,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.primary,
-                                ),
-                              ),
-                            ),
-                            Assets.svg.icCheckedTrans.svg(
-                              width: 30.w,
-                            ),
+                            // Fixed Header with Machine Image
+                            _buildFixedHeader(machineDetail),
+
+                            // Title เครื่องซัก, สาขา
+                            _mainTitle(machineDetail),
+                            AppDims.vericalPadding_18,
+
+                            // Progress Timeline
+                            ..._buildTimelineProgress(context, machineDetail),
+
+                            _divider(),
+
+                            // Summary Transaction
+                            _summary(machineDetail),
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_16.w,
-                        ),
-                        child: Row(
-                          children: [
-                            Column(
-                              children: [
-                                AppText(
-                                  'เริ่มต้น',
-                                  style: _textPrimary.copyWith(
-                                    fontSize: AppDims.size_12.sp,
-                                  ),
-                                ),
-                                AppText(
-                                  '16:00',
-                                  style: _textPrimary.copyWith(
-                                    color: AppColors.gray500,
-                                    fontSize: AppDims.size_12.sp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Spacer(),
-                            Column(
-                              children: [
-                                AppText(
-                                  'สำเร็จ',
-                                  style: _textPrimary.copyWith(
-                                    fontSize: AppDims.size_12.sp,
-                                  ),
-                                ),
-                                AppText(
-                                  '16:24',
-                                  style: _textPrimary.copyWith(
-                                    color: AppColors.gray500,
-                                    fontSize: AppDims.size_12.sp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      AppDims.vericalPadding_16,
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_16.w,
-                        ),
-                        child: Divider(),
-                      ),
-
-                      // Summary Transaction
-                      _summary(),
-
-                      // Extra padding เพื่อให้ scroll พ้น footer button
-                      // SizedBox(height: 42.h),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+                    ),
+                  ],
+                );
+              },
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildFixedHeader() {
+  Padding _divider() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_16.w,
+      ),
+      child: Divider(),
+    );
+  }
+
+  List<Widget> _buildTimelineProgress(
+    BuildContext context,
+    MachineDetailResponse machineDetail,
+  ) {
+    return [
+      Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDims.size_16.w,
+        ),
+        child: Row(
+          children: [
+            Assets.svg.icPawRoundedGreen.svg(
+              width: 30.w,
+            ),
+            Expanded(
+              child: _isImageLoading
+                  ? SizedBox(height: 4.h)
+                  // Progress การทำงานของเครื่อง - ใช้ ValueListenableBuilder อัพเดทเฉพาะ Slider
+                  : ValueListenableBuilder<Duration?>(
+                      valueListenable: _viewmodel.remainingDurationNotifier,
+                      builder: (context, remainingDuration, child) {
+                        return SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: AppDims.size_4.h,
+                            thumbShape: CustomThumbShape(
+                              thumbImage: _thumbImage,
+                              // label: '20 นาที',
+                              label: _viewmodel.getBubbleLabel(
+                                context.languageCode,
+                              ),
+                              lableStyle: AppTextNumberStyles.labelSmall
+                                  .copyWith(
+                                    color: AppColors.textWhite,
+                                  ),
+                              bubbleColor: _viewmodel.getBubbleColor(),
+                            ),
+                            overlayShape: RoundSliderOverlayShape(
+                              overlayRadius: 0,
+                            ),
+                            // สีสำหรับ disabled slider
+                            disabledActiveTrackColor: AppColors.primary,
+                            disabledInactiveTrackColor: AppColors.ci7,
+                            // ลบ padding ซ้าย-ขวา ด้วย custom track shape
+                            trackShape: CustomSliderTrackShape(),
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Slider(
+                            min: 0,
+                            max: _viewmodel.totalDurationInSeconds,
+                            onChanged: null, // null = disabled
+                            value: _viewmodel.getSliderValue(
+                              context.languageCode,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            Assets.svg.icCheckedTrans.svg(
+              width: 30.w,
+            ),
+          ],
+        ),
+      ),
+      AppDims.vericalPadding_2,
+
+      Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDims.size_16.w,
+        ),
+        child: Row(
+          children: [
+            Column(
+              children: [
+                AppText(
+                  // เริ่มต้น
+                  context.wording.start,
+                  style: _textPrimary.copyWith(
+                    fontSize: AppDims.size_12.sp,
+                  ),
+                ),
+                AppText(
+                  machineDetail.startTime.orEmpty,
+                  style: _textPrimary.copyWith(
+                    color: AppColors.gray500,
+                    fontSize: AppDims.size_12.sp,
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
+            Column(
+              children: [
+                AppText(
+                  // สำเร็จ
+                  context.wording.completed,
+                  style: _textPrimary.copyWith(
+                    fontSize: AppDims.size_12.sp,
+                  ),
+                ),
+                AppText(
+                  machineDetail.finishDatatime.orEmpty,
+                  style: _textPrimary.copyWith(
+                    color: AppColors.gray500,
+                    fontSize: AppDims.size_12.sp,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      AppDims.vericalPadding_16,
+    ];
+  }
+
+  Widget _buildFixedHeader(MachineDetailResponse machineDetail) {
     return Container(
       height: 365.h, // กำหนดความสูงเท่าเดิม (ตาม SliverAppBar expandedHeight)
       decoration: BoxDecoration(
@@ -289,7 +399,8 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                 children: [
                   SizedBox(width: 56.w),
                   Image.network(
-                    _machineProgram!.machineImage.orEmpty,
+                    machineDetail.machineImage.orEmpty,
+                    errorBuilder: (_, _, _) => SizedBox(),
                   ),
                   Container(
                     padding: EdgeInsets.only(right: AppDims.size_16.w),
@@ -313,7 +424,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                                     top: 8.0.h,
                                   ),
                                   child: AppText(
-                                    _machineProgram!.machineNo.toString(),
+                                    machineDetail.machineNo.toString(),
                                     style: context.textTheme.headlineSmall!
                                         .copyWith(
                                           fontSize: AppDims.size_16.sp,
@@ -378,21 +489,19 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
     );
   }
 
-  Widget _mainTitle() {
+  Widget _mainTitle(MachineDetailResponse machineDetail) {
     return Column(
       children: [
         // Title เครื่องซัก
         AppText(
-          _machineProgram!.machineName!.getByLocaleCode(
-            context.languageCode,
-          )!,
+          machineDetail.getMachineNameDisplay(context.languageCode),
           style: context.textTheme.headlineMedium,
         ),
         AppDims.vericalPadding_4,
 
         // สาขา
         AppText(
-          _machineProgram!.storeName!.getByLocaleCode(
+          machineDetail.storeName!.getByLocaleCode(
             context.languageCode,
           )!,
           style: context.textTheme.bodyMedium!.copyWith(
@@ -405,7 +514,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
     );
   }
 
-  Widget _summary() {
+  Widget _summary(MachineDetailResponse machineDetail) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
       child: Column(
@@ -416,55 +525,65 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
           // Order ID
           _lineSummay(
             title: 'Order ID',
-            tailing: 'BBB3330000',
+            tailing: machineDetail.receiptNo.orEmpty,
           ),
           AppDims.vericalPadding_16,
           // บริการ
           _lineSummay(
             // บริการ
             title: context.wording.services,
-            tailing: 'บริการที่เลือก',
+            // บริการที่เลือก
+            tailing: context.wording.selectedService,
           ),
           AppDims.vericalPadding_16,
           // สถานะ
-          _lineSummay(
-            // สถานะ
-            title: context.wording.status,
-            tailing: 'สถานะเครื่อง',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppText(
+                // สถานะ
+                context.wording.status,
+                style: _textPrimary.copyWith(fontSize: AppDims.size_16.sp),
+              ),
+              Spacer(),
+              Row(
+                children: [
+                  Container(
+                    width: AppDims.size_12.w,
+                    height: AppDims.size_12.h,
+                    decoration: BoxDecoration(
+                      color: machineDetail.getColorByStatus,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  AppDims.horizonPadding_8,
+
+                  AppText(
+                    machineDetail.getStatusDisplay(context.languageCode),
+                    style: _textPrimary,
+                  ),
+                ],
+              ),
+            ],
           ),
+
           AppDims.vericalPadding_16,
-          // เวลาที่เหลือโดยประมาณ
-          _lineSummay(
-            title: 'เวลาที่เหลือโดยประมาณ',
-            tailing: '21:02',
-            textPriceColor: AppColors.primary,
+          // เวลาที่เหลือโดยประมาณ - ใช้ ValueListenableBuilder อัพเดทแบบ realtime
+          ValueListenableBuilder<Duration?>(
+            valueListenable: _viewmodel.remainingDurationNotifier,
+            builder: (context, remainingDuration, child) {
+              return _lineSummay(
+                // เวลาที่เหลือโดยประมาณ
+                title: context.wording.approximateRemainingTime,
+                tailing: _viewmodel.getFormattedRemainingTime(
+                  context.languageCode,
+                ),
+                textPriceColor: AppColors.primary,
+              );
+            },
           ),
           AppDims.vericalPadding_16,
         ],
-      ),
-    );
-  }
-
-  Widget _title({
-    required Widget icon,
-    required String title,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: null,
-      icon: icon,
-      label: AppText(
-        title,
-        style: context.textTheme.labelLarge!.copyWith(
-          fontSize: AppDims.size_16.sp,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.transparent,
-        foregroundColor: AppColors.primary,
-        alignment: AlignmentDirectional.centerStart,
-        padding: EdgeInsets.zero,
-        disabledBackgroundColor: AppColors.transparent,
-        overlayColor: AppColors.transparent,
       ),
     );
   }
@@ -488,5 +607,269 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
         ),
       ],
     );
+  }
+}
+
+/// Custom Thumb Shape สำหรับ Slider ที่แสดงสถานะเครื่องซัก/อบ
+///
+/// Component นี้ประกอบด้วย:
+/// 1. Speech Bubble (กล่องข้อความสีเขียว) - แสดง label เช่น "21 นาที" ด้านบน
+/// 2. Triangle Tail (หางสามเหลี่ยม) - เชื่อมต่อ bubble กับ thumb
+/// 3. White Circle Background (วงกลมพื้นหลังสีขาว) - ขนาด 32px
+/// 4. Green Border (ขอบสีเขียว) - หนา 2px รอบวงกลม
+/// 5. Paw Icon (ไอคอนรอยเท้า) - ขนาด 24x24 px อยู่ตรงกลาง
+class CustomThumbShape extends SliderComponentShape {
+  /// รูปภาพที่จะแสดงเป็น thumb (ควรโหลดเป็น ui.Image ก่อน)
+  final ui.Image? thumbImage;
+
+  /// ข้อความที่จะแสดงใน speech bubble ด้านบน เช่น "21 นาที"
+  final String label;
+
+  /// สีพื้นหลังของ bubble (เขียวสำหรับปกติ, แดงสำหรับ error)
+  final Color bubbleColor;
+
+  CustomThumbShape({
+    this.thumbImage,
+    required this.label,
+    required this.lableStyle,
+    this.bubbleColor = const Color(0xFF4CAF50),
+  });
+
+  final TextStyle? lableStyle;
+
+  /// กำหนดขนาดของ thumb component
+  ///
+  /// - Width: 40px (พอดีกับ thumb)
+  /// - Height: 30px (พอดีกับไอคอนข้างๆ - speech bubble จะวาดข้างนอก layout space)
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return const Size(40, 30);
+  }
+
+  /// วาด custom thumb shape ทั้งหมดบน canvas
+  ///
+  /// ลำดับการวาด:
+  /// 1. Speech bubble (กล่องข้อความด้านบน)
+  /// 2. Triangle tail (หางชี้ลงมา)
+  /// 3. Label text (ข้อความใน bubble)
+  /// 4. White circle (วงกลมพื้นหลัง)
+  /// 5. Green border (ขอบวงกลม)
+  /// 6. Thumb image (ไอคอนรอยเท้า)
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
+    final Canvas canvas = context.canvas;
+
+    // ========== ขั้นตอนที่ 1: คำนวณขนาด bubble จากความยาวของ label ==========
+    // วัดความกว้างของข้อความก่อน
+    final TextSpan measureSpan = TextSpan(
+      text: label,
+      style: lableStyle,
+    );
+    final TextPainter measurePainter = TextPainter(
+      text: measureSpan,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    measurePainter.layout();
+
+    // คำนวณขนาด bubble ให้พอดีกับข้อความ + padding
+    final double textWidth = measurePainter.width;
+    final double textHeight = measurePainter.height;
+    final double horizontalPadding = 8.w; // padding ซ้าย-ขวา
+    final double verticalPadding = 6.h; // padding บน-ล่าง
+
+    final double bubbleWidth = textWidth + (horizontalPadding * 2);
+    final double bubbleHeight = textHeight + (verticalPadding * 2);
+    final double bubbleTop = center.dy - 35; // ตำแหน่ง Y (อยู่เหนือ thumb)
+
+    // ========== ขั้นตอนที่ 2: วาด Speech Bubble ==========
+    // สร้าง rounded rectangle สำหรับ bubble
+    final RRect bubbleRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(center.dx, bubbleTop),
+        width: bubbleWidth,
+        height: bubbleHeight,
+      ),
+      Radius.circular(4.r), // มุมโค้ง
+    );
+
+    // สร้าง paint สำหรับระบายสี bubble (ใช้สีที่ส่งเข้ามา)
+    final Paint bubblePaint = Paint()
+      ..color = bubbleColor
+      ..style = PaintingStyle.fill; // ระบายเต็ม
+
+    // วาด bubble ลงบน canvas
+    canvas.drawRRect(bubbleRect, bubblePaint);
+
+    // ========== ขั้นตอนที่ 2: วาดหาง bubble (Triangle Tail) ==========
+    // สร้างรูปสามเหลี่ยมชี้ลงมาเชื่อม bubble กับ thumb พร้อม radius ที่ปลายแหลม
+    final Path trianglePath = Path();
+    final double tipRadius = 1.r; // รัศมีที่ปลายแหลม (1px)
+
+    // กำหนดจุดสำคัญของสามเหลี่ยม
+    final double leftX = center.dx - 8; // จุดซ้าย X
+    final double rightX = center.dx + 8; // จุดขวา X
+    final double topY = bubbleTop + bubbleHeight / 2 - 4; // จุดบน Y
+    final double tipY = bubbleTop + bubbleHeight / 2 + 8; // ปลายแหลม Y
+
+    trianglePath.moveTo(leftX, topY); // เริ่มที่จุดซ้ายบน
+    trianglePath.lineTo(
+      center.dx - tipRadius,
+      tipY - tipRadius,
+    ); // เส้นลงไปใกล้ปลาย (ซ้าย)
+
+    // ใช้ quadratic bezier curve สร้างความโค้งมนที่ปลายแหลม
+    trianglePath.quadraticBezierTo(
+      center.dx,
+      tipY, // control point (ปลายแหลมจริง)
+      center.dx + tipRadius,
+      tipY - tipRadius, // end point (ขวา)
+    );
+
+    trianglePath.lineTo(rightX, topY); // เส้นขึ้นไปจุดขวาบน
+    trianglePath.close(); // ปิด path กลับไปจุดเริ่มต้น
+
+    // วาดหางด้วยสีเดียวกับ bubble
+    canvas.drawPath(trianglePath, bubblePaint);
+
+    // ========== ขั้นตอนที่ 3: วาดข้อความใน bubble ==========
+    // วาดข้อความให้อยู่ตรงกลาง bubble (ใช้ measurePainter ที่คำนวณไว้แล้ว)
+    measurePainter.paint(
+      canvas,
+      Offset(
+        center.dx - measurePainter.width / 2, // จัดกึ่งกลางแนวนอน
+        bubbleTop - measurePainter.height / 2, // จัดกึ่งกลางแนวตั้ง
+      ),
+    );
+
+    // ========== ขั้นตอนที่ 4: วาด Thumb Image (ไอคอนรอยเท้า) ==========
+    if (thumbImage != null) {
+      // กรณีมีรูปภาพ: วาด icon ขนาด 24x24 ตรงกลาง (เหลือ padding 4px รอบด้าน)
+      final double imageSize = 24.w; // ขนาด icon 24x24 px
+
+      // วาดรูปด้วย drawImageRect เพื่อ scale ให้พอดี
+      canvas.drawImageRect(
+        thumbImage!,
+        // Source rect: ใช้รูปต้นฉบับทั้งหมด
+        Rect.fromLTWH(
+          0,
+          0,
+          thumbImage!.width.toDouble(),
+          thumbImage!.height.toDouble(),
+        ),
+        // Destination rect: วาดให้อยู่กึ่งกลางขนาด 24x24
+        Rect.fromCenter(
+          center: Offset(center.dx, center.dy),
+          width: imageSize,
+          height: imageSize,
+        ),
+        Paint()
+          ..filterQuality = FilterQuality.high, // ใช้ quality สูงเพื่อความคมชัด
+      );
+    } else {
+      // Fallback: กรณีไม่มีรูป ให้วาดวงกลมสีเขียวแทน
+      final Paint circlePaint = Paint()
+        ..color = AppColors.ci3
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, 12, circlePaint);
+    }
+  }
+}
+
+/// Custom Slider Track Shape ที่ไม่มี horizontal padding
+/// ทำให้ track ยาวเต็มความกว้างของ slider
+class CustomSliderTrackShape extends SliderTrackShape {
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight ?? 2;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+    required TextDirection textDirection,
+  }) {
+    final Rect trackRect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
+    );
+
+    final ColorTween activeTrackColorTween = ColorTween(
+      begin: sliderTheme.disabledActiveTrackColor,
+      end: sliderTheme.activeTrackColor,
+    );
+    final ColorTween inactiveTrackColorTween = ColorTween(
+      begin: sliderTheme.disabledInactiveTrackColor,
+      end: sliderTheme.inactiveTrackColor,
+    );
+
+    final Paint activePaint = Paint()
+      ..color = activeTrackColorTween.evaluate(enableAnimation)!;
+    final Paint inactivePaint = Paint()
+      ..color = inactiveTrackColorTween.evaluate(enableAnimation)!;
+
+    final double trackHeight = sliderTheme.trackHeight ?? 2;
+    final double trackRadius = trackHeight / 5;
+
+    // วาด inactive track (ส่วนที่ยังไม่เสร็จ)
+    final Rect inactiveTrackRect = Rect.fromLTRB(
+      thumbCenter.dx,
+      trackRect.top,
+      trackRect.right,
+      trackRect.bottom,
+    );
+    final RRect inactiveTrackRRect = RRect.fromRectAndRadius(
+      inactiveTrackRect,
+      Radius.circular(trackRadius),
+    );
+    context.canvas.drawRRect(inactiveTrackRRect, inactivePaint);
+
+    // วาด active track (ส่วนที่เสร็จแล้ว)
+    final Rect activeTrackRect = Rect.fromLTRB(
+      trackRect.left,
+      trackRect.top,
+      thumbCenter.dx,
+      trackRect.bottom,
+    );
+    final RRect activeTrackRRect = RRect.fromRectAndRadius(
+      activeTrackRect,
+      Radius.circular(trackRadius),
+    );
+    context.canvas.drawRRect(activeTrackRRect, activePaint);
   }
 }

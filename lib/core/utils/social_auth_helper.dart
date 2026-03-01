@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -53,7 +54,7 @@ class SocialAuthHelper {
       // Sign in to Firebase with the Google credential
       return await _auth.signInWithCredential(credential);
     } catch (e) {
-      print('Error signing in with Google: $e');
+      debugPrint('Error signing in with Google: $e');
       rethrow;
     }
   }
@@ -89,7 +90,7 @@ class SocialAuthHelper {
 
       return userCredential;
     } catch (e) {
-      print('Error signing in with Apple: $e');
+      debugPrint('Error signing in with Apple: $e');
       rethrow;
     }
   }
@@ -137,7 +138,7 @@ class SocialAuthHelper {
       // Sign in to Firebase with the Facebook credential
       return await _auth.signInWithCredential(facebookAuthCredential);
     } catch (e) {
-      print('Error signing in with Facebook: $e');
+      debugPrint('Error signing in with Facebook: $e');
       rethrow;
     }
   }
@@ -158,9 +159,9 @@ class SocialAuthHelper {
   static Future<void> initLineSDK(String channelId) async {
     try {
       await line.LineSDK.instance.setup(channelId);
-      print('LINE SDK initialized successfully');
+      debugPrint('LINE SDK initialized successfully');
     } catch (e) {
-      print('Error initializing LINE SDK: $e');
+      debugPrint('Error initializing LINE SDK: $e');
       rethrow;
     }
   }
@@ -177,7 +178,7 @@ class SocialAuthHelper {
       );
       return result;
     } catch (e) {
-      print('Error signing in with LINE: $e');
+      debugPrint('Error signing in with LINE: $e');
       rethrow;
     }
   }
@@ -188,7 +189,7 @@ class SocialAuthHelper {
       final result = await line.LineSDK.instance.currentAccessToken;
       return result;
     } catch (e) {
-      print('Error getting LINE access token: $e');
+      debugPrint('Error getting LINE access token: $e');
       return null;
     }
   }
@@ -199,7 +200,7 @@ class SocialAuthHelper {
       final result = await line.LineSDK.instance.getProfile();
       return result;
     } catch (e) {
-      print('Error getting LINE profile: $e');
+      debugPrint('Error getting LINE profile: $e');
       return null;
     }
   }
@@ -209,7 +210,7 @@ class SocialAuthHelper {
     try {
       await line.LineSDK.instance.logout();
     } catch (e) {
-      print('Error signing out from LINE: $e');
+      debugPrint('Error signing out from LINE: $e');
       if (needThrowable) {
         rethrow;
       }

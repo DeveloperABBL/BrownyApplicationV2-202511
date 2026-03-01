@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:crypto/crypto.dart';
 // import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter_test/flutter_test.dart';
@@ -31,10 +32,10 @@ void main() {
         appKey: serverKey,
       );
 
-      print('Decrypted PIN: $decryptedText'); // ควรจะเป็น 111111
+      debugPrint('Decrypted PIN: $decryptedText'); // ควรจะเป็น 111111
     } catch (e) {
-      print('Error: $e');
-      print('สาเหตุที่เป็นไปได้: Key ไม่ถูกต้อง หรือ Format ของ Key ผิด');
+      debugPrint('Error: $e');
+      debugPrint('สาเหตุที่เป็นไปได้: Key ไม่ถูกต้อง หรือ Format ของ Key ผิด');
     }
   });
 }

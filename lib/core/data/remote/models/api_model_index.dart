@@ -36,6 +36,8 @@ export 'package:browny_applications_new/core/data/remote/models/response/machine
 export 'package:browny_applications_new/core/data/remote/models/response/machine_order_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_order_receipt_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/working_machine_data.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';

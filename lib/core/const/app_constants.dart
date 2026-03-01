@@ -1,4 +1,4 @@
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:intl/intl.dart';
 
 /// Local storage key
@@ -34,7 +34,7 @@ String formatCurrency({
       ).format(value).toString()}$mTrailingSign';
     }
   } catch (ignore) {
-    print(ignore);
+    debugPrint(ignore.toString());
   }
 
   try {
@@ -44,7 +44,7 @@ String formatCurrency({
       ).format(num.parse(string.commaReplacer())).toString()}$mTrailingSign';
     }
   } catch (ignore) {
-    print(ignore);
+    debugPrint(ignore.toString());
   }
 
   return '$mLeadSing${NumberFormat(
@@ -68,7 +68,7 @@ String formatDistance({
       ).format(value).toString()}$mTrailingSign';
     }
   } catch (ignore) {
-    print(ignore);
+    debugPrint(ignore.toString());
   }
 
   try {
@@ -78,7 +78,7 @@ String formatDistance({
       ).format(num.parse(string.commaReplacer())).toString()}$mTrailingSign';
     }
   } catch (ignore) {
-    print(ignore);
+    debugPrint(ignore.toString());
   }
 
   return '$mLeadSing${NumberFormat(

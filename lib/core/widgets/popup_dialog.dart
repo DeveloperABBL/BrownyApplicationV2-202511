@@ -155,7 +155,7 @@ class _PopupDialogState extends State<PopupDialog> {
                             shape: BoxShape.circle,
                             color: _currentIndex == index
                                 ? AppColors.primary
-                                : AppColors.white.withOpacity(0.5),
+                                : AppColors.white.withValues(alpha: 0.5),
                           ),
                         ),
                       ),

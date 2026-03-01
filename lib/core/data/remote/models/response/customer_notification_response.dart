@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -46,6 +47,35 @@ class CustomerNotificationItem {
     this.icon,
     this.createdAt,
   });
+
+  String createAtDisplay(String locale) {
+    String dateWording;
+    String timeWording;
+    switch (locale) {
+      case 'en':
+        {
+          dateWording = 'Date';
+          timeWording = 'Time';
+          break;
+        }
+      case 'zh':
+        {
+          dateWording = '日期';
+          timeWording = '时间';
+          break;
+        }
+      default:
+        {
+          dateWording = 'วันที่';
+          timeWording = 'เวลา';
+          break;
+        }
+    }
+    return createdAt!.formatDateDDMMMMyyyyHHmmMinText(
+      locale,
+      pattern: '$dateWording dd/MM/yyyy $timeWording HH:mm',
+    );
+  }
 
   factory CustomerNotificationItem.fromJson(Map<String, dynamic> json) =>
       _$CustomerNotificationItemFromJson(json);

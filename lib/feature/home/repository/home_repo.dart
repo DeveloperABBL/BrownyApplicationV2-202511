@@ -3,8 +3,10 @@ import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart
 import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
@@ -34,6 +36,34 @@ mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   ///
   /// ดึงข้อมูลว่า Popup inivit Friend วันนี้แสดงไปแล้วหรือยัง
   Future<RepoResult<bool>> fetchPopupInvitFriend();
+
+  /// DONG 2026-02-28
+  ///
+  /// API fetch รายการเครื่องที่กำลังทำงาน
+  ///
+  /// Parameters:
+  /// - customerId: UUID ของลูกค้า
+  /// - notificationToken: FCM token สำหรับ push notification
+  ///
+  /// Returns:
+  /// - WorkingMachinesResponse with count และ list ของเครื่องที่กำลังทำงาน
+  Future<RepoResult<WorkingMachinesResponse>> fetchWorkingMachines({
+    String? customerId,
+    String? notificationToken,
+  });
+
+  /// DONG 2026-02-28
+  ///
+  /// API fetch รายการ notifications ของลูกค้า
+  ///
+  /// Parameters:
+  /// - uuid: UUID ของลูกค้า
+  ///
+  /// Returns:
+  /// - CustomerNotificationResponse with list ของ notifications
+  Future<RepoResult<CustomerNotificationResponse>> fetchCustomerNotifications(
+    String uuid,
+  );
 
   /// บันทึกว่า popup นี้ถูก dismiss สำหรับวันนี้
   void dismissPopupForToday(int popupId);
@@ -187,5 +217,52 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   @override
   void dismissInvitFriendForToday() {
     _popupCache.markInvitFriendAsDismissedToday();
+  }
+
+  @override
+  Future<RepoResult<WorkingMachinesResponse>> fetchWorkingMachines({
+    String? customerId,
+    String? notificationToken,
+  }) async {
+    try {
+      final response = await requireRemote.fetchWorkingMachines(
+        customerId: customerId,
+        notificationToken: notificationToken,
+      );
+
+      if (!response.isSuccessful) {
+        return RepoResult.error(
+          error: Exception('Unknown error.'),
+        );
+      }
+
+      return RepoResult.success(
+        data: WorkingMachinesResponse(
+          count: response.data.orEmpty.length,
+          data: response.data,
+        ),
+      );
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CustomerNotificationResponse>> fetchCustomerNotifications(
+    String uuid,
+  ) async {
+    try {
+      final response = await requireRemote.fetchCustomerNotifications(uuid);
+
+      if (!response.isSuccessful) {
+        return RepoResult.error(
+          error: Exception('Unknown error.'),
+        );
+      }
+
+      return RepoResult.success(data: response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
   }
 }

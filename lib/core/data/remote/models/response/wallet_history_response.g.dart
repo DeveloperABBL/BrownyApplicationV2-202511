@@ -21,17 +21,20 @@ Map<String, dynamic> _$WalletHistoryResponseToJson(
 WalletHistoryItem _$WalletHistoryItemFromJson(Map<String, dynamic> json) =>
     WalletHistoryItem(
       type: json['type'] as String?,
-      dateTime: const DateTimeConverter().fromJson(json['dateTime'] as String?),
+      dateTime: const DateTimeStartWithDayConverter().fromJson(
+        json['dateTime'] as String?,
+      ),
       amount: json['amount'] as String?,
       description: json['description'] as String?,
       receiptNo: json['receipt_no'] as String?,
     );
 
-Map<String, dynamic> _$WalletHistoryItemToJson(WalletHistoryItem instance) =>
-    <String, dynamic>{
-      'type': instance.type,
-      'dateTime': const DateTimeConverter().toJson(instance.dateTime),
-      'amount': instance.amount,
-      'description': instance.description,
-      'receipt_no': instance.receiptNo,
-    };
+Map<String, dynamic> _$WalletHistoryItemToJson(
+  WalletHistoryItem instance,
+) => <String, dynamic>{
+  'type': instance.type,
+  'dateTime': const DateTimeStartWithDayConverter().toJson(instance.dateTime),
+  'amount': instance.amount,
+  'description': instance.description,
+  'receipt_no': instance.receiptNo,
+};

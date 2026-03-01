@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
+import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
@@ -183,35 +184,71 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
               );
               return;
             }
+            // รอเก็บข้อมูล QRCode ที่ได้จาก payload
+            String? qrData = '';
+            // เช็ค flag ว่าต้องเปิด In-app QR หรือไม่
+            if (_viewmodel.paymentSelected?.isShowInAppQR == true) {
+              if (_viewmodel.paymentSelected!.isWeChat) {
+                // WeChat
+                qrData = orderResponse.data?.responsePayload?.wechat;
+              } else {
+                // QR Promptpay
+                qrData = orderResponse.data?.responsePayload?.qrcode;
+              }
+            }
+            // ถ้ามีค่าเป็น null จะ error
+            if (qrData == null) {
+              AppOverlays.showBrownyDialog(
+                context,
+                message: 'ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง',
+              );
+              return;
+            }
+
+            _paymentProcessing = true;
 
             // Start polling for payment status
             _startPolling(orderData);
 
-            // Show WebView
-            WebViewController? controller;
-            _paymentProcessing = true;
-            await showModalBottomSheet(
-              context: context,
-              showDragHandle: true,
-              enableDrag: false,
-              isScrollControlled: true,
-              isDismissible: false,
-              builder: (dialogContext) {
-                controller = WebViewController()
-                  ..setJavaScriptMode(
-                    JavaScriptMode.unrestricted,
-                  )
-                  ..setBackgroundColor(AppColors.background)
-                  ..loadRequest(
-                    Uri.parse(orderResponse.redirectUrl!),
+            // DONG 2026-02-28
+            // เพิ่มการเช็คว่าถ้ามีค่า qrAndWechat จะทำการเปิดหน้า QR ในแอพแทน
+            if (_viewmodel.paymentSelected?.isShowInAppQR == true) {
+              await showDialog(
+                useSafeArea: false,
+                context: context,
+                builder: (context) => Dialog.fullscreen(
+                  child: QrPromptpayDialog(
+                    qrData: qrData!,
+                    isQRPromptPay: _viewmodel.paymentSelected!.isQR,
+                  ),
+                ),
+              );
+            } else {
+              // Show WebView
+              WebViewController? controller;
+              await showModalBottomSheet(
+                context: context,
+                showDragHandle: true,
+                enableDrag: false,
+                isScrollControlled: true,
+                isDismissible: false,
+                builder: (dialogContext) {
+                  controller = WebViewController()
+                    ..setJavaScriptMode(
+                      JavaScriptMode.unrestricted,
+                    )
+                    ..setBackgroundColor(AppColors.background)
+                    ..loadRequest(
+                      Uri.parse(orderResponse.redirectUrl!),
+                    );
+                  return SizedBox(
+                    height: 812.h * 0.85,
+                    child: WebViewWidget(controller: controller!),
                   );
-                return SizedBox(
-                  height: 812.h * 0.85,
-                  child: WebViewWidget(controller: controller!),
-                );
-              },
-            );
-            controller?.clearCache();
+                },
+              );
+              controller?.clearCache();
+            }
             _paymentProcessing = false;
             _stopPolling();
             await _checkPaymentStatus();

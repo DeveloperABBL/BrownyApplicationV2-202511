@@ -3,12 +3,25 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
+import 'package:browny_applications_new/core/data/cache/app_local_secure_storage.dart';
+import 'package:browny_applications_new/core/data/cache/biometric_helper.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
+import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
+import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
+import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
+import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
+import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
+import 'package:browny_applications_new/feature/profile/repository/notification_preferences_repo.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -26,11 +39,15 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
     required super.context,
     required this.repo,
     required this.contactRepo,
+    required this.notificationPreferencesRepo,
   });
 
   // ========== Repository ==========
   final ProfileRepo repo;
   final ContactDataSourceMixin contactRepo;
+  final PinBioMetricRepository pinBioMetricRepository =
+      PinBioMetricRepository();
+  final NotificationPreferencesDataSourceMixin notificationPreferencesRepo;
 
   // ========== Notifier, Controller ==========
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -130,12 +147,30 @@ Terms and Conditions
   );
   ValueListenable<UiResult<UserModel>> get profileData => _profileDataNotifier;
 
-  // Image Picker
-  final ImagePicker _imagePicker = ImagePicker();
+  // Notification Preferences
+  final ValueNotifier<UiResult<NotificationPreferencesData>>
+  _notificationPreferencesNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<NotificationPreferencesData>>
+  get notificationPreferencesNotifier => _notificationPreferencesNotifier;
 
-  // ========== Function, Logic  ==========
-  /// DONG 2026-02-21
-  ///
+  // User Preferences (Biometric, Save Slip Auto, Location)
+  final ValueNotifier<bool> _biometricEnabledNotifier = ValueNotifier(false);
+  ValueListenable<bool> get biometricEnabledNotifier =>
+      _biometricEnabledNotifier;
+
+  final ValueNotifier<bool> _saveSlipAutoNotifier = ValueNotifier(false);
+  ValueListenable<bool> get saveSlipAutoNotifier => _saveSlipAutoNotifier;
+
+  final ValueNotifier<bool> _locationPermissionNotifier = ValueNotifier(false);
+  ValueListenable<bool> get locationPermissionNotifier =>
+      _locationPermissionNotifier;
+
+  // Helper instances
+  final _secureStorage = AppLocalSecureStorage.instance();
+  final _localStorage = AppLocalStorage.instance();
+  final _biometricHelper = BiometricHelper.instance();
+  final _imagePicker = ImagePicker();
+
   /// fetch ข้อมูลช่องทางการติดต่อต่างๆ
   Future<void> fetchContactAndSupportLink() async {
     try {
@@ -150,6 +185,311 @@ Terms and Conditions
     } catch (_) {
       _contactAndSupportLinkNotifier.value = UiResult.empty();
     }
+  }
+
+  /// DONG 2026-03-01
+  ///
+  /// Fetch ข้อมูลการตั้งค่าการแจ้งเตือน
+  Future<void> fetchNotificationPreferences() async {
+    _notificationPreferencesNotifier.value = UiResult.loading();
+
+    final uuid = currentCustomerProvider.current.id;
+    if (uuid == null || uuid.isEmpty) {
+      _notificationPreferencesNotifier.value = UiResult.empty();
+      return;
+    }
+
+    try {
+      final result = await notificationPreferencesRepo
+          .fetchNotificationPreferences(uuid);
+
+      if (result.hasError) {
+        _notificationPreferencesNotifier.value = UiResult.error(
+          error: result.error,
+        );
+        return;
+      }
+
+      if (result.isEmpty || result.data.data == null) {
+        _notificationPreferencesNotifier.value = UiResult.empty();
+        return;
+      }
+
+      _notificationPreferencesNotifier.value = UiResult.success(
+        data: result.data.data!,
+      );
+    } on Exception catch (e) {
+      _notificationPreferencesNotifier.value = UiResult.error(error: e);
+    } catch (e) {
+      _notificationPreferencesNotifier.value = UiResult.error(
+        error: Exception(e.toString()),
+      );
+    }
+  }
+
+  /// DONG 2026-03-01
+  ///
+  /// อัพเดทการตั้งค่าการแจ้งเตือน
+  Future<void> updateNotificationPreferences({
+    bool? notifyGeneral,
+    bool? notifyPromotion,
+    bool? notifyNews,
+    bool? notifyMachineDone,
+  }) async {
+    final uuid = currentCustomerProvider.current.id;
+    if (uuid == null || uuid.isEmpty) {
+      return;
+    }
+
+    final currentData = _notificationPreferencesNotifier.value.data;
+    if (currentData == null) {
+      return;
+    }
+
+    // สร้าง request จากค่าปัจจุบัน + ค่าที่ต้องการอัพเดท
+    final request = UpdateNotificationPreferencesRequest(
+      notifyGeneral: notifyGeneral ?? (currentData.notifyGeneral == 1),
+      notifyPromotion: notifyPromotion ?? (currentData.notifyPromotion == 1),
+      notifyNews: notifyNews ?? (currentData.notifyNews == 1),
+      notifyMachineDone:
+          notifyMachineDone ?? (currentData.notifyMachineDone == 1),
+    );
+
+    try {
+      final result = await notificationPreferencesRepo
+          .updateNotificationPreferences(uuid, request);
+
+      if (result.hasError) {
+        // แสดง error แต่ไม่ต้อง update UI (เก็บค่าเดิมไว้)
+        return;
+      }
+
+      // Update UI ด้วยค่าใหม่
+      final updatedData = NotificationPreferencesData(
+        notifyGeneral: request.notifyGeneral ? 1 : 0,
+        notifyPromotion: request.notifyPromotion ? 1 : 0,
+        notifyNews: request.notifyNews ? 1 : 0,
+        notifyMachineDone: request.notifyMachineDone ? 1 : 0,
+      );
+
+      _notificationPreferencesNotifier.value = UiResult.success(
+        data: updatedData,
+      );
+    } catch (e) {
+      // ถ้า error ให้เก็บค่าเดิมไว้
+      debugPrint('Error updating notification preferences: $e');
+    }
+  }
+
+  // ========== User Preferences (Biometric, Save Slip Auto, Location) ==========
+
+  /// DONG 2026-03-01
+  ///
+  /// Load ค่า preferences ทั้งหมด (เรียกใน initState)
+  Future<void> loadUserPreferences() async {
+    // 1. Biometric
+    final biometricEnabled = await _secureStorage.isBiometricEnabled();
+    _biometricEnabledNotifier.value = biometricEnabled;
+
+    // 2. Save Slip Auto (Hive เป็น sync)
+    final saveSlipAuto = _localStorage.isSaveSlipAutoEnabled();
+    _saveSlipAutoNotifier.value = saveSlipAuto;
+
+    // 3. Location Permission
+    final locationPermission = await LocationHelper.checkLocationPermission();
+    _locationPermissionNotifier.value =
+        locationPermission == LocationPermission.whileInUse ||
+        locationPermission == LocationPermission.always;
+  }
+
+  /// DONG 2026-03-01
+  ///
+  /// Toggle Biometric Authentication
+  /// - ต้องมี PIN ก่อนจึงจะเปิดได้
+  Future<void> toggleBiometric(bool value) async {
+    if (value) {
+      // เปิด Biometric → ต้องเช็ค PIN ก่อน
+      final hasPin = await _secureStorage.hasPin();
+
+      if (!hasPin) {
+        // ไม่มี PIN → ต้องไปตั้ง PIN ก่อน
+        if (context.mounted) {
+          // แสดง dialog แจ้งให้ไปตั้ง PIN
+          await _showPinRequiredDialog();
+        }
+        return;
+      }
+
+      // มี PIN แล้ว → เช็คว่า device รองรับ biometric หรือไม่
+      final isAvailable = await _biometricHelper.isBiometricAvailable();
+
+      if (!isAvailable) {
+        if (context.mounted) {
+          // แสดง dialog แจ้งว่า device ไม่รองรับ
+          await _showBiometricNotAvailableDialog();
+        }
+        return;
+      }
+      if (context.mounted) {
+        final verified = await TransactionAuthenPage.goToPage(
+          context,
+          process: PinBiometricPross.verifyByPin,
+        );
+        if (verified) {
+          // หลอกเพื่อให้ระบบ authen
+          await _secureStorage.setBiometricEnabled(true);
+
+          final result = await pinBioMetricRepository.authenticateWithBiometric(
+            reason: 'กรุณายืนยันตัวตนเพื่อดำเนินการต่อ',
+          );
+
+          if (!context.mounted) return;
+          if (result.hasError) {
+            AppOverlays.showBrownyDialog(
+              context,
+              title: context.wording.errorOccurred,
+              message: result.error.toString(),
+            );
+            return;
+          }
+          // รองรับ → เปิด biometric
+          await _secureStorage.setBiometricEnabled(result.data.isSuccess);
+          _biometricEnabledNotifier.value = result.data.isSuccess;
+        }
+      }
+    } else {
+      final verified = await TransactionAuthenPage.goToPage(
+        context,
+        process: PinBiometricPross.verifyByPin,
+      );
+      if (verified) {
+        // ปิด Biometric
+        await _secureStorage.setBiometricEnabled(false);
+        _biometricEnabledNotifier.value = false;
+      }
+    }
+  }
+
+  /// DONG 2026-03-01
+  ///
+  /// Toggle Save Slip Auto
+  Future<void> toggleSaveSlipAuto(bool value) async {
+    _localStorage.setSaveSlipAutoEnabled(value);
+    _saveSlipAutoNotifier.value = value;
+  }
+
+  /// DONG 2026-03-01
+  ///
+  /// Toggle Location Permission
+  Future<void> toggleLocationPermission(bool value) async {
+    if (value) {
+      // เปิด → ขอ permission
+      final hasPermission = await LocationHelper.ensureLocationPermission();
+
+      if (hasPermission) {
+        _locationPermissionNotifier.value = true;
+      } else {
+        // ถ้า denied forever → แสดง dialog พาไป settings
+        if (context.mounted) {
+          final permission = await LocationHelper.checkLocationPermission();
+          if (permission == LocationPermission.deniedForever) {
+            await _showLocationDeniedForeverDialog();
+          }
+        }
+        _locationPermissionNotifier.value = false;
+      }
+    } else {
+      // ปิด → แสดง dialog ยืนยัน และพาไป settings
+      if (context.mounted) {
+        await _showDisableLocationDialog();
+      }
+    }
+  }
+
+  // ========== Dialog Helpers ==========
+
+  /// แสดง dialog แจ้งให้ตั้ง PIN ก่อน
+  Future<void> _showPinRequiredDialog() async {
+    if (!context.mounted) return;
+
+    await AppOverlays.showBrownyDialog(
+      context,
+      title: 'กรุณาตั้งค่า PIN',
+      message: 'คุณต้องตั้งค่ารหัส PIN ก่อนจึงจะสามารถเปิดใช้งาน Biometric ได้',
+      confirmText: 'ไปตั้งค่า PIN',
+      onConfirm: () async {
+        if (context.mounted) {
+          await CreateAppPinPage.goToPage(
+            context,
+            process: PinBiometricPross.create,
+          );
+          // หลังจากกลับมา ลอง toggle biometric อีกครั้ง
+          // เผื่อ user ไปตั้ง PIN เสร็จแล้ว
+          if (context.mounted) {
+            await toggleBiometric(true);
+          }
+        }
+      },
+      cancelText: context.wording.cancel,
+      onCancel: () {
+        // User cancelled
+      },
+    );
+  }
+
+  /// แสดง dialog แจ้งว่า device ไม่รองรับ biometric
+  Future<void> _showBiometricNotAvailableDialog() async {
+    if (!context.mounted) return;
+
+    await AppOverlays.showBrownyDialog(
+      context,
+      title: 'ไม่รองรับ Biometric',
+      message: 'อุปกรณ์ของคุณไม่รองรับการยืนยันตัวตนด้วย Biometric',
+      confirmText: context.wording.confirm,
+      onConfirm: () {
+        // User acknowledged
+      },
+    );
+  }
+
+  /// แสดง dialog แจ้งว่า location permission denied forever
+  Future<void> _showLocationDeniedForeverDialog() async {
+    if (!context.mounted) return;
+
+    await AppOverlays.showBrownyDialog(
+      context,
+      imageAsset: Assets.png.brownyMoto.path,
+      title: 'เข้าถึงตำแหน่ง',
+      message: 'กรุณาไปเปิดสิทธิ์เข้าถึงตำแหน่งในการตั้งค่าของอุปกรณ์',
+
+      confirmText: context.wording.openSettings,
+      onConfirm: () async {
+        await LocationHelper.openLocationSettings();
+      },
+      cancelText: context.wording.cancel,
+      onCancel: () {
+        // User cancelled
+      },
+    );
+  }
+
+  /// แสดง dialog ยืนยันการปิด location permission
+  Future<void> _showDisableLocationDialog() async {
+    if (!context.mounted) return;
+
+    await AppOverlays.showBrownyDialog(
+      context,
+      title: 'ปิด Location',
+      message: 'หากต้องการปิดสิทธิ์ Location กรุณาไปปิดในการตั้งค่าของอุปกรณ์',
+      confirmText: context.wording.openSettings,
+      onConfirm: () async {
+        await LocationHelper.openLocationSettings();
+      },
+      cancelText: context.wording.cancel,
+      onCancel: () {
+        // User cancelled
+      },
+    );
   }
 
   /// DONG 2026-02-21
@@ -424,9 +764,17 @@ Terms and Conditions
   // ============ dispose ============
   @override
   void dispose() {
+    unawaited(
+      // คืนค่ากลับ เผื่อกรณี user ปัดแอพทิ้ง
+      _secureStorage.setBiometricEnabled(_biometricEnabledNotifier.value),
+    );
     _contactAndSupportLinkNotifier.dispose();
     _currentSliderIndexNotifier.dispose();
     _profileDataNotifier.dispose();
+    _notificationPreferencesNotifier.dispose();
+    _biometricEnabledNotifier.dispose();
+    _saveSlipAutoNotifier.dispose();
+    _locationPermissionNotifier.dispose();
     phoneController.dispose();
     emailController.dispose();
     nameController.dispose();

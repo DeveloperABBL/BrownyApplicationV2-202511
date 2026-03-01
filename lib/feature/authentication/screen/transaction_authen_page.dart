@@ -4,14 +4,22 @@ part of 'app_pin_page.dart';
 class TransactionAuthenPage extends StatelessWidget {
   const TransactionAuthenPage({
     super.key,
+    required this.process,
   });
+  final PinBiometricPross process;
 
   static final pagePath = '/transaction_authen_page';
   static final pageName = 'TransactionAuthenPage';
 
   /// util function route to pageName
-  static Future<T?> goToPage<T>(BuildContext context) async {
-    return await context.pushNamed(TransactionAuthenPage.pageName);
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    PinBiometricPross process = PinBiometricPross.verify,
+  }) async {
+    return await context.pushNamed(
+      TransactionAuthenPage.pageName,
+      extra: process,
+    );
   }
 
   @override
@@ -22,14 +30,17 @@ class TransactionAuthenPage extends StatelessWidget {
         repository: PinBioMetricRepository(),
       ),
       child: _TransactionAuthenContent(
-        process: PinBiometricPross.verify,
+        // process: PinBiometricPross.verify,
+        process: process,
       ),
     );
   }
 }
 
 class _TransactionAuthenContent extends _CreateAppPinContent {
-  const _TransactionAuthenContent({required super.process});
+  const _TransactionAuthenContent({
+    required super.process,
+  });
 
   @override
   _CreateAppPinContentState createState() => __TransactionAuthenContentState();
@@ -63,22 +74,28 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
           cancelText: 'ยกเลิก',
           onConfirm: () {
             if (context.mounted) {
-              context
-                  .pushNamed(
-                    // Transaction Create PIN
-                    CreateAppPinPage.pageName,
-                    extra: {
-                      // ไม่ใช้การ signup ใหม่
-                      CreateAppPinPage.kFirstSignup: false,
-                      // Map<Type, PinBiometricPross>
-                      CreateAppPinPage.kPinBiometricProcess: {
-                        PinBiometricPross: PinBiometricPross.create,
-                      },
-                    },
-                  )
-                  .then((_) async {
-                    await _initializeAuthentication();
-                  });
+              CreateAppPinPage.goToPage(
+                context,
+                process: PinBiometricPross.create,
+              ).then((_) async {
+                await _initializeAuthentication();
+              });
+              // context
+              //     .pushNamed(
+              //       // Transaction Create PIN
+              //       CreateAppPinPage.pageName,
+              //       extra: {
+              //         // ไม่ใช้การ signup ใหม่
+              //         CreateAppPinPage.kFirstSignup: false,
+              //         // Map<Type, PinBiometricPross>
+              //         CreateAppPinPage.kPinBiometricProcess: {
+              //           PinBiometricPross: PinBiometricPross.create,
+              //         },
+              //       },
+              //     )
+              //     .then((_) async {
+              //       await _initializeAuthentication();
+              //     });
             }
           },
         );
@@ -88,8 +105,12 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
 
     // ตรวจสอบว่าเปิด Biometric หรือไม่
     _isBiometricEnabled = await _authViewModel.isBiometricEnabled();
-
-    if (_isBiometricEnabled) {
+    if (widget.process == PinBiometricPross.verifyByPin) {
+      // Force แสดง PIN widget เลย
+      setState(() {
+        _showPinWidget = true;
+      });
+    } else if (_isBiometricEnabled) {
       // พยายาม authenticate ด้วย Biometric ก่อน
       await _attemptBiometricAuth();
     } else {

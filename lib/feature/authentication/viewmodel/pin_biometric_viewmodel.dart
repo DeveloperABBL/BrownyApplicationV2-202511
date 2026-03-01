@@ -12,8 +12,10 @@ import 'package:provider/provider.dart';
 enum PinBiometricPross {
   // Process การสร้าง PIN
   create,
-  // Process การ verify PIN ที่กรอกเข้ามา
+  // Process การ verify PIN ที่กรอกเข้ามา หรือ Biometric
   verify,
+  // Process การ verify PIN ที่กรอกเข้ามา
+  verifyByPin,
   // Process การลืม PIN
   forgot,
 }
@@ -259,6 +261,7 @@ class PinBiometricViewModel extends AppViewModel {
       // 3. Decrypt ciphertext กลับเป็น PIN จริง
       String? decryptedPin;
       try {
+        if (!context.mounted) return false;
         // ดึง APP_KEY จาก AppEnvironment แทน hardcode
         final env = context.read<AppEvnironment>();
         final appKey = env.laravelAppKey;

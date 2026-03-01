@@ -41,12 +41,12 @@ Map<String, dynamic> _$CouponAvailableCountDataToJson(
 CouponsCount _$CouponsCountFromJson(Map<String, dynamic> json) => CouponsCount(
   redemption: (json['redemption'] as num?)?.toInt(),
   discount: (json['discount'] as num?)?.toInt(),
-  eVoucher: (json['e_voucher'] as num?)?.toInt(),
+  eVoucher: json['eVoucher'] as String?,
 );
 
 Map<String, dynamic> _$CouponsCountToJson(CouponsCount instance) =>
     <String, dynamic>{
       'redemption': instance.redemption,
       'discount': instance.discount,
-      'e_voucher': instance.eVoucher,
+      'eVoucher': instance.eVoucher,
     };

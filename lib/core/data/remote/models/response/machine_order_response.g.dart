@@ -49,6 +49,11 @@ MachineOrderData _$MachineOrderDataFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       updatedAt: json['updated_at'] as String?,
       createdAt: json['created_at'] as String?,
+      responsePayload: json['response_payload'] == null
+          ? null
+          : ResponsePayload.fromJson(
+              json['response_payload'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$MachineOrderDataToJson(MachineOrderData instance) =>
@@ -62,6 +67,7 @@ Map<String, dynamic> _$MachineOrderDataToJson(MachineOrderData instance) =>
       'coupon_customer_id': instance.couponCustomerId,
       'discount_id': instance.discountId,
       'coupon_discount': instance.couponDiscount,
+      'response_payload': instance.responsePayload,
       'system_discount': instance.systemDiscount,
       'discount_amount': instance.discountAmount,
       'price_original': instance.priceOriginal,

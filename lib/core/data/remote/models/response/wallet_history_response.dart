@@ -25,7 +25,7 @@ class WalletHistoryItem {
   final String? type;
 
   /// วันเวลาที่ทำธุรกรรม (format: "dd-MM-yyyy / HH:mm")
-  @DateTimeConverter()
+  @DateTimeStartWithDayConverter()
   @JsonKey(name: 'dateTime')
   final DateTime? dateTime;
 

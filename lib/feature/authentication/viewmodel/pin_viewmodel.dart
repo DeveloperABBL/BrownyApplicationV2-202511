@@ -1,7 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
-import 'package:flutter/material.dart';
 
 /// ViewModel สำหรับจัดการ PIN
 /// - สร้าง PIN ใหม่

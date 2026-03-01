@@ -10,6 +10,7 @@ part 'app_client.g.dart';
 /// Note: เมื่อมีการแก้ไข ให้ run command นี้ใน terminal ด้วย
 ///
 /// dart run build_runner build --delete-conflicting-outputs
+/// dart run build_runner watch
 @RestApi()
 abstract class AppClient {
   static final _AppClient _instance = _AppClient(
@@ -31,6 +32,10 @@ abstract class AppClient {
       .._dio.options.headers.putIfAbsent(
         'Authorization',
         () => 'Bearer ${config.token}',
+      )
+      .._dio.options.headers.putIfAbsent(
+        'clientVersion',
+        () => config.clientVersion,
       );
   }
 
@@ -138,7 +143,7 @@ abstract class AppClient {
   /// DONG 2026-02-09
   ///
   /// API fetch customer notification preferences
-  @GET('/customer/{uuid}/notification-preferences')
+  @GET('/customer/{uuid}/notification-settings')
   Future<HttpResponse<NotificationPreferencesResponse>>
   fetchNotificationPreferences(
     @Path('uuid') String uuid,
@@ -323,13 +328,16 @@ abstract class AppClient {
     @Body() Map<String, dynamic> body,
   );
 
+  /// DONG 2026-03-01
+  /// ปรับเส้น API เป็น /machines/{id}/progress
+  ///
   /// DONG 2026-02-20
   ///
   /// API fetch รายละเอียดเครื่อง (machine detail)
   ///
   /// Response:
   /// - MachineDetailResponse with machine info, status, remaining time
-  @GET('/machines/{id}')
+  @GET('/machines/{id}/progress')
   Future<HttpResponse<MachineDetailResponse>> fetchMachineDetail(
     @Path('id') String machineId,
   );
@@ -408,6 +416,22 @@ abstract class AppClient {
     @Path('order_id') String orderId,
     @Body() MachineOrderReviewRequest body,
   );
+
+  /// DONG 2026-02-28
+  ///
+  /// API fetch รายการเครื่องที่กำลังทำงาน (working machines)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (UUID ของลูกค้า)
+  /// - notification_token: String? (FCM token, nullable)
+  ///
+  /// Response:
+  /// - WorkingMachinesResponse with count and list of working machines
+  @GET('/machines/working')
+  Future<HttpResponse<List<WorkingMachineData>>> fetchWorkingMachines({
+    @Query('customer_id') String? customerId,
+    @Query('notification_token') String? notificationToken,
+  });
 
   /// DONG 2026-01-13
   ///

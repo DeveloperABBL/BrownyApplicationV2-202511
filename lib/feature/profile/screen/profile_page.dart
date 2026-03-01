@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
+import 'package:browny_applications_new/feature/profile/repository/notification_preferences_repo.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -43,6 +44,7 @@ class ProfilePage extends StatelessWidget {
         context: context,
         repo: ProfileRepo(),
         contactRepo: ContactRepo(),
+        notificationPreferencesRepo: NotificationPreferencesRepo(),
       ),
       child: ProfileWidget(
         isFirstSignup: isFirstSignup,
@@ -296,7 +298,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 _viewModel.genderController.text = value!;
               },
             ),
-            SizedBox(height: AppDims.size_16.h),
+            AppDims.vericalPadding_16,
 
             // Date of Birth Field
             AppText(
@@ -305,8 +307,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: AppDims.size_8.h),
+            AppDims.vericalPadding_8,
+
             AppTextFormField(
+              enabled: widget.isFirstSignup,
               focusNode: _birthDatefocusNode,
               controller: _viewModel.dateOfBirth,
               readOnly: true,
@@ -314,7 +318,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 color: AppColors.textPrimary,
               ),
               decoration: InputDecoration(
-                fillColor: AppColors.background,
+                fillColor: widget.isFirstSignup
+                    ? AppColors.background
+                    : AppColors.gray500,
                 hintText: context.wording.ddMMyy,
                 hintStyle: context.inputTextStyle.copyWith(
                   color: AppColors.gray500,
@@ -442,56 +448,56 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
             SizedBox(height: AppDims.size_8.h),
             // Submit Button
-            if (!widget.isFirstSignup)
-              ElevatedButton(
-                onPressed: () async {
-                  await AppOverlays.showBrownyDialog(
-                    context,
-                    imageAsset: Assets.png.brownyError1.path,
-                    title: context.wording.logout,
-                    message: context.wording.confirmLogoutMessage,
-                    confirmText: context.wording.confirm,
-                    cancelText: context.wording.cancel,
-                    onConfirm: () async {
-                      AppOverlays.showLoading(
-                        context,
-                        timeout: Duration(seconds: 3),
-                        onTimeout: () {
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(
-                            SnackBar(content: Text('Time out')),
-                          );
-                        },
-                      );
-                      final result = await _viewModel.logout();
-                      AppOverlays.hideLoading();
-                      if (result.isSuccess && context.mounted) {
-                        context.pop();
-                        // context.pushNamedAndClear(
-                        //   OnBoardingPage.pageName,
-                        // );
-                      }
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppDims.size_8.r,
-                    ),
-                  ),
-                ),
-                child: Text(
-                  context.wording.logout,
-                  style: context.textTheme.bodyMedium!.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            SizedBox(height: AppDims.size_8.h),
+            // if (!widget.isFirstSignup)
+            //   ElevatedButton(
+            //     onPressed: () async {
+            //       await AppOverlays.showBrownyDialog(
+            //         context,
+            //         imageAsset: Assets.png.brownyError1.path,
+            //         title: context.wording.logout,
+            //         message: context.wording.confirmLogoutMessage,
+            //         confirmText: context.wording.confirm,
+            //         cancelText: context.wording.cancel,
+            //         onConfirm: () async {
+            //           AppOverlays.showLoading(
+            //             context,
+            //             timeout: Duration(seconds: 3),
+            //             onTimeout: () {
+            //               ScaffoldMessenger.of(
+            //                 context,
+            //               ).showSnackBar(
+            //                 SnackBar(content: Text('Time out')),
+            //               );
+            //             },
+            //           );
+            //           final result = await _viewModel.logout();
+            //           AppOverlays.hideLoading();
+            //           if (result.isSuccess && context.mounted) {
+            //             context.pop();
+            //             // context.pushNamedAndClear(
+            //             //   OnBoardingPage.pageName,
+            //             // );
+            //           }
+            //         },
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: AppColors.error,
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(
+            //           AppDims.size_8.r,
+            //         ),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       context.wording.logout,
+            //       style: context.textTheme.bodyMedium!.copyWith(
+            //         color: Colors.white,
+            //         fontWeight: FontWeight.w600,
+            //       ),
+            //     ),
+            //   ),
+            // SizedBox(height: AppDims.size_8.h),
           ],
         ),
       ),
@@ -971,20 +977,22 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       ),
                                     ),
                                     AppDims.vericalPadding_4,
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        _birthDatefocusNode.requestFocus();
-                                        dialogContext.pop();
-                                        _onbirthDateFieldTap();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.ci3,
-                                        foregroundColor: AppColors.primary,
+                                    if (widget.isFirstSignup)
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _birthDatefocusNode.requestFocus();
+                                          dialogContext.pop();
+                                          _onbirthDateFieldTap();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.ci3,
+                                          foregroundColor: AppColors.primary,
+                                        ),
+                                        child: AppText(
+                                          // เปลี่ยวันเกิด
+                                          context.wording.changeBirthday,
+                                        ),
                                       ),
-                                      child: AppText(
-                                        context.wording.changeBirthday,
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ),

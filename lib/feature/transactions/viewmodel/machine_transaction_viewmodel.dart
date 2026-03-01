@@ -14,6 +14,9 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   // ========== Dispose ==========
   @override
   void dispose() {
+    _statusUpdateTimer?.cancel();
+    _remainingDurationNotifier.dispose();
+    _machineDetailNotifier.dispose();
     _machineProgramsNotifier.dispose();
     _machineTransactionStateNotifier.dispose();
     super.dispose();
@@ -32,6 +35,22 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   String get machineId =>
       machineProgramsNotifier.value.data!.machineId.toString();
 
+  // ========== Machine Status Timer & Progress ==========
+  Timer? _statusUpdateTimer;
+  final ValueNotifier<Duration?> _remainingDurationNotifier = ValueNotifier(
+    null,
+  );
+  ValueListenable<Duration?> get remainingDurationNotifier =>
+      _remainingDurationNotifier;
+
+  double _totalDurationInSeconds = 1.0;
+  double get totalDurationInSeconds => _totalDurationInSeconds;
+
+  final ValueNotifier<MachineDetailResponse?> _machineDetailNotifier =
+      ValueNotifier(null);
+  ValueListenable<MachineDetailResponse?> get machineDetailNotifier =>
+      _machineDetailNotifier;
+
   /// State สำหรับจัดการ Machine Payment Transaction (payment status + receipt)
   /// แยกออกจาก parent class เพราะใช้ MachineOrderReceiptResponse แทน CouponReceiptModel
   late final ValueNotifier<UiResult<MachinePaymentTransactionState>>
@@ -43,6 +62,7 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
   // ========== Logic ==========
   /// API fetch รายละเอียดเครื่อง (machine detail)
+  /// เรียกครั้งเดียวและเก็บใน ValueNotifier เพื่อหลีกเลี่ยงการ rebuild
   Future<UiResult<MachineDetailResponse>> fetchMachineDetail(
     String machineId,
   ) async {
@@ -56,7 +76,146 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       return UiResult.empty();
     }
 
+    // เก็บข้อมูลใน notifier
+    _machineDetailNotifier.value = result.data;
+
+    // คำนวณและเริ่ม timer
+    _calculateSliderValues(result.data);
+
     return UiResult.success(data: result.data);
+  }
+
+  /// คำนวณค่าต่างๆ สำหรับ Slider จากข้อมูล MachineDetailResponse
+  void _calculateSliderValues(MachineDetailResponse machineDetail) {
+    try {
+      // แปลง startTime และ finishDatatime เป็น DateTime
+      final now = DateTime.now();
+      final startParts = machineDetail.startTime.orEmpty.split(':');
+      final finishParts = machineDetail.finishDatatime.orEmpty.split(':');
+
+      if (startParts.length >= 2 && finishParts.length >= 2) {
+        final startTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          int.parse(startParts[0]),
+          int.parse(startParts[1]),
+        );
+
+        var finishTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          int.parse(finishParts[0]),
+          int.parse(finishParts[1]),
+        );
+
+        // ถ้าเวลาสิ้นสุดน้อยกว่าเวลาเริ่มต้น แสดงว่าข้ามวัน
+        if (finishTime.isBefore(startTime)) {
+          finishTime = finishTime.add(const Duration(days: 1));
+        }
+
+        // คำนวณเวลาทั้งหมด (วินาที)
+        _totalDurationInSeconds = finishTime
+            .difference(startTime)
+            .inSeconds
+            .toDouble();
+
+        // แปลง remainingTime ("00:13:27") เป็น Duration
+        final timeParts = machineDetail.remainingTime.orEmpty.split(':');
+        if (timeParts.length == 3) {
+          _remainingDurationNotifier.value = Duration(
+            hours: int.parse(timeParts[0]),
+            minutes: int.parse(timeParts[1]),
+            seconds: int.parse(timeParts[2]),
+          );
+
+          // เริ่ม Timer เพื่ออัพเดท UI
+          _startStatusTimer(machineDetail);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error calculating slider values: $e');
+    }
+  }
+
+  /// เริ่ม Timer สำหรับอัพเดท remaining time ทุก 1 วินาที
+  void _startStatusTimer(MachineDetailResponse machineDetail) {
+    _statusUpdateTimer?.cancel();
+
+    if (!machineDetail.isBusy) {
+      return;
+    }
+
+    _statusUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final currentDuration = _remainingDurationNotifier.value;
+      if (currentDuration != null && currentDuration.inSeconds > 0) {
+        // อัพเดทเฉพาะ ValueNotifier ไม่ทำให้ rebuild ทั้ง widget
+        _remainingDurationNotifier.value = Duration(
+          seconds: currentDuration.inSeconds - 1,
+        );
+      } else {
+        // หมดเวลาแล้ว หยุด timer
+        timer.cancel();
+      }
+    });
+  }
+
+  /// คำนวณ value ของ slider (เวลาที่ผ่านไปแล้ว)
+  double getSliderValue(String locale) {
+    final remainingDuration = _remainingDurationNotifier.value;
+    if (remainingDuration == null || _totalDurationInSeconds <= 0) {
+      return 0;
+    }
+
+    final elapsed = _totalDurationInSeconds - remainingDuration.inSeconds;
+    return elapsed.clamp(0, _totalDurationInSeconds);
+  }
+
+  /// ดึง label สำหรับแสดงใน bubble ("21 นาที" หรือสถานะอื่นๆ)
+  String getBubbleLabel(String locale) {
+    final machineDetail = _machineDetailNotifier.value;
+    if (machineDetail == null) return '';
+
+    if (machineDetail.isFailed) {
+      // แสดงสถานะสำหรับเครื่องขัดข้อง
+      return machineDetail.getStatusDisplay(locale);
+    }
+
+    final remainingDuration = _remainingDurationNotifier.value;
+    if (machineDetail.isBusy && remainingDuration != null) {
+      // แสดงเวลาที่เหลือในรูปแบบ "mm นาที"
+      final minutes = remainingDuration.inMinutes;
+      return '$minutes นาที';
+    }
+
+    return '';
+  }
+
+  /// ดึงสีของ bubble ตามสถานะ
+  Color getBubbleColor() {
+    final machineDetail = _machineDetailNotifier.value;
+    if (machineDetail == null) return AppColors.primary;
+
+    if (machineDetail.isFailed) {
+      return AppColors.error; // สีแดงสำหรับเครื่องขัดข้อง
+    }
+
+    return AppColors.primary; // สีเขียวปกติ
+  }
+
+  /// ฟอร์แมต remaining time สำหรับแสดงใน summary ("mm:ss")
+  String getFormattedRemainingTime(String locale) {
+    final remainingDuration = _remainingDurationNotifier.value;
+    final machineDetail = _machineDetailNotifier.value;
+
+    if (remainingDuration == null) {
+      return machineDetail?.getRemainingTimeDisplay(locale) ?? '-';
+    }
+
+    final minutes = remainingDuration.inMinutes;
+    final seconds = remainingDuration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   /// API fetch โปรแกรมของเครื่อง (machine programs)

@@ -27,6 +27,10 @@ class DevEnvironment extends AppEvnironment {
 
   @override
   Future<void> loadEnv() async {
+    // 4. ดึง App Version
+    final packageInfo = await PackageInfo.fromPlatform();
+    // "3.0.0 30"
+    final appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
     // 1. สร้าง API Config call ไปที่ Enviroment DEV
     apiConfig = ApiConfigs(
       // dev API
@@ -39,6 +43,7 @@ class DevEnvironment extends AppEvnironment {
       token: const String.fromEnvironment(
         kToken,
       ),
+      clientVersion: appVersion,
     );
 
     // 2. Initialize AppLocalStorage

@@ -9,7 +9,7 @@ class UpdateNotificationPreferencesResponse {
   final String? message;
 
   @JsonKey(name: 'data')
-  final NotificationPreferencesData? data;
+  final UpdateNotificationPreferencesData? data;
 
   UpdateNotificationPreferencesResponse({
     this.message,
@@ -25,7 +25,7 @@ class UpdateNotificationPreferencesResponse {
 }
 
 @JsonSerializable()
-class NotificationPreferencesData {
+class UpdateNotificationPreferencesData {
   @JsonKey(name: 'notify_machine_done')
   final bool? notifyMachineDone;
 
@@ -35,14 +35,16 @@ class NotificationPreferencesData {
   @JsonKey(name: 'notify_promotion')
   final bool? notifyPromotion;
 
-  NotificationPreferencesData({
+  UpdateNotificationPreferencesData({
     this.notifyMachineDone,
     this.notifyNews,
     this.notifyPromotion,
   });
 
-  factory NotificationPreferencesData.fromJson(Map<String, dynamic> json) =>
-      _$NotificationPreferencesDataFromJson(json);
+  factory UpdateNotificationPreferencesData.fromJson(
+    Map<String, dynamic> json,
+  ) => _$UpdateNotificationPreferencesDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$NotificationPreferencesDataToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$UpdateNotificationPreferencesDataToJson(this);
 }

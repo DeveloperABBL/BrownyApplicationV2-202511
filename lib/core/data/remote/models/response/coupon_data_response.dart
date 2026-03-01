@@ -130,8 +130,9 @@ class CouponData {
   /// Helper: แปลง customerCouponId เป็น int
   int? get customerCouponIdInt {
     if (customerCouponId is int) return customerCouponId as int;
-    if (customerCouponId is String)
+    if (customerCouponId is String) {
       return int.tryParse(customerCouponId as String);
+    }
     return null;
   }
 }

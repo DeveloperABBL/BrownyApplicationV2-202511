@@ -128,7 +128,7 @@ class _MapContentState extends State<MapContent> {
         });
       }
     } catch (e) {
-      print('Error getting current position: $e');
+      debugPrint('Error getting current position: $e');
     }
   }
 
@@ -223,13 +223,11 @@ class _MapContentState extends State<MapContent> {
     // Check if speech recognition is available
     bool available = await _speech.initialize(
       onStatus: (status) {
-        print('Speech recognition status: $status');
         if (status == 'done' || status == 'notListening') {
           _stateSpeechingingChnage();
         }
       },
       onError: (error) {
-        print('Speech recognition error: $error');
         _stateSpeechingingChnage();
       },
     );

@@ -46,6 +46,7 @@ class AppDims {
   static final double size_60 = 60.0;
   static final double size_64 = 64.0;
   static final double size_65 = 65.0;
+  static final double size_75 = 75.0;
   static final double size_77 = 77.0;
   static final double size_85 = 85.0;
   static final double size_84 = 84.0;
@@ -59,6 +60,12 @@ class AppDims {
   );
   static SizedBox get horizonPadding_2 => SizedBox(
     width: 2.w,
+  );
+  static SizedBox get vericalPadding_3 => SizedBox(
+    height: 3.h,
+  );
+  static SizedBox get horizonPadding_3 => SizedBox(
+    width: 3.w,
   );
   static SizedBox get vericalPadding_4 => SizedBox(
     height: 4.h,
@@ -107,6 +114,12 @@ class AppDims {
   );
   static SizedBox get horizonPadding_16 => SizedBox(
     width: 16.w,
+  );
+  static SizedBox get vericalPadding_18 => SizedBox(
+    height: 18.h,
+  );
+  static SizedBox get horizonPadding_18 => SizedBox(
+    width: 18.w,
   );
   static SizedBox get vericalPadding_19 => SizedBox(
     height: 19.h,

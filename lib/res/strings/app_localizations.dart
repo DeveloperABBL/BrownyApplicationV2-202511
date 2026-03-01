@@ -2163,6 +2163,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start operation'**
   String get startOperation;
+
+  /// No description provided for @estimatedCompletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Completion'**
+  String get estimatedCompletion;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @selectedService.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Service'**
+  String get selectedService;
+
+  /// No description provided for @approximateRemainingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Approximate Remaining Time'**
+  String get approximateRemainingTime;
 }
 
 class _AppLocalizationsDelegate

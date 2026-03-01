@@ -86,7 +86,7 @@ class _BiometricContentState extends State<_BiometricContent> {
         final authenBiometricResult = await _viewModel
             .authenticateWithBiometric();
 
-        if (!context.mounted) return;
+        if (!mounted) return;
 
         if (authenBiometricResult.isSuccess) {
           // Navigate to Profile

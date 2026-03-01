@@ -159,7 +159,10 @@ class PaymentMethodModel {
     isActive: isActive ?? this.isActive,
   );
 
+  bool get isQR => method == 'qr';
+  bool get isWeChat => method == 'wechat';
   bool get isTpWallet => method == 'tp_wallet';
+  bool get isShowInAppQR => isQR || isWeChat;
 }
 
 /// Helper class สำหรับ CouponData พร้อม display methods

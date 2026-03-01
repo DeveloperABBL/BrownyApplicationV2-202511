@@ -296,7 +296,7 @@ class _AppClient implements AppClient {
           Options(method: 'GET', headers: _headers, extra: _extra)
               .compose(
                 _dio.options,
-                '/customer/${uuid}/notification-preferences',
+                '/customer/${uuid}/notification-settings',
                 queryParameters: queryParameters,
                 data: _data,
               )
@@ -882,7 +882,7 @@ class _AppClient implements AppClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/machines/${machineId}',
+            '/machines/${machineId}/progress',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -1016,6 +1016,46 @@ class _AppClient implements AppClient {
     late BaseResponse _value;
     try {
       _value = BaseResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<List<WorkingMachineData>>> fetchWorkingMachines({
+    String? customerId,
+    String? notificationToken,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'customer_id': customerId,
+      r'notification_token': notificationToken,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<List<WorkingMachineData>>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/machines/working',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<WorkingMachineData> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                WorkingMachineData.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

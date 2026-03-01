@@ -1065,4 +1065,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startOperation => 'Start operation';
+
+  @override
+  String get estimatedCompletion => 'Estimated Completion';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get selectedService => 'Selected Service';
+
+  @override
+  String get approximateRemainingTime => 'Approximate Remaining Time';
 }

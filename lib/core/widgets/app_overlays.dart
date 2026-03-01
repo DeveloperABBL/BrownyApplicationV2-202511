@@ -213,7 +213,7 @@ class AppOverlays {
   /// [onCancel] - Callback เมื่อกดปุ่มยกเลิก
   /// [barrierDismissible] - กำหนดว่าสามารถปิด dialog ด้วยการแตะพื้นหลังได้หรือไม่
   ///
-  /// Returns Future<bool?> - true ถ้ากดยืนยัน, false ถ้ากดยกเลิก, null ถ้าปิดด้วยวิธีอื่น
+  /// Returns Future-bool - true ถ้ากดยืนยัน, false ถ้ากดยกเลิก, null ถ้าปิดด้วยวิธีอื่น
   static Future<bool?> showWalletDialog(
     BuildContext context, {
     String? title,

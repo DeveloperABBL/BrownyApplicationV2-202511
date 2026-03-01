@@ -28,6 +28,9 @@ class CouponOrderResponse {
   @JsonKey(name: 'redirect_url')
   final String? redirectUrl;
 
+  @JsonKey(name: 'qr_and_wechat')
+  final String? qrAndWechat;
+
   /// สถานะการชำระเงิน
   /// - true: ชำระเงินสำเร็จแล้ว (กรณี wallet payment)
   /// - false: รอการชำระเงิน (pending)
@@ -44,6 +47,7 @@ class CouponOrderResponse {
     this.data,
     this.walletBalance,
     this.redirectUrl,
+    this.qrAndWechat,
     this.paid,
     this.priceRequired,
   });
@@ -106,7 +110,7 @@ class CouponOrderData {
   final String? gatewayTransactionId;
 
   @JsonKey(name: 'response_payload')
-  final dynamic responsePayload;
+  final ResponsePayload? responsePayload;
 
   @JsonKey(name: 'responded_at')
   final String? respondedAt;
@@ -207,4 +211,42 @@ class CouponOrderData {
   bool get isPending => paymentStatus?.toLowerCase() == 'pending';
 
   bool get isFailed => paymentStatus?.toLowerCase() == 'failed';
+}
+
+@JsonSerializable()
+class ResponsePayload {
+  @JsonKey(name: 'referenceNo')
+  final String? referenceNo;
+
+  @JsonKey(name: 'resultCode')
+  final String? resultCode;
+
+  @JsonKey(name: 'gbpReferenceNo')
+  final String? gbpReferenceNo;
+
+  @JsonKey(name: 'qrcode')
+  final String? qrcode;
+
+  @JsonKey(name: 'wechat')
+  final String? wechat;
+
+  @JsonKey(name: 'resultMessage')
+  final String? resultMessage;
+
+  ResponsePayload({
+    this.referenceNo,
+    this.resultCode,
+    this.gbpReferenceNo,
+    this.qrcode,
+    this.wechat,
+    this.resultMessage,
+  });
+
+  factory ResponsePayload.fromJson(Map<String, dynamic> json) =>
+      _$ResponsePayloadFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ResponsePayloadToJson(this);
+
+  /// ตรวจสอบว่าเป็นผลสำเร็จหรือไม่
+  bool get isSuccess => resultCode?.toLowerCase() == '00';
 }

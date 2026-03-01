@@ -1,11 +1,6 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/login_customer_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';

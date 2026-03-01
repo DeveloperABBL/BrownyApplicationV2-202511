@@ -347,5 +347,9 @@
   "addOrSelect": "添加/选择",
   "participatingStoresOnly": "仅限参与门店",
   "select": "选择",
-  "startOperation": "开始运行"
+  "startOperation": "开始运行",
+  "estimatedCompletion": "预计完成",
+  "completed": "完成",
+  "selectedService": "所选服务",
+  "approximateRemainingTime": "大约剩余时间"
 }

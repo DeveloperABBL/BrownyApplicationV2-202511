@@ -9,24 +9,49 @@ part 'notification_preferences_response.g.dart';
 
 @JsonSerializable()
 class NotificationPreferencesResponse {
-  @JsonKey(name: 'notify_machine_done')
-  final int? notifyMachineDone;
+  @JsonKey(name: 'success')
+  final bool? success;
 
-  @JsonKey(name: 'notify_news')
-  final int? notifyNews;
-
-  @JsonKey(name: 'notify_promotion')
-  final int? notifyPromotion;
+  @JsonKey(name: 'data')
+  final NotificationPreferencesData? data;
 
   NotificationPreferencesResponse({
-    this.notifyMachineDone,
-    this.notifyNews,
-    this.notifyPromotion,
+    this.success,
+    this.data,
   });
 
   factory NotificationPreferencesResponse.fromJson(
     Map<String, dynamic> json,
   ) => _$NotificationPreferencesResponseFromJson(json);
+
   Map<String, dynamic> toJson() =>
       _$NotificationPreferencesResponseToJson(this);
+}
+
+@JsonSerializable()
+class NotificationPreferencesData {
+  @JsonKey(name: 'notify_general')
+  final int? notifyGeneral;
+
+  @JsonKey(name: 'notify_promotion')
+  final int? notifyPromotion;
+
+  @JsonKey(name: 'notify_news')
+  final int? notifyNews;
+
+  @JsonKey(name: 'notify_machine_done')
+  final int? notifyMachineDone;
+
+  NotificationPreferencesData({
+    this.notifyGeneral,
+    this.notifyPromotion,
+    this.notifyNews,
+    this.notifyMachineDone,
+  });
+
+  factory NotificationPreferencesData.fromJson(
+    Map<String, dynamic> json,
+  ) => _$NotificationPreferencesDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NotificationPreferencesDataToJson(this);
 }

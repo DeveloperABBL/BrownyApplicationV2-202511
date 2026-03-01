@@ -347,5 +347,9 @@
     "addOrSelect": "Add/Select",
     "participatingStoresOnly": "Participating stores only",
     "select": "Select",
-    "startOperation": "Start operation"
+    "startOperation": "Start operation",
+    "estimatedCompletion": "Estimated Completion",
+    "completed": "Completed",
+    "selectedService": "Selected Service",
+    "approximateRemainingTime": "Approximate Remaining Time"
 }

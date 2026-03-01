@@ -90,4 +90,19 @@ class AppLocalStorage with AppLocalStoreMixin {
   void write<W>({required String key, required W value}) {
     Hive.box(_boxKey).put(key, value);
   }
+
+  // ========== Preference Keys ==========
+  static const String _saveSlipAutoKey = 'save_slip_auto';
+
+  // ========== Save Slip Auto Preference ==========
+
+  /// ตรวจสอบว่าเปิดบันทึก Slip อัตโนมัติหรือไม่
+  bool isSaveSlipAutoEnabled() {
+    return read<bool>(_saveSlipAutoKey, defaultValue: true) ?? true;
+  }
+
+  /// เปิด/ปิดการบันทึก Slip อัตโนมัติ
+  void setSaveSlipAutoEnabled(bool enabled) {
+    write<bool>(key: _saveSlipAutoKey, value: enabled);
+  }
 }

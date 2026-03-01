@@ -1060,4 +1060,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get startOperation => 'เริ่มต้นทำงาน';
+
+  @override
+  String get estimatedCompletion => 'เสร็จโดยประมาณ';
+
+  @override
+  String get completed => 'สำเร็จ';
+
+  @override
+  String get selectedService => 'บริการที่เลือก';
+
+  @override
+  String get approximateRemainingTime => 'เวลาที่เหลือโดยประมาณ';
 }

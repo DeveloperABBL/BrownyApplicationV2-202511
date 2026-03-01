@@ -1039,4 +1039,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get startOperation => '开始运行';
+
+  @override
+  String get estimatedCompletion => '预计完成';
+
+  @override
+  String get completed => '完成';
+
+  @override
+  String get selectedService => '所选服务';
+
+  @override
+  String get approximateRemainingTime => '大约剩余时间';
 }

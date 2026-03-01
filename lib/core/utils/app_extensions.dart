@@ -339,6 +339,17 @@ extension StringExtension on String? {
   String ifEmpty(String value) => orEmpty.isEmpty ? value : this!;
 
   String commaReplacer() => ifEmpty('').replaceAll(',', '');
+
+  /// DONG 2026-02-28
+  ///
+  /// ใช้สำหรับ parse String to DateTime Object
+  DateTime? convertToDateTime(String pattern, String locale) {
+    try {
+      return DateFormat(pattern, locale).parse(this!);
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 /// Extension สำหรับจัดรูปแบบวันที่ (DateTime)

@@ -54,6 +54,50 @@ class DateTimeConverter implements JsonConverter<DateTime?, String?> {
   }
 }
 
+class DateTimeStartWithDayConverter
+    implements JsonConverter<DateTime?, String?> {
+  const DateTimeStartWithDayConverter();
+
+  @override
+  DateTime? fromJson(String? json) {
+    if (json == null || json.isEmpty) {
+      return null;
+    }
+
+    try {
+      return DateTime.parse(json);
+    } catch (_) {
+      // ถ้า parse ไม่ได้ ให้ลอง parse ด้วย format ข้างล่างต่อก่อน
+    }
+
+    try {
+      return DateFormat(
+        'dd-MM-yyyy HH:mm:ss',
+      ).parse(json);
+    } catch (_) {
+      // ถ้า parse ไม่ได้ ให้ลอง parse ด้วย format ข้างล่างต่อก่อน
+    }
+
+    try {
+      return DateFormat(
+        'dd-MM-yyyy / HH:mm',
+      ).parse(json);
+    } catch (e) {
+      // ถ้า parse ไม่ได้ ให้ return null
+      return null;
+    }
+  }
+
+  @override
+  String? toJson(DateTime? object) {
+    if (object == null) {
+      return null;
+    }
+
+    return object.toIso8601String();
+  }
+}
+
 /// Converter สำหรับ DateTime ที่ไม่ nullable
 class DateTimeConverterNonNull implements JsonConverter<DateTime, String> {
   const DateTimeConverterNonNull();

@@ -15,14 +15,25 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 
 class ScannerPage extends StatelessWidget {
-  const ScannerPage({super.key});
+  const ScannerPage({
+    super.key,
+    this.initialIndex = 0,
+  });
+
+  final int initialIndex;
 
   static final pagePath = '/scanner';
   static final pageName = 'scannerPage';
 
   /// util function route to pageName
-  static Future<T?> goToPage<T>(BuildContext context) async {
-    return await context.pushNamed(ScannerPage.pageName);
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    int initialIndex = 0,
+  }) async {
+    return await context.pushNamed(
+      ScannerPage.pageName,
+      extra: initialIndex,
+    );
   }
 
   @override
@@ -32,14 +43,16 @@ class ScannerPage extends StatelessWidget {
         context: context,
         repo: CustomerDataRepo(),
       ),
-      child: _ScannerWidget(),
+      child: _ScannerWidget(initialIndex: initialIndex),
     );
   }
 }
 
 class _ScannerWidget extends StatefulWidget {
-  const _ScannerWidget();
-
+  const _ScannerWidget({
+    this.initialIndex = 0,
+  });
+  final int initialIndex;
   @override
   State<_ScannerWidget> createState() => __ScannerWidgetState();
 }
@@ -53,6 +66,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
     super.initState();
     _viewModel = context.read<ScannerViewModel>();
     _viewModel.attachContext(context);
+    _viewModel.onTabChanged(widget.initialIndex);
 
     // Initialize camera controller
     _viewModel.cameraController = MobileScannerController(
@@ -96,7 +110,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      initialIndex: 0,
+      initialIndex: widget.initialIndex,
       child: ValueListenableBuilder(
         valueListenable: _viewModel.selectedTab,
         builder: (context, tabIndex, _) {
@@ -107,9 +121,14 @@ class __ScannerWidgetState extends State<_ScannerWidget>
             persistentFooterButtons: [
               tabIndex == 0
                   ? _buildBottomButtons(context)
-                  : ElevatedButton(
-                      onPressed: () => context.pop(),
-                      child: AppText(context.wording.backToHome),
+                  : Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_16.w,
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () => context.pop(),
+                        child: AppText(context.wording.backToHome),
+                      ),
                     ),
             ],
             backgroundColor: AppColors.background,

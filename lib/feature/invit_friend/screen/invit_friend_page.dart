@@ -248,7 +248,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                           ),
                         ).then((_) {
                           // Show a SnackBar to confirm the action
-                          if (mounted) {
+                          if (context.mounted) {
                             ScaffoldMessenger.of(
                               context,
                             ).showSnackBar(

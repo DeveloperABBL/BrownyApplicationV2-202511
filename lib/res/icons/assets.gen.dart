@@ -366,6 +366,14 @@ class $AssetsPngGen {
   AssetGenImage get brownyMachineError2 =>
       const AssetGenImage('assets/png/browny_machine_error2.png');
 
+  /// File path: assets/png/browny_moto.png
+  AssetGenImage get brownyMoto =>
+      const AssetGenImage('assets/png/browny_moto.png');
+
+  /// File path: assets/png/browny_progress_circle.png
+  AssetGenImage get brownyProgressCircle =>
+      const AssetGenImage('assets/png/browny_progress_circle.png');
+
   /// File path: assets/png/browny_promotion.png
   AssetGenImage get brownyPromotion =>
       const AssetGenImage('assets/png/browny_promotion.png');
@@ -485,6 +493,8 @@ class $AssetsPngGen {
     brownyLogoAndroid,
     brownyMachineError1,
     brownyMachineError2,
+    brownyMoto,
+    brownyProgressCircle,
     brownyPromotion,
     brownySuccess,
     brownySuccess1,
@@ -551,6 +561,10 @@ class $AssetsServicesGen {
   AssetGenImage get bDryer =>
       const AssetGenImage('assets/services/b_dryer.png');
 
+  /// File path: assets/services/banner_dryer_extend_time.png
+  AssetGenImage get bannerDryerExtendTime =>
+      const AssetGenImage('assets/services/banner_dryer_extend_time.png');
+
   /// File path: assets/services/c_charger.png
   AssetGenImage get cCharger =>
       const AssetGenImage('assets/services/c_charger.png');
@@ -574,6 +588,7 @@ class $AssetsServicesGen {
   List<dynamic> get values => [
     aWasher,
     bDryer,
+    bannerDryerExtendTime,
     cCharger,
     icDryer,
     icWasher,

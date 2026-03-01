@@ -332,6 +332,8 @@ class AppColors {
 
   static const Color yellow2 = Color(0xFFFFCD46); // #FFCD46
 
+  static const Color yellow3 = Color(0xFFFFC21F); // #FFC21F
+
   // ============================================================================
   // Status Colors
   // ============================================================================

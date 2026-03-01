@@ -15,6 +15,7 @@ CouponOrderResponse _$CouponOrderResponseFromJson(Map<String, dynamic> json) =>
           : CouponOrderData.fromJson(json['data'] as Map<String, dynamic>),
       walletBalance: (json['wallet_balance'] as num?)?.toDouble(),
       redirectUrl: json['redirect_url'] as String?,
+      qrAndWechat: json['qr_and_wechat'] as String?,
       paid: json['paid'] as bool?,
       priceRequired: (json['price_required'] as num?)?.toDouble(),
     );
@@ -27,6 +28,7 @@ Map<String, dynamic> _$CouponOrderResponseToJson(
   'data': instance.data,
   'wallet_balance': instance.walletBalance,
   'redirect_url': instance.redirectUrl,
+  'qr_and_wechat': instance.qrAndWechat,
   'paid': instance.paid,
   'price_required': instance.priceRequired,
 };
@@ -44,7 +46,11 @@ CouponOrderData _$CouponOrderDataFromJson(Map<String, dynamic> json) =>
       paymentStatus: json['payment_status'] as String?,
       paymentRef: json['payment_ref'] as String?,
       gatewayTransactionId: json['gateway_transaction_id'] as String?,
-      responsePayload: json['response_payload'],
+      responsePayload: json['response_payload'] == null
+          ? null
+          : ResponsePayload.fromJson(
+              json['response_payload'] as Map<String, dynamic>,
+            ),
       respondedAt: json['responded_at'] as String?,
       receiptNo: json['receipt_no'] as String?,
       receiptAt: json['receipt_at'] as String?,
@@ -71,4 +77,24 @@ Map<String, dynamic> _$CouponOrderDataToJson(CouponOrderData instance) =>
       'receipt_at': instance.receiptAt,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
+    };
+
+ResponsePayload _$ResponsePayloadFromJson(Map<String, dynamic> json) =>
+    ResponsePayload(
+      referenceNo: json['referenceNo'] as String?,
+      resultCode: json['resultCode'] as String?,
+      gbpReferenceNo: json['gbpReferenceNo'] as String?,
+      qrcode: json['qrcode'] as String?,
+      wechat: json['wechat'] as String?,
+      resultMessage: json['resultMessage'] as String?,
+    );
+
+Map<String, dynamic> _$ResponsePayloadToJson(ResponsePayload instance) =>
+    <String, dynamic>{
+      'referenceNo': instance.referenceNo,
+      'resultCode': instance.resultCode,
+      'gbpReferenceNo': instance.gbpReferenceNo,
+      'qrcode': instance.qrcode,
+      'wechat': instance.wechat,
+      'resultMessage': instance.resultMessage,
     };

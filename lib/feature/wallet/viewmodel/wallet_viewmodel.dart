@@ -112,7 +112,7 @@ class WalletViewModel extends AppViewModelObscureHandler {
         TopupRequest(
           customerId: currentCustomerProvider.current.id!,
           amount: int.parse(amountController.text.commaReplacer()),
-          gateway: 'promptpay',
+          gateway: 'qr',
         ),
       );
 

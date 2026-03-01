@@ -1,5 +1,5 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claim_response.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:intl/intl.dart';
 
 // {
@@ -158,7 +158,7 @@ class CoinDataModel extends CoinClaimData {
                 .formatDateLocale(locale, pattern: 'dd MMM');
           }
         } catch (e) {
-          print(e);
+          debugPrint(e.toString());
         }
       }
 

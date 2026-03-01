@@ -1,11 +1,13 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 enum HomePageState { home, couponVoucher, scan, branches, brownyShop }
@@ -27,6 +29,7 @@ class HomePageViewmodel extends AppViewModel {
     _bannerNotifier.dispose();
     _bannerHighlightNotifier.dispose();
     _categoriesNotifier.dispose();
+    _workingMachinesNotifier.dispose();
     super.dispose();
   }
 
@@ -63,6 +66,14 @@ class HomePageViewmodel extends AppViewModel {
   ValueListenable<UiResult<List<CategoryData>>> get categoriesNotifier =>
       _categoriesNotifier;
 
+  /// Notifier fetch working machines (เครื่องที่กำลังทำงาน)
+  final ValueNotifier<UiResult<WorkingMachinesResponse>>
+  _workingMachinesNotifier = ValueNotifier(
+    UiResult.loading(),
+  );
+  ValueListenable<UiResult<WorkingMachinesResponse>>
+  get workingMachinesNotifier => _workingMachinesNotifier;
+
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
   }
@@ -86,6 +97,7 @@ class HomePageViewmodel extends AppViewModel {
   Future<void> refresh() async {
     await fetchBanners();
     await fetchBannersHighlight();
+    await fetchWorkingMachines();
     final profileResult = await _repo.fetchProfileInfo('');
     if (profileResult.isSuccess) {
       currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
@@ -209,5 +221,45 @@ class HomePageViewmodel extends AppViewModel {
   /// บันทึกว่า popup list นี้ถูก dismiss สำหรับวันนี้
   void dismissPopupsForToday(List<PopupData> popups) {
     _repo.dismissPopupsForToday(popups);
+  }
+
+  /// DONG 2026-02-28
+  ///
+  /// API fetch รายการเครื่องที่กำลังทำงาน
+  ///
+  /// จะแสดงเครื่องที่กำลังทำงานของ user ปัจจุบัน
+  Future<void> fetchWorkingMachines() async {
+    try {
+      _workingMachinesNotifier.value = UiResult.loading();
+
+      // ดึง customer_id และ notification_token
+      final customerId = currentCustomerProvider.current.id;
+      final notificationToken = await FirebaseMessaging.instance.getToken();
+
+      // ต้องมีค่าใดค่านึง
+      if (customerId.orEmpty.isEmpty && notificationToken.orEmpty.isEmpty) {
+        _workingMachinesNotifier.value = UiResult.empty();
+        return;
+      }
+
+      final result = await _repo.fetchWorkingMachines(
+        customerId: customerId,
+        notificationToken: notificationToken,
+      );
+
+      if (result.hasError) {
+        _workingMachinesNotifier.value = UiResult.error(error: result.error);
+        return;
+      }
+
+      if (result.isEmpty) {
+        _workingMachinesNotifier.value = UiResult.empty();
+        return;
+      }
+
+      _workingMachinesNotifier.value = UiResult.success(data: result.data);
+    } on Exception catch (e) {
+      _workingMachinesNotifier.value = UiResult.error(error: e);
+    }
   }
 }

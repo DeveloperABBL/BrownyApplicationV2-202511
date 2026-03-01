@@ -1,10 +1,9 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/converters/marker_icon_converter.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/store_location_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -81,7 +80,7 @@ class MapRepo extends AppRepository with MapDataSourceMixin {
 
           typeToIcons[type] = icons;
         } catch (e) {
-          print('Error downloading icons for type $type: $e');
+          debugPrint('Error downloading icons for type $type: $e');
           // ถ้า download ไม่ได้ ให้ใช้ default marker
           typeToIcons[type] = {
             'active': null,

@@ -347,5 +347,9 @@
     "addOrSelect": "เพิ่ม/เลือก",
     "participatingStoresOnly": "เฉพาะสาขาที่ร่วมรายการ",
     "select": "เลือก",
-    "startOperation": "เริ่มต้นทำงาน"
+    "startOperation": "เริ่มต้นทำงาน",
+    "estimatedCompletion": "เสร็จโดยประมาณ",
+    "completed": "สำเร็จ",
+    "selectedService": "บริการที่เลือก",
+    "approximateRemainingTime": "เวลาที่เหลือโดยประมาณ"
 }

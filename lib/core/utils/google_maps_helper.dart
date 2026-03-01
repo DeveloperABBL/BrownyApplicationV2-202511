@@ -62,7 +62,7 @@ class GoogleMapsHelper {
       circleId: CircleId(circleId),
       center: center,
       radius: radius,
-      fillColor: fillColor ?? Colors.blue.withOpacity(0.2),
+      fillColor: fillColor ?? Colors.blue.withValues(alpha: 0.2),
       strokeColor: strokeColor ?? Colors.blue,
       strokeWidth: strokeWidth.round(),
     );

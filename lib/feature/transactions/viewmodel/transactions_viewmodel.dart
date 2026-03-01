@@ -1,24 +1,12 @@
 import 'dart:async';
 
-import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/machine_order_request.dart';
-import 'package:browny_applications_new/core/data/remote/models/request/machine_order_review_request.dart';
+import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/machine_order_receipt_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/machine_order_response.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/payment_transaction_state.dart';
-import 'package:browny_applications_new/core/utils/location_helper.dart';
-import 'package:browny_applications_new/core/utils/permission_helper.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
-import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_list_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
@@ -32,13 +20,8 @@ import 'package:browny_applications_new/feature/transactions/screens/coupons_evo
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/models/user_model.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
 
@@ -335,7 +318,6 @@ class TransactionsViewmodel extends AppViewModel
         // User denied permission
         AppOverlays.showBrownyDialog(
           context,
-          imageAsset: Assets.png.brownyError2.path,
           title: 'ไม่สามารถเข้าถึงตำแหน่งได้',
           message: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
           confirmText: 'เปิด Setting',

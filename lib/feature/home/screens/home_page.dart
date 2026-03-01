@@ -5,12 +5,16 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
+import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
+import 'package:browny_applications_new/feature/home/models/customer_services_working_model.dart';
+import 'package:browny_applications_new/feature/home/screens/app_notifications_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_status_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
@@ -61,6 +65,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewmodel.fetchBannersHighlight();
+      await _viewmodel.fetchWorkingMachines();
 
       if (mounted) {
         final showInvitFriendToday = await _viewmodel
@@ -205,20 +210,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     ),
                     GestureDetector(
                       onTap: () {
-                        if (_viewmodel.isProfileGuest()) {
-                          context.pushNamed(
-                            AuthenticationPage.pageName,
-                            extra: {
-                              AuthenProcess: AuthenProcess.login,
-                            },
-                          );
-                        } else {
-                          // context.pushNamed(CouponVoucherPage.pageName);
-                          CouponVoucherPage.goToPage(
-                            context,
-                          );
-                        }
-
+                        // context.pushNamed(CouponVoucherPage.pageName);
+                        CouponVoucherPage.goToPage(
+                          context,
+                        );
                         // _showInvitBottomSheet();
                       },
                       // banner เก็บคูปอง
@@ -247,63 +242,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
               ),
             ),
 
-            // สถานะบริการ
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                  top: AppDims.size_8.h,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      child: ElevatedButton.icon(
-                        onPressed: null,
-                        icon: Assets.svg.icRefreshRoundGreen.svg(),
-                        label: Column(
-                          children: [
-                            AppText(
-                              // สถานะการใช้งาน
-                              context.wording.usageStatus,
-                              style: context.textTheme.labelLarge,
-                            ),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.transparent,
-                          foregroundColor: AppColors.primary,
-                          alignment: AlignmentDirectional.centerStart,
-                          padding: EdgeInsets.zero,
-                          disabledBackgroundColor: AppColors.transparent,
-                          overlayColor: AppColors.transparent,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: AppToggleWidget(),
-                    ),
-                    AppDims.vericalPadding_8,
-
-                    Align(
-                      alignment: Alignment.center,
-                      child: Assets.png.brownyWashy.image(
-                        width: AppDims.size_90.w,
-                      ),
-                    ),
-                    AppDims.vericalPadding_8,
-
-                    Align(
-                      alignment: Alignment.center,
-                      // #รักใครให้ซักผ้า
-                      child: AppText(context.wording.loveAnyoneDoLaundry),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // สถานะบริการ ที่กำลังใช้งาน
+            _buildServicesWorking(context),
 
             // สถานะบริการ
             SliverToBoxAdapter(
@@ -341,19 +281,19 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     ),
                     // TODO ต้องเอาออก
                     GestureDetector(
-                      // onTap: () {
-                      //   final data = Uri.parse(
-                      //     'http://brownypay.com/wash/dry/18',
-                      //   );
-                      //   if (data.pathSegments.isNotEmpty) {
-                      //     MachineTransactionPage2.goToPage(
-                      //       context,
-                      //       machineId: data.pathSegments.last,
-                      //     );
-                      //   }
+                      onTap: () {
+                        final data = Uri.parse(
+                          'http://brownypay.com/wash/dry/18',
+                        );
+                        if (data.pathSegments.isNotEmpty) {
+                          MachineTransactionPage2.goToPage(
+                            context,
+                            machineId: data.pathSegments.last,
+                          );
+                        }
 
-                      //   // MachineStatusPage.goToPage(context, machineId: '13');
-                      // },
+                        // MachineStatusPage.goToPage(context, machineId: '13');
+                      },
                       child: SizedBox(
                         height: AppDims.size_106.h,
                         child: ListView.separated(
@@ -395,6 +335,118 @@ class _HomePageWidgetState extends State<HomePageWidget>
               return;
             }
           },
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildServicesWorking(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: AppDims.size_16.w,
+          right: AppDims.size_16.w,
+          top: AppDims.size_8.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: Assets.svg.icRefreshRoundGreen.svg(),
+                label: Column(
+                  children: [
+                    AppText(
+                      // สถานะการใช้งาน
+                      context.wording.usageStatus,
+                      style: context.textTheme.labelLarge,
+                    ),
+                  ],
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.transparent,
+                  foregroundColor: AppColors.primary,
+                  alignment: AlignmentDirectional.centerStart,
+                  padding: EdgeInsets.zero,
+                  disabledBackgroundColor: AppColors.transparent,
+                  overlayColor: AppColors.transparent,
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: AppToggleWidget(
+                data: [
+                  // ทั้งหมด
+                  AppToggleData(lable: 'ทั้งหมด', value: 0),
+                  // ซักอบ
+                  AppToggleData(lable: context.wording.sakob, value: 1),
+                  // การสั่งซื้อ
+                  AppToggleData(lable: 'การสั่งซื้อ', value: 2, enable: false),
+                ],
+                onChange: (index) {},
+              ),
+            ),
+
+            Align(
+              alignment: Alignment.center,
+              child: ValueListenableBuilder(
+                valueListenable: _viewmodel.workingMachinesNotifier,
+                builder: (context, result, child) {
+                  if (result.isLoading) {
+                    return CircularProgressIndicator();
+                  }
+
+                  if (result.isEmpty || result.hasError) {
+                    // รักใครให้ซักผ้า
+                    return Padding(
+                      padding: EdgeInsets.only(top: AppDims.size_12.h),
+                      child: Column(
+                        children: [
+                          Assets.png.brownyWashy.image(
+                            width: AppDims.size_90.w,
+                          ),
+                          AppDims.vericalPadding_8,
+
+                          Align(
+                            alignment: Alignment.center,
+                            // #รักใครให้ซักผ้า
+                            child: AppText(context.wording.loveAnyoneDoLaundry),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final workingList = result.data!.data.orEmpty;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...List.generate(
+                        workingList.length,
+                        (index) =>
+                            // Single Item Card Service ที่กำลังทำงาน
+                            _CustomerServicesWorkingWidget(
+                              data:
+                                  CustomerServicesWorkingModel.fromWorkingMachineResponse(
+                                    workingList[index],
+                                  ),
+                              onTap: () {
+                                MachineStatusPage.goToPage(
+                                  context,
+                                  machineId: workingList[index].id!.toString(),
+                                );
+                              },
+                            ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            AppDims.vericalPadding_8,
+          ],
         ),
       ),
     );
@@ -451,24 +503,29 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 },
               ),
 
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+              GestureDetector(
+                onTap: () => CouponVoucherPage.goToPage(
+                  context,
                 ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscCoupon.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      // คูปอง
-                      context.wording.rewards,
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDims.size_8.w,
+                    vertical: AppDims.size_8.h,
+                  ),
+                  child: Column(
+                    children: [
+                      Assets.iconShortcut.iscCoupon.image(
+                        width: AppDims.size_64.w,
+                        height: AppDims.size_32.h,
+                      ),
+                      AppText(
+                        // คูปอง
+                        context.wording.rewards,
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -583,23 +640,30 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
               ),
 
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+              GestureDetector(
+                onTap: () => ScannerPage.goToPage(
+                  context,
+                  // เปิดหน้า QRCode
+                  initialIndex: 1,
                 ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscBrownyId.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      'Browny ID',
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDims.size_8.w,
+                    vertical: AppDims.size_8.h,
+                  ),
+                  child: Column(
+                    children: [
+                      Assets.iconShortcut.iscBrownyId.image(
+                        width: AppDims.size_64.w,
+                        height: AppDims.size_32.h,
+                      ),
+                      AppText(
+                        'Browny ID',
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -736,10 +800,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   //   _viewmodel,
                   // );
 
-                  NotificationHelper.showTestNotification(
-                    title: 'In-App Test Notification',
-                    body: 'body',
-                  );
+                  // NotificationHelper.showTestNotification(
+                  //   title: 'In-App Test Notification',
+                  //   body: 'body',
+                  // );
+
+                  AppNotificationsPage.goToPage(context);
                 },
                 icon: Assets.svg.icNotification.svg(
                   // เปลี่ยนสี svg
@@ -1196,5 +1262,187 @@ class _HomePageWidgetState extends State<HomePageWidget>
         ),
       ],
     );
+  }
+}
+
+class _CustomerServicesWorkingWidget extends StatefulWidget {
+  const _CustomerServicesWorkingWidget({
+    required this.data,
+    required this.onTap,
+  });
+
+  final CustomerServicesWorkingModel data;
+  final VoidCallback onTap;
+
+  @override
+  State<_CustomerServicesWorkingWidget> createState() =>
+      _CustomerServicesWorkingWidgetState();
+}
+
+class _CustomerServicesWorkingWidgetState
+    extends State<_CustomerServicesWorkingWidget> {
+  late final ValueNotifier<Duration> _countDownNotifier;
+
+  Timer? _statusUpdateTimer;
+
+  @override
+  void dispose() {
+    _countDownNotifier.dispose();
+    _statusUpdateTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _countDownNotifier = ValueNotifier(
+      widget.data.remainingTimeDuration,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _statusUpdateTimer?.cancel();
+
+      _statusUpdateTimer = Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) {
+          final currentDuration = _countDownNotifier.value;
+          if (currentDuration.inSeconds > 0) {
+            // อัพเดทเฉพาะ ValueNotifier ไม่ทำให้ rebuild ทั้ง widget
+            _countDownNotifier.value = Duration(
+              seconds: currentDuration.inSeconds - 1,
+            );
+          } else {
+            // หมดเวลาแล้ว หยุด timer
+            timer.cancel();
+          }
+        },
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: AppDims.size_8.h,
+      ),
+      padding: EdgeInsets.all(12.r),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Card แสดงรูปภาพ service
+          Container(
+            padding: EdgeInsets.symmetric(
+              vertical: AppDims.size_5.h,
+              horizontal: AppDims.size_12.w,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.r),
+              color: AppColors.border,
+            ),
+            child: Image.network(
+              // "https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
+              widget.data.machineImage,
+              width: AppDims.size_50.w,
+            ),
+          ),
+          AppDims.horizonPadding_8,
+
+          // Detail การใช้งาน
+          Expanded(
+            child: Column(
+              spacing: AppDims.size_4.h,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  widget.data.name.getTextByLocale(context.languageCode),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.labelLarge,
+                ),
+                Row(
+                  spacing: AppDims.size_8.w,
+                  children: [
+                    Expanded(
+                      child: AppText(
+                        // เวลาคงเหลือ
+                        context.wording.remainingTime,
+                        style: context.textTheme.labelMedium!.copyWith(
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ValueListenableBuilder(
+                        valueListenable: _countDownNotifier,
+                        builder: (context, duration, child) {
+                          return AppText(
+                            countDowntDisplay(duration),
+                            style: context.textTheme.labelMedium!.copyWith(
+                              color: AppColors.gray600,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  spacing: AppDims.size_8.w,
+                  children: [
+                    AppText(
+                      // เสร็จโดยประมาณ
+                      context.wording.estimatedCompletion,
+                      style: context.textTheme.labelMedium!.copyWith(
+                        color: AppColors.gray600,
+                      ),
+                    ),
+                    Expanded(
+                      child: AppText(
+                        widget.data.finishTime,
+                        style: context.textTheme.labelMedium!.copyWith(
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          AppDims.horizonPadding_16,
+
+          // Button ดู Detail
+          GestureDetector(
+            onTap: widget.onTap,
+            child: Container(
+              padding: EdgeInsets.all(8.r),
+              width: AppDims.size_26.w,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Assets.svg.icArrowForward.svg(
+                colorFilter: ColorFilter.mode(
+                  AppColors.background,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String countDowntDisplay(Duration duration) {
+    final totalSeconds = duration.inSeconds < 0 ? 0 : duration.inSeconds;
+    final hours = totalSeconds ~/ 3600;
+    final minute = (totalSeconds % 3600) ~/ 60;
+    final second = totalSeconds % 60;
+    String hourStr = hours < 10 ? '0$hours' : '$hours';
+    String minuteStr = minute < 10 ? '0$minute' : '$minute';
+    String secondStr = second < 10 ? '0$second' : '$second';
+
+    return '$hourStr : $minuteStr : $secondStr';
   }
 }

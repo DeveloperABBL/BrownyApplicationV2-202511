@@ -259,7 +259,16 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    AppOverlays.showWalletDialog(
+                      context,
+                      title: context.wording.cancelTransaction,
+                      message: context.wording.confirmCancelTransaction,
+                      confirmText: context.wording.confirm,
+                      cancelText: context.wording.cancel,
+                      onConfirm: () {
+                        context.pop();
+                      },
+                    );
                   },
                   style: context.appTheme.elevatedButtonTheme.style!.copyWith(
                     backgroundColor: WidgetStatePropertyAll(

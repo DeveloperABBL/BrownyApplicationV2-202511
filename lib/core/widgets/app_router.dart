@@ -14,6 +14,7 @@ import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/coin/viewmodel/coin_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
+import 'package:browny_applications_new/feature/home/screens/app_notifications_page.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
@@ -68,6 +69,11 @@ class AppRouter {
         builder: (context, state) => const HomePage(),
       ),
       GoRoute(
+        path: AppNotificationsPage.pagePath,
+        name: AppNotificationsPage.pageName,
+        builder: (context, state) => const AppNotificationsPage(),
+      ),
+      GoRoute(
         path: AuthenticationPage.pagePath,
         name: AuthenticationPage.pageName,
         builder: (context, state) {
@@ -84,7 +90,7 @@ class AppRouter {
           try {
             final extra = state.extra as Map<String, dynamic>?;
             isEditing = extra?[ProfilePage.kFirstSignup];
-          } catch (ignore) {}
+          } catch (_) {}
           return ProfilePage(isFirstSignup: isEditing);
         },
       ),
@@ -106,7 +112,7 @@ class AppRouter {
             final extra = state.extra as Map<String, dynamic>?;
             implementBackButton = extra?[CreateAppPinPage.kImplementBackButton];
             isFirstSignup = extra?[CreateAppPinPage.kFirstSignup];
-          } catch (ignore) {}
+          } catch (_) {}
           try {
             final extra = state.extra as Map<String, dynamic>?;
             // {String, Map<Type, PinBiometricPross>}
@@ -179,7 +185,11 @@ class AppRouter {
               authenProcess: AuthenProcess.login,
             );
           }
-          return const ScannerPage();
+          int initIndex = 0;
+          try {
+            initIndex = state.extra as int;
+          } on Exception catch (_) {}
+          return ScannerPage(initialIndex: initIndex);
         },
       ),
       GoRoute(
@@ -307,7 +317,11 @@ class AppRouter {
       GoRoute(
         path: TransactionAuthenPage.pagePath,
         name: TransactionAuthenPage.pageName,
-        builder: (context, state) => TransactionAuthenPage(),
+        builder: (context, state) {
+          return TransactionAuthenPage(
+            process: state.extra as PinBiometricPross,
+          );
+        },
       ),
       GoRoute(
         path: ArticlesPage.pagePath,

@@ -47,6 +47,26 @@ class CreateAppPinPage extends StatelessWidget {
   final bool isFirstSignup;
   final PinBiometricPross process;
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    bool isFirstSingup = false,
+    required PinBiometricPross process,
+  }) async {
+    return await context.pushNamed(
+      // Transaction Create PIN
+      CreateAppPinPage.pageName,
+      extra: {
+        // ไม่ใช้การ signup ใหม่
+        CreateAppPinPage.kFirstSignup: isFirstSingup,
+        // Map<Type, PinBiometricPross>
+        CreateAppPinPage.kPinBiometricProcess: {
+          PinBiometricPross: process,
+        },
+      },
+    );
+  }
+
   static final pagePath = '/create_app_pin';
   static final pageName = 'create_app_pin';
   static final kImplementBackButton = 'kImplementBackButton';
@@ -290,9 +310,14 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
 
   /// Get title text - สามารถ override ได้
   String _getTitleText(BuildContext context, PinBiometricViewModel viewModel) {
-    return viewModel.step == 1
-        ? context.wording.createNewPin
-        : context.wording.confirmNewPin;
+    if (widget.process == PinBiometricPross.verify ||
+        widget.process == PinBiometricPross.verifyByPin) {
+      return 'กรอกรหัส PIN 6 หลัก';
+    } else {
+      return viewModel.step == 1
+          ? context.wording.createNewPin
+          : context.wording.confirmNewPin;
+    }
   }
 
   /// แสดง Error Message

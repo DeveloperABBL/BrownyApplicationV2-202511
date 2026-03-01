@@ -80,6 +80,13 @@
 			"/// ```"
 		]
 	},
+	"Auto Comment generate": {
+		"prefix": "cmm",
+		"body": [
+			"// DONG ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+			"// $1",
+		]
+	},
 	"Auto Spearater": {
 		"prefix": "=s=",
 		"body": [
@@ -120,7 +127,6 @@
 			"}"
 		]
 	},
-
 	"Auto addPostFrameCallback": {
 		"prefix": "postframcallback",
 		"body": [

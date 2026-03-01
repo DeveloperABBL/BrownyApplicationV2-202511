@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'machine_order_response.g.dart';
@@ -61,6 +62,7 @@ class MachineOrderData {
     this.id,
     this.updatedAt,
     this.createdAt,
+    this.responsePayload,
   });
 
   @JsonKey(name: 'customer_id')
@@ -89,6 +91,9 @@ class MachineOrderData {
 
   @JsonKey(name: 'coupon_discount')
   final String? couponDiscount;
+
+  @JsonKey(name: 'response_payload')
+  final ResponsePayload? responsePayload;
 
   @JsonKey(name: 'system_discount')
   final String? systemDiscount;

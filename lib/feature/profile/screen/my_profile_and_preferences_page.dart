@@ -5,6 +5,7 @@ import 'package:browny_applications_new/feature/contacts/repository/contact_repo
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
+import 'package:browny_applications_new/feature/profile/repository/notification_preferences_repo.dart';
 import 'package:browny_applications_new/feature/profile/repository/profile_repo.dart';
 import 'package:browny_applications_new/feature/profile/screen/profile_page.dart';
 import 'package:browny_applications_new/feature/profile/viewmodel/profile_viewmodel.dart';
@@ -24,6 +25,7 @@ class MyProfileAndPreferencesPage extends StatelessWidget {
         context: context,
         repo: ProfileRepo(),
         contactRepo: ContactRepo(),
+        notificationPreferencesRepo: NotificationPreferencesRepo(),
       ),
       child: MyProfileAndPreferencesContent(),
     );
@@ -42,7 +44,8 @@ class MyProfileAndPreferencesContent extends StatefulWidget {
 }
 
 class _MyProfileAndPreferencesContentState
-    extends State<MyProfileAndPreferencesContent> {
+    extends State<MyProfileAndPreferencesContent>
+    with WidgetsBindingObserver {
   late final ProfileViewModel _viewModel;
 
   @override
@@ -51,9 +54,28 @@ class _MyProfileAndPreferencesContentState
     _viewModel = context.read();
     _viewModel.attachContext(context);
 
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewModel.fetchContactAndSupportLink();
+      await _viewModel.fetchNotificationPreferences();
+      await _viewModel.loadUserPreferences();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      await _viewModel.loadUserPreferences();
+    }
   }
 
   @override
@@ -263,7 +285,12 @@ class _MyProfileAndPreferencesContentState
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  _showQrCustomer(context);
+                                  ScannerPage.goToPage(
+                                    context,
+                                    // เปิด QR
+                                    initialIndex: 1,
+                                  );
+                                  // _showQrCustomer(context);
                                 },
                                 child: Assets.svg.icQrDummy.svg(
                                   width: AppDims.size_24.h,
@@ -725,45 +752,60 @@ class _MyProfileAndPreferencesContentState
             ),
 
             // Biometric Authentication
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icFace,
-              title: context.wording.allowBiometricAuth,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
+            ValueListenableBuilder<bool>(
+              valueListenable: _viewModel.biometricEnabledNotifier,
+              builder: (context, isBiometricEnabled, _) {
+                return _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icFace,
+                  title: context.wording.allowBiometricAuth,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: isBiometricEnabled,
+                    onChanged: (value) {
+                      _viewModel.toggleBiometric(value);
+                    },
+                  ),
+                  onTap: null,
+                );
+              },
             ),
 
             // Save Slip Auto
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icImport,
-              title: context.wording.autoSaveReceipt,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
+            ValueListenableBuilder<bool>(
+              valueListenable: _viewModel.saveSlipAutoNotifier,
+              builder: (context, isSaveSlipAutoEnabled, _) {
+                return _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icImport,
+                  title: context.wording.autoSaveReceipt,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: isSaveSlipAutoEnabled,
+                    onChanged: (value) {
+                      _viewModel.toggleSaveSlipAuto(value);
+                    },
+                  ),
+                  onTap: null,
+                );
+              },
             ),
 
             // Location Permission
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icLocation,
-              title: context.wording.locationAccess,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
+            ValueListenableBuilder<bool>(
+              valueListenable: _viewModel.locationPermissionNotifier,
+              builder: (context, isLocationEnabled, _) {
+                return _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icLocation,
+                  title: context.wording.locationAccess,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: isLocationEnabled,
+                    onChanged: (value) {
+                      _viewModel.toggleLocationPermission(value);
+                    },
+                  ),
+                  onTap: null,
+                );
+              },
             ),
 
             // Email Settings
@@ -872,74 +914,90 @@ class _MyProfileAndPreferencesContentState
           right: AppDims.size_16.w,
           bottom: AppDims.size_8.h,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppText(
-              context.wording.notifications,
-              style: _defaultPreferencesTextStyle,
-            ),
-            AppDims.vericalPadding_8,
+        child: ValueListenableBuilder(
+          valueListenable: _viewModel.notificationPreferencesNotifier,
+          builder: (context, result, _) {
+            // แสดง loading หรือ error ไม่ต้องทำอะไร ให้แสดง UI ปกติ
+            final data = result.data;
 
-            // Push Notifications
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icNotification,
-              title: context.wording.generalNotifications,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
-            ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  context.wording.notifications,
+                  style: _defaultPreferencesTextStyle,
+                ),
+                AppDims.vericalPadding_8,
 
-            // Promotions
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icDiscount,
-              title: context.wording.promotions,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
-            ),
+                // General Notifications (การแจ้งเตือนทั่วไป)
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icNotification,
+                  title: context.wording.generalNotifications,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: data?.notifyGeneral == 1,
+                    onChanged: (value) {
+                      _viewModel.updateNotificationPreferences(
+                        notifyGeneral: value,
+                      );
+                    },
+                  ),
+                  onTap: null,
+                ),
 
-            // News
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icAnnouncement,
-              title: context.wording.updates,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
-            ),
+                // Promotions (โปรโมชั่น)
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icDiscount,
+                  title: context.wording.promotions,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: data?.notifyPromotion == 1,
+                    onChanged: (value) {
+                      _viewModel.updateNotificationPreferences(
+                        notifyPromotion: value,
+                      );
+                    },
+                  ),
+                  onTap: null,
+                ),
 
-            // Order Status
-            _buildPreferenceItem(
-              leadingSvg: Assets.iconProfilePreferences.icRefreshCircular,
-              title: context.wording.workOrderStatus,
-              trailing: null,
-              suffixWidget: _buildSwitch(
-                value: true,
-                onChanged: (value) {
-                  // TODO: Handle biometric toggle
-                },
-              ),
-              onTap: null,
-            ),
+                // News (ข่าวสาร)
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icAnnouncement,
+                  title: context.wording.updates,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: data?.notifyNews == 1,
+                    onChanged: (value) {
+                      _viewModel.updateNotificationPreferences(
+                        notifyNews: value,
+                      );
+                    },
+                  ),
+                  onTap: null,
+                ),
 
-            AppDims.vericalPadding_12,
-            Divider(),
-          ],
+                // Order Status (สถานะคำสั่งซื้อ / เครื่องทำงานเสร็จ)
+                _buildPreferenceItem(
+                  leadingSvg: Assets.iconProfilePreferences.icRefreshCircular,
+                  title: context.wording.workOrderStatus,
+                  trailing: null,
+                  suffixWidget: _buildSwitch(
+                    value: data?.notifyMachineDone == 1,
+                    onChanged: (value) {
+                      _viewModel.updateNotificationPreferences(
+                        notifyMachineDone: value,
+                      );
+                    },
+                  ),
+                  onTap: null,
+                ),
+
+                AppDims.vericalPadding_12,
+                Divider(),
+              ],
+            );
+          },
         ),
       ),
     );
