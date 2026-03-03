@@ -26,6 +26,9 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
           json['usage_label'] as Map<String, dynamic>,
         ),
   icon: json['icon'] as String?,
+  name: json['name'] == null
+      ? null
+      : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
   packageName: json['package_name'] == null
       ? null
       : ContentLocalizeData.fromJson(
@@ -50,6 +53,7 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
   redemptionLimit: json['redemption_limit'] as String?,
   redeemPrice: json['redeem_price'] as String?,
   deliveryFee: json['delivery_fee'] as String?,
+  appliesTo: json['applies_to'] as String?,
 );
 
 Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
@@ -65,6 +69,7 @@ Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
       'type_label': instance.typeLabel,
       'usage_label': instance.usageLabel,
       'icon': instance.icon,
+      'name': instance.name,
       'package_name': instance.packageName,
       'description': instance.description,
       'image_url': instance.imageUrl,
@@ -77,6 +82,7 @@ Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
       'redemption_limit': instance.redemptionLimit,
       'redeem_price': instance.redeemPrice,
       'delivery_fee': instance.deliveryFee,
+      'applies_to': instance.appliesTo,
     };
 
 CouponStoreData _$CouponStoreDataFromJson(Map<String, dynamic> json) =>

@@ -35,10 +35,14 @@ class UpdateNotificationPreferencesData {
   @JsonKey(name: 'notify_promotion')
   final bool? notifyPromotion;
 
+  @JsonKey(name: 'notify_general')
+  final bool? notifyGeneral;
+
   UpdateNotificationPreferencesData({
     this.notifyMachineDone,
     this.notifyNews,
     this.notifyPromotion,
+    this.notifyGeneral,
   });
 
   factory UpdateNotificationPreferencesData.fromJson(

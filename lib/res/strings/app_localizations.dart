@@ -1936,6 +1936,24 @@ abstract class AppLocalizations {
   /// **'Sakob'**
   String get sakob;
 
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @orderPlacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get orderPlacement;
+
+  /// No description provided for @mine.
+  ///
+  /// In en, this message translates to:
+  /// **'My'**
+  String get mine;
+
   /// No description provided for @eVoucherDetails.
   ///
   /// In en, this message translates to:
@@ -2041,7 +2059,7 @@ abstract class AppLocalizations {
   /// No description provided for @loveAnyoneDoLaundry.
   ///
   /// In en, this message translates to:
-  /// **'#LoveAnyoneDoLaundry'**
+  /// **'#Love Anyone Do Laundry'**
   String get loveAnyoneDoLaundry;
 
   /// No description provided for @services.

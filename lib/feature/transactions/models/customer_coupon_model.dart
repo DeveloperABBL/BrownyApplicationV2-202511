@@ -16,6 +16,7 @@ class CustomerCouponModel extends CouponData {
     required super.typeLabel,
     super.usageLabel,
     required super.icon,
+    super.name,
     required super.packageName,
     required super.description,
     required super.imageUrl,
@@ -28,6 +29,7 @@ class CustomerCouponModel extends CouponData {
     super.redemptionLimit,
     super.redeemPrice,
     super.deliveryFee,
+    super.appliesTo,
     this.isSelected = false,
   });
 
@@ -50,6 +52,7 @@ class CustomerCouponModel extends CouponData {
       typeLabel: data.typeLabel,
       usageLabel: data.usageLabel,
       icon: data.icon,
+      name: data.name,
       packageName: data.packageName,
       description: data.description,
       imageUrl: data.imageUrl,
@@ -62,6 +65,7 @@ class CustomerCouponModel extends CouponData {
       redemptionLimit: data.redemptionLimit,
       redeemPrice: data.redeemPrice,
       deliveryFee: data.deliveryFee,
+      appliesTo: data.appliesTo,
       isSelected: isSelected,
     );
   }
@@ -78,6 +82,7 @@ class CustomerCouponModel extends CouponData {
     ContentLocalizeData? typeLabel,
     ContentLocalizeData? usageLabel,
     String? icon,
+    ContentLocalizeData? name,
     ContentLocalizeData? packageName,
     ContentLocalizeData? description,
     ContentLocalizeData? imageUrl,
@@ -90,6 +95,7 @@ class CustomerCouponModel extends CouponData {
     String? redemptionLimit,
     String? redeemPrice,
     String? deliveryFee,
+    String? appliesTo,
     bool? isSelected,
   }) {
     return CustomerCouponModel(
@@ -104,6 +110,7 @@ class CustomerCouponModel extends CouponData {
       typeLabel: typeLabel ?? this.typeLabel,
       usageLabel: usageLabel ?? this.usageLabel,
       icon: icon ?? this.icon,
+      name: name ?? this.name,
       packageName: packageName ?? this.packageName,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -116,8 +123,15 @@ class CustomerCouponModel extends CouponData {
       redemptionLimit: redemptionLimit ?? this.redemptionLimit,
       redeemPrice: redeemPrice ?? this.redeemPrice,
       deliveryFee: deliveryFee ?? this.deliveryFee,
+      appliesTo: appliesTo ?? this.appliesTo,
       isSelected: isSelected ?? this.isSelected,
     );
+  }
+
+  /// ดึง localized package name ตาม locale ปัจจุบัน
+  String nameDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    return name?.getByLocaleCode(locale) ?? '';
   }
 
   /// ดึง localized package name ตาม locale ปัจจุบัน
@@ -144,6 +158,20 @@ class CustomerCouponModel extends CouponData {
     return description?.getByLocaleCode(locale) ?? '';
   }
 
+  /// ดึง localized description
+  String couponDescriptionNonHTMLDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    String content = description?.getByLocaleCode(locale) ?? '';
+    return content
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'");
+  }
+
   /// ดึง localized image URL ตาม locale ปัจจุบัน
   String imageUrlDisplay(BuildContext context) {
     final locale = context.languageCode;
@@ -151,9 +179,27 @@ class CustomerCouponModel extends CouponData {
   }
 
   /// ดึง localized type label ตาม locale ปัจจุบัน
-  String typeLabelDisplay(BuildContext context) {
+  /// [mineText] - คำว่า "ของฉัน/Mine/我的" ที่ localized แล้ว จะถูกเพิ่มตาวโครงสร้างภาษา
+  String typeLabelDisplay(BuildContext context, {String? mineText}) {
     final locale = context.languageCode;
-    return typeLabel?.getByLocaleCode(locale) ?? '';
+    final typeText = typeLabel?.getByLocaleCode(locale) ?? '';
+
+    if (mineText == null || mineText.isEmpty || typeText.isEmpty) {
+      return typeText;
+    }
+
+    // จัดการตำแหน่งของ "mine" ตามโครงสร้างภาษา
+    switch (locale) {
+      case 'en':
+        // ภาษาอังกฤษ: "My" + type (prefix with space)
+        return '$mineText ${typeLabel!.en.orEmpty}';
+      case 'zh':
+        // ภาษาจีน: "我的" + type (prefix without space)
+        return '$mineText${typeLabel!.en.orEmpty}';
+      default:
+        // ภาษาไทย: type + "ของฉัน" (postfix with space)
+        return '${typeLabel!.en.orEmpty} $mineText';
+    }
   }
 
   String detailUsingDisplay(BuildContext context) {

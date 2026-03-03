@@ -88,20 +88,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   /// คำนวณค่าต่างๆ สำหรับ Slider จากข้อมูล MachineDetailResponse
   void _calculateSliderValues(MachineDetailResponse machineDetail) {
     try {
-      // แปลง startTime และ finishDatatime เป็น DateTime
+      // ใช้ startTime ที่เป็น DateTime โดยตรง
+      final startTime = machineDetail.startTime;
+
+      // แปลง finishDatatime จาก String เป็น DateTime
       final now = DateTime.now();
-      final startParts = machineDetail.startTime.orEmpty.split(':');
       final finishParts = machineDetail.finishDatatime.orEmpty.split(':');
 
-      if (startParts.length >= 2 && finishParts.length >= 2) {
-        final startTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          int.parse(startParts[0]),
-          int.parse(startParts[1]),
-        );
-
+      if (startTime != null && finishParts.length >= 2) {
         var finishTime = DateTime(
           now.year,
           now.month,

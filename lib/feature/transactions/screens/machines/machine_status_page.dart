@@ -83,7 +83,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
     _viewmodel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _viewmodel.fetchMachinePrograms(widget.machineId);
+      // await _viewmodel.fetchMachinePrograms(widget.machineId);
       await _loadThumbImage();
     });
   }
@@ -324,7 +324,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                   ),
                 ),
                 AppText(
-                  machineDetail.startTime.orEmpty,
+                  machineDetail.startTime?.formatForShow('HH:mm') ?? '-',
                   style: _textPrimary.copyWith(
                     color: AppColors.gray500,
                     fontSize: AppDims.size_12.sp,
@@ -464,6 +464,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                                     )
                                   : Image.network(
                                       result.data!.selectedProgram!.image!,
+                                      errorBuilder: (_, _, _) => SizedBox(),
                                     ),
                             );
                           },

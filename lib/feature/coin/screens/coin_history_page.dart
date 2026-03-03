@@ -106,7 +106,7 @@ class _CoinHistoryPageState extends State<CoinHistoryPage>
                       ),
                       AppDims.vericalPadding_8,
 
-                      // ช่องกรอก
+                      // ช่องแสดง expire
                       Row(
                         children: [
                           AppText(

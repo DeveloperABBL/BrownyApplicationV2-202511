@@ -95,54 +95,54 @@ class __MachineContentState extends State<_MachineContent>
 
     // Fetch coupon detail data with location
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final result = await _viewmodel.fetchMachineDetail(widget.machineId);
-      if (!mounted) return;
+      // final result = await _viewmodel.fetchMachineDetail(widget.machineId);
+      // if (!mounted) return;
 
-      if (result.hasError || result.isEmpty) {
-        await AppOverlays.showBrownyDialog(
-          context,
-          title: context.wording.errorOccurred,
-          message: context.wording.errorUi,
-          onConfirm: () {
-            if (!mounted) return;
-            context.pop();
-          },
-        );
-        return;
-      }
+      // if (result.hasError || result.isEmpty) {
+      //   await AppOverlays.showBrownyDialog(
+      //     context,
+      //     title: context.wording.errorOccurred,
+      //     message: context.wording.errorUi,
+      //     onConfirm: () {
+      //       if (!mounted) return;
+      //       context.pop();
+      //     },
+      //   );
+      //   return;
+      // }
 
-      final machine = result.data!;
+      // final machine = result.data!;
 
-      if (machine.isBusy) {
-        await AppOverlays.showBrownyDialog(
-          // เดิม: เครื่องกำลังทำงาน
-          context,
-          title: context.wording.theMachineIsWorking,
-          // เดิม: กรุณาลองเครื่องอื่น
-          message: context.wording.pleaseTryAnotherMachine,
-          onConfirm: () {
-            if (!mounted) return;
-            context.pop();
-          },
-        );
-        return;
-      }
+      // if (machine.isBusy) {
+      //   await AppOverlays.showBrownyDialog(
+      //     // เดิม: เครื่องกำลังทำงาน
+      //     context,
+      //     title: context.wording.theMachineIsWorking,
+      //     // เดิม: กรุณาลองเครื่องอื่น
+      //     message: context.wording.pleaseTryAnotherMachine,
+      //     onConfirm: () {
+      //       if (!mounted) return;
+      //       context.pop();
+      //     },
+      //   );
+      //   return;
+      // }
 
-      if (machine.isTimeOut) {
-        await AppOverlays.showBrownyDialog(
-          context,
-          imageAsset: Assets.png.brownyMachineError1.path,
-          // เดิม: เครื่องไม่สามารถใช้งานได้ในขณะนี้
-          title: context.wording.machineUnavailableAtTheMoment,
-          // เดิม: กรุณาลองเครื่องอื่น
-          message: context.wording.pleaseTryAnotherMachine,
-          onConfirm: () {
-            if (!mounted) return;
-            context.pop();
-          },
-        );
-        return;
-      }
+      // if (machine.isTimeOut) {
+      //   await AppOverlays.showBrownyDialog(
+      //     context,
+      //     imageAsset: Assets.png.brownyMachineError1.path,
+      //     // เดิม: เครื่องไม่สามารถใช้งานได้ในขณะนี้
+      //     title: context.wording.machineUnavailableAtTheMoment,
+      //     // เดิม: กรุณาลองเครื่องอื่น
+      //     message: context.wording.pleaseTryAnotherMachine,
+      //     onConfirm: () {
+      //       if (!mounted) return;
+      //       context.pop();
+      //     },
+      //   );
+      //   return;
+      // }
 
       if (!mounted) return;
       await _viewmodel.fetchMachinePrograms(widget.machineId);
@@ -352,7 +352,8 @@ class __MachineContentState extends State<_MachineContent>
               );
             } else {
               // Show WebView
-              WebViewController? controller;
+              // WebViewController? controller;
+              LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
               await showModalBottomSheet(
                 context: context,
                 showDragHandle: true,
@@ -360,21 +361,52 @@ class __MachineContentState extends State<_MachineContent>
                 isScrollControlled: true,
                 isDismissible: false,
                 builder: (dialogContext) {
-                  controller = WebViewController()
-                    ..setJavaScriptMode(
-                      JavaScriptMode.unrestricted,
-                    )
-                    ..setBackgroundColor(AppColors.background)
-                    ..loadRequest(
-                      Uri.parse(orderResponse.redirectUrl!),
-                    );
+                  // controller = WebViewController()
+                  //   ..setJavaScriptMode(
+                  //     JavaScriptMode.unrestricted,
+                  //   )
+                  //   ..setBackgroundColor(AppColors.background)
+                  //   ..loadRequest(
+                  //     Uri.parse(orderResponse.redirectUrl!),
+                  //   );
                   return SizedBox(
                     height: 812.h * 0.85,
-                    child: WebViewWidget(controller: controller!),
+                    child: Scaffold(
+                      persistentFooterDecoration: BoxDecoration(),
+                      persistentFooterButtons: [
+                        SafeArea(
+                          top: false,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDims.size_16.w,
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () => dialogContext.pop(),
+                              child: AppText(context.wording.backToMainPage),
+                            ),
+                          ),
+                        ),
+                      ],
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: AppDims.size_8.h,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            CircularProgressIndicator(),
+
+                            AppText(
+                              'กำลังดำเนินการ กรุณารอซักครู่...',
+                              style: context.textTheme.labelLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
-              controller?.clearCache();
+              // controller?.clearCache();
             }
             _paymentProcessing = false;
             _stopPolling();

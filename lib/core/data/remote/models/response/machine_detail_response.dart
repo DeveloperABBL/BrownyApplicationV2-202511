@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/base_re
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -50,8 +51,9 @@ class MachineDetailResponse extends BaseModelResponse {
   @JsonKey(name: 'status')
   final String? status;
 
+  @DateTimeConverter()
   @JsonKey(name: 'startTime')
-  final String? startTime;
+  final DateTime? startTime;
 
   @JsonKey(name: 'finish_datatime')
   final String? finishDatatime;

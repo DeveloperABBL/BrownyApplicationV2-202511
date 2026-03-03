@@ -243,6 +243,11 @@ Terms and Conditions
 
     final currentData = _notificationPreferencesNotifier.value.data;
     if (currentData == null) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: context.wording.errorUi,
+      );
       return;
     }
 
@@ -259,8 +264,13 @@ Terms and Conditions
       final result = await notificationPreferencesRepo
           .updateNotificationPreferences(uuid, request);
 
-      if (result.hasError) {
+      if (context.mounted && result.hasError) {
         // แสดง error แต่ไม่ต้อง update UI (เก็บค่าเดิมไว้)
+        AppOverlays.showBrownyDialog(
+          context,
+          title: context.wording.errorOccurred,
+          message: context.wording.errorUi,
+        );
         return;
       }
 

@@ -55,7 +55,9 @@ class TransactionsViewmodel extends AppViewModel
     _showNearbyStoresNotifier.dispose();
     _evoucherForSellNotifier.dispose();
     _evoucherNotifier.dispose();
+    _discountNotifier.dispose();
     _transactionStateNotifier.dispose();
+    _inputCollectCouponNotifier.dispose();
     super.dispose();
   }
 
@@ -67,12 +69,19 @@ class TransactionsViewmodel extends AppViewModel
   ValueListenable<bool> get showNearbyStoresNotifier =>
       _showNearbyStoresNotifier;
 
-  late final ValueNotifier<UiResult<List<CustomerCouponModel>>>
+  late final ValueNotifier<UiResult<Map<String, List<CustomerCouponModel>>>>
   _evoucherNotifier = ValueNotifier(
     UiResult.loading(),
   );
-  ValueListenable<UiResult<List<CustomerCouponModel>>> get evoucherNotifier =>
-      _evoucherNotifier;
+  ValueListenable<UiResult<Map<String, List<CustomerCouponModel>>>>
+  get evoucherNotifier => _evoucherNotifier;
+
+  late final ValueNotifier<UiResult<Map<String, List<CustomerCouponModel>>>>
+  _discountNotifier = ValueNotifier(
+    UiResult.loading(),
+  );
+  ValueListenable<UiResult<Map<String, List<CustomerCouponModel>>>>
+  get discountNotifier => _discountNotifier;
 
   late final ValueNotifier<UiResult<CouponListModel>> _evoucherForSellNotifier =
       ValueNotifier(
@@ -112,6 +121,17 @@ class TransactionsViewmodel extends AppViewModel
   );
   ValueListenable<UiResult<PaymentTransactionState>>
   get transactionStateNotifier => _transactionStateNotifier;
+
+  /// Notifier สำหรับเก็บสถานะการ เปิด/ปิด ปุ่มรหัสคูปอง
+  late final ValueNotifier<bool> _inputCollectCouponNotifier = ValueNotifier(
+    false,
+  );
+  ValueListenable<bool> get inputCollectCouponNotifier =>
+      _inputCollectCouponNotifier;
+  late final TextEditingController _inputCollectCouponControler =
+      TextEditingController();
+  TextEditingController get inputCollectCouponControler =>
+      _inputCollectCouponControler;
 
   // ========== function, Logic ==========
   late CouponPackageItem _selectedCoupon;
@@ -389,6 +409,7 @@ class TransactionsViewmodel extends AppViewModel
   }
 
   /// Fetch ข้อมูล EVoucher ของ Customer
+  /// Returns Map grouped by couponId
   Future<void> fetchCustomerEVoucher() async {
     if (!evoucherNotifier.value.isLoading) {
       _evoucherNotifier.value = UiResult.loading();
@@ -408,52 +429,143 @@ class TransactionsViewmodel extends AppViewModel
       return;
     }
 
-    _evoucherNotifier.value = UiResult.success(
-      data: result.data.data!
-          // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
-          // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
-          .where(
-            (e) =>
-                customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
-                true,
-          )
-          .map(
-            (e) => CustomerCouponModel.fromCouponData(
-              e,
-              customerCouponModelSelected != null &&
-                  customerCouponModelSelected!.customerCouponId ==
-                      e.customerCouponId,
-            ),
-          )
-          .toList(),
-    );
+    // Filter และ map เป็น CustomerCouponModel ก่อน
+    final filteredCoupons = result.data.data!
+        // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
+        // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
+        .where(
+          (e) =>
+              customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
+              true,
+        )
+        .map(
+          (e) => CustomerCouponModel.fromCouponData(
+            e,
+            customerCouponModelSelected != null &&
+                customerCouponModelSelected!.customerCouponId ==
+                    e.customerCouponId,
+          ),
+        )
+        .toList();
+
+    // Group by typeLabel.en
+    final groupedMap = <String, List<CustomerCouponModel>>{};
+    for (var coupon in filteredCoupons) {
+      // Skip if typeLabel.en is null or empty
+      final key = coupon.typeLabel?.en;
+      if (key == null || key.isEmpty) continue;
+      groupedMap.putIfAbsent(key, () => []).add(coupon);
+    }
+
+    _evoucherNotifier.value = UiResult.success(data: groupedMap);
   }
 
   void onCustomerEVoucherSelected(CustomerCouponModel customerEVoucher) {
     customerCouponModelSelected = customerEVoucher;
-    final newCustomerEvoucher = _evoucherNotifier.value.data.orEmpty.map((e) {
-      return e.copyWith(isSelected: false);
+
+    // ถ้าไม่มี data ให้ return
+    if (!_evoucherNotifier.value.isSuccess ||
+        _evoucherNotifier.value.data == null) {
+      return;
+    }
+
+    final currentMap = _evoucherNotifier.value.data!;
+    final newMap = <String, List<CustomerCouponModel>>{};
+
+    // Iterate through each group and update isSelected
+    currentMap.forEach((typeKey, coupons) {
+      final updatedCoupons = coupons.map((e) {
+        return e.copyWith(
+          isSelected:
+              e.customerCouponId ==
+              customerCouponModelSelected!.customerCouponId,
+        );
+      }).toList();
+
+      newMap[typeKey] = updatedCoupons;
     });
 
-    _evoucherNotifier.value = UiResult.success(
-      data: newCustomerEvoucher
-          // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
-          // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
-          .where(
-            (e) =>
-                customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
-                true,
-          )
-          .map(
-            (e) => CustomerCouponModel.fromCouponData(
-              e,
-              customerCouponModelSelected != null &&
-                  customerCouponModelSelected!.customerCouponId ==
-                      e.customerCouponId,
-            ),
-          )
-          .toList(),
-    );
+    _evoucherNotifier.value = UiResult.success(data: newMap);
+  }
+
+  /// Fetch ข้อมูล Discount Coupon ของ Customer
+  /// Returns Map grouped by appliesTo (washer, dryer, both)
+  Future<void> fetchCustomerDiscount() async {
+    if (!discountNotifier.value.isLoading) {
+      _discountNotifier.value = UiResult.loading();
+    }
+
+    String id = currentCustomerProvider.current.id!;
+    final result = await _couponRepo.fetchCouponDiscount(id);
+    if (result.isEmpty || result.data.data.orEmpty.isEmpty) {
+      // ไม่ข้อมูล noti ด้วย empty
+      _discountNotifier.value = UiResult.empty();
+      return;
+    }
+
+    if (result.hasError) {
+      // มี error
+      _discountNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    // Filter และ map เป็น CustomerCouponModel ก่อน
+    final filteredCoupons = result.data.data!
+        // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
+        // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
+        .where(
+          (e) =>
+              customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
+              true,
+        )
+        .map(
+          (e) => CustomerCouponModel.fromCouponData(
+            e,
+            customerCouponModelSelected != null &&
+                customerCouponModelSelected!.customerCouponId ==
+                    e.customerCouponId,
+          ),
+        )
+        .toList();
+
+    // Group by appliesTo (washer, dryer, both)
+    final groupedMap = <String, List<CustomerCouponModel>>{};
+    for (var coupon in filteredCoupons) {
+      // Skip if appliesTo is null or empty
+      final key = coupon.appliesTo;
+      if (key == null || key.isEmpty) continue;
+      groupedMap.putIfAbsent(key, () => []).add(coupon);
+    }
+
+    _discountNotifier.value = UiResult.success(data: groupedMap);
+  }
+
+  void onCustomerDiscountSelected(CustomerCouponModel customerDiscount) {
+    customerCouponModelSelected = customerDiscount;
+
+    // ถ้าไม่มี data ให้ return
+    if (!_discountNotifier.value.isSuccess ||
+        _discountNotifier.value.data == null) {
+      return;
+    }
+
+    final currentMap = _discountNotifier.value.data!;
+    final newMap = <String, List<CustomerCouponModel>>{};
+
+    // Iterate through each group and update isSelected
+    currentMap.forEach((appliesTo, coupons) {
+      final updatedCoupons = coupons.map((e) {
+        return e.copyWith(
+          isSelected:
+              e.customerCouponId ==
+              customerCouponModelSelected!.customerCouponId,
+        );
+      }).toList();
+
+      newMap[appliesTo] = updatedCoupons;
+    });
+
+    _discountNotifier.value = UiResult.success(data: newMap);
   }
 
   /// dispose สำหรับหน้า [transaction_selecte_page]
@@ -725,5 +837,76 @@ class TransactionsViewmodel extends AppViewModel
     } catch (e) {
       return UiResult.error(error: Unprocessable(e.toString()));
     }
+  }
+
+  /// รับคูปองจาก code หรือ QR
+  ///
+  /// [type]: ประเภท (code/qr)
+  /// [data]: ข้อมูล URL หรือ QR code data
+  ///
+  /// Returns:
+  /// - UiResult.success: สำเร็จพร้อม CouponCollectResponse
+  /// - UiResult.error: เกิด error
+  /// - UiResult.empty: Customer ID ไม่พบหรือ API ไม่สำเร็จ
+  Future<void> collectCoupon([
+    String? data,
+    String type = 'code',
+  ]) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    AppOverlays.showLoading(context);
+
+    final customerId = currentCustomerProvider.current.id;
+    if (customerId == null || customerId.isEmpty) {
+      // return UiResult.error(
+      //   error: Exception('Customer ID not found'),
+      // );
+      AppOverlays.hideLoading();
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: '${context.wording.errorUi} : Customer ID not found',
+      );
+      return;
+    }
+
+    final result = await _couponRepo.collectCoupon(
+      type,
+      data ?? _inputCollectCouponControler.text,
+      customerId,
+    );
+
+    if (context.mounted && result.hasError) {
+      AppOverlays.hideLoading();
+      // return UiResult.error(error: result.error);
+      if (result.error is AuthenExceptions) {
+        AppOverlays.showBrownyDialog(
+          context,
+          title: context.wording.errorOccurred,
+          message: (result.error as AuthenExceptions).toUiMessage(context),
+        );
+      }
+
+      return;
+    }
+
+    if (context.mounted && result.isEmpty) {
+      AppOverlays.hideLoading();
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: context.wording.errorUi,
+      );
+    }
+
+    // รีเฟรชรายการคูปองหลังจากรับสำเร็จ
+    await fetchCustomerEVoucher();
+    await fetchCustomerDiscount();
+
+    AppOverlays.hideLoading();
+    // return UiResult.success(data: result.data);
+  }
+
+  void onInputCouponChange(String value) {
+    _inputCollectCouponNotifier.value = value.isNotEmpty;
   }
 }

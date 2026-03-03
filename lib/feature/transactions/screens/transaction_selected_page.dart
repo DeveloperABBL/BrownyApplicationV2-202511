@@ -14,7 +14,6 @@ import 'package:browny_applications_new/feature/transactions/screens/available_p
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class TransactionSelectedPage extends StatefulWidget {
   const TransactionSelectedPage({
@@ -225,7 +224,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
               );
             } else {
               // Show WebView
-              WebViewController? controller;
+              // WebViewController? controller;
+              LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
               await showModalBottomSheet(
                 context: context,
                 showDragHandle: true,
@@ -233,21 +233,52 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                 isScrollControlled: true,
                 isDismissible: false,
                 builder: (dialogContext) {
-                  controller = WebViewController()
-                    ..setJavaScriptMode(
-                      JavaScriptMode.unrestricted,
-                    )
-                    ..setBackgroundColor(AppColors.background)
-                    ..loadRequest(
-                      Uri.parse(orderResponse.redirectUrl!),
-                    );
+                  // controller = WebViewController()
+                  //   ..setJavaScriptMode(
+                  //     JavaScriptMode.unrestricted,
+                  //   )
+                  //   ..setBackgroundColor(AppColors.background)
+                  //   ..loadRequest(
+                  //     Uri.parse(orderResponse.redirectUrl!),
+                  //   );
                   return SizedBox(
                     height: 812.h * 0.85,
-                    child: WebViewWidget(controller: controller!),
+                    child: Scaffold(
+                      persistentFooterDecoration: BoxDecoration(),
+                      persistentFooterButtons: [
+                        SafeArea(
+                          top: false,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDims.size_16.w,
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () => dialogContext.pop(),
+                              child: AppText(context.wording.backToMainPage),
+                            ),
+                          ),
+                        ),
+                      ],
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: AppDims.size_8.h,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            CircularProgressIndicator(),
+
+                            AppText(
+                              'กำลังดำเนินการ กรุณารอซักครู่...',
+                              style: context.textTheme.labelLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
-              controller?.clearCache();
+              // controller?.clearCache();
             }
             _paymentProcessing = false;
             _stopPolling();

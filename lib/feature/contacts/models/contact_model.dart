@@ -53,6 +53,8 @@ enum ContactProvider {
         ).getByLocaleCode(locale)!;
       case ContactProvider.facebookLink:
         return ContentLocalizeData(
+          en: 'Facebook',
+          zh: 'Facebook',
           th: 'Facebook',
         ).getByLocaleCode(locale)!;
 
@@ -65,11 +67,15 @@ enum ContactProvider {
 
       case ContactProvider.youtubeLink:
         return ContentLocalizeData(
+          en: 'Youtube',
+          zh: 'Youtube',
           th: 'Youtube',
         ).getByLocaleCode(locale)!;
 
       case ContactProvider.tiktokLink:
         return ContentLocalizeData(
+          en: 'TikTok',
+          zh: 'TikTok',
           th: 'TikTok',
         ).getByLocaleCode(locale)!;
 

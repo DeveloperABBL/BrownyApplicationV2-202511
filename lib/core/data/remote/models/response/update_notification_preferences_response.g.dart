@@ -27,6 +27,7 @@ UpdateNotificationPreferencesData _$UpdateNotificationPreferencesDataFromJson(
   notifyMachineDone: json['notify_machine_done'] as bool?,
   notifyNews: json['notify_news'] as bool?,
   notifyPromotion: json['notify_promotion'] as bool?,
+  notifyGeneral: json['notify_general'] as bool?,
 );
 
 Map<String, dynamic> _$UpdateNotificationPreferencesDataToJson(
@@ -35,4 +36,5 @@ Map<String, dynamic> _$UpdateNotificationPreferencesDataToJson(
   'notify_machine_done': instance.notifyMachineDone,
   'notify_news': instance.notifyNews,
   'notify_promotion': instance.notifyPromotion,
+  'notify_general': instance.notifyGeneral,
 };

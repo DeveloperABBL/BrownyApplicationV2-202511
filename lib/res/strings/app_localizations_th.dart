@@ -945,6 +945,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get sakob => 'ซักอบ';
 
   @override
+  String get all => 'ทั้งหมด';
+
+  @override
+  String get orderPlacement => 'การสั่งซื้อ';
+
+  @override
+  String get mine => 'ของฉัน';
+
+  @override
   String get eVoucherDetails => 'รายละเอียด E-Voucher';
 
   @override

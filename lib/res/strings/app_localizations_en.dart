@@ -949,6 +949,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sakob => 'Sakob';
 
   @override
+  String get all => 'All';
+
+  @override
+  String get orderPlacement => 'Orders';
+
+  @override
+  String get mine => 'My';
+
+  @override
   String get eVoucherDetails => 'E-Voucher Details';
 
   @override
@@ -1000,7 +1009,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get usageStatus => 'Usage Status';
 
   @override
-  String get loveAnyoneDoLaundry => '#LoveAnyoneDoLaundry';
+  String get loveAnyoneDoLaundry => '#Love Anyone Do Laundry';
 
   @override
   String get services => 'Services';

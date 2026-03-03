@@ -19,6 +19,7 @@ import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmod
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
+import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_selected_page.dart';
@@ -186,10 +187,16 @@ class AppRouter {
             );
           }
           int initIndex = 0;
+          ScannerProcess process = ScannerProcess.machine;
           try {
-            initIndex = state.extra as int;
+            final listExtra = state.extra as List<Object>;
+            initIndex = listExtra[0] as int;
+            process = listExtra[1] as ScannerProcess;
           } catch (_) {}
-          return ScannerPage(initialIndex: initIndex);
+          return ScannerPage(
+            initialIndex: initIndex,
+            process: process,
+          );
         },
       ),
       GoRoute(

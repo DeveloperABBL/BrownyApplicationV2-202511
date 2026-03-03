@@ -11,9 +11,17 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
 
+enum ScannerProcess {
+  // Scan เพื่อสั่งทำงานเครื่อง
+  machine,
+  // ต้องการแค่ Result จากการ Detect
+  needResult,
+}
+
 class ScannerViewModel extends AppViewModel {
   ScannerViewModel({
     required super.context,
+    required this.process,
     required CustomerDataSourceMixin repo,
   }) : _repo = repo;
 
@@ -21,6 +29,8 @@ class ScannerViewModel extends AppViewModel {
   final MachineTransactionDataSourceMixin _machRepo = MachineRepo();
 
   // ========= valueNotifier, controller =========
+  final ScannerProcess process;
+
   late final ValueNotifier<UiResult<CustomerQRResponse>> _qrNotifier =
       ValueNotifier(
         UiResult.loading(),
@@ -148,6 +158,7 @@ class ScannerViewModel extends AppViewModel {
         debugPrint('QR Code detected: ${barcode.rawValue}');
 
         // Navigate to next page or process the data
+        // scan แล้วได้่ค่าเป็นว่าง
         if (barcode.rawValue.orEmpty.isEmpty) {
           AppOverlays.showBrownyDialog(
             context,
@@ -160,74 +171,87 @@ class ScannerViewModel extends AppViewModel {
         // Show result
         if (context.mounted) {
           try {
-            // จะได้เป็น URL มา เอามา parse เป็น URI ไว้เช็คเงื่อนไข
-            final uri = Uri.parse(barcode.rawValue!);
-            if (uri.pathSegments.isNotEmpty) {
-              AppOverlays.showLoading(context);
+            switch (process) {
+              case ScannerProcess.machine:
+                {
+                  // จะได้เป็น URL มา เอามา parse เป็น URI ไว้เช็คเงื่อนไข
+                  // parse เป็น Uri แล้วเช็คจาก path /wash/dry/{id}
+                  final uri = Uri.parse(barcode.rawValue!);
+                  // ดึงเอา path สุดท้ายมาใช้ {id}
+                  if (uri.pathSegments.isNotEmpty) {
+                    AppOverlays.showLoading(context);
 
-              final machineResult = await _machRepo.fetchMachineDetail(
-                uri.pathSegments.last,
-              );
-              if (!context.mounted) return;
-
-              AppOverlays.hideLoading();
-              if (machineResult.hasError || machineResult.isEmpty) {
-                await AppOverlays.showBrownyDialog(
-                  context,
-                  title: context.wording.errorOccurred,
-                  message: context.wording.errorUi,
-                  onConfirm: () {
+                    final machineResult = await _machRepo.checkMachineStatus(
+                      // uri.pathSegments.last,
+                      barcode.rawValue!,
+                    );
                     if (!context.mounted) return;
-                    context.pop();
-                    // Resume scanning after 2 seconds
-                    _resumeFlagScanning();
-                  },
-                );
-                return;
-              }
 
-              final machine = machineResult.data;
+                    AppOverlays.hideLoading();
+                    if (machineResult.hasError || machineResult.isEmpty) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        title: context.wording.errorOccurred,
+                        message: context.wording.errorUi,
+                        onConfirm: () {
+                          if (!context.mounted) return;
+                          context.pop();
+                          // Resume scanning after 2 seconds
+                          _resumeFlagScanning();
+                        },
+                      );
+                      return;
+                    }
 
-              if (machine.isBusy) {
-                await AppOverlays.showBrownyDialog(
-                  context,
-                  // เครื่องกำลังทำงาน
-                  title: context.wording.theMachineIsWorking,
-                  // กรุณาลองเครื่องอื่น
-                  message: context.wording.pleaseTryAnotherMachine,
-                  onConfirm: () {
-                    if (!context.mounted) return;
-                    context.pop();
-                    // Resume scanning after 2 seconds
-                    _resumeFlagScanning();
-                  },
-                );
-                return;
-              }
+                    final machine = machineResult.data;
 
-              if (machine.isTimeOut) {
-                await AppOverlays.showBrownyDialog(
-                  context,
-                  imageAsset: Assets.png.brownyMachineError1.path,
-                  // เครื่องไม่สามารถใช้งานได้ในขณะนี้
-                  title: context.wording.machineUnavailableAtTheMoment,
-                  // กรุณาลองเครื่องอื่น
-                  message: context.wording.pleaseTryAnotherMachine,
-                  onConfirm: () {
-                    if (!context.mounted) return;
-                    context.pop();
-                    // Resume scanning after 2 seconds
-                    _resumeFlagScanning();
-                  },
-                );
-                return;
-              }
+                    if (machine.isBusy) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        // เครื่องกำลังทำงาน
+                        title: context.wording.theMachineIsWorking,
+                        // กรุณาลองเครื่องอื่น
+                        message: context.wording.pleaseTryAnotherMachine,
+                        onConfirm: () {
+                          if (!context.mounted) return;
+                          context.pop();
+                          // Resume scanning after 2 seconds
+                          _resumeFlagScanning();
+                        },
+                      );
+                      return;
+                    }
 
-              MachineTransactionPage2.goReplacementPage(
-                context,
-                machineId: uri.pathSegments.last,
-              );
-              return;
+                    if (machine.isTimeOut) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        imageAsset: Assets.png.brownyMachineError1.path,
+                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                        title: context.wording.machineUnavailableAtTheMoment,
+                        // กรุณาลองเครื่องอื่น
+                        message: context.wording.pleaseTryAnotherMachine,
+                        onConfirm: () {
+                          if (!context.mounted) return;
+                          context.pop();
+                          // Resume scanning after 2 seconds
+                          _resumeFlagScanning();
+                        },
+                      );
+                      return;
+                    }
+
+                    MachineTransactionPage2.goReplacementPage(
+                      context,
+                      machineId: uri.pathSegments.last,
+                    );
+                    return;
+                  }
+                }
+              case ScannerProcess.needResult:
+                {
+                  context.pop(barcode.rawValue!);
+                  return;
+                }
             }
           } catch (_) {}
 

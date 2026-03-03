@@ -927,6 +927,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sakob => 'Sakob';
 
   @override
+  String get all => '全部';
+
+  @override
+  String get orderPlacement => '订购';
+
+  @override
+  String get mine => '我的';
+
+  @override
   String get eVoucherDetails => '电子券详情';
 
   @override

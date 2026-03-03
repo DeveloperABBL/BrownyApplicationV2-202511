@@ -562,9 +562,25 @@ class $AssetsServicesGen {
   AssetGenImage get aWasher =>
       const AssetGenImage('assets/services/a_washer.png');
 
+  /// File path: assets/services/a_washer_en.png
+  AssetGenImage get aWasherEn =>
+      const AssetGenImage('assets/services/a_washer_en.png');
+
+  /// File path: assets/services/a_washer_zh.png
+  AssetGenImage get aWasherZh =>
+      const AssetGenImage('assets/services/a_washer_zh.png');
+
   /// File path: assets/services/b_dryer.png
   AssetGenImage get bDryer =>
       const AssetGenImage('assets/services/b_dryer.png');
+
+  /// File path: assets/services/b_dryer_en.png
+  AssetGenImage get bDryerEn =>
+      const AssetGenImage('assets/services/b_dryer_en.png');
+
+  /// File path: assets/services/b_dryer_zh.png
+  AssetGenImage get bDryerZh =>
+      const AssetGenImage('assets/services/b_dryer_zh.png');
 
   /// File path: assets/services/banner_dryer_extend_time.png
   AssetGenImage get bannerDryerExtendTime =>
@@ -573,6 +589,14 @@ class $AssetsServicesGen {
   /// File path: assets/services/c_charger.png
   AssetGenImage get cCharger =>
       const AssetGenImage('assets/services/c_charger.png');
+
+  /// File path: assets/services/c_charger_en.png
+  AssetGenImage get cChargerEn =>
+      const AssetGenImage('assets/services/c_charger_en.png');
+
+  /// File path: assets/services/c_charger_zh.png
+  AssetGenImage get cChargerZh =>
+      const AssetGenImage('assets/services/c_charger_zh.png');
 
   /// File path: assets/services/ic_dryer.svg
   SvgGenImage get icDryer => const SvgGenImage('assets/services/ic_dryer.svg');
@@ -592,9 +616,15 @@ class $AssetsServicesGen {
   /// List of all assets
   List<dynamic> get values => [
     aWasher,
+    aWasherEn,
+    aWasherZh,
     bDryer,
+    bDryerEn,
+    bDryerZh,
     bannerDryerExtendTime,
     cCharger,
+    cChargerEn,
+    cChargerZh,
     icDryer,
     icWasher,
     storeDryer,
@@ -949,6 +979,14 @@ class $AssetsSvgGen {
   /// File path: assets/svg/scan_icon.svg
   SvgGenImage get scanIcon => const SvgGenImage('assets/svg/scan_icon.svg');
 
+  /// File path: assets/svg/scan_icon_en.svg
+  SvgGenImage get scanIconEn =>
+      const SvgGenImage('assets/svg/scan_icon_en.svg');
+
+  /// File path: assets/svg/scan_icon_zh.svg
+  SvgGenImage get scanIconZh =>
+      const SvgGenImage('assets/svg/scan_icon_zh.svg');
+
   /// List of all assets
   List<SvgGenImage> get values => [
     arrowRight,
@@ -1045,6 +1083,8 @@ class $AssetsSvgGen {
     icWashRoundedGreen,
     icWashWhiteRoundedGreen,
     scanIcon,
+    scanIconEn,
+    scanIconZh,
   ];
 }
 

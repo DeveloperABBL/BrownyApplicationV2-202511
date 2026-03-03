@@ -47,7 +47,7 @@ class CoinHistoryItemWidget extends StatelessWidget {
                     backgroundBlendMode: BlendMode.saturation,
                   )
                 : null,
-            child: Assets.png.brownyCoin.image(
+            child: Assets.png.brownyCoin2.image(
               width: 44.w,
             ),
           ),

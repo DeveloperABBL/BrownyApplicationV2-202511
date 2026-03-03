@@ -10,7 +10,7 @@ import 'package:browny_applications_new/feature/transactions/screens/coupons_evo
 /// รองรับการใช้งานคล้าย BottomNavigationBar มาตรฐานของ Flutter
 ///
 /// พารามิเตอร์หลัก (คล้าย BottomNavigationBar):
-/// - items: รายการปุ่ม navigation (List<BottomNavigationBarItem>)
+/// - items: รายการปุ่ม navigation (List BottomNavigationBarItem)
 /// - currentIndex: ตำแหน่งปุ่มที่เลือกอยู่
 /// - onTap: ฟังก์ชันที่เรียกเมื่อกดปุ่ม (รับ index ของปุ่ม)
 ///
@@ -194,9 +194,28 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
               bottom: _centerBottomOffset(),
               child: GestureDetector(
                 onTap: mOnCenterTap,
-                child: Assets.svg.scanIcon.svg(
-                  width: 106.w,
-                  height: 100.h,
+                child: Builder(
+                  builder: (context) {
+                    double width = 106.w;
+                    double height = 100.h;
+                    switch (context.languageCode) {
+                      case 'zh':
+                        return Assets.svg.scanIconZh.svg(
+                          width: width,
+                          height: height,
+                        );
+                      case 'en':
+                        return Assets.svg.scanIconEn.svg(
+                          width: width,
+                          height: height,
+                        );
+                      default:
+                        return Assets.svg.scanIcon.svg(
+                          width: width,
+                          height: height,
+                        );
+                    }
+                  },
                 ),
               ),
             ),

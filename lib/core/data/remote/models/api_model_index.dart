@@ -1,4 +1,5 @@
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
+export 'package:browny_applications_new/core/data/remote/models/request/coupon_collect_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/device_log_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/machine_order_request.dart';
@@ -21,6 +22,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/coin_cl
 export 'package:browny_applications_new/core/data/remote/models/response/coin_history_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/coupon_collect_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
@@ -33,6 +35,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/get_pin
 export 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/machine_status_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_order_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_order_receipt_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';

@@ -17,10 +17,12 @@ import 'package:provider/provider.dart';
 class ScannerPage extends StatelessWidget {
   const ScannerPage({
     super.key,
+    required this.process,
     this.initialIndex = 0,
   });
 
   final int initialIndex;
+  final ScannerProcess process;
 
   static final pagePath = '/scanner';
   static final pageName = 'scannerPage';
@@ -29,10 +31,14 @@ class ScannerPage extends StatelessWidget {
   static Future<T?> goToPage<T>(
     BuildContext context, {
     int initialIndex = 0,
+    ScannerProcess process = ScannerProcess.machine,
   }) async {
     return await context.pushNamed(
       ScannerPage.pageName,
-      extra: initialIndex,
+      extra: [
+        initialIndex,
+        process,
+      ],
     );
   }
 
@@ -41,9 +47,12 @@ class ScannerPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ScannerViewModel(
         context: context,
+        process: process,
         repo: CustomerDataRepo(),
       ),
-      child: _ScannerWidget(initialIndex: initialIndex),
+      child: _ScannerWidget(
+        initialIndex: initialIndex,
+      ),
     );
   }
 }

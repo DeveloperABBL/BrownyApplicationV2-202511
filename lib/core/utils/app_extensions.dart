@@ -144,6 +144,8 @@ extension ResponseExtension on Response {
   bool get isUnprocessable => statusCode != null && (statusCode! == 422);
 
   bool get isGone => statusCode != null && (statusCode! == 410);
+
+  bool get isBadRequest => statusCode != null && (statusCode! == 400);
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย

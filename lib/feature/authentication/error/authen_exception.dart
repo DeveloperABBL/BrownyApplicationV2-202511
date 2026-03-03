@@ -114,3 +114,31 @@ class OTPExpired extends AuthenExceptions {
     return super.message ?? 'OTPExpired';
   }
 }
+
+class CollectCouponNotFound extends AuthenExceptions {
+  CollectCouponNotFound([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return 'รหัสคูปองของคุณไม่ถูกต้อง';
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'Coupon Not Found';
+  }
+}
+
+class CollectCouponCollected extends AuthenExceptions {
+  CollectCouponCollected([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    return 'คุณได้รับคูปองนี้ไปแล้ว';
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'Coupon Collected';
+  }
+}

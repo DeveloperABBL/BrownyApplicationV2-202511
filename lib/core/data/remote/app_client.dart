@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/data/remote/models/api_model_index.
 import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
+import 'package:flutter/foundation.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
@@ -27,6 +28,27 @@ abstract class AppClient {
   factory AppClient.instance() => _instance;
 
   factory AppClient.init(ApiConfigs config) {
+    if (kDebugMode) {
+      _instance._dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            // ignore: avoid_print
+            debugPrint(
+              'DIO: REQUEST[${options.method}] => PATH: ${options.path}',
+            );
+            return handler.next(options); // continue
+          },
+          onResponse: (response, handler) {
+            debugPrint('DIO: RESPONSE : ${response.toString()}');
+            return handler.next(response); // continue
+          },
+          onError: (error, handler) {
+            debugPrint('DIO: RESPONSE : ${error.toString()}');
+            return handler.next(error); // continue
+          },
+        ),
+      );
+    }
     return _instance
       ..baseUrl = config.baseUrl
       .._dio.options.headers.putIfAbsent(
@@ -259,6 +281,25 @@ abstract class AppClient {
     @Body() CouponListRequest body,
   );
 
+  /// DONG 2026-03-03
+  ///
+  /// API collect coupon จาก code หรือ QR
+  ///
+  /// Body parameters:
+  /// - type: String ("code" หรือ "qr")
+  /// - data: String (URL ของ coupon หรือ QR code data)
+  /// - customer_id: String (UUID ของลูกค้า)
+  ///
+  /// Response:
+  /// - CouponCollectResponse with success message and coupon_customer data
+  ///
+  /// Error States:
+  /// - 404/400: {"message": "Invalid or expired coupon code."}
+  @POST('/coupon/collect')
+  Future<HttpResponse<CouponCollectResponse>> collectCoupon(
+    @Body() CouponCollectRequest body,
+  );
+
   /// DONG 2026-01-20
   ///
   /// API fetch จำนวนคูปองที่มีอยู่ของ customer ตาม uuid
@@ -325,6 +366,24 @@ abstract class AppClient {
   /// - CoinHistoryResponse with coin balance, expire info, and history
   @GET('/coin/history')
   Future<HttpResponse<CoinHistoryResponse>> fetchCoinHistory(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// DONG 2026-03-03
+  ///
+  /// API ตรวจสอบสถานะเครื่องจาก QR code
+  ///
+  /// Body parameters:
+  /// - qr: String (QR code URL เช่น "http://brownypay.com/wash/dry/2")
+  ///
+  /// Response:
+  /// - MachineStatusResponse with status, message, store_machine_id, qr
+  /// - status: "available" (พร้อมใช้งาน), "busy" (กำลังใช้งาน), "unavailable" (ไม่พร้อมใช้งาน)
+  ///
+  /// Example Response:
+  /// {"status": "available", "message": "พร้อมใช้งาน", "store_machine_id": 2, "qr": "http://brownypay.com/wash/dry/2"}
+  @GET('/status/machine')
+  Future<HttpResponse<MachineStatusResponse>> checkMachineStatus(
     @Body() Map<String, dynamic> body,
   );
 

@@ -45,6 +45,9 @@ class CouponData {
   @JsonKey(name: 'icon')
   final String? icon;
 
+  @JsonKey(name: 'name')
+  final ContentLocalizeData? name;
+
   @JsonKey(name: 'package_name')
   final ContentLocalizeData? packageName;
 
@@ -83,6 +86,9 @@ class CouponData {
   @JsonKey(name: 'delivery_fee')
   final String? deliveryFee;
 
+  @JsonKey(name: 'applies_to')
+  final String? appliesTo;
+
   CouponData({
     this.couponId,
     this.customerCouponId,
@@ -95,6 +101,7 @@ class CouponData {
     this.typeLabel,
     this.usageLabel,
     this.icon,
+    this.name,
     this.packageName,
     this.description,
     this.imageUrl,
@@ -107,6 +114,7 @@ class CouponData {
     this.redemptionLimit,
     this.redeemPrice,
     this.deliveryFee,
+    this.appliesTo,
   });
 
   factory CouponData.fromJson(Map<String, dynamic> json) =>

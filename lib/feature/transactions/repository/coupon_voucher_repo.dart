@@ -1,11 +1,15 @@
+import 'package:browny_applications_new/core/data/remote/models/request/coupon_collect_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:dio/dio.dart';
 
 mixin CouponVoucherDataSourceMixin on CustomerDataSourceMixin {
   /// ฟังก์ชันดึงรายการคูปอง E-Voucher ของ customer ตาม [uuid]
@@ -44,6 +48,17 @@ mixin CouponVoucherDataSourceMixin on CustomerDataSourceMixin {
     String? longitude,
     String? customerId,
   });
+
+  /// ฟังก์ชันรับคูปองจาก code หรือ QR
+  ///
+  /// [type] - ประเภท (code/qr)
+  /// [data] - ข้อมูล URL หรือ QR code
+  /// [customerId] - รหัสลูกค้า (UUID)
+  Future<RepoResult<CouponCollectResponse>> collectCoupon(
+    String type,
+    String data,
+    String customerId,
+  );
 }
 
 class CouponVoucherRepo extends CustomerDataRepo
@@ -134,6 +149,41 @@ class CouponVoucherRepo extends CustomerDataRepo
       }
 
       return RepoResult.dependOn(response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CouponCollectResponse>> collectCoupon(
+    String type,
+    String data,
+    String customerId,
+  ) async {
+    try {
+      final request = CouponCollectRequest(
+        type: type,
+        data: data,
+        customerId: customerId,
+      );
+
+      final response = await requireRemote.collectCoupon(request);
+
+      if (!response.isSuccessful) {
+        return RepoResult.empty(
+          error: Exception(response.data.message),
+        );
+      }
+
+      return RepoResult.success(data: response.data);
+    } on DioException catch (dioEx) {
+      if (dioEx.response!.isNotFound) {
+        return RepoResult.error(error: CollectCouponNotFound());
+      }
+      if (dioEx.response!.isBadRequest) {
+        return RepoResult.error(error: CollectCouponCollected());
+      }
+      return RepoResult.error(error: dioEx);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }

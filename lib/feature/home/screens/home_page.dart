@@ -118,30 +118,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    switch (state) {
-      case AppLifecycleState.resumed:
-        // App is visible and responding to user input (e.g., app comes to foreground)
-        debugPrint('AppLifecycleState.resumed');
-        // if (mounted) {
-        //   unawaited(_fetchPopups(context));
-        // }
-        break;
-      case AppLifecycleState.inactive:
-        // App is in an inactive state (e.g., user opens app switcher or receives a call)
-        debugPrint('AppLifecycleState.inactive');
-        break;
-      case AppLifecycleState.hidden:
-        // All views of the app are hidden (e.g., app is minimized)
-        debugPrint('AppLifecycleState.hidden');
-        break;
-      case AppLifecycleState.paused:
-        // App is not visible and not responding to user input
-        debugPrint('AppLifecycleState.paused');
-        break;
-      case AppLifecycleState.detached:
-        // The Flutter engine is running but detached from any host views (e.g., app termination)
-        debugPrint('AppLifecycleState.detached');
-        break;
+    if (state case AppLifecycleState.resumed) {
+      debugPrint('AppLifecycleState.resumed');
+      // ถ้ามีการพับแอพหรือไปแอพอื่นกลับมา จะทำการ fetch ใหม่
+      if (mounted) {
+        Future.microtask(_viewmodel.fetchWorkingMachines);
+      }
     }
   }
 
@@ -180,7 +162,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 padding: EdgeInsets.only(
                   left: AppDims.size_16.w,
                   right: AppDims.size_16.w,
-                  top: AppDims.size_16.h,
+                  // top: AppDims.size_8.h,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +233,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 padding: EdgeInsets.only(
                   left: AppDims.size_16.w,
                   right: AppDims.size_16.w,
-                  top: AppDims.size_8.h,
+                  // top: AppDims.size_8.h,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,7 +265,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     GestureDetector(
                       onTap: () {
                         final data = Uri.parse(
-                          'http://brownypay.com/wash/dry/18',
+                          'http://brownypay.com/wash/dry/13',
                         );
                         if (data.pathSegments.isNotEmpty) {
                           MachineTransactionPage2.goToPage(
@@ -296,16 +278,47 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       },
                       child: SizedBox(
                         height: AppDims.size_106.h,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) =>
-                              Assets.services.values[index].image(
-                                width: AppDims.size_109.w,
-                                height: AppDims.size_106.h,
-                              ),
-                          separatorBuilder: (context, index) =>
-                              AppDims.horizonPadding_8,
-                          itemCount: Assets.services.values.take(2).length,
+                        child: Builder(
+                          builder: (context) {
+                            List<AssetGenImage> services = [];
+                            switch (context.languageCode) {
+                              case 'zh':
+                                {
+                                  services.addAll([
+                                    Assets.services.aWasherZh,
+                                    Assets.services.bDryerZh,
+                                  ]);
+                                  break;
+                                }
+                              case 'en':
+                                {
+                                  services.addAll([
+                                    Assets.services.aWasherEn,
+                                    Assets.services.bDryerEn,
+                                  ]);
+                                  break;
+                                }
+                              default:
+                                {
+                                  services.addAll([
+                                    Assets.services.aWasher,
+                                    Assets.services.bDryer,
+                                  ]);
+                                  break;
+                                }
+                            }
+                            return ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) =>
+                                  services[index].image(
+                                    width: AppDims.size_109.w,
+                                    height: AppDims.size_106.h,
+                                  ),
+                              separatorBuilder: (context, index) =>
+                                  AppDims.horizonPadding_8,
+                              itemCount: 2,
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -346,7 +359,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         padding: EdgeInsets.only(
           left: AppDims.size_16.w,
           right: AppDims.size_16.w,
-          top: AppDims.size_8.h,
+          // top: AppDims.size_8.h,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,11 +392,15 @@ class _HomePageWidgetState extends State<HomePageWidget>
               child: AppToggleWidget(
                 data: [
                   // ทั้งหมด
-                  AppToggleData(lable: 'ทั้งหมด', value: 0),
+                  AppToggleData(lable: context.wording.all, value: 0),
                   // ซักอบ
                   AppToggleData(lable: context.wording.sakob, value: 1),
                   // การสั่งซื้อ
-                  AppToggleData(lable: 'การสั่งซื้อ', value: 2, enable: false),
+                  AppToggleData(
+                    lable: context.wording.orderPlacement,
+                    value: 2,
+                    enable: false,
+                  ),
                 ],
                 onChange: (index) {},
               ),
@@ -399,6 +416,26 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   }
 
                   if (result.isEmpty || result.hasError) {
+                    // เกิด Error
+                    return Padding(
+                      padding: EdgeInsets.only(top: AppDims.size_12.h),
+                      child: Column(
+                        children: [
+                          Assets.png.brownyError1.image(
+                            width: AppDims.size_60.w,
+                          ),
+                          AppDims.vericalPadding_8,
+
+                          Align(
+                            alignment: Alignment.center,
+                            child: AppText(context.wording.errorUi),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (result.data!.data.orEmpty.isEmpty) {
                     // รักใครให้ซักผ้า
                     return Padding(
                       padding: EdgeInsets.only(top: AppDims.size_12.h),
@@ -445,7 +482,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 },
               ),
             ),
-            AppDims.vericalPadding_8,
+            // AppDims.vericalPadding_8,
           ],
         ),
       ),
@@ -483,7 +520,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: AppDims.size_8.w,
-                        vertical: AppDims.size_8.h,
+                        // vertical: AppDims.size_8.h,
                       ),
                       child: Column(
                         children: [
@@ -510,7 +547,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppDims.size_8.w,
-                    vertical: AppDims.size_8.h,
+                    // vertical: AppDims.size_8.h,
                   ),
                   child: Column(
                     children: [
@@ -532,7 +569,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+                  // vertical: AppDims.size_8.h,
                 ),
                 child: GestureDetector(
                   onTap: () => onBrownyClubClick(highlight: null),
@@ -555,7 +592,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+                  // vertical: AppDims.size_8.h,
                 ),
                 child: Column(
                   children: [
@@ -575,7 +612,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+                  // vertical: AppDims.size_8.h,
                 ),
                 child: Column(
                   children: [
@@ -595,7 +632,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_8.w,
-                  vertical: AppDims.size_8.h,
+                  // vertical: AppDims.size_8.h,
                 ),
                 child: Column(
                   children: [
@@ -621,7 +658,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppDims.size_8.w,
-                    vertical: AppDims.size_8.h,
+                    // vertical: AppDims.size_8.h,
                   ),
                   child: Column(
                     children: [
@@ -649,7 +686,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppDims.size_8.w,
-                    vertical: AppDims.size_8.h,
+                    // vertical: AppDims.size_8.h,
                   ),
                   child: Column(
                     children: [
@@ -1375,6 +1412,14 @@ class _CustomerServicesWorkingWidgetState
                       child: ValueListenableBuilder(
                         valueListenable: _countDownNotifier,
                         builder: (context, duration, child) {
+                          if (duration == Duration.zero) {
+                            return AppText(
+                              'เสร็จสิ้น',
+                              style: context.textTheme.labelMedium!.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            );
+                          }
                           return AppText(
                             countDowntDisplay(duration),
                             style: context.textTheme.labelMedium!.copyWith(
@@ -1389,19 +1434,34 @@ class _CustomerServicesWorkingWidgetState
                 Row(
                   spacing: AppDims.size_8.w,
                   children: [
-                    AppText(
-                      // เสร็จโดยประมาณ
-                      context.wording.estimatedCompletion,
-                      style: context.textTheme.labelMedium!.copyWith(
-                        color: AppColors.gray600,
-                      ),
-                    ),
                     Expanded(
                       child: AppText(
-                        widget.data.finishTime,
+                        // เสร็จโดยประมาณ
+                        context.wording.estimatedCompletion,
                         style: context.textTheme.labelMedium!.copyWith(
                           color: AppColors.gray600,
                         ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ValueListenableBuilder(
+                        valueListenable: _countDownNotifier,
+                        builder: (context, duration, child) {
+                          if (duration == Duration.zero) {
+                            return AppText(
+                              'เสร็จสิ้น',
+                              style: context.textTheme.labelMedium!.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            );
+                          }
+                          return AppText(
+                            widget.data.finishTime,
+                            style: context.textTheme.labelMedium!.copyWith(
+                              color: AppColors.gray600,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
