@@ -91,8 +91,8 @@ class InvitBottomSheetDialog extends StatelessWidget {
                                           break;
                                         case HomePageState.scan:
                                           // ไปหน้า Scan
-                                          context.pushNamed(
-                                            ScannerPage.pageName,
+                                          ScannerPage.goToPage(
+                                            context,
                                           );
                                           break;
                                         case HomePageState.branches:

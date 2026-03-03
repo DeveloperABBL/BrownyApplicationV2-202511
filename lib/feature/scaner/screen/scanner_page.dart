@@ -66,7 +66,6 @@ class __ScannerWidgetState extends State<_ScannerWidget>
     super.initState();
     _viewModel = context.read<ScannerViewModel>();
     _viewModel.attachContext(context);
-    _viewModel.onTabChanged(widget.initialIndex);
 
     // Initialize camera controller
     _viewModel.cameraController = MobileScannerController(
@@ -93,6 +92,9 @@ class __ScannerWidgetState extends State<_ScannerWidget>
           );
         },
       );
+      if (widget.initialIndex != 0) {
+        await _viewModel.onTabChanged(widget.initialIndex);
+      }
     });
   }
 

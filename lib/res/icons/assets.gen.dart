@@ -310,6 +310,10 @@ class $AssetsPngGen {
   AssetGenImage get brownyCoin =>
       const AssetGenImage('assets/png/browny_coin.png');
 
+  /// File path: assets/png/browny_coin_2.png
+  AssetGenImage get brownyCoin2 =>
+      const AssetGenImage('assets/png/browny_coin_2.png');
+
   /// File path: assets/png/browny_coin_claim_title.png
   AssetGenImage get brownyCoinClaimTitle =>
       const AssetGenImage('assets/png/browny_coin_claim_title.png');
@@ -479,6 +483,7 @@ class $AssetsPngGen {
     bgProfile,
     bgUnselectedCouponEvoucher,
     brownyCoin,
+    brownyCoin2,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
     brownyCoinInactive,

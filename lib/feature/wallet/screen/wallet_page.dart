@@ -280,8 +280,8 @@ class _WalletWidgetState extends State<WalletWidget> {
                                         // scan
                                         state == WalletProcessState.scan,
                                         svgIcon: Assets.svg.icScan,
-                                        onPressed: () => context.pushNamed(
-                                          ScannerPage.pageName,
+                                        onPressed: () => ScannerPage.goToPage(
+                                          context,
                                         ),
                                       ),
                                       AppDims.vericalPadding_2,

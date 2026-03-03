@@ -188,7 +188,7 @@ class AppRouter {
           int initIndex = 0;
           try {
             initIndex = state.extra as int;
-          } on Exception catch (_) {}
+          } catch (_) {}
           return ScannerPage(initialIndex: initIndex);
         },
       ),

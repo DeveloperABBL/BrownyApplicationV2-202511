@@ -114,8 +114,9 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
         widget.onCenterTap ??
         () {
           // Default ไปหน้า Scan
-          context.pushNamed(
-            ScannerPage.pageName,
+          ScannerPage.goToPage(
+            context,
+            initialIndex: 0,
           );
         };
     // final hasCenter = mOnCenterTap != null;

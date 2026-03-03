@@ -51,7 +51,7 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           child: ElevatedButton.icon(
             iconAlignment: IconAlignment.end,
             onPressed: () {
-              context.pushNamed(ScannerPage.pageName);
+              ScannerPage.goToPage(context);
             },
             icon: Assets.svg.icScan2.svg(
               colorFilter: ColorFilter.mode(AppColors.white, BlendMode.srcIn),

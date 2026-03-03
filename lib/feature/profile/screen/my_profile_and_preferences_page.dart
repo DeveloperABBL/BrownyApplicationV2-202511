@@ -618,9 +618,7 @@ class _MyProfileAndPreferencesContentState
                             break;
                           case HomePageState.scan:
                             // ไปหน้า Scan
-                            context.pushNamed(
-                              ScannerPage.pageName,
-                            );
+                            ScannerPage.goToPage(context, initialIndex: 0);
                             break;
                           case HomePageState.branches:
                             context.pushNamed(
