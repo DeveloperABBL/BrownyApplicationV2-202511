@@ -231,6 +231,7 @@ class _ArticlesPageState extends State<ArticlesPage> {
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(AppDims.size_12.r),
                     child: Image.network(
+                      width: double.infinity,
                       imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, _, _) => Center(

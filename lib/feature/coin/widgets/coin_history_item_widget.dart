@@ -58,7 +58,7 @@ class CoinHistoryItemWidget extends StatelessWidget {
           //     : Assets.png.brownyCoin.image(
           //         width: 44.w,
           //       ),
-          AppDims.horizonPadding_4,
+          AppDims.horizonPadding_8,
 
           // ข้อมูลรายการ (ชื่อ)
           Expanded(

@@ -6,6 +6,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/machine
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'machine_detail_response.g.dart';
@@ -31,6 +32,8 @@ class MachineDetailResponse extends BaseModelResponse {
     this.name,
     this.addTime,
     this.programImage,
+    this.programName,
+    this.machineType,
     super.success,
     super.message,
     super.errorType,
@@ -75,6 +78,17 @@ class MachineDetailResponse extends BaseModelResponse {
 
   @JsonKey(name: 'program_image')
   final String? programImage;
+
+  @JsonKey(name: 'program_name')
+  final ContentLocalizeData? programName;
+
+  @JsonKey(name: 'machine_type')
+  final ContentLocalizeData? machineType;
+
+  String getProgramNameDisplay(String locale) {
+    if (programName == null) return '';
+    return programName!.getByLocaleCode(locale) ?? '';
+  }
 
   /// ดึงชื่อร้านตาม locale
   String getStoreNameDisplay(String locale) {
@@ -139,6 +153,20 @@ class MachineDetailResponse extends BaseModelResponse {
     }
 
     return AppColors.yellow3;
+  }
+
+  /// เช็คว่าเป็นเครื่องอบหรือไม่
+  bool get isDryer => machineType?.en.orEmpty.toLowerCase() == 'dryer';
+
+  AssetGenImage getDryerExtendingTimeDisplay(String locale) {
+    switch (locale) {
+      case 'en':
+        return Assets.services.dryerExtendTimeEn;
+      case 'zh':
+        return Assets.services.dryerExtendTimeZh;
+      default:
+        return Assets.services.dryerExtendTime;
+    }
   }
 
   factory MachineDetailResponse.fromJson(Map<String, dynamic> json) =>

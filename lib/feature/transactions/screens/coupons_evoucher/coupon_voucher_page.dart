@@ -248,7 +248,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                           context,
                           process: ScannerProcess.needResult,
                         ).then((data) {
-                          if (context.mounted) {
+                          if (context.mounted && data != null) {
                             try {
                               final qrdata = data as String;
                               _viewmodel.collectCoupon(qrdata);

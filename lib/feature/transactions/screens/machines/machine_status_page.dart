@@ -67,7 +67,8 @@ class MachineStatusContent extends StatefulWidget {
   State<MachineStatusContent> createState() => _MachineStatusContentState();
 }
 
-class _MachineStatusContentState extends State<MachineStatusContent> {
+class _MachineStatusContentState extends State<MachineStatusContent>
+    with WidgetsBindingObserver {
   TextStyle get _textPrimary => context.textTheme.labelLarge!.copyWith(
     color: AppColors.textPrimary,
   );
@@ -79,6 +80,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _viewmodel = context.read();
     _viewmodel.attachContext(context);
 
@@ -91,7 +93,23 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
   @override
   void dispose() {
     // ViewModel จะจัดการ dispose timer เอง
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state case AppLifecycleState.resumed) {
+      debugPrint('AppLifecycleState.resumed');
+      // ถ้ามีการพับแอพหรือไปแอพอื่นกลับมา จะทำการ fetch ใหม่
+      if (mounted) {
+        Future.microtask(() async {
+          await _viewmodel.fetchMachineDetail(widget.machineId);
+        });
+      }
+    }
   }
 
   /// โหลด SVG/PNG asset และแปลงเป็น ui.Image สำหรับใช้ใน CustomThumbShape
@@ -202,15 +220,24 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                     // Scrollable Content
                     Expanded(
                       child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         child: Column(
+                          mainAxisSize: MainAxisSize.max,
                           children: [
                             // Fixed Header with Machine Image
                             _buildFixedHeader(machineDetail),
 
                             // Title เครื่องซัก, สาขา
                             _mainTitle(machineDetail),
-                            AppDims.vericalPadding_18,
+
+                            if (machineDetail.isDryer) ...[
+                              machineDetail
+                                  .getDryerExtendingTimeDisplay(
+                                    context.languageCode,
+                                  )
+                                  .image(),
+                            ],
+                            AppDims.vericalPadding_32,
 
                             // Progress Timeline
                             ..._buildTimelineProgress(context, machineDetail),
@@ -263,11 +290,13 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                   : ValueListenableBuilder<Duration?>(
                       valueListenable: _viewmodel.remainingDurationNotifier,
                       builder: (context, remainingDuration, child) {
+                        bool isProcessing = remainingDuration != Duration.zero;
                         return SliderTheme(
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: AppDims.size_4.h,
                             thumbShape: CustomThumbShape(
                               thumbImage: _thumbImage,
+                              isProcessing: isProcessing,
                               // label: '20 นาที',
                               label: _viewmodel.getBubbleLabel(
                                 context.languageCode,
@@ -300,8 +329,18 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                       },
                     ),
             ),
-            Assets.svg.icCheckedTrans.svg(
-              width: 30.w,
+            ValueListenableBuilder(
+              valueListenable: _viewmodel.remainingDurationNotifier,
+              builder: (context, remainingDuration, child) {
+                if (remainingDuration == Duration.zero) {
+                  return Assets.svg.icChecked2.svg(
+                    width: 30.w,
+                  );
+                }
+                return Assets.svg.icCheckedTrans.svg(
+                  width: 30.w,
+                );
+              },
             ),
           ],
         ),
@@ -453,7 +492,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                                 color: AppColors.ci3,
                                 shape: BoxShape.circle,
                               ),
-                              child: result.data?.selectedProgram == null
+                              child: machineDetail.programImage.orEmpty.isEmpty
                                   ? AppText(
                                       '?',
                                       style: context.textTheme.labelLarge!
@@ -463,7 +502,8 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
                                           ),
                                     )
                                   : Image.network(
-                                      result.data!.selectedProgram!.image!,
+                                      // result.data!.selectedProgram!.image!,
+                                      machineDetail.programImage.orEmpty,
                                       errorBuilder: (_, _, _) => SizedBox(),
                                     ),
                             );
@@ -534,7 +574,7 @@ class _MachineStatusContentState extends State<MachineStatusContent> {
             // บริการ
             title: context.wording.services,
             // บริการที่เลือก
-            tailing: context.wording.selectedService,
+            tailing: machineDetail.getProgramNameDisplay(context.languageCode),
           ),
           AppDims.vericalPadding_16,
           // สถานะ
@@ -629,10 +669,13 @@ class CustomThumbShape extends SliderComponentShape {
   /// สีพื้นหลังของ bubble (เขียวสำหรับปกติ, แดงสำหรับ error)
   final Color bubbleColor;
 
+  final bool isProcessing;
+
   CustomThumbShape({
     this.thumbImage,
     required this.label,
     required this.lableStyle,
+    required this.isProcessing,
     this.bubbleColor = const Color(0xFF4CAF50),
   });
 
@@ -671,6 +714,8 @@ class CustomThumbShape extends SliderComponentShape {
     required double textScaleFactor,
     required Size sizeWithOverflow,
   }) {
+    if (!isProcessing) return;
+
     final Canvas canvas = context.canvas;
 
     // ========== ขั้นตอนที่ 1: คำนวณขนาด bubble จากความยาวของ label ==========

@@ -471,6 +471,10 @@ class $AssetsPngGen {
   AssetGenImage get walletObjBg =>
       const AssetGenImage('assets/png/wallet_obj_bg.png');
 
+  /// File path: assets/png/wechat_pay_badge.png
+  AssetGenImage get wechatPayBadge =>
+      const AssetGenImage('assets/png/wechat_pay_badge.png');
+
   /// List of all assets
   List<AssetGenImage> get values => [
     bgAppBar,
@@ -524,6 +528,7 @@ class $AssetsPngGen {
     promptpayBadgeNoLine,
     splashBackground,
     walletObjBg,
+    wechatPayBadge,
   ];
 }
 
@@ -598,6 +603,18 @@ class $AssetsServicesGen {
   AssetGenImage get cChargerZh =>
       const AssetGenImage('assets/services/c_charger_zh.png');
 
+  /// File path: assets/services/dryer_extend_time.png
+  AssetGenImage get dryerExtendTime =>
+      const AssetGenImage('assets/services/dryer_extend_time.png');
+
+  /// File path: assets/services/dryer_extend_time_en.png
+  AssetGenImage get dryerExtendTimeEn =>
+      const AssetGenImage('assets/services/dryer_extend_time_en.png');
+
+  /// File path: assets/services/dryer_extend_time_zh.png
+  AssetGenImage get dryerExtendTimeZh =>
+      const AssetGenImage('assets/services/dryer_extend_time_zh.png');
+
   /// File path: assets/services/ic_dryer.svg
   SvgGenImage get icDryer => const SvgGenImage('assets/services/ic_dryer.svg');
 
@@ -625,6 +642,9 @@ class $AssetsServicesGen {
     cCharger,
     cChargerEn,
     cChargerZh,
+    dryerExtendTime,
+    dryerExtendTimeEn,
+    dryerExtendTimeZh,
     icDryer,
     icWasher,
     storeDryer,
@@ -706,6 +726,10 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_checked.svg
   SvgGenImage get icChecked => const SvgGenImage('assets/svg/ic_checked.svg');
+
+  /// File path: assets/svg/ic_checked_2.svg
+  SvgGenImage get icChecked2 =>
+      const SvgGenImage('assets/svg/ic_checked_2.svg');
 
   /// File path: assets/svg/ic_checked_trans.svg
   SvgGenImage get icCheckedTrans =>
@@ -1008,6 +1032,7 @@ class $AssetsSvgGen {
     icCheckboxCheckedReg,
     icCheckboxReg,
     icChecked,
+    icChecked2,
     icCheckedTrans,
     icClockRoundedGreen,
     icCopy,

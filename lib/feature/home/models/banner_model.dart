@@ -63,6 +63,7 @@ class BannerHighLightModel extends BannerHighlightData {
     super.subtitle,
     super.dateTime,
     super.category,
+    super.target,
   });
 
   factory BannerHighLightModel.fromBannerResponse(
@@ -77,6 +78,7 @@ class BannerHighLightModel extends BannerHighlightData {
       subtitle: response.subtitle,
       dateTime: response.dateTime,
       category: response.category,
+      target: response.target,
     );
   }
 

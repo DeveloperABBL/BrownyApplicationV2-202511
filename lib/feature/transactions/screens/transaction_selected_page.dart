@@ -218,14 +218,19 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                 builder: (context) => Dialog.fullscreen(
                   child: QrPromptpayDialog(
                     qrData: qrData!,
-                    isQRPromptPay: _viewmodel.paymentSelected!.isQR,
+                    paymentDadge: _viewmodel.paymentSelected!.isQR
+                        ? Assets.png.promptpayBadgeNoLine
+                        : Assets.png.wechatPayBadge,
+                    // isQRPromptPay: _viewmodel.paymentSelected!.isQR,
                   ),
                 ),
               );
             } else {
               // Show WebView
               // WebViewController? controller;
-              LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
+              if (_viewmodel.paymentSelected!.isLaunchExternalWeb == true) {
+                LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
+              }
               await showModalBottomSheet(
                 context: context,
                 showDragHandle: true,

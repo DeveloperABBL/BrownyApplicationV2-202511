@@ -162,6 +162,7 @@ class PaymentMethodModel {
   bool get isQR => method == 'qr';
   bool get isWeChat => method == 'wechat';
   bool get isTpWallet => method == 'tp_wallet';
+  bool get isLaunchExternalWeb => !isTpWallet;
   bool get isShowInAppQR => isQR || isWeChat;
 }
 

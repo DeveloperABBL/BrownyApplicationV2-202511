@@ -264,15 +264,15 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     // TODO ต้องเอาออก
                     GestureDetector(
                       onTap: () {
-                        final data = Uri.parse(
-                          'http://brownypay.com/wash/dry/13',
-                        );
-                        if (data.pathSegments.isNotEmpty) {
-                          MachineTransactionPage2.goToPage(
-                            context,
-                            machineId: data.pathSegments.last,
-                          );
-                        }
+                        // final data = Uri.parse(
+                        //   'http://brownypay.com/wash/dry/13',
+                        // );
+                        // if (data.pathSegments.isNotEmpty) {
+                        //   MachineTransactionPage2.goToPage(
+                        //     context,
+                        //     machineId: data.pathSegments.last,
+                        //   );
+                        // }
 
                         // MachineStatusPage.goToPage(context, machineId: '13');
                       },
@@ -590,6 +590,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
               ),
 
               Container(
+                // foregroundDecoration: BoxDecoration(
+                //   color: Colors.grey,
+                //   backgroundBlendMode: BlendMode.saturation,
+                // ),
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_8.w,
                   // vertical: AppDims.size_8.h,
@@ -747,8 +751,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 );
                 return GestureDetector(
                   onTap: () {
-                    if (result.requireData[index].type == 'article') {
+                    final data = result.requireData[index];
+                    final type = data.type;
+                    if (type == 'article') {
                       onBrownyClubClick(highlight: result.requireData[index]);
+                    } else if (type == 'external_link') {
+                      LaunchHelper.openUrlInBrowser(data.target.orEmpty);
                     }
                   },
                   child: CachedNetworkImage(

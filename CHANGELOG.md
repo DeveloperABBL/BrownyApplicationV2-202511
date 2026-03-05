@@ -1,4 +1,12 @@
 # CHANGELOG
+### DONG 2026-03-06
+* เก็บ Logic การแสดง Machine status ให้แสดงผล status ต่างๆ ถูกต้อง
+* แก้ไข ขนาด Banner ใน Browny Club แสดงไม่เท่ากัน
+* แก้ไข Banner ที่กำหนดเป็น external_link เมื่อ กดแล้วไม่สั่งเปิด Browser
+* เพิ่มการแสดง Banner WeChat Pay ที่หน้าแสดง QRCode
+* แก้ไข UI หน้า Coin History, Icon เหรียญไม่ชิดขอบ
+* แก้ไขจังหวะชำระ TPWallet แต่สั่งเปิด External Web
+
 ### DONG 2026-03-03
 * เก็บ design และ ภาษาในหน้าหลัก
 * ปรับ Logic จังหวะชำระเงินให้ redirect ไปที่ External Browser แทน

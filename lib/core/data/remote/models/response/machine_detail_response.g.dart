@@ -30,6 +30,16 @@ MachineDetailResponse _$MachineDetailResponseFromJson(
       ?.map((e) => ProgramData.fromJson(e as Map<String, dynamic>))
       .toList(),
   programImage: json['program_image'] as String?,
+  programName: json['program_name'] == null
+      ? null
+      : ContentLocalizeData.fromJson(
+          json['program_name'] as Map<String, dynamic>,
+        ),
+  machineType: json['machine_type'] == null
+      ? null
+      : ContentLocalizeData.fromJson(
+          json['machine_type'] as Map<String, dynamic>,
+        ),
   success: json['success'] as bool?,
   message: json['message'] as String?,
   errorType: json['error_type'] as String?,
@@ -54,4 +64,6 @@ Map<String, dynamic> _$MachineDetailResponseToJson(
   'name': instance.name,
   'addTime': instance.addTime,
   'program_image': instance.programImage,
+  'program_name': instance.programName,
+  'machine_type': instance.machineType,
 };

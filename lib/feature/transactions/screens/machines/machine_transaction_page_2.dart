@@ -14,7 +14,6 @@ import 'package:browny_applications_new/feature/transactions/screens/receipt_mac
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class MachineTransactionPage2 extends StatelessWidget {
   const MachineTransactionPage2({
@@ -275,7 +274,7 @@ class __MachineContentState extends State<_MachineContent>
       );
       return;
     }
-
+    // ไปหน้า PIN/Biometric เพื่อยืนยันการทำรายการ
     TransactionAuthenPage.goToPage(context).then(
       (result) async {
         if (!mounted) return;
@@ -346,14 +345,19 @@ class __MachineContentState extends State<_MachineContent>
                 builder: (context) => Dialog.fullscreen(
                   child: QrPromptpayDialog(
                     qrData: qrData!,
-                    isQRPromptPay: _viewmodel.paymentSelected!.isQR,
+                    paymentDadge: _viewmodel.paymentSelected!.isQR
+                        ? Assets.png.promptpayBadgeNoLine
+                        : Assets.png.wechatPayBadge,
+                    // isQRPromptPay: _viewmodel.paymentSelected!.isQR,
                   ),
                 ),
               );
             } else {
               // Show WebView
               // WebViewController? controller;
-              LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
+              if (_viewmodel.paymentSelected!.isLaunchExternalWeb == true) {
+                LaunchHelper.openUrlInBrowser(orderResponse.redirectUrl!);
+              }
               await showModalBottomSheet(
                 context: context,
                 showDragHandle: true,

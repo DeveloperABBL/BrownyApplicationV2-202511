@@ -11,11 +11,13 @@ class QrPromptpayDialog extends StatefulWidget {
   const QrPromptpayDialog({
     super.key,
     required this.qrData,
-    this.isQRPromptPay = true,
+    required this.paymentDadge,
+    // this.isQRPromptPay = true,
   });
 
   final String qrData;
-  final bool isQRPromptPay;
+  // final bool isQRPromptPay;
+  final AssetGenImage paymentDadge;
 
   @override
   State<QrPromptpayDialog> createState() => _QrPromptpayDialogState();
@@ -259,15 +261,16 @@ class _QrPromptpayDialogState extends State<QrPromptpayDialog> {
                           child: Column(
                             children: [
                               // PromptPay Logo
-                              if (widget.isQRPromptPay) ...[
-                                Assets.png.promptpayBadgeNoLine.image(
-                                  height: 73.w,
-                                  width: 228.h,
-                                ),
-                                AppDims.vericalPadding_16,
-                                Divider(),
-                              ],
+                              // if (widget.isQRPromptPay) ...[
+                              // Assets.png.promptpayBadgeNoLine.image(
+                              widget.paymentDadge.image(
+                                height: 73.w,
+                                width: 228.h,
+                              ),
+                              AppDims.vericalPadding_16,
+                              Divider(),
 
+                              // ],
                               AppDims.vericalPadding_16,
 
                               QrImageView(
