@@ -113,17 +113,17 @@ class MachineDetailResponse extends BaseModelResponse {
     const statusMap = {
       'en': {
         'busy': 'In Use',
-        'vacant': 'Available',
+        'vacant': 'Success',
         'default': 'Failed',
       },
       'zh': {
         'busy': '使用中',
-        'vacant': '可用',
+        'vacant': '已完成',
         'default': '故障',
       },
       'th': {
         'busy': 'กำลังทำงาน',
-        'vacant': 'ว่าง',
+        'vacant': 'สำเร็จ',
         'default': 'ขัดข้อง',
       },
     };

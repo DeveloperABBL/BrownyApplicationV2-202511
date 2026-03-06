@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
@@ -76,6 +79,8 @@ class _MachineStatusContentState extends State<MachineStatusContent>
   late final MachineTransactionViewmodel _viewmodel;
   ui.Image? _thumbImage;
   bool _isImageLoading = true;
+  bool isMachineStarted = false;
+  Timer? _autoCheckTimer;
 
   @override
   void initState() {
@@ -85,13 +90,20 @@ class _MachineStatusContentState extends State<MachineStatusContent>
     _viewmodel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // await _viewmodel.fetchMachinePrograms(widget.machineId);
       await _loadThumbImage();
+      // Fetch machine detail ครั้งแรก
+      await _viewmodel.fetchMachineDetail(widget.machineId);
+      // เช็คสถานะหลังจาก fetch เสร็จ
+      if (mounted) {
+        _checkMachineStatusAndShowDialog();
+      }
     });
   }
 
   @override
   void dispose() {
+    // ยกเลิก auto-check timer
+    _autoCheckTimer?.cancel();
     // ViewModel จะจัดการ dispose timer เอง
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -139,6 +151,93 @@ class _MachineStatusContentState extends State<MachineStatusContent>
     }
   }
 
+  /// เช็คสถานะเครื่องและแสดง Dialog ถ้าเครื่องยังไม่เริ่มทำงาน
+  void _checkMachineStatusAndShowDialog() {
+    final machineDetail = _viewmodel.machineDetailNotifier.value;
+
+    if (machineDetail == null) return;
+
+    // ถ้าเครื่องไม่ได้ทำงาน (isBusy == false) ให้แสดง Dialog
+    if (!machineDetail.isBusy) {
+      _showMachineNotStartedDialog();
+      _startAutoCheckTimer();
+    } else {
+      // ถ้าเครื่องทำงานแล้ว ให้หยุด Timer
+      _stopAutoCheckTimer();
+    }
+  }
+
+  /// แสดง Dialog แจ้งให้กดเริ่มที่หน้าเครื่อง
+  void _showMachineNotStartedDialog() {
+    if (!mounted) return;
+
+    AppOverlays.showBrownyDialog(
+      context,
+      imageAsset: Assets.png.brownyWashy.path,
+      // เริ่มการทำงานเครื่อง
+      title: context.wording.startMachineOperation,
+      // กรุณากดปุ่มที่หน้าเครื่องเพื่อเริ่มการทำงาน
+      message: context.wording.pleasePressMachineButton,
+      // ตรวจสอบสถานะ
+      confirmText: context.wording.checkStatus,
+      // แจ้งปัญหาการใช้งาน
+      cancelText: context.wording.reportProblem,
+      onCancel: () async {
+        await ContactPage.goToPage(
+          context,
+          ContactProvider.helpAndProblemNoti,
+        );
+
+        // ถ้า back กลับมา เช็คสถานะอีกครั้ง
+        await _viewmodel.fetchMachineDetail(widget.machineId);
+        _checkMachineStatusAndShowDialog();
+      },
+      onConfirm: () async {
+        // แสดง loading
+        AppOverlays.showLoading(context);
+        await Future.delayed(
+          const Duration(seconds: 1, milliseconds: 5),
+          () async {
+            // เช็คสถานะอีกครั้ง
+            await _viewmodel.fetchMachineDetail(widget.machineId);
+          },
+        );
+        AppOverlays.hideLoading();
+
+        // เช็คอีกครั้ง
+        _checkMachineStatusAndShowDialog();
+      },
+    );
+  }
+
+  /// เริ่ม Timer เพื่อ auto-check สถานะเครื่องทุกๆ 3 วินาที
+  void _startAutoCheckTimer() {
+    // ยกเลิก timer เก่าก่อน (ถ้ามี)
+    _autoCheckTimer?.cancel();
+
+    _autoCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      // เช็คสถานะเครื่อง
+      await _viewmodel.fetchMachineDetail(widget.machineId);
+
+      final machineDetail = _viewmodel.machineDetailNotifier.value;
+      if (machineDetail != null && machineDetail.isBusy) {
+        // เครื่องเริ่ลทำงานแล้ว หยุด timer
+        _stopAutoCheckTimer();
+      }
+    });
+  }
+
+  /// หยุด Timer
+  void _stopAutoCheckTimer() {
+    _autoCheckTimer?.cancel();
+    _autoCheckTimer = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,90 +268,61 @@ class _MachineStatusContentState extends State<MachineStatusContent>
           ),
         ),
       ],
-      body: FutureBuilder(
-        future: _viewmodel.fetchMachineDetail(widget.machineId),
-        builder: (context, snapshot) {
-          // ตรวจสอบ error
-          if (snapshot.hasError) {
-            return Center(
-              child: AppText(
-                context.wording.errorUi,
-              ),
-            );
-          }
-
-          final result = snapshot.data;
-          // ตรวจสอบ loading
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              !snapshot.hasData ||
-              result!.isLoading == true) {
-            return Center(
+      body: ValueListenableBuilder<MachineDetailResponse?>(
+        valueListenable: _viewmodel.machineDetailNotifier,
+        builder: (context, machineDetail, child) {
+          // ตรวจสอบ loading (machineDetail == null)
+          if (machineDetail == null) {
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          // ตรวจสอบ empty
-          if (result.hasError || result.isEmpty) {
-            return Center(
-              child: AppText(
-                context.wording.machineDataLoadError,
-              ),
-            );
-          }
+          // เช็คสถานะเครื่องครั้งแรก (เฉพาะครั้งเดียว)
+          // ย้ายมาทำใน initState แล้ว ไม่ต้องทำที่นี่
 
-          // เรียก API ครั้งเดียว หลังจากนี้ใช้ ValueListenableBuilder
+          // แสดง UI ปกติ
           return RefreshIndicator(
             onRefresh: () async {
               // Refresh โดยเรียก API ใหม่
               await _viewmodel.fetchMachineDetail(widget.machineId);
             },
-            child: ValueListenableBuilder<MachineDetailResponse?>(
-              valueListenable: _viewmodel.machineDetailNotifier,
-              builder: (context, machineDetail, child) {
-                if (machineDetail == null) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+            child: Column(
+              children: [
+                // Scrollable Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        // Fixed Header with Machine Image
+                        _buildFixedHeader(machineDetail),
 
-                return Column(
-                  children: [
-                    // Scrollable Content
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            // Fixed Header with Machine Image
-                            _buildFixedHeader(machineDetail),
+                        // Title เครื่องซัก, สาขา
+                        _mainTitle(machineDetail),
 
-                            // Title เครื่องซัก, สาขา
-                            _mainTitle(machineDetail),
+                        if (machineDetail.isDryer) ...[
+                          machineDetail
+                              .getDryerExtendingTimeDisplay(
+                                context.languageCode,
+                              )
+                              .image(),
+                        ],
+                        AppDims.vericalPadding_32,
 
-                            if (machineDetail.isDryer) ...[
-                              machineDetail
-                                  .getDryerExtendingTimeDisplay(
-                                    context.languageCode,
-                                  )
-                                  .image(),
-                            ],
-                            AppDims.vericalPadding_32,
+                        // Progress Timeline
+                        ..._buildTimelineProgress(context, machineDetail),
 
-                            // Progress Timeline
-                            ..._buildTimelineProgress(context, machineDetail),
+                        _divider(),
 
-                            _divider(),
-
-                            // Summary Transaction
-                            _summary(machineDetail),
-                          ],
-                        ),
-                      ),
+                        // Summary Transaction
+                        _summary(machineDetail),
+                      ],
                     ),
-                  ],
-                );
-              },
+                  ),
+                ),
+              ],
             ),
           );
         },

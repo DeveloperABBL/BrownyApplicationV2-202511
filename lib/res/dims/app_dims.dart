@@ -54,6 +54,7 @@ class AppDims {
   static final double size_100 = 100.0;
   static final double size_106 = 106.0;
   static final double size_109 = 109.0;
+  static final double size_120 = 120.0;
 
   static SizedBox get vericalPadding_2 => SizedBox(
     height: 2.h,

@@ -1081,4 +1081,17 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get approximateRemainingTime => 'เวลาที่เหลือโดยประมาณ';
+
+  @override
+  String get startMachineOperation => 'เริ่มการทำงานเครื่อง';
+
+  @override
+  String get pleasePressMachineButton =>
+      'กรุณากดปุ่มที่หน้าเครื่องเพื่อเริ่มการทำงาน';
+
+  @override
+  String get checkStatus => 'ตรวจสอบสถานะ';
+
+  @override
+  String get reportProblem => 'แจ้งปัญหาการใช้งาน';
 }

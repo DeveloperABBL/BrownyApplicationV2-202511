@@ -64,10 +64,13 @@ class _HomePageWidgetState extends State<HomePageWidget>
     _viewmodel.attachContext(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // ดึง Banner
       await _viewmodel.fetchBannersHighlight();
+      // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
       await _viewmodel.fetchWorkingMachines();
 
       if (mounted) {
+        // ดึงข้อมูลแสดง Popup เพื่อนเชิญเพื่อน ของวันนี้
         final showInvitFriendToday = await _viewmodel
             .fetchPopupInivitFriendForToday();
         if (mounted && showInvitFriendToday.data!) {
@@ -75,10 +78,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
             context,
             _viewmodel,
           );
+          // flag ว่าวันนี้ขึ้น Popup เพื่อนเชิญเพื่อน ของวันนี้
           _viewmodel.dismissInvitFriendForToday();
         }
 
         if (!mounted) return;
+        // ดึง Popup โฆษณา
         await _fetchPopups(context);
       }
     });
@@ -1327,12 +1332,14 @@ class _CustomerServicesWorkingWidget extends StatefulWidget {
 class _CustomerServicesWorkingWidgetState
     extends State<_CustomerServicesWorkingWidget> {
   late final ValueNotifier<Duration> _countDownNotifier;
+  late final ValueNotifier<bool> _finishedNotifier;
 
   Timer? _statusUpdateTimer;
 
   @override
   void dispose() {
     _countDownNotifier.dispose();
+    _finishedNotifier.dispose();
     _statusUpdateTimer?.cancel();
     super.dispose();
   }
@@ -1343,6 +1350,7 @@ class _CustomerServicesWorkingWidgetState
     _countDownNotifier = ValueNotifier(
       widget.data.remainingTimeDuration,
     );
+    _finishedNotifier = ValueNotifier(false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _statusUpdateTimer?.cancel();
 
@@ -1356,6 +1364,7 @@ class _CustomerServicesWorkingWidgetState
               seconds: currentDuration.inSeconds - 1,
             );
           } else {
+            _finishedNotifier.value = true;
             // หมดเวลาแล้ว หยุด timer
             timer.cancel();
           }
@@ -1422,7 +1431,8 @@ class _CustomerServicesWorkingWidgetState
                         builder: (context, duration, child) {
                           if (duration == Duration.zero) {
                             return AppText(
-                              'เสร็จสิ้น',
+                              // เสร็จสิ้น
+                              context.wording.done,
                               style: context.textTheme.labelMedium!.copyWith(
                                 color: AppColors.primary,
                               ),
@@ -1453,11 +1463,12 @@ class _CustomerServicesWorkingWidgetState
                     ),
                     Expanded(
                       child: ValueListenableBuilder(
-                        valueListenable: _countDownNotifier,
-                        builder: (context, duration, child) {
-                          if (duration == Duration.zero) {
+                        valueListenable: _finishedNotifier,
+                        builder: (context, finished, child) {
+                          if (finished) {
                             return AppText(
-                              'เสร็จสิ้น',
+                              // เสร็จสิ้น
+                              context.wording.done,
                               style: context.textTheme.labelMedium!.copyWith(
                                 color: AppColors.primary,
                               ),
@@ -1480,22 +1491,23 @@ class _CustomerServicesWorkingWidgetState
           AppDims.horizonPadding_16,
 
           // Button ดู Detail
-          GestureDetector(
-            onTap: widget.onTap,
-            child: Container(
-              padding: EdgeInsets.all(8.r),
-              width: AppDims.size_26.w,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Assets.svg.icArrowForward.svg(
-                colorFilter: ColorFilter.mode(
-                  AppColors.background,
-                  BlendMode.srcIn,
+          ValueListenableBuilder(
+            valueListenable: _finishedNotifier,
+            builder: (context, finished, child) {
+              return GestureDetector(
+                onTap: finished ? null : widget.onTap,
+                child: Container(
+                  width: AppDims.size_26.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: finished
+                      ? Assets.svg.icChecked2.svg()
+                      : Assets.svg.arrowRight.svg(),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),

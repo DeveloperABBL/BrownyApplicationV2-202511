@@ -94,7 +94,8 @@ class _WallHistoryContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppText(
-                    'ประวัติการทำรายการ',
+                    // ประวัติการทำรายการ
+                    context.wording.transactionHistory,
                     style: context.textTheme.titleMedium!.copyWith(
                       color: AppColors.textBlack,
                     ),

@@ -354,5 +354,9 @@
     "estimatedCompletion": "เสร็จโดยประมาณ",
     "completed": "สำเร็จ",
     "selectedService": "บริการที่เลือก",
-    "approximateRemainingTime": "เวลาที่เหลือโดยประมาณ"
+    "approximateRemainingTime": "เวลาที่เหลือโดยประมาณ",
+    "startMachineOperation": "เริ่มการทำงานเครื่อง",
+    "pleasePressMachineButton": "กรุณากดปุ่มที่หน้าเครื่องเพื่อเริ่มการทำงาน",
+    "checkStatus": "ตรวจสอบสถานะ",
+    "reportProblem": "แจ้งปัญหาการใช้งาน"
 }

@@ -2205,6 +2205,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Approximate Remaining Time'**
   String get approximateRemainingTime;
+
+  /// No description provided for @startMachineOperation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Machine Operation'**
+  String get startMachineOperation;
+
+  /// No description provided for @pleasePressMachineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Please press the button on the machine to start.'**
+  String get pleasePressMachineButton;
+
+  /// No description provided for @checkStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Status'**
+  String get checkStatus;
+
+  /// No description provided for @reportProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Problem'**
+  String get reportProblem;
 }
 
 class _AppLocalizationsDelegate

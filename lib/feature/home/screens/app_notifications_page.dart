@@ -237,22 +237,4 @@ class _NotificationItem extends StatelessWidget {
       ),
     );
   }
-
-  /// Format DateTime เป็นรูปแบบที่อ่านง่าย
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inMinutes < 1) {
-      return 'เมื่อสักครู่';
-    } else if (difference.inHours < 1) {
-      return '${difference.inMinutes} นาทีที่แล้ว';
-    } else if (difference.inDays < 1) {
-      return '${difference.inHours} ชั่วโมงที่แล้ว';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} วันที่แล้ว';
-    } else {
-      return '${date.day}/${date.month}/${date.year}';
-    }
-  }
 }

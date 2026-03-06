@@ -354,5 +354,9 @@
   "estimatedCompletion": "预计完成",
   "completed": "完成",
   "selectedService": "所选服务",
-  "approximateRemainingTime": "大约剩余时间"
+  "approximateRemainingTime": "大约剩余时间",
+  "startMachineOperation": "启动机器",
+  "pleasePressMachineButton": "请按机器上的按钮启动。",
+  "checkStatus": "检查状态",
+  "reportProblem": "报告问题"
 }

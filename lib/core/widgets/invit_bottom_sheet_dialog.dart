@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
@@ -53,7 +54,11 @@ class InvitBottomSheetDialog extends StatelessWidget {
                       child: Column(
                         children: [
                           AppText(
-                            'เชิญเพื่อนมาใช้ Browny\nสะสมแต้มแลกคูปอง!',
+                            ContentLocalizeData(
+                              en: 'Invite friends to Browny\nEarn points & coupons!',
+                              zh: '邀请好友加入 Browny\n累积积分，兑换优惠券！',
+                              th: 'เชิญเพื่อนมาใช้ Browny\nสะสมแต้มแลกคูปอง!',
+                            ).getTextByLocale(context.languageCode),
                             style: context.textTheme.titleLarge!.copyWith(
                               fontSize: AppDims.size_24,
                             ),
@@ -62,7 +67,12 @@ class InvitBottomSheetDialog extends StatelessWidget {
                           AppDims.vericalPadding_10,
 
                           AppText(
-                            'เพียงแค่ส่งลิงก์ให้เพื่อน หรือให้เพื่อนกรอกเบอร์โทรศัพท์ของคุณ! ก็สะสมแต้ม และนำไปแลกคูปองได้อีกเพียบ',
+                            ContentLocalizeData(
+                              en: 'Simply share your link with friends or have them enter your phone number! Start collecting points today and unlock a world of rewards.',
+                              zh: '只需将链接分享给好友，或让好友输入您的手机号，即可轻松累积积分，兑换更多超值优惠券！',
+                              th: 'เพียงแค่ส่งลิงก์ให้เพื่อน หรือให้เพื่อนกรอกเบอร์โทรศัพท์ของคุณ! ก็สะสมแต้ม และนำไปแลกคูปองได้อีกเพียบ',
+                            ).getTextByLocale(context.languageCode),
+
                             style: context.textTheme.bodyMedium!.copyWith(
                               color: AppColors.textSecondary,
                             ),
@@ -107,7 +117,11 @@ class InvitBottomSheetDialog extends StatelessWidget {
                                   });
                             },
                             child: AppText(
-                              'เชิญเพื่อนเลย',
+                              ContentLocalizeData(
+                                en: 'Invite Friends Now',
+                                zh: '立即邀请好友',
+                                th: 'เชิญเพื่อนเลย',
+                              ).getTextByLocale(context.languageCode),
                             ),
                           ),
                           AppDims.vericalPadding_8,

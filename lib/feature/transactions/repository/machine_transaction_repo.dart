@@ -61,18 +61,18 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
       //         "zh": "-"
       //     },
       //     "status": "Busy",
-      //     "finish_datatime": "16:30",
-      //     "remaining_time": "00:00:50",
+      //     "finish_datatime": "23:00",
+      //     "remaining_time": "00:30:00",
       //     "machine_no": "1",
       //     "machine_image": "https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
       //     "name": {
-      //         "th": "เครื่องซัก 1 - 16.00 กก.",
-      //         "en": "Washer 1 - 16.00 kg",
-      //         "zh": "洗衣机 1 - 16.00 公斤"
+      //       "th": "เครื่องซัก 1 / Test",
+      //       "en": "Washer 1 / Test",
+      //       "zh": "洗衣机 1 / Test"
       //     },
       //     "order_id": "BBL11234",
       //     "receipt_no": "1234",
-      //     "startTime": "2026-03-05 16:00:23",
+      //     "startTime": "2026-03-06 22:30:00",
       //     "addTime": [],
       //     "program_image": "https://dev.abgroup.co.th/storage/galleries/fFr4U1j8jv8NYy1adbWjJvsuT9BaX9AOWAnoOASF.png",
       //     "program_name": {

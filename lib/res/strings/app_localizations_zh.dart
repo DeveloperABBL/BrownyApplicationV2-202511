@@ -1060,4 +1060,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get approximateRemainingTime => '大约剩余时间';
+
+  @override
+  String get startMachineOperation => '启动机器';
+
+  @override
+  String get pleasePressMachineButton => '请按机器上的按钮启动。';
+
+  @override
+  String get checkStatus => '检查状态';
+
+  @override
+  String get reportProblem => '报告问题';
 }

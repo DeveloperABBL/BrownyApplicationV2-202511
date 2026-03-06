@@ -52,12 +52,12 @@ class WalletHistoryItemWidget extends StatelessWidget {
             ),
             child: isIncome
                 ? Assets.svg.icDownload.svg(
-                    width: 24.w,
-                    height: 24.h,
+                    width: AppDims.size_24.w,
+                    height: AppDims.size_24.h,
                   )
                 : Assets.svg.icUpload.svg(
-                    width: 24.w,
-                    height: 24.h,
+                    width: AppDims.size_24.w,
+                    height: AppDims.size_24.h,
                   ),
           ),
           SizedBox(width: 12.w),
@@ -92,14 +92,14 @@ class WalletHistoryItemWidget extends StatelessWidget {
               AppText(
                 formatCurrency(
                   string: amount,
-                  leadingSign: isIncome ? '+฿' : '-฿',
+                  leadingSign: isIncome ? '+฿ ' : '-฿ ',
                 ),
                 style: context.textTheme.headlineSmall!.copyWith(
-                  fontSize: 12.sp,
+                  fontSize: AppDims.size_12.sp,
                   color: isIncome ? AppColors.cocoaBrown : AppColors.textBlack,
                 ),
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: AppDims.size_4.h),
               // วันที่
               AppText(
                 date,

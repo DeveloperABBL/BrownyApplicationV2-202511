@@ -1,15 +1,20 @@
+import 'dart:convert';
+
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/working_machine_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+import 'package:flutter/foundation.dart';
 
 mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   /// ดึงข้อมูล Banner สำหรับแสดงในหน้าหลัก
@@ -225,6 +230,40 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
     String? notificationToken,
   }) async {
     try {
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: WorkingMachinesResponse(
+      //       count: 2,
+      //       data: [
+      //         WorkingMachineData(
+      //           id: 13,
+      //           machineImage:
+      //               'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+      //           finishDatatime: '23:30',
+      //           remainingTime: '00:00:10',
+      //           name: ContentLocalizeData(
+      //             th: "เครื่องซัก 1 / Test",
+      //             en: "Washer 1 / Test",
+      //             zh: "洗衣机 1 / Test",
+      //           ),
+      //         ),
+      //         WorkingMachineData(
+      //           id: 14,
+      //           machineImage:
+      //               'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+      //           finishDatatime: '23:06',
+      //           remainingTime: '00:00:00',
+      //           name: ContentLocalizeData(
+      //             th: "เครื่องซัก 2 / Test",
+      //             en: "Washer 2 / Test",
+      //             zh: "洗衣机 2 / Test",
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   );
+      // }
+
       final response = await requireRemote.fetchWorkingMachines(
         customerId: customerId,
         notificationToken: notificationToken,

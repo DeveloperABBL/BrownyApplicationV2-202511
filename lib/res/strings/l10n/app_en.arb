@@ -354,5 +354,9 @@
     "estimatedCompletion": "Estimated Completion",
     "completed": "Completed",
     "selectedService": "Selected Service",
-    "approximateRemainingTime": "Approximate Remaining Time"
+    "approximateRemainingTime": "Approximate Remaining Time",
+    "startMachineOperation": "Start Machine Operation",
+    "pleasePressMachineButton": "Please press the button on the machine to start.",
+    "checkStatus": "Check Status",
+    "reportProblem": "Report Problem"
 }
