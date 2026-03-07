@@ -1,8 +1,10 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -154,7 +156,7 @@ class AppOverlays {
     BuildContext context, {
     String? title,
     required String message,
-    String confirmText = 'รับทราบ',
+    String? confirmText,
     String? cancelText,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
@@ -174,7 +176,7 @@ class AppOverlays {
       builder: (context) => _BrownyDialog(
         title: title,
         message: message,
-        confirmText: confirmText,
+        confirmText: confirmText ?? context.wording.acknowledge,
         cancelText: cancelText,
         image: image,
         imageAsset: imageAsset ?? Assets.png.brownyError1.path,
@@ -218,7 +220,7 @@ class AppOverlays {
     BuildContext context, {
     String? title,
     required String message,
-    String confirmText = 'รับทราบ',
+    String? confirmText,
     String? cancelText,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
@@ -238,7 +240,7 @@ class AppOverlays {
       builder: (context) => _WalletDialog(
         title: title,
         message: message,
-        confirmText: confirmText,
+        confirmText: confirmText ?? context.wording.acknowledge,
         cancelText: cancelText,
         image: image,
         onConfirm: () {

@@ -255,6 +255,11 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
         automaticallyImplyLeading: false,
         leading: BackButton(
           color: AppColors.textPrimary,
+          onPressed: () {
+            context.popUntil(
+              predicate: (route) => route.name.orEmpty == HomePage.pageName,
+            );
+          },
         ),
         title: AppText(
           'ใบเสร็จ',
@@ -306,7 +311,12 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
               }
 
               if (!context.mounted) return;
-              MachineStatusPage.goReplacementPage(
+              context.popUntil(
+                predicate: (route) {
+                  return route.name.orEmpty == HomePage.pageName;
+                },
+              );
+              MachineStatusPage.goToPage(
                 context,
                 machineId: _viewmodel.machineId,
               );
@@ -495,9 +505,10 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             _listTile(
                               // ส่วนลด/โปรโมชั่น
                               leading: receiptData.hasDiscount
-                                  ? receiptData.discountNameDisplay(
-                                      context,
-                                    )
+                                  ? receiptData.summary!.discount!.wording!
+                                        .getTextByLocale(
+                                          context.languageCode,
+                                        )
                                   : 'โปรโมชั่นสาขา',
                               trailing: '',
                               trailingWidget: AppText(

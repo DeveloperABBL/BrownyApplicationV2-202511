@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
@@ -129,6 +130,12 @@ class _MyProfileAndPreferencesContentState
     return SliverToBoxAdapter(
       child: Consumer<CustomerProvider>(
         builder: (context, provider, _) {
+          // เพิ่มการโหลด notification เพิ่มถ้า Provider ของ User ถูก noti
+          Future.microtask(() {
+            _viewModel.fetchNotificationPreferences();
+            _viewModel.loadUserPreferences();
+          });
+
           final isGuest = provider.current.isGuest;
           final customer = provider.current;
 
@@ -304,7 +311,8 @@ class _MyProfileAndPreferencesContentState
 
                               GestureDetector(
                                 onTap: () {
-                                  context.pushNamed(ProfilePage.pageName);
+                                  ProfilePage.goToPage(context);
+                                  // context.pushNamed(ProfilePage.pageName);
                                 },
                                 child: Assets.svg.icEditReg.svg(
                                   width: AppDims.size_24.h,
@@ -425,6 +433,7 @@ class _MyProfileAndPreferencesContentState
                       ),
                       _buildQuickActionButton(
                         icon: Assets.profileQuickAction.icRefreshDouble.svg(),
+                        // สถานะ
                         label: context.wording.status,
                         onTap: () {
                           // TODO: Navigate to status page
@@ -434,6 +443,7 @@ class _MyProfileAndPreferencesContentState
                         icon: Assets.profileQuickAction.icHistory.svg(
                           width: AppDims.size_28.w,
                         ),
+                        // ประวัติ
                         label: context.wording.history,
                         onTap: () {
                           // TODO: Navigate to history page
@@ -447,96 +457,6 @@ class _MyProfileAndPreferencesContentState
           );
         },
       ),
-    );
-  }
-
-  void _showQrCustomer(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return FutureBuilder(
-          future: _viewModel.fetchCustomerQRCode(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return SizedBox();
-            }
-
-            final result = snapshot.requireData;
-            if (result.isEmpty) {
-              return Center(
-                child: Column(
-                  children: [
-                    Spacer(),
-                    Assets.png.brownyError2.image(
-                      width: 145.w,
-                      height: 100.h,
-                    ),
-                    AppDims.vericalPadding_8,
-                    AppText(
-                      'ไม่พบข้อมูล Browny ID',
-                    ),
-                    Spacer(),
-                  ],
-                ),
-              );
-            }
-            return Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(16.r),
-                    right: Radius.circular(16.r),
-                  ),
-                ),
-                child: Center(
-                  child: result.isLoading
-                      ? CircularProgressIndicator()
-                      : Column(
-                          children: [
-                            AppDims.vericalPadding_20,
-                            // PromptPay Logo
-                            Assets.png.brownyHorizaontal2.image(
-                              height: 44.w,
-                              width: 135.h,
-                            ),
-                            AppDims.vericalPadding_20,
-                            Divider(
-                              indent: AppDims.size_16.w,
-                              endIndent: AppDims.size_16.w,
-                            ),
-                            AppDims.vericalPadding_16,
-
-                            // QR Code
-                            Expanded(
-                              child: Image.network(
-                                result.data!.url!,
-                              ),
-                            ),
-                            AppDims.vericalPadding_16,
-
-                            SafeArea(
-                              top: false,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppDims.size_16.w,
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  child: AppText(context.wording.close),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -674,10 +594,57 @@ class _MyProfileAndPreferencesContentState
             AppDims.vericalPadding_8,
             _buildPreferenceItem(
               icon: Icons.favorite_border,
+              // สินค้าที่บันทึกไว้
               title: context.wording.savedItems,
               suffixWidget: Assets.svg.icArrowForward.svg(),
-              onTap: () {
+              onTap: () async {
                 // TODO: Navigate to favorites page
+                await showDialog(
+                  useSafeArea: false,
+                  context: context,
+                  builder: (context) => Dialog.fullscreen(
+                    child: Scaffold(
+                      appBar: AppBar(
+                        // สินค้าที่บันทึกไว้
+                        title: AppText(
+                          // สินค้าที่บันทึกไว้
+                          context.wording.savedItems,
+                        ),
+                        leading: BackButton(
+                          color: AppColors.darkBrown,
+                        ),
+                      ),
+                      body: SafeArea(
+                        child: SizedBox(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Center(
+                                child: Assets.png.brownySuccess1.image(
+                                  width: 145.w,
+                                  height: 100.h,
+                                ),
+                              ),
+                              AppDims.vericalPadding_16,
+
+                              AppText(
+                                ContentLocalizeData(
+                                  en: 'Coming Soon.',
+                                  zh: '敬请期待',
+                                  th: 'พบกันเร็ว ๆ นี้',
+                                ).getTextByLocale(context.languageCode),
+                                style: context.textTheme.labelLarge!.copyWith(
+                                  fontSize: AppDims.size_16.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
             AppDims.vericalPadding_12,
@@ -809,20 +776,26 @@ class _MyProfileAndPreferencesContentState
             // Email Settings
             _buildPreferenceItem(
               leadingSvg: Assets.iconProfilePreferences.mail,
+              // เปลี่ยน e-mail
               title: context.wording.changeEmail,
               suffixWidget: Assets.svg.icArrowForward.svg(),
               onTap: () {
-                // TODO: Navigate to change email page
+                ProfilePage.goToPage(context);
               },
             ),
 
             // Password Settings
             _buildPreferenceItem(
               leadingSvg: Assets.iconProfilePreferences.icLock,
+              // เปลี่ยนรหัสผ่าน
               title: context.wording.changePassword,
               suffixWidget: Assets.svg.icArrowForward.svg(),
               onTap: () {
-                // TODO: Navigate to change password page
+                // ไป Process เปลี่ยน Password
+                AuthenticationPage.goToPage(
+                  context,
+                  process: AuthenProcess.changePassword,
+                );
               },
             ),
             AppDims.vericalPadding_12,
@@ -1142,7 +1115,9 @@ class _MyProfileAndPreferencesContentState
                       ? Assets.iconProfilePreferences.icLogin
                       : Assets.iconProfilePreferences.icLogout,
                   title: customer.isGuest
+                      // เข้าสู่ระบบ
                       ? context.wording.login
+                      // ออกจากระบบ
                       : context.wording.logout,
                   trailing: null,
                   onTap: () async {

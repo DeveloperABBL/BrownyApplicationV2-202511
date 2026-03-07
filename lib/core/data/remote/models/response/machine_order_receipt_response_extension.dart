@@ -86,19 +86,19 @@ extension MachineOrderReceiptResponseDisplay on MachineOrderReceiptResponse {
 
   /// แสดงชื่อ program ตาม locale
   String programNameDisplay(BuildContext context) {
-    if (summary?.program?.wording == null) return '';
+    if (summary?.program?.wording == null) return '0.00';
     return summary!.program!.wording!.getTextByLocale(context.languageCode);
   }
 
   /// แสดงส่วนลด
   String get discountAmount {
-    if (summary?.discount?.amount == null) return '';
-    return '฿${summary!.discount!.amount}';
+    if (summary?.discount?.amount == null) return '0.00';
+    return '฿${summary!.discount!.amount.ifNullOrEmpty('0.00')}';
   }
 
   /// แสดงชื่อส่วนลดตาม locale
   String discountNameDisplay(BuildContext context) {
-    if (summary?.discount?.wording == null) return '';
+    if (summary?.discount?.wording == null) return '0.00';
     return summary!.discount!.wording!.getTextByLocale(context.languageCode);
   }
 
@@ -131,7 +131,8 @@ extension MachineOrderReceiptResponseDisplay on MachineOrderReceiptResponse {
   }
 
   /// ตรวจสอบว่ามี discount หรือไม่
-  bool get hasDiscount => summary?.discount != null;
+  bool get hasDiscount =>
+      summary?.discount != null && summary?.discount!.amount.orEmpty != '';
 
   /// ตรวจสอบว่ามี coupon discount หรือไม่
   bool get hasCouponDiscount =>

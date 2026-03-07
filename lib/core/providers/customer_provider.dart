@@ -54,7 +54,8 @@ class UserTransactionsHolder {
   final Map<String, MachineProgramModel> machineUsing;
 
   void addNewMachineTracsactions(MachineProgramModel machine) {
-    machineUsing.putIfAbsent(machine.machineId.toString(), () => machine);
+    // machineUsing.putIfAbsent(machine.machineId.toString(), () => machine);
+    machineUsing.clear();
   }
 
   UserTransactionsHolder copyWith({

@@ -114,6 +114,24 @@ abstract class AppClient {
     @Body() PinRequest body,
   );
 
+  /// DONG 2026-03-07
+  ///
+  /// API เปลี่ยนรหัสผ่าน
+  ///
+  /// Body parameters:
+  /// - id: String (customer_id UUID)
+  /// - old_password: String (รหัสผ่านเดิม)
+  /// - new_password: String (รหัสผ่านใหม่)
+  ///
+  /// Response HTTP Codes:
+  /// - 200: เปลี่ยนรหัสผ่านสำเร็จ
+  /// - 403: รหัสผ่านเดิมไม่ถูกต้อง (error_type: "invalid_old_password")
+  /// - 422: รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม (error_type: "password_reused")
+  @PUT('/customer/change-password')
+  Future<HttpResponse<BaseResponse>> changePassword(
+    @Body() ChangePasswordRequest body,
+  );
+
   /// DONG 2026-02-12
   ///
   /// API fetch popups สำหรับแสดงในแต่ละหน้า

@@ -205,6 +205,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get forgotYourPassword => 'ลืมรหัสผ่าน?';
 
   @override
+  String get changePasswordQuestion => 'เปลี่ยนรหัสผ่าน?';
+
+  @override
   String get becomeFriendsWithBrowny => 'เป็นเพื่อนกับ Browny';
 
   @override
@@ -275,6 +278,22 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get skip => 'ข้าม';
+
+  @override
+  String get success => 'สำเร็จ';
+
+  @override
+  String get referralSavedSuccessfully => 'บันทึกชวนเพื่อนเรียบร้อยแล้ว';
+
+  @override
+  String get passwordChangedSuccessfully => 'เปลี่ยนรหัสผ่านสำเร็จ';
+
+  @override
+  String get invalidContactInfoError =>
+      'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง';
+
+  @override
+  String get requestNewCode => 'ขอรหัสใหม่';
 
   @override
   String get eVouchers => 'E-Voucher';
@@ -354,6 +373,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get setYourNewPassword => 'กำหนดรหัสผ่านใหม่';
 
   @override
+  String get setNewPasswordReady =>
+      'แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย';
+
+  @override
   String get inputPassword => 'สร้างรหัสผ่าน';
 
   @override
@@ -362,6 +385,13 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get enterPhoneNumberOfaReferrer =>
       'กรอกหมายเลขโทรศัพท์ของเพื่อนที่แนะนำมา';
+
+  @override
+  String get enterFriendPhoneNumber => 'กรอกเบอร์เพื่อนสมาชิก';
+
+  @override
+  String get friendReferralDescription =>
+      'กรอกเบอร์มือถือของเพื่อนที่แนะนำให้พี่รู้จักน้องบราวนี่';
 
   @override
   String get thisNumberDoesNotExist => 'ไม่มีหมายเลขนี้ในระบบ';

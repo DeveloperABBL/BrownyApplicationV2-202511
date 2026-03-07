@@ -206,32 +206,7 @@ class __MachineContentState extends State<_MachineContent>
           context.pop();
         }
 
-        // ReceiptMachinePage.goToPage(
-        //   context,
-        //   viewmodel: _viewmodel,
-        // );
-
-        AppOverlays.showBrownyDialog(
-          context,
-          imageAsset: Assets.png.brownySuccess.path,
-          title: context.wording.transactionSuccessful, // เดิม: ชำระเงินสำเร็จ
-          message: context
-              .wording
-              .orderCompletedMessage, // เดิม: คำสั่งซื้อของคุณเสร็จสิ้น
-          confirmText: context.wording.confirm,
-          onConfirm: () async {
-            if (!mounted) return;
-            AppOverlays.showLoading(context);
-            await _viewmodel.fetchMachineReceipt();
-
-            if (!mounted) return;
-            AppOverlays.hideLoading();
-            ReceiptMachinePage.goReplacementPage(
-              context,
-              viewmodel: _viewmodel,
-            );
-          },
-        );
+        _showDialogPaymentSuccess();
       } else if (status.isNotFound) {
         // Order not found
         _stopPolling();
@@ -253,6 +228,31 @@ class __MachineContentState extends State<_MachineContent>
       }
       // If pending, continue polling
     }
+  }
+
+  /// แสดง Popup ทำรายการทุกอย่างสำเร็จ เพื่อไปหน้า Receipt
+  void _showDialogPaymentSuccess() {
+    AppOverlays.showBrownyDialog(
+      context,
+      imageAsset: Assets.png.brownySuccess.path,
+      title: context.wording.transactionSuccessful, // เดิม: ชำระเงินสำเร็จ
+      message: context
+          .wording
+          .orderCompletedMessage, // เดิม: คำสั่งซื้อของคุณเสร็จสิ้น
+      confirmText: context.wording.confirm,
+      onConfirm: () async {
+        if (!mounted) return;
+        AppOverlays.showLoading(context);
+        await _viewmodel.fetchMachineReceipt();
+
+        if (!mounted) return;
+        AppOverlays.hideLoading();
+        ReceiptMachinePage.goToPage(
+          context,
+          viewmodel: _viewmodel,
+        );
+      },
+    );
   }
 
   void _onPurchaseClicked() async {
@@ -309,6 +309,18 @@ class __MachineContentState extends State<_MachineContent>
                 // เดิม: ไม่พบข้อมูล Payment Reference
                 message: context.wording.paymentReferenceNotFound,
               );
+              return;
+            }
+
+            // เช็ค Status ว่าชำระเงินแล้ว
+            if (orderResponse.data!.isPaymentPaid) {
+              // ถ้าน้อยกว่าหรือ 0.0 บาท จะแสดง popup ไปหน้า receipt เลย
+              _paymentProcessing = false;
+
+              if (!mounted) return;
+              // เก็บ paymentRef ก่อนที่จะ call payment check
+              _currentPaymentRef = paymentRef;
+              _checkPaymentStatus();
               return;
             }
 

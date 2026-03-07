@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/change_password_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
@@ -63,8 +64,14 @@ mixin CustomerDataSourceMixin {
 
   /// ฟังก์ชันอัพเดทรหัสผ่านของผู้ใช้
   /// [data] - Map ที่มี 'id' (UUID ของผู้ใช้) และ 'new_password' (รหัสผ่านใหม่)
-  /// คืนค่าเป็น Future ของ RepoResult<bool> ที่บอกว่าอัพเดทสำเร็จหรือไม่
+  /// คืนค่าเป็น Future ของ RepoResult bool ที่บอกว่าอัพเดทสำเร็จหรือไม่
   Future<RepoResult<bool>> updatePassword(Map<String, String> data);
+
+  /// ฟังก์ชันเปลี่ยนรหัสผ่านของผู้ใช้
+  /// - id: String (customer_id UUID)
+  /// - old_password: String (รหัสผ่านเดิม)
+  /// - new_password: String (รหัสผ่านใหม่)
+  Future<RepoResult<bool>> changePassword(ChangePasswordRequest data);
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
@@ -490,6 +497,32 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
         return RepoResult.empty(error: Unprocessable());
       }
 
+      return RepoResult.error(error: dioEx);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<bool>> changePassword(ChangePasswordRequest data) async {
+    try {
+      final response = await requireRemote.changePassword(data);
+
+      if (response.isSuccessful) {
+        return RepoResult.success(data: response.data.success);
+      }
+
+      return RepoResult.empty();
+    } on DioException catch (dioEx) {
+      // ใส่รหัสผ่านปัจจุบันไม่ถูก
+      if (dioEx.response!.isForbidden) {
+        return RepoResult.empty(error: ChangePasswordInvalidOldPassword());
+      }
+
+      // ใช้รหัสผ่านซ้ำกับปัจจุบัน
+      if (dioEx.response!.isUnprocessable) {
+        return RepoResult.empty(error: ChangePasswordReused());
+      }
       return RepoResult.error(error: dioEx);
     } on Exception catch (e) {
       return RepoResult.error(error: e);

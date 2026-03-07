@@ -205,6 +205,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotYourPassword => 'Forgot your password?';
 
   @override
+  String get changePasswordQuestion => 'Change Password?';
+
+  @override
   String get becomeFriendsWithBrowny => 'Become Friends with Browny';
 
   @override
@@ -275,6 +278,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skip => 'Skip';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get referralSavedSuccessfully => 'Referral saved successfully';
+
+  @override
+  String get passwordChangedSuccessfully => 'Password changed successfully';
+
+  @override
+  String get invalidContactInfoError =>
+      'Invalid contact information. Please try again.';
+
+  @override
+  String get requestNewCode => 'Request new code';
 
   @override
   String get eVouchers => 'E-Voucher';
@@ -353,6 +372,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setYourNewPassword => 'Set your new password';
 
   @override
+  String get setNewPasswordReady =>
+      'Just set a new password and you\'re ready to go! Let\'s get started';
+
+  @override
   String get inputPassword => 'Input password';
 
   @override
@@ -360,6 +383,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterPhoneNumberOfaReferrer => 'Enter phone number of a referrer.';
+
+  @override
+  String get enterFriendPhoneNumber => 'Enter Friend\'s Phone Number';
+
+  @override
+  String get friendReferralDescription =>
+      'Enter the phone number of the friend who referred you to Browny';
 
   @override
   String get thisNumberDoesNotExist => 'This number does not exist.';

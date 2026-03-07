@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
@@ -34,6 +35,19 @@ class ProfilePage extends StatelessWidget {
   static final pagePath = '/profile_page';
   static final pageName = 'profile_page';
   static final kFirstSignup = 'first_signup';
+
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    bool isFirstSignup = false,
+  }) async {
+    return await context.pushNamed(
+      ProfilePage.pageName,
+      extra: {
+        ProfilePage.kFirstSignup: isFirstSignup,
+      },
+    );
+  }
 
   final bool isFirstSignup;
 
@@ -430,8 +444,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   onPressed: () {
                     AppOverlays.showBrownyDialog(
                       context,
-                      title: 'ยืนยันการข้าม',
-                      message: 'คุณต้องการข้ามการบันทึกข้อมูลโปรไฟล์?',
+                      title: ContentLocalizeData(
+                        en: 'Confirm Skip',
+                        zh: '确认跳过',
+                        th: 'ยืนยันการข้าม',
+                      ).getTextByLocale(context.languageCode),
+                      message: ContentLocalizeData(
+                        en: 'Are you sure you want to skip saving your profile?',
+                        zh: '确定要跳过保存个人资料吗？',
+                        th: 'คุณต้องการข้ามการบันทึกข้อมูลโปรไฟล์?',
+                      ).getTextByLocale(context.languageCode),
                       confirmText: context.wording.confirm,
                       cancelText: context.wording.cancel,
                       imageAsset: Assets.png.brownyCreatePin.path,

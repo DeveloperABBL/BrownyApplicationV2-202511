@@ -484,6 +484,12 @@ abstract class AppLocalizations {
   /// **'Forgot your password?'**
   String get forgotYourPassword;
 
+  /// No description provided for @changePasswordQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password?'**
+  String get changePasswordQuestion;
+
   /// No description provided for @becomeFriendsWithBrowny.
   ///
   /// In en, this message translates to:
@@ -627,6 +633,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get skip;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @referralSavedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral saved successfully'**
+  String get referralSavedSuccessfully;
+
+  /// No description provided for @passwordChangedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangedSuccessfully;
+
+  /// No description provided for @invalidContactInfoError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid contact information. Please try again.'**
+  String get invalidContactInfoError;
+
+  /// No description provided for @requestNewCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Request new code'**
+  String get requestNewCode;
 
   /// No description provided for @eVouchers.
   ///
@@ -778,6 +814,12 @@ abstract class AppLocalizations {
   /// **'Set your new password'**
   String get setYourNewPassword;
 
+  /// No description provided for @setNewPasswordReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Just set a new password and you\'re ready to go! Let\'s get started'**
+  String get setNewPasswordReady;
+
   /// No description provided for @inputPassword.
   ///
   /// In en, this message translates to:
@@ -795,6 +837,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter phone number of a referrer.'**
   String get enterPhoneNumberOfaReferrer;
+
+  /// No description provided for @enterFriendPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Friend\'s Phone Number'**
+  String get enterFriendPhoneNumber;
+
+  /// No description provided for @friendReferralDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the phone number of the friend who referred you to Browny'**
+  String get friendReferralDescription;
 
   /// No description provided for @thisNumberDoesNotExist.
   ///

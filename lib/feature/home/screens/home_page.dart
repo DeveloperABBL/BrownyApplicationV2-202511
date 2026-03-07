@@ -25,6 +25,7 @@ import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmod
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/foundation.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -269,17 +270,19 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     // TODO ต้องเอาออก
                     GestureDetector(
                       onTap: () {
-                        // final data = Uri.parse(
-                        //   'http://brownypay.com/wash/dry/13',
-                        // );
-                        // if (data.pathSegments.isNotEmpty) {
-                        //   MachineTransactionPage2.goToPage(
-                        //     context,
-                        //     machineId: data.pathSegments.last,
-                        //   );
-                        // }
+                        if (kDebugMode) {
+                          final data = Uri.parse(
+                            'http://brownypay.com/wash/dry/13',
+                          );
+                          if (data.pathSegments.isNotEmpty) {
+                            MachineTransactionPage2.goToPage(
+                              context,
+                              machineId: data.pathSegments.last,
+                            );
+                          }
 
-                        // MachineStatusPage.goToPage(context, machineId: '13');
+                          // MachineStatusPage.goToPage(context, machineId: '13');
+                        }
                       },
                       child: SizedBox(
                         height: AppDims.size_106.h,
@@ -845,23 +848,18 @@ class _HomePageWidgetState extends State<HomePageWidget>
               backgroundColor: AppColors.background,
               child: IconButton(
                 onPressed: () async {
-                  // await InvitBottomSheetDialog.showInvitBottomSheet(
-                  //   context,
-                  //   _viewmodel,
-                  // );
-
-                  // NotificationHelper.showTestNotification(
-                  //   title: 'In-App Test Notification',
-                  //   body: 'body',
-                  // );
-
                   AppNotificationsPage.goToPage(context);
                 },
-                icon: Assets.svg.icNotification.svg(
-                  // เปลี่ยนสี svg
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
+                icon: Badge(
+                  alignment: AlignmentGeometry.topRight,
+                  backgroundColor: AppColors.error,
+                  smallSize: 7.r,
+                  child: Assets.svg.icNotification.svg(
+                    // เปลี่ยนสี svg
+                    colorFilter: ColorFilter.mode(
+                      AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),

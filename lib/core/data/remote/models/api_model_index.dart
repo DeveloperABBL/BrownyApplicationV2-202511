@@ -1,3 +1,4 @@
+export 'package:browny_applications_new/core/data/remote/models/request/change_password_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_collect_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';

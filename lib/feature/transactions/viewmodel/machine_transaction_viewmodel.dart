@@ -415,7 +415,7 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   }
 
   @override
-  Future<UiResult<void>> verifyOrder() async {
+  Future<UiResult<double>> verifyOrder() async {
     try {
       if (paymentSelected?.isTpWallet == true) {
         final result = await _couponRepo.fetchCustomerCredit(
@@ -439,12 +439,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
         final machinePrice = _machineProgramsNotifier.value.data!.getNetPrice();
         if (tpWalletBalance >= machinePrice) {
-          return UiResult.success(data: null);
+          return UiResult.success(data: machinePrice);
         }
 
         return UiResult.empty();
       } else {
-        return UiResult.success(data: null);
+        return UiResult.success(
+          data: _machineProgramsNotifier.value.data!.getNetPrice(),
+        );
       }
     } catch (e) {
       return UiResult.error(error: Unprocessable(e.toString()));

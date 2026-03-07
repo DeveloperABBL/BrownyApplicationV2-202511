@@ -182,6 +182,7 @@ class _MachineStatusContentState extends State<MachineStatusContent>
       confirmText: context.wording.checkStatus,
       // แจ้งปัญหาการใช้งาน
       cancelText: context.wording.reportProblem,
+      barrierDismissible: false,
       onCancel: () async {
         await ContactPage.goToPage(
           context,

@@ -51,12 +51,35 @@ class CreateAppPinPage extends StatelessWidget {
   static Future<T?> goToPage<T>(
     BuildContext context, {
     bool isFirstSingup = false,
+    bool implementBackButton = false,
     required PinBiometricPross process,
   }) async {
     return await context.pushNamed(
       // Transaction Create PIN
       CreateAppPinPage.pageName,
       extra: {
+        CreateAppPinPage.kImplementBackButton: implementBackButton,
+        // ไม่ใช้การ signup ใหม่
+        CreateAppPinPage.kFirstSignup: isFirstSingup,
+        // Map<Type, PinBiometricPross>
+        CreateAppPinPage.kPinBiometricProcess: {
+          PinBiometricPross: process,
+        },
+      },
+    );
+  }
+
+  static void goReplacementPage<T>(
+    BuildContext context, {
+    bool isFirstSingup = false,
+    bool implementBackButton = false,
+    required PinBiometricPross process,
+  }) async {
+    context.pushReplacementNamed(
+      // Transaction Create PIN
+      CreateAppPinPage.pageName,
+      extra: {
+        CreateAppPinPage.kImplementBackButton: implementBackButton,
         // ไม่ใช้การ signup ใหม่
         CreateAppPinPage.kFirstSignup: isFirstSingup,
         // Map<Type, PinBiometricPross>

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
@@ -476,7 +477,11 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             AppDims.vericalPadding_16,
 
             AppText(
-              'พบกันเร็ว ๆ นี้',
+              ContentLocalizeData(
+                en: 'Coming Soon.',
+                zh: '敬请期待',
+                th: 'พบกันเร็ว ๆ นี้',
+              ).getTextByLocale(context.languageCode),
               style: context.textTheme.labelLarge!.copyWith(
                 fontSize: AppDims.size_16.sp,
               ),

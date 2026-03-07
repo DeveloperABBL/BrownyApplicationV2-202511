@@ -201,6 +201,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get forgotYourPassword => '忘记密码？';
 
   @override
+  String get changePasswordQuestion => '更改密码？';
+
+  @override
   String get becomeFriendsWithBrowny => '成为布朗尼的朋友';
 
   @override
@@ -271,6 +274,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get skip => '跳过';
+
+  @override
+  String get success => '成功';
+
+  @override
+  String get referralSavedSuccessfully => '推荐保存成功';
+
+  @override
+  String get passwordChangedSuccessfully => '密码更改成功';
+
+  @override
+  String get invalidContactInfoError => '联系信息无效，请重试。';
+
+  @override
+  String get requestNewCode => '请求新验证码';
 
   @override
   String get eVouchers => 'E-Voucher';
@@ -348,6 +366,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setYourNewPassword => '设置新密码';
 
   @override
+  String get setNewPasswordReady => '只需设置新密码即可继续！让我们开始吧';
+
+  @override
   String get inputPassword => '输入密码';
 
   @override
@@ -355,6 +376,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enterPhoneNumberOfaReferrer => '输入推荐人手机号。';
+
+  @override
+  String get enterFriendPhoneNumber => '输入好友电话号码';
+
+  @override
+  String get friendReferralDescription => '输入介绍您认识布朗尼的朋友的手机号码';
 
   @override
   String get thisNumberDoesNotExist => '该号码不存在。';

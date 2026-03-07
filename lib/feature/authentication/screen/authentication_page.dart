@@ -1,28 +1,16 @@
 // ignore_for_file: unused_element_parameter
 
-import 'package:browny_applications_new/core/utils/launch_helper.dart';
+import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
-import 'package:browny_applications_new/res/colors/app_colors.dart';
-import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:browny_applications_new/res/strings/app_strings.dart';
-import 'package:browny_applications_new/res/styles/app_text_style.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
-import 'package:browny_applications_new/core/widgets/app_overlays.dart';
-import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
-import 'package:provider/provider.dart';
 
 /// หน้าหลักสำหรับการ Authentication (Login, Sign Up, Forgot Password, OTP)
 ///
@@ -44,6 +32,19 @@ class AuthenticationPage extends StatelessWidget {
     BuildContext context, {
     required AuthenProcess process,
   }) async {
+    if (context.read<CustomerProvider>().current.isGuest) {
+      if ([
+        AuthenProcess.changePassword,
+        AuthenProcess.forgotPassword,
+      ].contains(process)) {
+        return await context.pushNamed(
+          AuthenticationPage.pageName,
+          extra: {
+            AuthenProcess: AuthenProcess.login,
+          },
+        );
+      }
+    }
     return await context.pushNamed(
       AuthenticationPage.pageName,
       extra: {
@@ -204,6 +205,15 @@ class _AuthenticationWidgetState extends State<_AuthenticationWidget> {
 
           // default:
           //   return SizedBox();
+          case AuthenProcess.changePassword:
+            // หน้าสำหรับเปลี่ยนรหัสผ่าน
+            return _ChangePasswordWidget();
+          case AuthenProcess.changePasswordOTP:
+            // หน้าสำหรับกรอก OTP
+            return _ChangePasswordOTPWidget();
+          case AuthenProcess.changePasswordNewPassword:
+            // หน้าสำหรับกรอกรหัสผ่านเก่าและรหัสผ่านใหม่
+            return _ChangePasswordNewPasswordWidget();
         }
       }).toList(),
     );
@@ -443,19 +453,24 @@ class _SignUpWidget extends StatelessWidget {
     if (loginResult.data!.firstLogin == true) {
       viewmodel(context).goToProcess(AuthenProcess.referral, animate: false);
     } else {
-      context.pushReplacementNamed(
-        // Signup
-        CreateAppPinPage.pageName,
-        extra: {
-          CreateAppPinPage.kImplementBackButton: false,
-          CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
-          // Map<Type, PinBiometricPross>
-          CreateAppPinPage.kPinBiometricProcess: {
-            PinBiometricPross: PinBiometricPross.create,
-          },
-          // CreateAppPinPage.kFirstSignup: true,
-        },
+      CreateAppPinPage.goReplacementPage(
+        context,
+        isFirstSingup: loginResult.data!.firstLogin == true,
+        process: PinBiometricPross.create,
       );
+      // context.pushReplacementNamed(
+      //   // Signup
+      //   CreateAppPinPage.pageName,
+      //   extra: {
+      //     CreateAppPinPage.kImplementBackButton: false,
+      //     CreateAppPinPage.kFirstSignup: loginResult.data!.firstLogin == true,
+      //     // Map<Type, PinBiometricPross>
+      //     CreateAppPinPage.kPinBiometricProcess: {
+      //       PinBiometricPross: PinBiometricPross.create,
+      //     },
+      //     // CreateAppPinPage.kFirstSignup: true,
+      //   },
+      // );
     }
   }
 
@@ -705,7 +720,8 @@ class _SignUpWidget extends StatelessWidget {
                   AppOverlays.showBrownyDialog(
                     context,
                     title: context.wording.errorOccurred,
-                    message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+                    // ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
+                    message: context.wording.invalidContactInfoError,
                   );
                 }
               },
@@ -884,7 +900,11 @@ class _OTPContent extends _SignUpWidget {
                     builder: (context, value, _) {
                       return Center(
                         child: AppText(
-                          'รหัสอ้างอิง ${value.refCode}',
+                          ContentLocalizeData(
+                            en: 'Referral Code ${value.refCode}',
+                            zh: '推荐码 ${value.refCode}',
+                            th: 'รหัสอ้างอิง ${value.refCode}',
+                          ).getTextByLocale(context.languageCode),
                           style: context.textTheme.bodyMedium?.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -990,7 +1010,8 @@ class _OTPContent extends _SignUpWidget {
                   ),
                 ),
                 child: AppText(
-                  'ขอรหัสใหม่',
+                  // ขอรหัสใหม่
+                  context.wording.requestNewCode,
                   style: context.textTheme.labelLarge?.copyWith(
                     color: AppColors.primary,
                   ),
@@ -1005,7 +1026,11 @@ class _OTPContent extends _SignUpWidget {
                 return Padding(
                   padding: EdgeInsets.only(top: AppDims.size_8.h),
                   child: AppText(
-                    'ขอรหัสใหม่ใน $seconds วินาที',
+                    ContentLocalizeData(
+                      en: 'Resend in $seconds seconds',
+                      zh: '$seconds 秒后可重发',
+                      th: 'ขอรหัสใหม่ใน $seconds วินาที',
+                    ).getTextByLocale(context.languageCode),
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: AppColors.black,
                       fontWeight: FontWeight.w300,
@@ -1337,18 +1362,22 @@ class _LoginWidget extends _SignUpWidget {
 
               // สำเร็จ → ออกจากหน้า Authentication
               if (result.isSuccess) {
-                context.pushReplacementNamed(
-                  // Login
-                  CreateAppPinPage.pageName,
-                  extra: {
-                    CreateAppPinPage.kImplementBackButton: false,
-                    CreateAppPinPage.kFirstSignup: false,
-                    // Map<Type, PinBiometricPross>
-                    CreateAppPinPage.kPinBiometricProcess: {
-                      PinBiometricPross: PinBiometricPross.create,
-                    },
-                  },
+                CreateAppPinPage.goReplacementPage(
+                  context,
+                  process: PinBiometricPross.create,
                 );
+                // context.pushReplacementNamed(
+                //   // Login
+                //   CreateAppPinPage.pageName,
+                //   extra: {
+                //     CreateAppPinPage.kImplementBackButton: false,
+                //     CreateAppPinPage.kFirstSignup: false,
+                //     // Map<Type, PinBiometricPross>
+                //     CreateAppPinPage.kPinBiometricProcess: {
+                //       PinBiometricPross: PinBiometricPross.create,
+                //     },
+                //   },
+                // );
                 // context.pop();
               }
             },
@@ -1370,7 +1399,7 @@ class _LoginWidget extends _SignUpWidget {
     if (error is UserNotFound || error is UserUnauthorized) {
       message = (error as AuthenExceptions).toUiMessage(context);
     } else {
-      message = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+      message = context.wording.errorUi;
     }
 
     AppOverlays.showBrownyDialog(
@@ -1399,7 +1428,8 @@ class _ReferralWidget extends _SignUpWidget {
   Widget contentTitle(BuildContext context, {required String wording}) {
     return super.contentTitle(
       context,
-      wording: 'กรอกเบอร์เพื่อนสมาชิก',
+      // กรอกเบอร์เพื่อนสมาชิก
+      wording: context.wording.enterFriendPhoneNumber,
     );
   }
 
@@ -1407,7 +1437,8 @@ class _ReferralWidget extends _SignUpWidget {
   Widget contentDescription(BuildContext context, {required String wording}) {
     return super.contentDescription(
       context,
-      wording: 'กรอกเบอร์มือถือของเพื่อนที่แนะนำให้พี่รู้จักน้องบราวนี่',
+      // กรอกเบอร์มือถือของเพื่อนที่แนะนำให้พี่รู้จักน้องบราวนี่
+      wording: context.wording.friendReferralDescription,
     );
   }
 
@@ -1446,8 +1477,10 @@ class _ReferralWidget extends _SignUpWidget {
                           AppOverlays.showBrownyDialog(
                             context,
                             imageAsset: Assets.png.brownySuccess1.path,
-                            title: 'สำเร็จ',
-                            message: 'บันทึกชวนเพื่อนเรียบร้อยแล้ว',
+                            // สำเร็จ
+                            title: context.wording.success,
+                            // บันทึกชวนเพื่อนเรียบร้อยแล้ว
+                            message: context.wording.referralSavedSuccessfully,
                             onConfirm: () {
                               goToProcess(
                                 context,
@@ -1456,18 +1489,23 @@ class _ReferralWidget extends _SignUpWidget {
                               );
                             },
                           );
-                          context.pushNamed(
-                            // Save Referral summit
-                            CreateAppPinPage.pageName,
-                            extra: {
-                              CreateAppPinPage.kImplementBackButton: false,
-                              CreateAppPinPage.kFirstSignup: true,
-                              // Map<Type, PinBiometricPross>
-                              CreateAppPinPage.kPinBiometricProcess: {
-                                PinBiometricPross: PinBiometricPross.create,
-                              },
-                            },
+                          CreateAppPinPage.goToPage(
+                            context,
+                            isFirstSingup: true,
+                            process: PinBiometricPross.create,
                           );
+                          // context.pushNamed(
+                          //   // Save Referral summit
+                          //   CreateAppPinPage.pageName,
+                          //   extra: {
+                          //     CreateAppPinPage.kImplementBackButton: false,
+                          //     CreateAppPinPage.kFirstSignup: true,
+                          //     // Map<Type, PinBiometricPross>
+                          //     CreateAppPinPage.kPinBiometricProcess: {
+                          //       PinBiometricPross: PinBiometricPross.create,
+                          //     },
+                          //   },
+                          // );
                         } else {
                           if (context.mounted) {
                             AppOverlays.showBrownyDialog(
@@ -1496,18 +1534,23 @@ class _ReferralWidget extends _SignUpWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          context.pushReplacementNamed(
-            // Save Referral Skip
-            CreateAppPinPage.pageName,
-            extra: {
-              CreateAppPinPage.kImplementBackButton: false,
-              CreateAppPinPage.kFirstSignup: true,
-              // Map<Type, PinBiometricPross>
-              CreateAppPinPage.kPinBiometricProcess: {
-                PinBiometricPross: PinBiometricPross.create,
-              },
-            },
+          CreateAppPinPage.goReplacementPage(
+            context,
+            isFirstSingup: true,
+            process: PinBiometricPross.create,
           );
+          // context.pushReplacementNamed(
+          //   // Save Referral Skip
+          //   CreateAppPinPage.pageName,
+          //   extra: {
+          //     CreateAppPinPage.kImplementBackButton: false,
+          //     CreateAppPinPage.kFirstSignup: true,
+          //     // Map<Type, PinBiometricPross>
+          //     CreateAppPinPage.kPinBiometricProcess: {
+          //       PinBiometricPross: PinBiometricPross.create,
+          //     },
+          //   },
+          // );
         },
         child: AppText(
           '${context.wording.skip} ',
@@ -1681,6 +1724,7 @@ class _ForgotPasswordWidget extends _SignUpWidget {
   Widget contentTitle(BuildContext context, {required String wording}) {
     return super.contentTitle(
       context,
+      // ลืมรหัสผ่าน?
       wording: context.wording.forgotYourPassword,
     );
   }
@@ -1715,6 +1759,7 @@ class _ResetPasswordWidget extends _SignUpWidget {
   Widget contentTitle(BuildContext context, {required String wording}) {
     return super.contentTitle(
       context,
+      // กำหนดรหัสผ่านใหม่
       wording: context.wording.setYourNewPassword,
     );
   }
@@ -1723,7 +1768,8 @@ class _ResetPasswordWidget extends _SignUpWidget {
   Widget contentDescription(BuildContext context, {required String wording}) {
     return super.contentDescription(
       context,
-      wording: 'แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย',
+      // แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย
+      wording: context.wording.setNewPasswordReady,
     );
   }
 
@@ -1740,7 +1786,7 @@ class _ResetPasswordWidget extends _SignUpWidget {
               obscureText: isObscured,
               decoration: InputDecoration(
                 hint: AppText(
-                  context.wording.password,
+                  context.wording.newPassword,
                   style: DefaultTextStyle.of(context).style.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -1782,7 +1828,7 @@ class _ResetPasswordWidget extends _SignUpWidget {
               obscureText: isObscured,
               decoration: InputDecoration(
                 hint: AppText(
-                  context.wording.password,
+                  context.wording.confirmNewPassword,
                   style: DefaultTextStyle.of(context).style.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -1903,13 +1949,398 @@ class _ResetPasswordWidget extends _SignUpWidget {
                           AppOverlays.showBrownyDialog(
                             context,
                             imageAsset: Assets.png.brownySuccess1.path,
-                            message: 'เปลี่ยนรหัสผ่านสำเร็จ',
+                            // เปลี่ยนรหัสผ่านสำเร็จ
+                            message:
+                                context.wording.passwordChangedSuccessfully,
                             onConfirm: () {
                               goToProcess(
                                 context,
                                 AuthenProcess.login,
                                 animate: false,
                               );
+                            },
+                          );
+                        });
+                      }
+                    : null,
+                child: AppText(context.wording.repeatPassword),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// reset password
+  @override
+  Widget contentSocialLoginSeparator(BuildContext context) => SizedBox();
+
+  /// reset password
+  @override
+  Widget contentSocialLogin(BuildContext context) => SizedBox();
+}
+
+class _ChangePasswordOTPWidget extends StatefulWidget {
+  const _ChangePasswordOTPWidget({super.key});
+
+  @override
+  State<_ChangePasswordOTPWidget> createState() =>
+      __ChangePasswordOTPWidgetState();
+}
+
+class __ChangePasswordOTPWidgetState extends State<_ChangePasswordOTPWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    // เริ่ม OTP Timer เมื่อหน้าแสดง (หลัง build เสร็จ)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      AppOverlays.showLoading(context);
+      await context.read<AuthenticationViewModel>().startOtpTimer();
+
+      AppOverlays.hideLoading();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _ChangePasswordOTPContent();
+  }
+}
+
+class _ChangePasswordOTPContent extends _OTPContent {
+  const _ChangePasswordOTPContent();
+
+  @override
+  Future<void> _summitOtp(BuildContext context) async {
+    // สำเร็จ → หน้าไป resetpassword
+    goToProcess(
+      context,
+      AuthenProcess.changePasswordNewPassword,
+    );
+  }
+}
+
+/// หน้า Change Password (เปลี่ยนรหัสผ่าน)
+///
+/// **Extends จาก [_SignUpWidget]:**
+/// - ใช้โครงสร้างและ UI หลักร่วมกัน
+/// - Override เฉพาะส่วนที่แตกต่าง
+///
+/// **ความแตกต่างจาก Sign Up:**
+/// - เปลี่ยน Title/Description เป็น "เปลี่ยนรหัสผ่าน"
+/// - ฟอร์มมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์
+/// - ไม่มีช่องกรอกรหัสผ่าน
+/// - ไม่มี Checkbox ยอมรับข้อตกลง
+/// - ไม่มี Social Login และ Separator
+/// - ปุ่ม Submit ข้อความ "ถัดไป" (Next)
+/// - ปุ่ม Submit เรียก vm.onSignUp() (TODO: should be vm.onChangePassword)
+class _ChangePasswordWidget extends _SignUpWidget {
+  const _ChangePasswordWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
+    );
+  }
+
+  /// ปุ่ม Submit สำหรับ Change Password
+  /// - ข้อความ "ถัดไป" (Next)
+  @override
+  Widget contentButtonSummit(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () async {
+              AppOverlays.showLoading(context);
+              final result = await vm.onSummitForm();
+
+              if (!context.mounted) return;
+              AppOverlays.hideLoading();
+
+              if (result.isEmpty && !result.hasError) {
+                return;
+              }
+
+              if (!result.isSuccess) {
+                AppOverlays.showBrownyDialog(
+                  context,
+                  title: context.wording.errorOccurred,
+                  message: context.wording.errorUi,
+                );
+                return;
+              }
+
+              goToProcess(context, AuthenProcess.changePasswordOTP);
+            },
+            child: AppText(context.wording.next),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Key getFormKey(BuildContext context) {
+    return viewmodel(context).formKeyForgetPasswordUsername;
+  }
+
+  /// ไม่แสดง Social Login
+  @override
+  Widget contentSocialLogin(BuildContext context) => SizedBox();
+
+  /// ไม่แสดง Separator
+  @override
+  Widget contentSocialLoginSeparator(BuildContext context) => SizedBox();
+
+  /// ฟอร์มมีเฉพาะช่องกรอกอีเมล/เบอร์โทรศัพท์
+  /// - ไม่มีช่องรหัสผ่าน
+  /// - ไม่มี Checkbox
+  @override
+  List<Widget> listOfFormAuth(
+    BuildContext context,
+    AuthenticationViewModel vm,
+  ) => [
+    textFormFieldEmailOrPhone(context),
+    AppDims.vericalPadding_12,
+  ];
+
+  /// ไม่แสดง Checkbox ยอมรับข้อตกลง (return spacing แทน)
+  @override
+  Widget contentCheckboxTermOfPolicy(BuildContext context) {
+    return AppDims.vericalPadding_12;
+  }
+
+  /// เปลี่ยน Title เป็น "เปลี่ยนรหัสผ่าน"
+  @override
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return super.contentTitle(
+      context,
+      // เปลี่ยนรหัสผ่าน?
+      wording: context.wording.changePasswordQuestion,
+    );
+  }
+
+  /// เปลี่ยน Description เป็นคำอธิบายการลืมรหัสผ่าน
+  @override
+  Widget contentDescription(BuildContext context, {required String wording}) {
+    return super.contentDescription(
+      context,
+      wording: context.wording.forgotPasswordDescription,
+    );
+  }
+}
+
+/// DONG 2026-03-07
+///
+/// หน้าสำหรับเปลี่ยนรหัสผ่านไม่ จะไม่เหมือนลืมรหัสผ่าน ต้องกรอก รหัสผ่านเดิม และรหัสผ่านใหม่
+class _ChangePasswordNewPasswordWidget extends _SignUpWidget {
+  const _ChangePasswordNewPasswordWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constrainedBox) {
+        return buildContent(constrainedBox, context);
+      },
+    );
+  }
+
+  @override
+  Key getFormKey(BuildContext context) =>
+      viewmodel(context).formKeyForgetPasswordReset;
+
+  @override
+  Widget contentTitle(BuildContext context, {required String wording}) {
+    return super.contentTitle(
+      context,
+      // กำหนดรหัสผ่านใหม่
+      wording: context.wording.setYourNewPassword,
+    );
+  }
+
+  @override
+  Widget contentDescription(BuildContext context, {required String wording}) {
+    return super.contentDescription(
+      context,
+      // แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย
+      wording: context.wording.setNewPasswordReady,
+    );
+  }
+
+  @override
+  Widget textFormFieldPasswordWithObscure(BuildContext context) {
+    // TextField ใช้าสำหรับ กรอกรหัสปัจจุบัน
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.isObscure,
+          builder: (context, isObscured, _) {
+            return AppTextFormField(
+              controller: vm.passwordController,
+              textInputAction: TextInputAction.done,
+              obscureText: isObscured,
+              decoration: InputDecoration(
+                hint: AppText(
+                  // รหัสผ่านปัจจุบัน
+                  context.wording.currentPassword,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                prefixIcon: SizedBox.shrink(),
+                suffixIcon: IconButton(
+                  onPressed: vm.onObscureChange,
+                  icon: isObscured
+                      ? Assets.svg.icObscureOff.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        )
+                      : Assets.svg.icObscureOn.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        ),
+                ),
+              ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              // validator: (value) => getValidatorPassword(context, value),
+              // onChanged: vm.resetPasswordValidator,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// สร้าง TextFormField ใหม่ เพื่อใส่รหัสใหม่ที่ต้องการจะเปลี่ยน ต่อจาก [textFormFieldPasswordWithObscure]
+  Widget textFormFieldConfirmPasswordWithObscure(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.isObscure,
+          builder: (context, isObscured, _) {
+            return AppTextFormField(
+              controller: vm.confirmPasswordController,
+              textInputAction: TextInputAction.done,
+              obscureText: isObscured,
+              decoration: InputDecoration(
+                hint: AppText(
+                  // รหัสผ่านใหม่
+                  context.wording.newPassword,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                prefixIcon: SizedBox.shrink(),
+                suffixIcon: IconButton(
+                  onPressed: vm.onObscureChange,
+                  icon: isObscured
+                      ? Assets.svg.icObscureOff.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        )
+                      : Assets.svg.icObscureOn.svg(
+                          width: AppDims.size_16.w,
+                          height: AppDims.size_16.h,
+                        ),
+                ),
+              ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => viewmodel(
+                context,
+              ).changePasswordConfirmPasswordValidator(value),
+              onChanged: viewmodel(context).changePasswordValidator,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  List<Widget> listOfFormAuth(
+    BuildContext context,
+    AuthenticationViewModel vm,
+  ) => [
+    textFormFieldPasswordWithObscure(context),
+    AppDims.vericalPadding_12,
+    textFormFieldConfirmPasswordWithObscure(context),
+    AppDims.vericalPadding_8,
+
+    ValueListenableBuilder(
+      valueListenable: viewmodel(context).resetValidationNotifier,
+      builder: (context, value, child) {
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          minVerticalPadding: 0,
+          horizontalTitleGap: 0,
+          minTileHeight: 0,
+          leading: (value[ResetPasswordConditions.atleastLength] ?? false)
+              ? Assets.svg.icChecked.svg(width: 14.w)
+              : Assets.svg.icUnchecked.svg(width: 14.w),
+          title: AppText(
+            context.wording.atleast8Characters,
+            style: context.textTheme.bodySmall,
+          ),
+        );
+      },
+    ),
+
+    AppDims.vericalPadding_24,
+  ];
+
+  @override
+  String? getValidatorPassword(BuildContext context, String? value) =>
+      viewmodel(context).resetPasswordValidator(
+        value,
+      );
+
+  /// Change password
+  @override
+  Widget contentButtonSummit(BuildContext context) {
+    return Consumer<AuthenticationViewModel>(
+      builder: (context, vm, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: vm.validatorTriggle, // Signup
+          builder: (context, isValid, _) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isValid
+                    ? () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        AppOverlays.showLoading(context);
+                        // Change Password
+                        vm.onSummitForm().then((result) {
+                          if (!context.mounted) return;
+                          AppOverlays.hideLoading();
+
+                          if (result.hasError) {
+                            _showErrorDialog(
+                              context,
+                              result.error,
+                            );
+                            return;
+                          }
+
+                          if (result.isEmpty) {
+                            return;
+                          }
+
+                          AppOverlays.showBrownyDialog(
+                            context,
+                            imageAsset: Assets.png.brownySuccess1.path,
+                            // เปลี่ยนรหัสผ่านสำเร็จ,
+                            message:
+                                context.wording.passwordChangedSuccessfully,
+                            onConfirm: () {
+                              context.pop();
                             },
                           );
                         });

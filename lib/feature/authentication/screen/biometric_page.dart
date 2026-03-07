@@ -92,12 +92,13 @@ class _BiometricContentState extends State<_BiometricContent> {
           // Navigate to Profile
           // context.pushNamedAndClear(ProfilePage.pageName);
           if (widget.isFirstSignup) {
-            context.pushNamed(
-              ProfilePage.pageName,
-              extra: {
-                ProfilePage.kFirstSignup: true,
-              },
-            );
+            ProfilePage.goToPage(context, isFirstSignup: true);
+            // context.pushNamed(
+            //   ProfilePage.pageName,
+            //   extra: {
+            //     ProfilePage.kFirstSignup: true,
+            //   },
+            // );
           } else {
             context.pop();
           }
