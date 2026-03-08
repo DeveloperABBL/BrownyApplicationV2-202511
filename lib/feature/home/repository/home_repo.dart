@@ -1,8 +1,8 @@
-import 'dart:convert';
-
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/banner_collect_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_live_response.dart';
@@ -18,10 +18,18 @@ import 'package:flutter/foundation.dart';
 
 mixin HomeDataSourceMixin on CustomerDataSourceMixin {
   /// ดึงข้อมูล Banner สำหรับแสดงในหน้าหลัก
-  Future<RepoResult<BannerResponse>> fetchBanner();
+  ///
+  /// Parameters:
+  /// - customerId: UUID ของลูกค้า (nullable)
+  Future<RepoResult<BannerResponse>> fetchBanner({String? customerId});
 
   /// ดึงข้อมูล Banner Highlight สำหรับแสดงในหน้าหลัก
-  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight();
+  ///
+  /// Parameters:
+  /// - customerId: UUID ของลูกค้า (nullable)
+  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight({
+    String? customerId,
+  });
 
   /// ดึงข้อมูล Home Menu Items (รายการเมนูหน้าหลัก)
   Future<RepoResult<HomeMenuResponse>> fetchHomeMenu();
@@ -78,6 +86,21 @@ mixin HomeDataSourceMixin on CustomerDataSourceMixin {
 
   /// บันทึกว่า popup InvitFriend นี้ถูก dismiss สำหรับวันนี้
   void dismissInvitFriendForToday();
+
+  /// DONG 2026-03-08
+  ///
+  /// API Collect Banner (เก็บคูปองจาก Banner)
+  ///
+  /// Parameters:
+  /// - bannerId: ID ของ Banner
+  /// - customerId: UUID ของลูกค้า
+  ///
+  /// Returns:
+  /// - BannerCollectResponse with status และ message
+  Future<RepoResult<BannerCollectResponse>> collectBanner({
+    required int bannerId,
+    required String customerId,
+  });
 }
 
 class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
@@ -89,10 +112,10 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   }
 
   @override
-  Future<RepoResult<BannerResponse>> fetchBanner() async {
+  Future<RepoResult<BannerResponse>> fetchBanner({String? customerId}) async {
     try {
       // fetch data จาก api
-      final response = await requireRemote.fetchBanners();
+      final response = await requireRemote.fetchBanners(customerId);
 
       // ถ้าไม่ใช้ CODE Success จะ return Unknown error
       if (!response.isSuccessful) {
@@ -112,10 +135,12 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   }
 
   @override
-  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight() async {
+  Future<RepoResult<BannerHighlightResponse>> fetchBannerHighlight({
+    String? customerId,
+  }) async {
     try {
       // fetch data จาก api
-      final response = await requireRemote.fetchBannersHighlight();
+      final response = await requireRemote.fetchBannersHighlight(customerId);
 
       // ถ้าไม่ใช้ CODE Success จะ return Unknown error
       if (!response.isSuccessful) {
@@ -230,39 +255,39 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
     String? notificationToken,
   }) async {
     try {
-      // if (kDebugMode) {
-      //   return RepoResult.success(
-      //     data: WorkingMachinesResponse(
-      //       count: 2,
-      //       data: [
-      //         WorkingMachineData(
-      //           id: 13,
-      //           machineImage:
-      //               'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
-      //           finishDatatime: '23:30',
-      //           remainingTime: '00:00:10',
-      //           name: ContentLocalizeData(
-      //             th: "เครื่องซัก 1 / Test",
-      //             en: "Washer 1 / Test",
-      //             zh: "洗衣机 1 / Test",
-      //           ),
-      //         ),
-      //         WorkingMachineData(
-      //           id: 14,
-      //           machineImage:
-      //               'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
-      //           finishDatatime: '23:06',
-      //           remainingTime: '00:00:00',
-      //           name: ContentLocalizeData(
-      //             th: "เครื่องซัก 2 / Test",
-      //             en: "Washer 2 / Test",
-      //             zh: "洗衣机 2 / Test",
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   );
-      // }
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: WorkingMachinesResponse(
+            count: 2,
+            data: [
+              WorkingMachineData(
+                id: 13,
+                machineImage:
+                    'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+                finishDatatime: '16:30',
+                remainingTime: '00:08:00',
+                name: ContentLocalizeData(
+                  th: "เครื่องซัก 1 / Test",
+                  en: "Washer 1 / Test",
+                  zh: "洗衣机 1 / Test",
+                ),
+              ),
+              WorkingMachineData(
+                id: 14,
+                machineImage:
+                    'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+                finishDatatime: '23:06',
+                remainingTime: '00:00:00',
+                name: ContentLocalizeData(
+                  th: "เครื่องซัก 2 / Test",
+                  en: "Washer 2 / Test",
+                  zh: "洗衣机 2 / Test",
+                ),
+              ),
+            ],
+          ),
+        );
+      }
 
       final response = await requireRemote.fetchWorkingMachines(
         customerId: customerId,
@@ -292,6 +317,29 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
   ) async {
     try {
       final response = await requireRemote.fetchCustomerNotifications(uuid);
+
+      if (!response.isSuccessful) {
+        return RepoResult.error(
+          error: Exception('Unknown error.'),
+        );
+      }
+
+      return RepoResult.success(data: response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<BannerCollectResponse>> collectBanner({
+    required int bannerId,
+    required String customerId,
+  }) async {
+    try {
+      final response = await requireRemote.collectBanner(
+        bannerId,
+        BannerCollectRequest(customerId: customerId),
+      );
 
       if (!response.isSuccessful) {
         return RepoResult.error(

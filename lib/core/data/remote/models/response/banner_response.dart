@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
@@ -42,7 +43,11 @@ class BannerData {
     this.image,
     this.title,
     this.subtitle,
+    this.detail,
     this.dateTime,
+    this.hasButton,
+    this.buttonStatus,
+    this.couponId,
   });
 
   @JsonKey(name: 'id')
@@ -69,9 +74,23 @@ class BannerData {
   @JsonKey(name: 'subtitle')
   final ContentLocalizeData? subtitle;
 
+  @JsonKey(name: 'detail')
+  final ContentLocalizeData? detail;
+
   @DateTimeConverter()
   @JsonKey(name: 'date_time')
   final DateTime? dateTime;
+
+  @JsonKey(name: 'has_button')
+  final bool? hasButton;
+
+  @JsonKey(name: 'button_status')
+  final String? buttonStatus;
+
+  @JsonKey(name: 'coupon_id')
+  final int? couponId;
+
+  bool get isExternalLink => type.orEmpty.toLowerCase() == 'external_link';
 
   factory BannerData.fromJson(Map<String, dynamic> json) =>
       _$BannerDataFromJson(json);

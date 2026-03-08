@@ -81,7 +81,7 @@ class MachineOrderReceiptResponse {
   final String? qrImage;
 
   @JsonKey(name: 'review_score')
-  final int? reviewScore;
+  final String? reviewScore;
 
   factory MachineOrderReceiptResponse.fromJson(Map<String, dynamic> json) =>
       _$MachineOrderReceiptResponseFromJson(json);
@@ -105,7 +105,7 @@ class MachineOrderReceiptResponse {
     String? luckyNo,
     String? luckyImage,
     String? qrImage,
-    int? reviewScore,
+    String? reviewScore,
   }) {
     return MachineOrderReceiptResponse(
       total: total ?? this.total,

@@ -45,7 +45,13 @@ BannerData _$BannerDataFromJson(Map<String, dynamic> json) => BannerData(
   subtitle: json['subtitle'] == null
       ? null
       : ContentLocalizeData.fromJson(json['subtitle'] as Map<String, dynamic>),
+  detail: json['detail'] == null
+      ? null
+      : ContentLocalizeData.fromJson(json['detail'] as Map<String, dynamic>),
   dateTime: const DateTimeConverter().fromJson(json['date_time'] as String?),
+  hasButton: json['has_button'] as bool?,
+  buttonStatus: json['button_status'] as String?,
+  couponId: (json['coupon_id'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$BannerDataToJson(BannerData instance) =>
@@ -58,7 +64,11 @@ Map<String, dynamic> _$BannerDataToJson(BannerData instance) =>
       'image': instance.image,
       'title': instance.title,
       'subtitle': instance.subtitle,
+      'detail': instance.detail,
       'date_time': const DateTimeConverter().toJson(instance.dateTime),
+      'has_button': instance.hasButton,
+      'button_status': instance.buttonStatus,
+      'coupon_id': instance.couponId,
     };
 
 CategoryData _$CategoryDataFromJson(Map<String, dynamic> json) => CategoryData(

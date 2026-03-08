@@ -435,8 +435,9 @@ class _MyProfileAndPreferencesContentState
                         icon: Assets.profileQuickAction.icRefreshDouble.svg(),
                         // สถานะ
                         label: context.wording.status,
-                        onTap: () {
+                        onTap: () async {
                           // TODO: Navigate to status page
+                          await _showDialogComingSoon(context.wording.status);
                         },
                       ),
                       _buildQuickActionButton(
@@ -445,8 +446,9 @@ class _MyProfileAndPreferencesContentState
                         ),
                         // ประวัติ
                         label: context.wording.history,
-                        onTap: () {
+                        onTap: () async {
                           // TODO: Navigate to history page
+                          await _showDialogComingSoon(context.wording.history);
                         },
                       ),
                     ],
@@ -599,57 +601,62 @@ class _MyProfileAndPreferencesContentState
               suffixWidget: Assets.svg.icArrowForward.svg(),
               onTap: () async {
                 // TODO: Navigate to favorites page
-                await showDialog(
-                  useSafeArea: false,
-                  context: context,
-                  builder: (context) => Dialog.fullscreen(
-                    child: Scaffold(
-                      appBar: AppBar(
-                        // สินค้าที่บันทึกไว้
-                        title: AppText(
-                          // สินค้าที่บันทึกไว้
-                          context.wording.savedItems,
-                        ),
-                        leading: BackButton(
-                          color: AppColors.darkBrown,
-                        ),
-                      ),
-                      body: SafeArea(
-                        child: SizedBox(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Center(
-                                child: Assets.png.brownySuccess1.image(
-                                  width: 145.w,
-                                  height: 100.h,
-                                ),
-                              ),
-                              AppDims.vericalPadding_16,
-
-                              AppText(
-                                ContentLocalizeData(
-                                  en: 'Coming Soon.',
-                                  zh: '敬请期待',
-                                  th: 'พบกันเร็ว ๆ นี้',
-                                ).getTextByLocale(context.languageCode),
-                                style: context.textTheme.labelLarge!.copyWith(
-                                  fontSize: AppDims.size_16.sp,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
+                await _showDialogComingSoon(context.wording.savedItems);
               },
             ),
             AppDims.vericalPadding_12,
             Divider(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> _showDialogComingSoon(String title) async {
+    return await showDialog(
+      useSafeArea: false,
+      context: context,
+      builder: (context) => Dialog.fullscreen(
+        child: Scaffold(
+          appBar: AppBar(
+            // สินค้าที่บันทึกไว้
+            title: AppText(
+              // สินค้าที่บันทึกไว้
+              // context.wording.savedItems,
+              title,
+            ),
+            leading: BackButton(
+              color: AppColors.darkBrown,
+            ),
+          ),
+          body: SafeArea(
+            child: SizedBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Center(
+                    child: Assets.png.brownySuccess1.image(
+                      width: 145.w,
+                      height: 100.h,
+                    ),
+                  ),
+                  AppDims.vericalPadding_16,
+
+                  AppText(
+                    ContentLocalizeData(
+                      en: 'Coming Soon.',
+                      zh: '敬请期待',
+                      th: 'พบกันเร็ว ๆ นี้',
+                    ).getTextByLocale(context.languageCode),
+                    style: context.textTheme.labelLarge!.copyWith(
+                      fontSize: AppDims.size_16.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

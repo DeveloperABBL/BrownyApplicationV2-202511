@@ -689,7 +689,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                 }
 
                 final receiptData = result.data!.receipt!;
-                int? reviewScore = receiptData.reviewScore;
+                int? reviewScore = int.tryParse(
+                  receiptData.reviewScore.ifNullOrEmpty('-1'),
+                );
                 return Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(

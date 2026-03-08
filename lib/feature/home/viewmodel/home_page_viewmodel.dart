@@ -1,8 +1,10 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
@@ -79,18 +81,21 @@ class HomePageViewmodel extends AppViewModel {
   }
 
   // ========== Variables ==========
-  BannerHighLightModel? _highlighSelected;
-  BannerHighLightModel? get highlighSelected => _highlighSelected;
+  ArticleDetailModel? _highlighSelected;
+  ArticleDetailModel? get highlighSelected => _highlighSelected;
   void onBannerHighLightSelected(
     BuildContext context, {
-    required BannerHighLightModel? highlight,
+    required ArticleDetailModel? highlight,
+    bool redirect = true,
   }) {
     _highlighSelected = highlight;
 
-    context.pushNamed(
-      ArticlesPage.pageName,
-      extra: this,
-    );
+    if (redirect) {
+      context.pushNamed(
+        ArticlesPage.pageName,
+        extra: this,
+      );
+    }
   }
 
   // ========== Logic ==========
@@ -127,7 +132,8 @@ class HomePageViewmodel extends AppViewModel {
   }
 
   Future<void> fetchBanners() async {
-    final response = await _repo.fetchBanner();
+    final customerId = currentCustomerProvider.current.id;
+    final response = await _repo.fetchBanner(customerId: customerId);
     if (response.isEmpty || response.hasError) {
       _bannerNotifier.value = UiResult.empty();
       _categoriesNotifier.value = UiResult.empty();
@@ -152,7 +158,8 @@ class HomePageViewmodel extends AppViewModel {
   }
 
   Future<void> fetchBannersHighlight() async {
-    final response = await _repo.fetchBannerHighlight();
+    final customerId = currentCustomerProvider.current.id;
+    final response = await _repo.fetchBannerHighlight(customerId: customerId);
     if (response.isEmpty || response.hasError) {
       _bannerHighlightNotifier.value = UiResult.empty();
       return;
@@ -260,6 +267,57 @@ class HomePageViewmodel extends AppViewModel {
       _workingMachinesNotifier.value = UiResult.success(data: result.data);
     } on Exception catch (e) {
       _workingMachinesNotifier.value = UiResult.error(error: e);
+    }
+  }
+
+  /// DONG 2026-03-08
+  ///
+  /// API Collect Banner (เก็บคูปองจาก Banner)
+  ///
+  /// Parameters:
+  /// - bannerId: ID ของ Banner
+  ///
+  /// Returns:
+  /// - UiResult BannerCollectResponse with status และ message
+  ///
+  /// Response HTTP Codes:
+  /// - 200: สำเร็จ
+  /// - 400: ข้อมูลไม่ถูกต้อง
+  /// - 500: เกิดข้อผิดพลาดภายในระบบ
+  Future<UiResult<BannerCollectResponse>> collectBanner({
+    required int bannerId,
+  }) async {
+    try {
+      final customerId = currentCustomerProvider.current.id;
+
+      // ต้องมี customer_id
+      if (customerId == null || customerId.isEmpty) {
+        return UiResult.error(
+          error: Exception('Customer ID not found'),
+        );
+      }
+
+      final result = await _repo.collectBanner(
+        bannerId: bannerId,
+        customerId: customerId,
+      );
+
+      if (result.hasError) {
+        return UiResult.error(error: result.error);
+      }
+
+      if (result.isEmpty) {
+        return UiResult.empty();
+      }
+
+      // After successful collection, refresh banners to update button status
+      await fetchBanners();
+      await fetchBannersHighlight();
+      // assign state ใหม่ ให้ widget render ตาม state
+      _highlighSelected = _highlighSelected?.copyWith(buttonStatus: 'Claimed');
+      return UiResult.success(data: result.data);
+    } on Exception catch (e) {
+      return UiResult.error(error: e);
     }
   }
 }

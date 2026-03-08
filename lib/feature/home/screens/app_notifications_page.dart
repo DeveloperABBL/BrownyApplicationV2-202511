@@ -102,11 +102,21 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
               AppToggleWidget(
                 data: [
                   // ทั้งหมด
-                  AppToggleData(lable: 'ทั้งหมด', value: 0),
+                  AppToggleData(
+                    lable: context.wording.all,
+                    value: 0,
+                  ),
                   // ซักอบ
-                  AppToggleData(lable: context.wording.services, value: 1),
+                  AppToggleData(
+                    lable: context.wording.services,
+                    value: 1,
+                  ),
                   // การสั่งซื้อ
-                  AppToggleData(lable: 'การสั่งซื้อ', value: 2, enable: false),
+                  AppToggleData(
+                    lable: context.wording.orderPlacement,
+                    value: 2,
+                    enable: false,
+                  ),
                 ],
                 onChange: (index) {},
               ),
@@ -232,6 +242,11 @@ class _NotificationItem extends StatelessWidget {
                 ],
               ],
             ),
+          ),
+          AppDims.horizonPadding_16,
+
+          Assets.svg.arrowDown.svg(
+            width: AppDims.size_26.w,
           ),
         ],
       ),

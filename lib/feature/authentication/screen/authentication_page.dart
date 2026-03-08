@@ -2068,6 +2068,11 @@ class _ChangePasswordWidget extends _SignUpWidget {
                 return;
               }
 
+              if (result.hasError) {
+                _showErrorDialog(context, result.error);
+                return;
+              }
+
               if (!result.isSuccess) {
                 AppOverlays.showBrownyDialog(
                   context,

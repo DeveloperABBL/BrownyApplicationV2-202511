@@ -650,14 +650,44 @@ abstract class AppClient {
   /// DONG 2025-11-13
   ///
   /// API Fetch รูป Banners
+  ///
+  /// Query parameters:
+  /// - customer_id: String? (UUID ของลูกค้า, nullable)
   @GET('/banners')
-  Future<HttpResponse<BannerResponse?>> fetchBanners();
+  Future<HttpResponse<BannerResponse?>> fetchBanners(
+    @Query('customer_id') String? customerId,
+  );
 
   /// DONG 2026-02-17
   ///
   /// API Fetch รูป Banners Highlight
+  ///
+  /// Query parameters:
+  /// - customer_id: String? (UUID ของลูกค้า, nullable)
   @GET('/banners/highlight')
-  Future<HttpResponse<BannerHighlightResponse?>> fetchBannersHighlight();
+  Future<HttpResponse<BannerHighlightResponse?>> fetchBannersHighlight(
+    @Query('customer_id') String? customerId,
+  );
+
+  /// DONG 2026-03-08
+  ///
+  /// API Collect Banner (เก็บคูปองจาก Banner)
+  ///
+  /// Path parameters:
+  /// - banner_id: int (ID ของ Banner)
+  ///
+  /// Body parameters:
+  /// - customer_id: String (UUID ของลูกค้า)
+  ///
+  /// Response HTTP Codes:
+  /// - 200: สำเร็จ
+  /// - 400: ข้อมูลไม่ถูกต้อง
+  /// - 500: เกิดข้อผิดพลาดภายในระบบ
+  @POST('/banners/collect/{banner_id}')
+  Future<HttpResponse<BannerCollectResponse>> collectBanner(
+    @Path('banner_id') int bannerId,
+    @Body() BannerCollectRequest body,
+  );
 
   /// DONG 2025-11-10
   ///

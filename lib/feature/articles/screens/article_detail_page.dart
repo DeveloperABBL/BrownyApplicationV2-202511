@@ -1,35 +1,119 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
+import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ArticleDetailPage extends StatelessWidget {
+class ArticleDetailPage extends StatefulWidget {
   const ArticleDetailPage({
     super.key,
-    required this.article,
+    required this.viewmodel,
   });
 
   static final pagePath = '/article_detail_page';
   static final pageName = 'article_detail_page';
 
-  final ArticleDetailModel article;
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context,
+    // ArticleDetailModel article,
+    HomePageViewmodel viewmodel,
+  ) async {
+    return await context.pushNamed(
+      ArticleDetailPage.pageName,
+      extra: viewmodel,
+    );
+  }
+
+  final HomePageViewmodel viewmodel;
+
+  @override
+  State<ArticleDetailPage> createState() => _ArticleDetailPageState();
+}
+
+class _ArticleDetailPageState extends State<ArticleDetailPage> {
+  late ArticleDetailModel _article;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _article = widget.viewmodel.highlighSelected!;
+  }
 
   @override
   Widget build(BuildContext context) {
     final locale = context.languageCode;
-    final imageUrl = article.image?.getByLocaleCode(locale) ?? '';
-    final title = article.title?.getByLocaleCode(locale) ?? '';
-    final categoryName = article.category?.name?.getByLocaleCode(locale) ?? '';
-    final subtitle = article.subtitle?.getByLocaleCode(locale) ?? '';
+    final imageUrl = _article.image?.getByLocaleCode(locale) ?? '';
+    final title = _article.title?.getByLocaleCode(locale) ?? '';
+    final categoryName = _article.category?.name?.getByLocaleCode(locale) ?? '';
+    final detail = _article.detail?.getByLocaleCode(locale) ?? '';
 
     return Scaffold(
       appBar: AppBar(
         title: AppText(
-          article.category!.name!.getByLocaleCode(context.languageCode)!,
+          _article.category!.name!.getByLocaleCode(
+            context.languageCode,
+          )!,
         ),
         leading: BackButton(
           color: AppColors.darkBrown,
         ),
       ),
+      persistentFooterDecoration: _article.hasArticleButton
+          ? BoxDecoration()
+          : null,
+      persistentFooterButtons: _article.hasArticleButton
+          ? [
+              SafeArea(
+                // top: false,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+                  child: ElevatedButton(
+                    onPressed: _article.isClaimable
+                        ? () async {
+                            AppOverlays.showLoading(context);
+                            final result = await widget.viewmodel.collectBanner(
+                              bannerId: _article.id ?? -1,
+                            );
+                            if (!context.mounted) return;
+                            AppOverlays.hideLoading();
+                            if (result.isEmpty || result.hasError) {
+                              AppOverlays.showBrownyDialog(
+                                context,
+                                title: context.wording.errorOccurred,
+                                message: context.wording.errorUi,
+                              );
+                              return;
+                            }
+
+                            AppOverlays.showBrownyDialog(
+                              context,
+                              imageAsset: Assets.png.brownySuccess1.path,
+                              title: context.wording.success,
+                              message: ContentLocalizeData(
+                                en: 'Claimed successfully',
+                                zh: '领取成功',
+                                th: 'รับสิทธิ์เรียบร้อยแล้ว',
+                              ).getTextByLocale(locale),
+                              onConfirm: () {
+                                setState(() {
+                                  // เอา state ใน Widget มารับค่าใหม่
+                                  // จะมีการ assign ใน collectBanner แล้ว
+                                  _article = widget.viewmodel.highlighSelected!;
+                                });
+                              },
+                            );
+                          }
+                        : null,
+                    child: AppText(
+                      _article.getArticleButtonDisplay(locale),
+                    ),
+                  ),
+                ),
+              ),
+            ]
+          : null,
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -78,16 +162,16 @@ class ArticleDetailPage extends StatelessWidget {
                 AppDims.vericalPadding_8,
 
                 Html(
-                  data: subtitle,
+                  data: detail,
                   style: {
                     "body": Style(
                       fontSize: FontSize(14.sp),
                       padding: HtmlPaddings.zero,
-
                       textAlign: TextAlign.start,
                       margin: Margins.all(0),
                       fontWeight: FontWeight.w300,
                       color: AppColors.darkBrown,
+                      fontFamily: GoogleFonts.prompt().fontFamily,
                     ),
                   },
                 ),

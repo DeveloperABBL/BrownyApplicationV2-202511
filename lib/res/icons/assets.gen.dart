@@ -655,6 +655,9 @@ class $AssetsServicesGen {
 class $AssetsSvgGen {
   const $AssetsSvgGen();
 
+  /// File path: assets/svg/arrow_down.svg
+  SvgGenImage get arrowDown => const SvgGenImage('assets/svg/arrow_down.svg');
+
   /// File path: assets/svg/arrow_right.svg
   SvgGenImage get arrowRight => const SvgGenImage('assets/svg/arrow_right.svg');
 
@@ -1013,6 +1016,7 @@ class $AssetsSvgGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
+    arrowDown,
     arrowRight,
     icArrowBackward,
     icArrowDown,

@@ -705,7 +705,7 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
     _machineTransactionStateNotifier.value = UiResult.success(
       data: currentState.copyWith(
-        receipt: currentState.receipt!.copyWith(reviewScore: scored),
+        receipt: currentState.receipt!.copyWith(reviewScore: scored.toString()),
       ),
     );
   }
@@ -722,8 +722,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   Future<UiResult<void>> submitMachineOrderReview() async {
     try {
       final orderId = _machineTransactionStateNotifier.value.data!.orderId;
-      final score =
-          _machineTransactionStateNotifier.value.data!.receipt!.reviewScore;
+      final score = int.tryParse(
+        _machineTransactionStateNotifier
+            .value
+            .data!
+            .receipt!
+            .reviewScore
+            .orEmpty,
+      );
 
       if (score == null) return UiResult.empty();
 

@@ -11,8 +11,13 @@ class BannerModel extends BannerData {
     super.image,
     super.title,
     super.subtitle,
+    super.detail,
     super.category,
     super.dateTime,
+    super.target,
+    super.hasButton,
+    super.buttonStatus,
+    super.couponId,
   });
 
   factory BannerModel.fromBannerResponse(BannerData response) {
@@ -20,11 +25,16 @@ class BannerModel extends BannerData {
       id: response.id,
       name: response.name,
       type: response.type,
+      target: response.target,
       image: response.image,
       title: response.title,
       subtitle: response.subtitle,
+      detail: response.detail,
       category: response.category,
       dateTime: response.dateTime,
+      hasButton: response.hasButton,
+      buttonStatus: response.buttonStatus,
+      couponId: response.couponId,
     );
   }
 
@@ -61,9 +71,13 @@ class BannerHighLightModel extends BannerHighlightData {
     super.image,
     super.title,
     super.subtitle,
+    super.detail,
     super.dateTime,
     super.category,
     super.target,
+    super.hasButton,
+    super.buttonStatus,
+    super.couponId,
   });
 
   factory BannerHighLightModel.fromBannerResponse(
@@ -76,9 +90,13 @@ class BannerHighLightModel extends BannerHighlightData {
       image: response.image,
       title: response.title,
       subtitle: response.subtitle,
+      detail: response.detail,
       dateTime: response.dateTime,
       category: response.category,
       target: response.target,
+      hasButton: response.hasButton,
+      buttonStatus: response.buttonStatus,
+      couponId: response.couponId,
     );
   }
 

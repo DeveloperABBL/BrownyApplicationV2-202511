@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/social_auth_helper.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
@@ -745,6 +746,27 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
       // ขั้นตอน เปลี่ยนรหัสผ่าน
       AuthenProcess.changePassword,
     ].contains(currentProcess)) {
+      if (currentProcess == AuthenProcess.changePassword) {
+        final userAuthorized = usernameController.text;
+        final current = currentCustomerProvider.current;
+        bool authorized = false;
+        authorized =
+            current.phone.orEmpty == userAuthorized ||
+            current.email.orEmpty == userAuthorized;
+
+        if (context.mounted && !authorized) {
+          return UiResult.empty(
+            error: UserUnauthorized(
+              ContentLocalizeData(
+                en: 'User information does not match.\nPlease verify and try again.',
+                zh: '用户信息不匹配。\n请验证后重试。',
+                th: 'ข้อมูลผู้ใช้ไม่ตรงกัน\nกรุณาตรวจสอบและลองอีกครั้ง',
+              ).getTextByLocale(context.languageCode),
+            ),
+          );
+        }
+      }
+
       if (formKeyForgetPasswordUsername.currentState?.validate() == true) {
         final checkUserExists = await customerDataRepo.checkUsernameExists(
           usernameController.text,

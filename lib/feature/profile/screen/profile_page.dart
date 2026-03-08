@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
+import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
+import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/profile/repository/notification_preferences_repo.dart';
@@ -387,35 +389,44 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  AppOverlays.showLoading(context);
+                  // กรอก PIN เพื่อยืนยันการบันทึก
+                  TransactionAuthenPage.goToPage(
+                    context,
+                    process: PinBiometricPross.verifyByPin,
+                  ).then((result) async {
+                    if (context.mounted && result == true) {
+                      AppOverlays.showLoading(context);
 
-                  final result = await _viewModel.onSaveProfile();
+                      final result = await _viewModel.onSaveProfile();
 
-                  AppOverlays.hideLoading();
+                      AppOverlays.hideLoading();
 
-                  if (context.mounted) {
-                    if (result.isSuccess) {
-                      await AppOverlays.showBrownyDialog(
-                        context,
-                        title: context.wording.done,
-                        message: context.wording.profileSavedSuccessfully,
-                        confirmText: context.wording.close,
-                        imageAsset: Assets.png.brownyCreatePin.path,
-                        onConfirm: () {
-                          if (widget.isFirstSignup) {
-                            context.pushNamedAndClear(HomePage.pageName);
-                          }
-                        },
-                      );
-                    } else if (result.isError) {
-                      await AppOverlays.showBrownyDialog(
-                        context,
-                        title: context.wording.somethingWrong,
-                        message: result.error?.toString() ?? 'Update failed',
-                        imageAsset: Assets.png.brownyError1.path,
-                      );
+                      if (context.mounted) {
+                        if (result.isSuccess) {
+                          await AppOverlays.showBrownyDialog(
+                            context,
+                            title: context.wording.done,
+                            message: context.wording.profileSavedSuccessfully,
+                            confirmText: context.wording.close,
+                            imageAsset: Assets.png.brownyCreatePin.path,
+                            onConfirm: () {
+                              if (widget.isFirstSignup) {
+                                context.pushNamedAndClear(HomePage.pageName);
+                              }
+                            },
+                          );
+                        } else if (result.isError) {
+                          await AppOverlays.showBrownyDialog(
+                            context,
+                            title: context.wording.somethingWrong,
+                            message:
+                                result.error?.toString() ?? 'Update failed',
+                            imageAsset: Assets.png.brownyError1.path,
+                          );
+                        }
+                      }
                     }
-                  }
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -426,6 +437,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   ),
                 ),
                 child: Text(
+                  // บันทึก
                   context.wording.save,
                   style: context.textTheme.bodyMedium!.copyWith(
                     color: Colors.white,

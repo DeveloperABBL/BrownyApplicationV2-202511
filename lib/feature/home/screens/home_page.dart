@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/core/utils/notification_helper.dart';
 import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
-import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
+import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_page.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
@@ -472,7 +471,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         workingList.length,
                         (index) =>
                             // Single Item Card Service ที่กำลังทำงาน
-                            _CustomerServicesWorkingWidget(
+                            CustomerServicesWorkingWidget(
                               data:
                                   CustomerServicesWorkingModel.fromWorkingMachineResponse(
                                     workingList[index],
@@ -725,7 +724,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
   void onBrownyClubClick({
     required BannerHighLightModel? highlight,
   }) {
-    _viewmodel.onBannerHighLightSelected(context, highlight: highlight);
+    _viewmodel.onBannerHighLightSelected(
+      context,
+      highlight: highlight != null
+          ? ArticleDetailModel.fromBannerHighlightData(highlight)
+          : null,
+    );
     // context.pushNamed(
     //   ArticlesPage.pageName,
     //   extra: _viewmodel,
@@ -1313,8 +1317,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
   }
 }
 
-class _CustomerServicesWorkingWidget extends StatefulWidget {
-  const _CustomerServicesWorkingWidget({
+/// Widget แสดงสถานะการทำงานของเครื่องซักอบ
+class CustomerServicesWorkingWidget extends StatefulWidget {
+  const CustomerServicesWorkingWidget({
+    super.key,
     required this.data,
     required this.onTap,
   });
@@ -1323,12 +1329,12 @@ class _CustomerServicesWorkingWidget extends StatefulWidget {
   final VoidCallback onTap;
 
   @override
-  State<_CustomerServicesWorkingWidget> createState() =>
+  State<CustomerServicesWorkingWidget> createState() =>
       _CustomerServicesWorkingWidgetState();
 }
 
 class _CustomerServicesWorkingWidgetState
-    extends State<_CustomerServicesWorkingWidget> {
+    extends State<CustomerServicesWorkingWidget> {
   late final ValueNotifier<Duration> _countDownNotifier;
   late final ValueNotifier<bool> _finishedNotifier;
 
@@ -1500,9 +1506,7 @@ class _CustomerServicesWorkingWidgetState
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: finished
-                      ? Assets.svg.icChecked2.svg()
-                      : Assets.svg.arrowRight.svg(),
+                  child: finished ? SizedBox() : Assets.svg.arrowRight.svg(),
                 ),
               );
             },

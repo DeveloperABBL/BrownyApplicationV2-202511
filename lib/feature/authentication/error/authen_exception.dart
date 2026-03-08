@@ -51,7 +51,7 @@ class UserUnauthorized extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return context.wording.userUnauthorized;
+    return super.message ?? context.wording.userUnauthorized;
   }
 
   @override

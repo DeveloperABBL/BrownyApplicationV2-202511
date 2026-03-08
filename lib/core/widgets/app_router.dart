@@ -344,9 +344,10 @@ class AppRouter {
         path: ArticleDetailPage.pagePath,
         name: ArticleDetailPage.pageName,
         builder: (context, state) {
-          final article = state.extra as ArticleDetailModel;
+          // final article = state.extra as ArticleDetailModel;
+          final viewmodel = state.extra as HomePageViewmodel;
           return ArticleDetailPage(
-            article: article,
+            viewmodel: viewmodel,
           );
         },
       ),

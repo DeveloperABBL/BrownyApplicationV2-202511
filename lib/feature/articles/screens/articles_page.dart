@@ -38,12 +38,19 @@ class _ArticlesPageState extends State<ArticlesPage> {
 
       AppOverlays.hideLoading();
       if (widget.viewModel.highlighSelected != null) {
-        await context.pushNamed(
-          ArticleDetailPage.pageName,
-          extra: ArticleDetailModel.fromBannerHighlightData(
-            widget.viewModel.highlighSelected!,
-          ),
+        await ArticleDetailPage.goToPage(
+          context,
+          widget.viewModel,
+          // ArticleDetailModel.fromBannerHighlightData(
+          //   widget.viewModel.highlighSelected!,
+          // ),
         );
+        // await context.pushNamed(
+        //   ArticleDetailPage.pageName,
+        //   extra: ArticleDetailModel.fromBannerHighlightData(
+        //     widget.viewModel.highlighSelected!,
+        //   ),
+        // );
       }
     });
   }
@@ -191,10 +198,21 @@ class _ArticlesPageState extends State<ArticlesPage> {
               final banner = banners[index];
               return GestureDetector(
                 onTap: () {
-                  context.pushNamed(
-                    ArticleDetailPage.pageName,
-                    extra: ArticleDetailModel.fromBannerHighlightData(banner),
-                  );
+                  if (banner.isExternalLink) {
+                    LaunchHelper.openUrlInBrowser(banner.target.orEmpty);
+                  } else {
+                    widget.viewModel.onBannerHighLightSelected(
+                      context,
+                      redirect: false,
+                      highlight: ArticleDetailModel.fromBannerHighlightData(
+                        banner,
+                      ),
+                    );
+                    ArticleDetailPage.goToPage(
+                      context,
+                      widget.viewModel,
+                    );
+                  }
                 },
                 child: _buildBannerCard(banner),
               );
@@ -461,10 +479,20 @@ class _ArticlesPageState extends State<ArticlesPage> {
                 final article = displayArticles[index];
                 return GestureDetector(
                   onTap: () {
-                    context.pushNamed(
-                      ArticleDetailPage.pageName,
-                      extra: ArticleDetailModel.fromBannerData(article),
-                    );
+                    if (article.isExternalLink) {
+                      LaunchHelper.openUrlInBrowser(article.target.orEmpty);
+                    } else {
+                      widget.viewModel.onBannerHighLightSelected(
+                        context,
+                        redirect: false,
+                        highlight: ArticleDetailModel.fromBannerData(article),
+                      );
+                      ArticleDetailPage.goToPage(context, widget.viewModel);
+                      // context.pushNamed(
+                      //   ArticleDetailPage.pageName,
+                      //   extra: ArticleDetailModel.fromBannerData(article),
+                      // );
+                    }
                   },
                   child: _buildArticleCard(article),
                 );

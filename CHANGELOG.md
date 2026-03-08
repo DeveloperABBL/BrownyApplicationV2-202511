@@ -1,5 +1,12 @@
 # CHANGELOG
+### DONG 2026-03-08
+* เพิ่ม function การ Claim สิทธิพิเศษจาก Browny Club
+* แก้บัคไม่สามารถแสดง scored review store ในหน้าแสดง Receipt ได้
+* เก็บ UI หน้าแสดง Notification ตาม Design
+
+---
 ### DONG 2026-03-07
+* แก้บัคไม่สามารถ review store ในหน้าแสดง Receipt ได้
 * เพิ่มการทำงานเมนู เปลี่ยนรหัสผ่าน, เปลี่ยน e-mail, สินค้าที่บันทึกไว้(แสดงเป็น Coming soon)
 * Localized wording ใน app ที่ยังไม่เรียบร้อย
 * แก้บัคหาก Login ผ่านหน้า User preferrence สำเร็จแล้ว ไม่ fetch user notification settings

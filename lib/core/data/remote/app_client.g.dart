@@ -1662,9 +1662,10 @@ class _AppClient implements AppClient {
   }
 
   @override
-  Future<HttpResponse<BannerResponse?>> fetchBanners() async {
+  Future<HttpResponse<BannerResponse?>> fetchBanners(String? customerId) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'customer_id': customerId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<BannerResponse?>>(
@@ -1692,9 +1693,12 @@ class _AppClient implements AppClient {
   }
 
   @override
-  Future<HttpResponse<BannerHighlightResponse?>> fetchBannersHighlight() async {
+  Future<HttpResponse<BannerHighlightResponse?>> fetchBannersHighlight(
+    String? customerId,
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'customer_id': customerId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<BannerHighlightResponse?>>(
@@ -1713,6 +1717,38 @@ class _AppClient implements AppClient {
       _value = _result.data == null
           ? null
           : BannerHighlightResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<BannerCollectResponse>> collectBanner(
+    int bannerId,
+    BannerCollectRequest body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<HttpResponse<BannerCollectResponse>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/banners/collect/${bannerId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BannerCollectResponse _value;
+    try {
+      _value = BannerCollectResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

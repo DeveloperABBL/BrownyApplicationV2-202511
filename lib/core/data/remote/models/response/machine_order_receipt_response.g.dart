@@ -39,7 +39,7 @@ MachineOrderReceiptResponse _$MachineOrderReceiptResponseFromJson(
   luckyNo: json['lucky_no'] as String?,
   luckyImage: json['lucky_image'] as String?,
   qrImage: json['qr_image'] as String?,
-  reviewScore: (json['review_score'] as num?)?.toInt(),
+  reviewScore: json['review_score'] as String?,
 );
 
 Map<String, dynamic> _$MachineOrderReceiptResponseToJson(
