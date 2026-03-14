@@ -272,6 +272,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         if (kDebugMode) {
                           final data = Uri.parse(
                             'http://brownypay.com/wash/dry/13',
+                            // 'http://brownypay.com/wash/dry/2',
                           );
                           if (data.pathSegments.isNotEmpty) {
                             MachineTransactionPage2.goToPage(
@@ -835,7 +836,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         stretchModes: [
           StretchMode.blurBackground,
         ],
-        expandedTitleScale: 8,
+        expandedTitleScale: 6,
         title: AppContainerRadius(
           height: AppDims.size_2.h,
         ),
@@ -926,7 +927,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           bool isGuest = provider.current.isGuest;
           EdgeInsets? margin = isGuest
               ? null
-              : EdgeInsets.only(top: AppDims.size_21.h);
+              : EdgeInsets.only(top: AppDims.size_22.h);
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1307,7 +1308,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // วางไว้ที่พิกัด 0,0 ของกลุ่มย่อยนี้ สุนัขจะทับป้ายแดงในองศาเดิมเสมอ
         Positioned(
           left: -27.w,
-          top: -2,
+          top: -1,
           child: isGuest
               ? SizedBox()
               : Assets.svg.icBrownySpeaker.svg(width: 35.w),

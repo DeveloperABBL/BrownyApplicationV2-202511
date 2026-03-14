@@ -389,44 +389,35 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  // กรอก PIN เพื่อยืนยันการบันทึก
-                  TransactionAuthenPage.goToPage(
-                    context,
-                    process: PinBiometricPross.verifyByPin,
-                  ).then((result) async {
-                    if (context.mounted && result == true) {
-                      AppOverlays.showLoading(context);
+                  AppOverlays.showLoading(context);
 
-                      final result = await _viewModel.onSaveProfile();
+                  final result = await _viewModel.onSaveProfile();
 
-                      AppOverlays.hideLoading();
+                  AppOverlays.hideLoading();
 
-                      if (context.mounted) {
-                        if (result.isSuccess) {
-                          await AppOverlays.showBrownyDialog(
-                            context,
-                            title: context.wording.done,
-                            message: context.wording.profileSavedSuccessfully,
-                            confirmText: context.wording.close,
-                            imageAsset: Assets.png.brownyCreatePin.path,
-                            onConfirm: () {
-                              if (widget.isFirstSignup) {
-                                context.pushNamedAndClear(HomePage.pageName);
-                              }
-                            },
-                          );
-                        } else if (result.isError) {
-                          await AppOverlays.showBrownyDialog(
-                            context,
-                            title: context.wording.somethingWrong,
-                            message:
-                                result.error?.toString() ?? 'Update failed',
-                            imageAsset: Assets.png.brownyError1.path,
-                          );
-                        }
-                      }
+                  if (context.mounted) {
+                    if (result.isSuccess) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        title: context.wording.done,
+                        message: context.wording.profileSavedSuccessfully,
+                        confirmText: context.wording.close,
+                        imageAsset: Assets.png.brownyCreatePin.path,
+                        onConfirm: () {
+                          if (widget.isFirstSignup) {
+                            context.pushNamedAndClear(HomePage.pageName);
+                          }
+                        },
+                      );
+                    } else if (result.isError) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        title: context.wording.somethingWrong,
+                        message: result.error?.toString() ?? 'Update failed',
+                        imageAsset: Assets.png.brownyError1.path,
+                      );
                     }
-                  });
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

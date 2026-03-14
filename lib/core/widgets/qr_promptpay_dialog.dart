@@ -23,8 +23,43 @@ class QrPromptpayDialog extends StatefulWidget {
   State<QrPromptpayDialog> createState() => _QrPromptpayDialogState();
 }
 
-class _QrPromptpayDialogState extends State<QrPromptpayDialog> {
+class _QrPromptpayDialogState extends State<QrPromptpayDialog>
+    with SingleTickerProviderStateMixin {
   final GlobalKey _qrKey = GlobalKey();
+  late AnimationController _flashController;
+  late Animation<double> _flashAnimation;
+  bool _isDownloadSuccess = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _flashController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _flashAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _flashController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _flashController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playFlashAnimation() async {
+    for (int i = 0; i < 1; i++) {
+      await _flashController.forward();
+      await _flashController.reverse();
+      if (i < 1) {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+    }
+  }
 
   /// DONG 2026-02-15
   /// เปลี่ยนวิธีการแสดง QRCode เพราะมีปัญหาเรื่องการ capture Image ที่แสดงผ่าน ​WebView ไม่ได้
@@ -76,23 +111,16 @@ class _QrPromptpayDialogState extends State<QrPromptpayDialog> {
 
         if (mounted) {
           if (result['isSuccess'] == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.qrCodeSavedSuccessfully,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.primary,
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(
-                  bottom: AppDims.size_16.w,
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                ),
-              ),
-            );
+            await _playFlashAnimation();
+            setState(() {
+              _isDownloadSuccess = true;
+            });
+            await Future.delayed(const Duration(seconds: 2));
+            if (mounted) {
+              setState(() {
+                _isDownloadSuccess = false;
+              });
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -243,46 +271,66 @@ class _QrPromptpayDialogState extends State<QrPromptpayDialog> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // QR Code Section
-                      RepaintBoundary(
-                        key: _qrKey,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10.r,
-                                offset: const Offset(0, 4),
+                      AnimatedBuilder(
+                        animation: _flashAnimation,
+                        builder: (context, child) => Stack(
+                          children: [
+                            child!,
+                            if (_flashAnimation.value > 0)
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.walletBackground
+                                        .withValues(
+                                          alpha: _flashAnimation.value * 0.3,
+                                        ),
+                                    borderRadius: BorderRadius.circular(16.r),
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                          padding: EdgeInsets.all(AppDims.size_24.w),
-                          child: Column(
-                            children: [
-                              // PromptPay Logo
-                              // if (widget.isQRPromptPay) ...[
-                              // Assets.png.promptpayBadgeNoLine.image(
-                              widget.paymentDadge.image(
-                                height: 73.w,
-                                width: 228.h,
-                              ),
-                              AppDims.vericalPadding_16,
-                              Divider(),
+                          ],
+                        ),
+                        child: RepaintBoundary(
+                          key: _qrKey,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(16.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10.r,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.all(AppDims.size_24.w),
+                            child: Column(
+                              children: [
+                                // PromptPay Logo
+                                // if (widget.isQRPromptPay) ...[
+                                // Assets.png.promptpayBadgeNoLine.image(
+                                widget.paymentDadge.image(
+                                  height: 73.w,
+                                  width: 228.h,
+                                ),
+                                AppDims.vericalPadding_16,
+                                Divider(),
 
-                              // ],
-                              AppDims.vericalPadding_16,
+                                // ],
+                                AppDims.vericalPadding_16,
 
-                              QrImageView(
-                                data: _extractQRDataFromUrl(widget.qrData)!,
-                                version: QrVersions.auto,
-                                size: 228.w,
-                                backgroundColor: Colors.white,
-                                errorCorrectionLevel: QrErrorCorrectLevel.M,
-                              ),
+                                QrImageView(
+                                  data: _extractQRDataFromUrl(widget.qrData)!,
+                                  version: QrVersions.auto,
+                                  size: 228.w,
+                                  backgroundColor: Colors.white,
+                                  errorCorrectionLevel: QrErrorCorrectLevel.M,
+                                ),
 
-                              AppDims.vericalPadding_16,
-                            ],
+                                AppDims.vericalPadding_16,
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -294,7 +342,18 @@ class _QrPromptpayDialogState extends State<QrPromptpayDialog> {
                         onTap: _captureAndSaveQR,
                         child: Column(
                           children: [
-                            Assets.svg.icDownStorage.svg(),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: _isDownloadSuccess
+                                  ? Assets.svg.icChecked2.svg(
+                                      width: AppDims.size_20.w,
+                                      key: const ValueKey('checked'),
+                                    )
+                                  : Assets.svg.icDownStorage.svg(
+                                      width: AppDims.size_20.w,
+                                      key: const ValueKey('download'),
+                                    ),
+                            ),
                             AppDims.vericalPadding_8,
                             AppText(
                               context.wording.save,

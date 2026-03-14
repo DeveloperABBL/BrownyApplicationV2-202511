@@ -34,15 +34,32 @@ class ShowQRPromptpayPage extends StatefulWidget {
   State<ShowQRPromptpayPage> createState() => _ShowQRPromptpayPageState();
 }
 
-class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
+class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage>
+    with SingleTickerProviderStateMixin {
   final GlobalKey _qrKey = GlobalKey();
   late WebViewController controller;
   String? _qrCodeData;
   bool _isLoading = true;
+  bool _isDownloadSuccess = false;
+  late AnimationController _flashController;
+  late Animation<double> _flashAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize flash animation controller
+    _flashController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+
+    _flashAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _flashController,
+        curve: Curves.easeInOut,
+      ),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeData();
@@ -131,21 +148,22 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
 
         if (mounted) {
           if (result['isSuccess'] == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.qrCodeSavedSuccessfully,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.walletBackground,
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(
-                  bottom: AppDims.size_84.w,
-                ),
-              ),
-            );
+            // เล่น flash animation แทน SnackBar เมื่อบันทึกสำเร็จ
+            await _playFlashAnimation();
+
+            // เปลี่ยนไอคอนเป็น checked
+            setState(() {
+              _isDownloadSuccess = true;
+            });
+
+            // รอ 2 วินาที แล้วเปลี่ยนกลับ
+            await Future.delayed(const Duration(seconds: 2));
+
+            if (mounted) {
+              setState(() {
+                _isDownloadSuccess = false;
+              });
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -207,8 +225,20 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
     }
   }
 
+  /// เล่น flash animation (กระพริบ 2 ครั้ง)
+  Future<void> _playFlashAnimation() async {
+    for (int i = 0; i < 1; i++) {
+      await _flashController.forward();
+      await _flashController.reverse();
+      if (i < 1) {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _flashController.dispose();
     widget.viewModel.stopPaymentStatusCheck();
     super.dispose();
   }
@@ -321,49 +351,70 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // QR Code Section
-                          RepaintBoundary(
-                            key: _qrKey,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(16.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 10.r,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding: EdgeInsets.all(AppDims.size_24.w),
-                              child: Column(
+                          // QR Code Section with Flash Animation
+                          AnimatedBuilder(
+                            animation: _flashAnimation,
+                            builder: (context, child) {
+                              return Stack(
                                 children: [
-                                  // PromptPay Logo
-                                  Assets.png.promptpayBadgeNoLine.image(
-                                    height: 73.w,
-                                    width: 228.h,
-                                  ),
-                                  AppDims.vericalPadding_16,
-
-                                  // QR Code using qr_flutter
-                                  if (_qrCodeData.orEmpty.isNotEmpty)
-                                    // SizedBox(
-                                    //   width: 228.w,
-                                    //   height: 228.h,
-                                    //   child: WebViewWidget(
-                                    //     controller: controller,
-                                    //   ),
-                                    // ),
-                                    QrImageView(
-                                      data: _qrCodeData!,
-                                      version: QrVersions.auto,
-                                      size: 228.w,
-                                      backgroundColor: Colors.white,
-                                      errorCorrectionLevel:
-                                          QrErrorCorrectLevel.M,
+                                  child!,
+                                  // Flash overlay
+                                  if (_flashAnimation.value > 0)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColors.walletBackground
+                                              .withValues(
+                                                alpha:
+                                                    _flashAnimation.value * 0.3,
+                                              ),
+                                          borderRadius: BorderRadius.circular(
+                                            16.r,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                 ],
+                              );
+                            },
+                            child: RepaintBoundary(
+                              key: _qrKey,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      blurRadius: 10.r,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.all(AppDims.size_24.w),
+                                child: Column(
+                                  children: [
+                                    // PromptPay Logo
+                                    Assets.png.promptpayBadgeNoLine.image(
+                                      height: 73.w,
+                                      width: 228.h,
+                                    ),
+                                    AppDims.vericalPadding_16,
+
+                                    // QR Code using qr_flutter
+                                    if (_qrCodeData.orEmpty.isNotEmpty)
+                                      QrImageView(
+                                        data: _qrCodeData!,
+                                        version: QrVersions.auto,
+                                        size: 228.w,
+                                        backgroundColor: Colors.white,
+                                        errorCorrectionLevel:
+                                            QrErrorCorrectLevel.M,
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -375,7 +426,19 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage> {
                             onTap: _captureAndSaveQR,
                             child: Column(
                               children: [
-                                Assets.svg.icDownStorage.svg(),
+                                // แสดงไอคอนตามสถานะ
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: _isDownloadSuccess
+                                      ? Assets.svg.icChecked2.svg(
+                                          width: AppDims.size_20.w,
+                                          key: const ValueKey('checked'),
+                                        )
+                                      : Assets.svg.icDownStorage.svg(
+                                          width: AppDims.size_20.w,
+                                          key: const ValueKey('download'),
+                                        ),
+                                ),
                                 AppDims.vericalPadding_8,
                                 AppText(
                                   context.wording.save,

@@ -101,11 +101,10 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
       if (dioEx.response!.isDuplicated) {
         return RepoResult.empty(error: UserDuplicated());
       }
+      return RepoResult.error(error: dioEx);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }
-
-    return RepoResult.empty();
   }
 
   @override

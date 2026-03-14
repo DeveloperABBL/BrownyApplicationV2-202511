@@ -461,7 +461,7 @@ class MachineProgramModel extends MachineProgramsResponse {
   bool get isSelectedCouponCoupon {
     if (selectedCoupon == null) return false;
     final typeEn = selectedCoupon!.type?.en ?? '';
-    return typeEn.toLowerCase() == 'coupon';
+    return typeEn.toLowerCase() == 'discount';
   }
 
   /// ดึงประเภทของ Coupon ที่เลือก (E-Voucher หรือ Coupon)

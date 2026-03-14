@@ -764,6 +764,10 @@ class TransactionsViewmodel extends AppViewModel
           result.data.data!,
         );
 
+        // รีเฟรชรายการคูปองหลังจากรับสำเร็จ
+        await fetchCustomerEVoucher();
+        await fetchCustomerDiscount();
+
         // อัพเดท state เป็น receipt loaded (transaction complete)
         _transactionStateNotifier.value = UiResult.success(
           data: PaymentTransactionState.receiptLoaded(
@@ -901,6 +905,15 @@ class TransactionsViewmodel extends AppViewModel
     // รีเฟรชรายการคูปองหลังจากรับสำเร็จ
     await fetchCustomerEVoucher();
     await fetchCustomerDiscount();
+
+    if (context.mounted) {
+      await AppOverlays.showBrownyDialog(
+        context,
+        imageAsset: Assets.png.brownySuccess2.path,
+        title: 'ยินดีด้วย',
+        message: 'คุณได้ทำการเพิ่มคูปองสำเร็จ',
+      );
+    }
 
     AppOverlays.hideLoading();
     // return UiResult.success(data: result.data);
