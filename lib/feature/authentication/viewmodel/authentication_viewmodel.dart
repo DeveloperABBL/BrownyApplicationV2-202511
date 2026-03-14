@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
@@ -15,6 +16,7 @@ import 'package:browny_applications_new/feature/authentication/repository/otp_da
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:go_router/go_router.dart';
 
 enum SignUpRequiredConditions {
@@ -905,12 +907,18 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
               return UiResult.empty();
             }
             final userData = userCredential.user!;
+            final email =
+                userData.email ?? userData.providerData.first.email ?? '';
+
+            if (email.isEmpty) {
+              return UiResult.empty(error: UserUnauthorized('Email is empty'));
+            }
             final socialLoginResult = await customerDataRepo.socialLogin(
               SocialLoginRequest(
                 provider: 'facebook',
                 appId: userData.uid,
                 name: userData.displayName!,
-                email: userData.email!,
+                email: email,
                 profileImage: userData.photoURL.orEmpty,
               ),
             );
@@ -925,6 +933,38 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
             result = UiResult.success(data: socialLoginResult.data.data!);
             break;
           } on Exception catch (e) {
+            // DONG 2026-03-14
+            // ถ้าตก catch และเป็น iOS จะดึงข้อมูลตรงจาก FacebookAuth.accessToken ตรง
+            // มีปัญหากับ Firebase ไม่สามารถ login facebook ได้
+            if (Platform.isIOS) {
+              // ดึงข้อมูลจาก accessToken ตรง
+              final directInfo = await SocialAuthHelper.getFacebookDirectInfo();
+              if (directInfo != null) {
+                final user = directInfo['userInfo'] as LimitedToken;
+                // ถ้าไม่ได้ Email จะไม่ให้ลงทะเบียน
+                if (user.userEmail.orEmpty.isEmpty) return UiResult.empty();
+                // ดึงข้อมูลส่ง API สมัครสมาชิก
+                final socialLoginResult = await customerDataRepo.socialLogin(
+                  SocialLoginRequest(
+                    provider: 'facebook',
+                    appId: user.userId,
+                    name: user.userName,
+                    email: user.userEmail!,
+                    profileImage: '',
+                  ),
+                );
+
+                if (socialLoginResult.isEmpty || socialLoginResult.hasError) {
+                  return UiResult.empty(error: socialLoginResult.error);
+                }
+                if (socialLoginResult.data.data == null) {
+                  return UiResult.empty();
+                }
+
+                result = UiResult.success(data: socialLoginResult.data.data!);
+                break;
+              }
+            }
             return UiResult.error(error: e);
           }
         }
@@ -963,7 +1003,6 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
             return UiResult.error(error: e);
           }
         }
-
       case SocialLoginType.Apple:
         {
           try {

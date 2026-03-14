@@ -1143,6 +1143,7 @@ class _MyProfileAndPreferencesContentState
                             context,
                             timeout: Duration(seconds: 3),
                             onTimeout: () {
+                              if (!mounted) return;
                               ScaffoldMessenger.of(
                                 context,
                               ).showSnackBar(

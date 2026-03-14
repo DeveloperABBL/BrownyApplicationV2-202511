@@ -6,5 +6,6 @@
         Get these values from: https://developers.facebook.com/apps/
     -->
     <string name="facebook_app_id">909604355579723</string>
+    <string name="fb_login_protocol_scheme">fb909604355579723</string>
     <string name="facebook_client_token">1d6250d26a1b986306c6f37620b89fe1</string>
 </resources>

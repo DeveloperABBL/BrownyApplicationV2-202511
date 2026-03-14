@@ -2,7 +2,6 @@ import 'package:browny_applications_new/core/data/remote/models/response/store_d
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
-import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/article_detail_page.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';

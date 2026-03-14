@@ -113,12 +113,16 @@ class SocialAuthHelper {
   /// และตั้งค่าใน:
   /// - Android: strings.xml
   /// - iOS: Info.plist
-  static Future<UserCredential?> signInWithFacebook() async {
+  ///
+  /// **iOS 13.1+**: Use Limited Login to avoid "Bad Signature" error
+  /// Set [useLimitedLogin] to true (iOS only, requires iOS 13.1+)
+  static Future<UserCredential?> signInWithFacebook({
+    bool useLimitedLogin = true, // Enable Limited Login for iOS by default
+  }) async {
     try {
       // Trigger the Facebook authentication flow
-      final LoginResult loginResult = await FacebookAuth.instance.login(
-        permissions: ['email', 'public_profile'],
-      );
+      await signOut();
+      final LoginResult loginResult = await FacebookAuth.instance.login();
 
       // If user cancels the sign-in
       if (loginResult.status != LoginStatus.success) {
@@ -219,6 +223,26 @@ class SocialAuthHelper {
 
   // ========== Common Methods ==========
 
+  /// Get Facebook Login debug information
+  /// Use this to troubleshoot "Bad Signature" or other Facebook login issues
+  static Future<Map<String, dynamic>?> getFacebookDirectInfo() async {
+    try {
+      final accessToken = await FacebookAuth.instance.accessToken;
+      final userInfo = accessToken;
+
+      return {
+        'isLoggedIn': accessToken != null,
+        'hasToken': accessToken?.tokenString != null,
+        'tokenLength': accessToken?.tokenString.length ?? 0,
+        'userInfo': userInfo,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+    } catch (e) {
+      debugPrint('Error getting Facebook debug info: $e');
+      return null;
+    }
+  }
+
   /// Get current Firebase user
   static User? get currentUser => _auth.currentUser;
 
@@ -227,6 +251,10 @@ class SocialAuthHelper {
     // Sign out from Google if signed in
     if (await _googleSignIn.isSignedIn()) {
       await _googleSignIn.signOut();
+    }
+    final accessToken = await FacebookAuth.instance.accessToken;
+    if (accessToken != null) {
+      await FacebookAuth.instance.logOut();
     }
 
     // Sign out from Firebase

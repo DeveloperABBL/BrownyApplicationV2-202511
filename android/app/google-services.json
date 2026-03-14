@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "261060252828-k5dfgqcp1oe16l38e7hd8uc5gi0n8b9u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brownywash.browny_applications_new",
+            "certificate_hash": "13c35f33890c173adb4549b397673f36cf4089f9"
+          }
+        },
+        {
           "client_id": "261060252828-l59h1104q38n92hef3j3l03m5gtdobis.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

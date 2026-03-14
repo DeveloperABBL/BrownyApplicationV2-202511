@@ -1,5 +1,7 @@
 # CHANGELOG
 ### DONG 2026-03-14
+* แก้ไข Facebook Login ไม่ได้(workaround) ด้วยการไม่ผ่าน Firebase Authen แต่ใช้ข้อมูลจาก Facebook Register ตรงแทน
+ - upgrade version firebase packages, version facebook_auth
 * แก้ไข save referral ได้ response 500 แต่ App แสดง บันทึกชวนเพื่อนสำเร็จ
 * แก้ไข ปุ่มบันทึก QR ขึ้น ทั้งทีปัดออกหน้า QR มาแล้ว - ต้องปัดลงถึงจะหาย
 ​ - ปรับ design ใหม่ ให้เป็นการแสดง Check ถูก แทน

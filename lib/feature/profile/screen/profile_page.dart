@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
-import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
-import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/profile/repository/notification_preferences_repo.dart';

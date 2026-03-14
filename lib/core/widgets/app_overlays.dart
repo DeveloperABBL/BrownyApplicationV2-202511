@@ -54,6 +54,7 @@ class AppOverlays {
           ),
       () {
         hideLoading();
+        if (!context.mounted) return;
         onTimeout?.call();
       },
     );
