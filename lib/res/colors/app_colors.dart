@@ -341,5 +341,7 @@ class AppColors {
   /// สีแสดงสถานะ Error
   static const Color error = Color(0xFFE02A48); // #E02A48
 
+  static const Color errorBackground = Color(0xFFFFE4E9); // #FFE4E9
+
   static const Color walletButtonForegroundColor = paleOrange; // #FF334B
 }

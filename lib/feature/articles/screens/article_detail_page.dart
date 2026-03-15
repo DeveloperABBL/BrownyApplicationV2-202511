@@ -69,7 +69,16 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 // top: false,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
+                    icon: _article.isExpired
+                        ? Assets.svg.icInfoRad.svg()
+                        : null,
+                    style: _article.isExpired
+                        ? ElevatedButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                            disabledBackgroundColor: AppColors.errorBackground,
+                          )
+                        : null,
                     onPressed: _article.isClaimable
                         ? () async {
                             AppOverlays.showLoading(context);
@@ -106,8 +115,13 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                             );
                           }
                         : null,
-                    child: AppText(
+                    label: AppText(
                       _article.getArticleButtonDisplay(locale),
+                      style: _article.isExpired
+                          ? context.textTheme.labelLarge!.copyWith(
+                              color: AppColors.error,
+                            )
+                          : null,
                     ),
                   ),
                 ),

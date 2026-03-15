@@ -848,6 +848,9 @@ class $AssetsSvgGen {
   SvgGenImage get icHomeActive =>
       const SvgGenImage('assets/svg/ic_home_active.svg');
 
+  /// File path: assets/svg/ic_info_rad.svg
+  SvgGenImage get icInfoRad => const SvgGenImage('assets/svg/ic_info_rad.svg');
+
   /// File path: assets/svg/ic_invit_state_coupon_active.svg
   SvgGenImage get icInvitStateCouponActive =>
       const SvgGenImage('assets/svg/ic_invit_state_coupon_active.svg');
@@ -1072,6 +1075,7 @@ class $AssetsSvgGen {
     icHistory2,
     icHome,
     icHomeActive,
+    icInfoRad,
     icInvitStateCouponActive,
     icInvitStateCouponInactive,
     icInvitStatePawActive,

@@ -3,10 +3,12 @@ import 'package:browny_applications_new/core/data/remote/models/response/banner_
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
+import 'package:browny_applications_new/core/services/live_activity/laundry_live_activity_service.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
+import 'package:browny_applications_new/feature/home/models/customer_services_working_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -265,6 +267,28 @@ class HomePageViewmodel extends AppViewModel {
       }
 
       _workingMachinesNotifier.value = UiResult.success(data: result.data);
+
+      // [DEBUG] POC: เริ่ม Live Activity จากเครื่องแรกที่กำลังทำงาน
+      if (kDebugMode) {
+        final machines = result.data.data;
+        if (machines != null && machines.isNotEmpty) {
+          final machine = machines.first;
+          final remaining =
+              CustomerServicesWorkingModel.fromWorkingMachineResponse(
+                machine,
+              ).remainingTimeDuration;
+          await LaundryLiveActivityService.instance.startActivity(
+            data: LaundryLiveActivityData(
+              machineId: '${machine.id ?? 0}',
+              machineNumber: machine.getNameDisplay('th'),
+              serviceType: 'wash',
+              branchName: '',
+              remainingSeconds: remaining.inSeconds,
+              totalSeconds: remaining.inSeconds,
+            ),
+          );
+        }
+      }
     } on Exception catch (e) {
       _workingMachinesNotifier.value = UiResult.error(error: e);
     }

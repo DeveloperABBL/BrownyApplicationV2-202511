@@ -1,5 +1,8 @@
 # CHANGELOG
 ### DONG 2026-03-15
+* Implement Notification Live Activites iOS
+ - วางโครงสร้างการทำงานเบื้องต้นที่เกี่ยวข้อง
+* ปุ่มรับสิทธิ์ หน้า Article กรณี หมดเขต ให้แสดงเป็นสีแดงตาม Design
 * localize app wording
 * แก้ไข E-Voucher กดเลือกเพื่อใช้งานจากส่วนท้ายไม่ได้
 
