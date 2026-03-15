@@ -980,12 +980,18 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
               return UiResult.empty();
             }
             final userData = userCredential.user!;
+            final email =
+                userData.email ?? userData.providerData.first.email ?? '';
+
+            if (email.isEmpty) {
+              return UiResult.empty(error: UserUnauthorized('Email is empty'));
+            }
             final socialLoginResult = await customerDataRepo.socialLogin(
               SocialLoginRequest(
                 provider: 'google',
                 appId: userData.uid,
                 name: userData.displayName!,
-                email: userData.email!,
+                email: email,
                 profileImage: userData.photoURL.orEmpty,
               ),
             );
@@ -1023,12 +1029,18 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
               return UiResult.empty();
             }
             final userData = userCredential.user!;
+            final email =
+                userData.email ?? userData.providerData.first.email ?? '';
+
+            if (email.isEmpty) {
+              return UiResult.empty(error: UserUnauthorized('Email is empty'));
+            }
             final socialLoginResult = await customerDataRepo.socialLogin(
               SocialLoginRequest(
                 provider: 'apple',
                 appId: userData.uid,
                 name: userData.displayName!,
-                email: userData.email!,
+                email: email,
                 profileImage: userData.photoURL.orEmpty,
               ),
             );

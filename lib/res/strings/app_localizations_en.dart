@@ -271,6 +271,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmNewPin => 'Confirm new PIN';
 
   @override
+  String get enterPin6Digits => 'Enter your 6-digit PIN';
+
+  @override
   String get enableBiometric => 'Enable Biometric Authentication';
 
   @override
@@ -1129,4 +1132,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportProblem => 'Report Problem';
+
+  @override
+  String get continueWithoutCoupon => 'Continue without coupon';
+
+  @override
+  String get couponAndVoucherCode => 'Coupon and Voucher Code';
+
+  @override
+  String get codeAndScan => 'Code and Scan';
+
+  @override
+  String get enterYourCouponCode => 'Enter your coupon code here';
+
+  @override
+  String get washerCoupon => 'Washer Coupon';
+
+  @override
+  String get dryerCoupon => 'Dryer Coupon';
+
+  @override
+  String get washerDryerCoupon => 'Washer & Dryer Coupon';
+
+  @override
+  String couponNotFoundOf(String title) {
+    return 'No $title found';
+  }
+
+  @override
+  String get collapseMore => 'Collapse';
+
+  @override
+  String get showMore => 'Show more';
+
+  @override
+  String get showNearbyEVoucherPackages =>
+      'Show E-Voucher packages near me within 25 km.';
+
+  @override
+  String get evoucherNotFound => 'E-Voucher not found';
+
+  @override
+  String get startService => 'Start service';
+
+  @override
+  String afterPurchaseEVoucher(String expireDate) {
+    return '$expireDate after purchasing E-Voucher';
+  }
+
+  @override
+  String useWithin(String dateLeft) {
+    return 'Use within\n$dateLeft';
+  }
+
+  @override
+  String washRemainLabel(String washRemain) {
+    return 'Wash\n$washRemain';
+  }
+
+  @override
+  String dryRemainLabel(String dryRemain) {
+    return 'Dry\n$dryRemain';
+  }
+
+  @override
+  String get cannotLoadCouponData => 'Cannot load coupon data';
+
+  @override
+  String get dataNotFound => 'Data not found';
+
+  @override
+  String washTimesLabel(String count) {
+    return 'Wash\n$count times';
+  }
+
+  @override
+  String dryTimesLabel(String count) {
+    return 'Dry\n$count times';
+  }
 }

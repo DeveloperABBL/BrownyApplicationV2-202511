@@ -271,6 +271,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get confirmNewPin => 'ยืนยันรหัส PIN อีกครั้ง';
 
   @override
+  String get enterPin6Digits => 'กรอกรหัส PIN 6 หลัก';
+
+  @override
   String get enableBiometric => 'เปิดการใช้งานด้วย Biometric';
 
   @override
@@ -1124,4 +1127,82 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get reportProblem => 'แจ้งปัญหาการใช้งาน';
+
+  @override
+  String get continueWithoutCoupon => 'ดำเนินการต่อโดยไม่ใช้คูปอง';
+
+  @override
+  String get couponAndVoucherCode => 'คูปองและรหัสคูปอง';
+
+  @override
+  String get codeAndScan => 'รหัสและการสแกน';
+
+  @override
+  String get enterYourCouponCode => 'ใส่รหัสคูปองของคุณได้ที่นี่';
+
+  @override
+  String get washerCoupon => 'คูปองซัก';
+
+  @override
+  String get dryerCoupon => 'คูปองอบ';
+
+  @override
+  String get washerDryerCoupon => 'คูปองซักอบ';
+
+  @override
+  String couponNotFoundOf(String title) {
+    return 'ไม่พบ$title';
+  }
+
+  @override
+  String get collapseMore => 'ปิดการแสดงเพิ่มเติม';
+
+  @override
+  String get showMore => 'แสดงเพิ่มเติม';
+
+  @override
+  String get showNearbyEVoucherPackages =>
+      'แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.';
+
+  @override
+  String get evoucherNotFound => 'ไม่พบคูปอง E-Voucher';
+
+  @override
+  String get startService => 'เริ่มต้นใช้บริการ';
+
+  @override
+  String afterPurchaseEVoucher(String expireDate) {
+    return '$expireDate หลังซื้อ E-Voucher';
+  }
+
+  @override
+  String useWithin(String dateLeft) {
+    return 'ใช้งานภายใน\n$dateLeft';
+  }
+
+  @override
+  String washRemainLabel(String washRemain) {
+    return 'ซัก\n$washRemain';
+  }
+
+  @override
+  String dryRemainLabel(String dryRemain) {
+    return 'อบ\n$dryRemain';
+  }
+
+  @override
+  String get cannotLoadCouponData => 'ไม่สามารถโหลดข้อมูลคูปองได้';
+
+  @override
+  String get dataNotFound => 'ไม่พบข้อมูล';
+
+  @override
+  String washTimesLabel(String count) {
+    return 'ซัก\n$count ครั้ง';
+  }
+
+  @override
+  String dryTimesLabel(String count) {
+    return 'อบ\n$count ครั้ง';
+  }
 }

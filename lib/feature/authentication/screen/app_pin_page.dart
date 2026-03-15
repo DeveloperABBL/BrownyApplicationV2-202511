@@ -335,7 +335,8 @@ class _CreateAppPinContentState extends State<_CreateAppPinContent> {
   String _getTitleText(BuildContext context, PinBiometricViewModel viewModel) {
     if (widget.process == PinBiometricPross.verify ||
         widget.process == PinBiometricPross.verifyByPin) {
-      return 'กรอกรหัส PIN 6 หลัก';
+      // กรอกรหัส PIN 6 หลัก
+      return context.wording.enterPin6Digits;
     } else {
       return viewModel.step == 1
           ? context.wording.createNewPin

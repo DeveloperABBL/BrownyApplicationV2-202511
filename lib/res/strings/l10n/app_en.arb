@@ -86,6 +86,7 @@
     "forgotPin": "Forgot PIN",
     "createNewPin": "Create new 6-digit PIN",
     "confirmNewPin": "Confirm new PIN",
+    "enterPin6Digits": "Enter your 6-digit PIN",
     "enableBiometric": "Enable Biometric Authentication",
     "confirm": "Confirm",
     "skip": "Skip",
@@ -367,5 +368,75 @@
     "startMachineOperation": "Start Machine Operation",
     "pleasePressMachineButton": "Please press the button on the machine to start.",
     "checkStatus": "Check Status",
-    "reportProblem": "Report Problem"
+    "reportProblem": "Report Problem",
+    "continueWithoutCoupon": "Continue without coupon",
+    "couponAndVoucherCode": "Coupon and Voucher Code",
+    "codeAndScan": "Code and Scan",
+    "enterYourCouponCode": "Enter your coupon code here",
+    "washerCoupon": "Washer Coupon",
+    "dryerCoupon": "Dryer Coupon",
+    "washerDryerCoupon": "Washer & Dryer Coupon",
+    "couponNotFoundOf": "No {title} found",
+    "@couponNotFoundOf": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "collapseMore": "Collapse",
+    "showMore": "Show more",
+    "showNearbyEVoucherPackages": "Show E-Voucher packages near me within 25 km.",
+    "evoucherNotFound": "E-Voucher not found",
+    "startService": "Start service",
+    "afterPurchaseEVoucher": "{expireDate} after purchasing E-Voucher",
+    "@afterPurchaseEVoucher": {
+        "placeholders": {
+            "expireDate": {
+                "type": "String"
+            }
+        }
+    },
+    "useWithin": "Use within\n{dateLeft}",
+    "@useWithin": {
+        "placeholders": {
+            "dateLeft": {
+                "type": "String"
+            }
+        }
+    },
+    "washRemainLabel": "Wash\n{washRemain}",
+    "@washRemainLabel": {
+        "placeholders": {
+            "washRemain": {
+                "type": "String"
+            }
+        }
+    },
+    "dryRemainLabel": "Dry\n{dryRemain}",
+    "@dryRemainLabel": {
+        "placeholders": {
+            "dryRemain": {
+                "type": "String"
+            }
+        }
+    },
+    "cannotLoadCouponData": "Cannot load coupon data",
+    "dataNotFound": "Data not found",
+    "washTimesLabel": "Wash\n{count} times",
+    "@washTimesLabel": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
+    "dryTimesLabel": "Dry\n{count} times",
+    "@dryTimesLabel": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    }
 }

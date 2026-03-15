@@ -1,5 +1,6 @@
 # CHANGELOG
 ### DONG 2026-03-15
+* localize app wording
 * แก้ไข E-Voucher กดเลือกเพื่อใช้งานจากส่วนท้ายไม่ได้
 
 ### DONG 2026-03-14

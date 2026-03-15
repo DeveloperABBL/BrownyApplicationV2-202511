@@ -181,7 +181,7 @@ class NotificationHelper {
 
     // Initialize
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (details) {
         // Handle notification tap from local notifications
         debugPrint('📱 Local notification tapped: ${details.payload}');
@@ -261,10 +261,10 @@ class NotificationHelper {
 
     if (notification != null) {
       await _localNotifications.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
+        id: notification.hashCode,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'browny_channel',
             'Browny Notifications',
@@ -368,10 +368,10 @@ class NotificationHelper {
     Map<String, dynamic>? data,
   }) async {
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      const NotificationDetails(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'browny_channel',
           'Browny Notifications',

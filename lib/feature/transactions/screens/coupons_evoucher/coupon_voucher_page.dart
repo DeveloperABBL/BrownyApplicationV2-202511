@@ -169,7 +169,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             onPressed: () {
               context.pop();
             },
-            child: AppText('ดำเนินการต่อโดยไม่ใช้คูปอง'),
+            // ดำเนินการต่อโดยไม่ใช้คูปอง
+            child: AppText(context.wording.continueWithoutCoupon),
           ),
         ),
       ];
@@ -196,7 +197,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                 ),
               ),
               title: AppText(
-                'คูปองและรหัสคูปอง',
+                // คูปองและรหัสคูปอง
+                context.wording.couponAndVoucherCode,
                 style: context.textTheme.titleLarge!.copyWith(
                   color: AppColors.textWhite,
                 ),
@@ -229,7 +231,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                         Assets.svg.icCouponEditRoundedGreen.svg(),
                         AppDims.horizonPadding_8,
                         AppText(
-                          'รหัสและการสแกน',
+                          // รหัสและการสแกน
+                          context.wording.codeAndScan,
                           style: context.textTheme.labelLarge!.copyWith(
                             fontSize: AppDims.size_16.sp,
                           ),
@@ -379,7 +382,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               controller: _viewmodel.inputCollectCouponControler,
               style: AppTextNumberStyles.labelMedium,
               decoration: InputDecoration(
-                hintText: 'ใส่รหัสคูปองของคุณได้ที่นี่',
+                // ใส่รหัสคูปองของคุณได้ที่นี่
+                hintText: context.wording.enterYourCouponCode,
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -432,7 +436,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                       hintStyle: context.textTheme.labelLarge!.copyWith(
                         color: AppColors.textWhite,
                       ),
-                      hintText: 'ใช้คูปอง',
+                      // ใช้คูปอง
+                      hintText: context.wording.useCoupon,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
@@ -854,7 +859,8 @@ class _CustomerWashDryCouponWidgetState
                 context: context,
                 key: 'washer',
                 icon: Assets.svg.icCouponWashRoundedGreen.svg(),
-                title: 'คูปองซัก',
+                // คูปองซัก
+                title: context.wording.washerCoupon,
                 coupons: washerCoupons,
               ),
             );
@@ -866,7 +872,8 @@ class _CustomerWashDryCouponWidgetState
                 context: context,
                 key: 'dryer',
                 icon: Assets.svg.icCouponDryRoundedGreen.svg(),
-                title: 'คูปองอบ',
+                // คูปองอบ
+                title: context.wording.dryerCoupon,
                 coupons: dryerCoupons,
               ),
             );
@@ -878,7 +885,8 @@ class _CustomerWashDryCouponWidgetState
                 context: context,
                 key: 'both',
                 icon: Assets.svg.icCouponWashRoundedGreen.svg(),
-                title: 'คูปองซักอบ',
+                // คูปองซักอบ
+                title: context.wording.washerDryerCoupon,
                 coupons: bothCoupons,
               ),
             );
@@ -948,7 +956,8 @@ class _CustomerWashDryCouponWidgetState
             AppDims.vericalPadding_16,
 
             AppText(
-              'ไม่พบ$title',
+              // ไม่พบ$title
+              context.wording.couponNotFoundOf(title),
               style: context.textTheme.labelLarge!.copyWith(
                 fontSize: AppDims.size_16.sp,
               ),
@@ -1040,7 +1049,8 @@ class _CustomerWashDryCouponWidgetState
       child: Column(
         children: [
           AppText(
-            expanded ? 'ปิดการแสดงเพิ่มเติม' : 'แสดงเพิ่มเติม',
+            // 'ปิดการแสดงเพิ่มเติม' : 'แสดงเพิ่มเติม'
+            expanded ? context.wording.collapseMore : context.wording.showMore,
           ),
           expanded ? Assets.svg.icArrowUp.svg() : Assets.svg.icArrowDown.svg(),
         ],
@@ -1061,7 +1071,8 @@ class _CustomerWashDryCouponWidgetState
           onPressed: null,
           icon: Assets.svg.icCouponWashRoundedGreen.svg(),
           label: AppText(
-            'คูปองซัก',
+            // 'คูปองซัก',
+            context.wording.washerCoupon,
             style: context.textTheme.labelLarge,
           ),
           style: ElevatedButton.styleFrom(
@@ -1082,7 +1093,8 @@ class _CustomerWashDryCouponWidgetState
         ),
         AppDims.vericalPadding_16,
         AppText(
-          'ไม่พบคูปอง',
+          // 'ไม่พบคูปอง',
+          context.wording.couponNotFoundOf(context.wording.washerCoupon),
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: AppDims.size_16.sp,
           ),
@@ -1092,7 +1104,8 @@ class _CustomerWashDryCouponWidgetState
           onPressed: null,
           icon: Assets.svg.icCouponDryRoundedGreen.svg(),
           label: AppText(
-            'คูปองอบ',
+            // 'คูปองอบ',
+            context.wording.dryerCoupon,
             style: context.textTheme.labelLarge,
           ),
           style: ElevatedButton.styleFrom(
@@ -1113,7 +1126,8 @@ class _CustomerWashDryCouponWidgetState
         ),
         AppDims.vericalPadding_16,
         AppText(
-          'ไม่พบคูปอง',
+          // 'ไม่พบคูปอง',
+          context.wording.couponNotFoundOf(context.wording.dryerCoupon),
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: AppDims.size_16.sp,
           ),
@@ -1298,6 +1312,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
               children: [
                 Expanded(
                   child: AppText(
+                    // 'แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.',
                     'แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.',
                     style: context.textTheme.titleSmall!.copyWith(
                       color: AppColors.gray600,
@@ -1474,7 +1489,8 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
       child: Column(
         children: [
           AppText(
-            expanded ? 'ปิดการแสดงเพิ่มเติม' : 'แสดงเพิ่มเติม',
+            // 'ปิดการแสดงเพิ่มเติม' : 'แสดงเพิ่มเติม'
+            expanded ? context.wording.collapseMore : context.wording.showMore,
           ),
           expanded ? Assets.svg.icArrowUp.svg() : Assets.svg.icArrowDown.svg(),
         ],
@@ -1500,7 +1516,8 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
         AppDims.vericalPadding_16,
 
         AppText(
-          'ไม่พบคูปอง E-Voucher',
+          // 'ไม่พบคูปอง E-Voucher'
+          context.wording.evoucherNotFound,
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: AppDims.size_16.sp,
           ),

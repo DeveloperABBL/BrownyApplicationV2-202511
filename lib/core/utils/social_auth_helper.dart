@@ -25,7 +25,14 @@ enum SocialLoginType {
 /// - LINE Login (ไม่ผ่าน Firebase - ใช้ flutter_line_sdk โดยตรง)
 class SocialAuthHelper {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  static bool _isGoogleSignInInitialized = false;
+
+  static Future<void> _ensureGoogleSignInInitialized() async {
+    if (_isGoogleSignInInitialized) return;
+    await _googleSignIn.initialize();
+    _isGoogleSignInInitialized = true;
+  }
 
   // ========== Google Sign-In ==========
 
@@ -33,26 +40,35 @@ class SocialAuthHelper {
   /// Returns: [UserCredential] if successful, null if cancelled or failed
   static Future<UserCredential?> signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      await _ensureGoogleSignInInitialized();
 
-      // If user cancels the sign-in
-      if (googleUser == null) {
-        return null;
-      }
+      // Trigger the authentication flow (v7+)
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
+        // scopeHint: ['email', 'profile'],
+      );
 
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      // Obtain ID token and OAuth access token
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final GoogleSignInClientAuthorization? googleAuthorization =
+          await googleUser.authorizationClient.authorizationForScopes([
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',
+          ]);
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: googleAuthorization?.accessToken,
         idToken: googleAuth.idToken,
       );
 
       // Sign in to Firebase with the Google credential
       return await _auth.signInWithCredential(credential);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return null;
+      }
+      debugPrint('Error signing in with Google: $e');
+      rethrow;
     } catch (e) {
       debugPrint('Error signing in with Google: $e');
       rethrow;
@@ -248,10 +264,8 @@ class SocialAuthHelper {
 
   /// Sign out from Firebase (และ Google ถ้ามีการ login ด้วย Google)
   static Future<void> signOut() async {
-    // Sign out from Google if signed in
-    if (await _googleSignIn.isSignedIn()) {
-      await _googleSignIn.signOut();
-    }
+    // google_sign_in v7 removed isSignedIn(); signOut is safe to call directly.
+    await _googleSignIn.signOut();
     final accessToken = await FacebookAuth.instance.accessToken;
     if (accessToken != null) {
       await FacebookAuth.instance.logOut();

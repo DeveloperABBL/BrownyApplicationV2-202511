@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 3.0.0+37
 
 environment:
-  sdk: ^3.9.0
+  sdk: '>=3.9.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -68,19 +68,19 @@ dependencies:
   webview_flutter: ^4.9.0
   url_launcher: ^6.3.1
   dropdown_search: ^6.0.2
-  google_maps_flutter: ^2.14.0
-  geolocator: ^13.0.2
+  google_maps_flutter: ^2.15.0
+  geolocator: ^14.0.2
   speech_to_text: ^7.0.0
   firebase_core: ^4.5.0
   firebase_auth: ^6.2.0
   firebase_crashlytics: ^5.0.8
   firebase_messaging: ^16.1.2
-  flutter_local_notifications: ^17.2.3
-  google_sign_in: ^6.2.1
+  flutter_local_notifications: ^21.0.0
+  google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.0
-  flutter_line_sdk: ^2.3.8
+  flutter_line_sdk: ^2.7.0
   cached_network_image: ^3.4.1
-  device_info_plus: ^10.1.2
+  device_info_plus: ^12.3.0
   flutter_staggered_grid_view: ^0.7.0
   # encrypt: ^5.0.3
   pointycastle: ^4.0.0

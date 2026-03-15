@@ -616,6 +616,12 @@ abstract class AppLocalizations {
   /// **'Confirm new PIN'**
   String get confirmNewPin;
 
+  /// No description provided for @enterPin6Digits.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 6-digit PIN'**
+  String get enterPin6Digits;
+
   /// No description provided for @enableBiometric.
   ///
   /// In en, this message translates to:
@@ -2283,6 +2289,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report Problem'**
   String get reportProblem;
+
+  /// No description provided for @continueWithoutCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without coupon'**
+  String get continueWithoutCoupon;
+
+  /// No description provided for @couponAndVoucherCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon and Voucher Code'**
+  String get couponAndVoucherCode;
+
+  /// No description provided for @codeAndScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Code and Scan'**
+  String get codeAndScan;
+
+  /// No description provided for @enterYourCouponCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your coupon code here'**
+  String get enterYourCouponCode;
+
+  /// No description provided for @washerCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Washer Coupon'**
+  String get washerCoupon;
+
+  /// No description provided for @dryerCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Dryer Coupon'**
+  String get dryerCoupon;
+
+  /// No description provided for @washerDryerCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Washer & Dryer Coupon'**
+  String get washerDryerCoupon;
+
+  /// No description provided for @couponNotFoundOf.
+  ///
+  /// In en, this message translates to:
+  /// **'No {title} found'**
+  String couponNotFoundOf(String title);
+
+  /// No description provided for @collapseMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapseMore;
+
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// No description provided for @showNearbyEVoucherPackages.
+  ///
+  /// In en, this message translates to:
+  /// **'Show E-Voucher packages near me within 25 km.'**
+  String get showNearbyEVoucherPackages;
+
+  /// No description provided for @evoucherNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'E-Voucher not found'**
+  String get evoucherNotFound;
+
+  /// No description provided for @startService.
+  ///
+  /// In en, this message translates to:
+  /// **'Start service'**
+  String get startService;
+
+  /// No description provided for @afterPurchaseEVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'{expireDate} after purchasing E-Voucher'**
+  String afterPurchaseEVoucher(String expireDate);
+
+  /// No description provided for @useWithin.
+  ///
+  /// In en, this message translates to:
+  /// **'Use within\n{dateLeft}'**
+  String useWithin(String dateLeft);
+
+  /// No description provided for @washRemainLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wash\n{washRemain}'**
+  String washRemainLabel(String washRemain);
+
+  /// No description provided for @dryRemainLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry\n{dryRemain}'**
+  String dryRemainLabel(String dryRemain);
+
+  /// No description provided for @cannotLoadCouponData.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot load coupon data'**
+  String get cannotLoadCouponData;
+
+  /// No description provided for @dataNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Data not found'**
+  String get dataNotFound;
+
+  /// No description provided for @washTimesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wash\n{count} times'**
+  String washTimesLabel(String count);
+
+  /// No description provided for @dryTimesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry\n{count} times'**
+  String dryTimesLabel(String count);
 }
 
 class _AppLocalizationsDelegate

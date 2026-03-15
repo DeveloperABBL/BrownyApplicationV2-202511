@@ -123,7 +123,8 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                   Assets.png.brownyError1.image(width: 145.w, height: 100.h),
                   AppDims.vericalPadding_16,
                   AppText(
-                    'ไม่สามารถโหลดข้อมูลคูปองได้',
+                    // 'ไม่สามารถโหลดข้อมูลคูปองได้',
+                    context.wording.cannotLoadCouponData,
                     style: context.textTheme.labelLarge!.copyWith(
                       fontSize: AppDims.size_16.sp,
                     ),
@@ -145,7 +146,12 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                   selectedPackage ?? couponDetail.packages.firstOrNull;
 
               if (packageData == null || couponData == null) {
-                return Center(child: AppText('ไม่พบข้อมูล'));
+                return Center(
+                  child: AppText(
+                    // 'ไม่พบข้อมูล',
+                    context.wording.dataNotFound,
+                  ),
+                );
               }
 
               return _buildContent(
@@ -303,7 +309,7 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                               formatCurrency(
                                 string: '${packageData.brownyCoinValue}',
                                 decimal: false,
-                                trailingSign: ' คอยน์',
+                                trailingSign: ' ${context.wording.coin}',
                               ),
                               style: context.textTheme.headlineSmall!.copyWith(
                                 fontSize: AppDims.size_14.sp,
@@ -333,7 +339,10 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                 children: [
                   _buildConditionItem(
                     wording:
-                        'ใช้งานภายใน\n${couponData.usageDurationDays ?? '0'}',
+                        // ใช้งานภายใน\nusageDurationDays,
+                        context.wording.useWithin(
+                          couponData.usageDurationDays ?? '0',
+                        ),
                     icon: Assets.svg.icCalendarRoundedGreen.svg(
                       width: 28.w,
                       height: 28.h,
@@ -352,7 +361,10 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                   ),
 
                   _buildConditionItem(
-                    wording: 'ซัก\n${packageData.qtyWasherValue} ครั้ง',
+                    // ซัก\n qtyWasherValue ครั้ง',
+                    wording: context.wording.washTimesLabel(
+                      '${packageData.qtyWasherValue}',
+                    ),
                     icon: Assets.svg.icWashRoundedGreen.svg(
                       width: 28.w,
                       height: 28.h,
@@ -371,7 +383,10 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                   ),
 
                   _buildConditionItem(
-                    wording: 'อบ\n${packageData.qtyDryerValue} ครั้ง',
+                    // 'อบ\nqtyDryerValue ครั้ง',
+                    wording: context.wording.dryTimesLabel(
+                      '${packageData.qtyDryerValue}',
+                    ),
                     icon: Assets.svg.icDryRoundedGreen.svg(
                       width: 28.w,
                       height: 28.h,
@@ -388,7 +403,8 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  'เลือกสาขา',
+                  // 'เลือกสาขา',
+                  context.wording.chooseStore,
                   style: context.textTheme.titleMedium!.copyWith(
                     fontSize: AppDims.size_16.sp,
                   ),
@@ -423,7 +439,8 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                         )
                         .toList(),
                     hint: packageData.storeNameDisplay(context).isEmpty
-                        ? 'ค้นหาสาขาที่ร่วมรายการ'
+                        // 'ค้นหาสาขาที่ร่วมรายการ'
+                        ? context.wording.searchStoreParticipating
                         : packageData.storeNameDisplay(context),
                     isInteractive: false,
                     onLocationTap: () async {

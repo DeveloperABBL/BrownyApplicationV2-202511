@@ -267,6 +267,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmNewPin => '确认新的 PIN';
 
   @override
+  String get enterPin6Digits => '请输入6位PIN码';
+
+  @override
   String get enableBiometric => '启用生物识别认证';
 
   @override
@@ -1099,4 +1102,81 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reportProblem => '报告问题';
+
+  @override
+  String get continueWithoutCoupon => '不使用优惠券继续';
+
+  @override
+  String get couponAndVoucherCode => '优惠券和优惠券码';
+
+  @override
+  String get codeAndScan => '代码和扫描';
+
+  @override
+  String get enterYourCouponCode => '请在此输入您的优惠券代码';
+
+  @override
+  String get washerCoupon => '洗衣优惠券';
+
+  @override
+  String get dryerCoupon => '烘干优惠券';
+
+  @override
+  String get washerDryerCoupon => '洗烘优惠券';
+
+  @override
+  String couponNotFoundOf(String title) {
+    return '未找到$title';
+  }
+
+  @override
+  String get collapseMore => '收起';
+
+  @override
+  String get showMore => '显示更多';
+
+  @override
+  String get showNearbyEVoucherPackages => '显示25公里内附近门店的E-Voucher套餐';
+
+  @override
+  String get evoucherNotFound => '未找到E-Voucher';
+
+  @override
+  String get startService => '开始使用服务';
+
+  @override
+  String afterPurchaseEVoucher(String expireDate) {
+    return '$expireDate 购买E-Voucher后';
+  }
+
+  @override
+  String useWithin(String dateLeft) {
+    return '在\n$dateLeft内使用';
+  }
+
+  @override
+  String washRemainLabel(String washRemain) {
+    return '洗\n$washRemain';
+  }
+
+  @override
+  String dryRemainLabel(String dryRemain) {
+    return '烘\n$dryRemain';
+  }
+
+  @override
+  String get cannotLoadCouponData => '无法加载优惠券数据';
+
+  @override
+  String get dataNotFound => '未找到数据';
+
+  @override
+  String washTimesLabel(String count) {
+    return '洗\n$count 次';
+  }
+
+  @override
+  String dryTimesLabel(String count) {
+    return '烘\n$count 次';
+  }
 }

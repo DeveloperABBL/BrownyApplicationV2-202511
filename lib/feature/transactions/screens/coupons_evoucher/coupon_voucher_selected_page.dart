@@ -66,7 +66,8 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
             ), //
             iconAlignment: IconAlignment.end,
             onPressed: () {},
-            label: AppText('เริ่มต้นใช้บริการ'),
+            // เริ่มต้นใช้บริการ
+            label: AppText(context.wording.startService),
           ),
         ),
       ],
@@ -117,7 +118,10 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                   ),
                 ),
                 AppText(
-                  '${data.expireDateDisplay(context)} หลังซื้อ E-Voucher',
+                  // 'expireDateDisplay หลังซื้อ E-Voucher',
+                  context.wording.afterPurchaseEVoucher(
+                    data.expireDateDisplay(context),
+                  ),
                   style: context.textTheme.bodyMedium!.copyWith(
                     fontSize: AppDims.size_15.sp,
                     color: AppColors.gray500,
@@ -146,7 +150,10 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
               child: Row(
                 children: [
                   _buildConditionItem(
-                    wording: 'ใช้งานภายใน\n${data.dateLeftDisplay(context)}',
+                    // ใช้งานภายใน\n dateLeftDisplay',
+                    wording: context.wording.useWithin(
+                      data.dateLeftDisplay(context),
+                    ),
                     icon: Assets.svg.icCalendarRoundedGreen.svg(
                       width: AppDims.size_28.w,
                       height: AppDims.size_28.h,
@@ -165,7 +172,10 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                   ),
 
                   _buildConditionItem(
-                    wording: 'ซัก\n${data.washRemainDisplay}',
+                    // 'ซัก\nwashRemainDisplay',
+                    wording: context.wording.washRemainLabel(
+                      data.washRemainDisplay,
+                    ),
                     icon: Assets.svg.icWashRoundedGreen.svg(
                       width: AppDims.size_28.w,
                       height: AppDims.size_28.h,
@@ -184,7 +194,10 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                   ),
 
                   _buildConditionItem(
-                    wording: 'อบ\n${data.dryRemainDisplay}',
+                    // อบ\ndryRemainDisplay',
+                    wording: context.wording.dryRemainLabel(
+                      data.dryRemainDisplay,
+                    ),
                     icon: Assets.svg.icDryRoundedGreen.svg(
                       width: AppDims.size_28.w,
                       height: AppDims.size_28.h,
@@ -201,7 +214,8 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  'เลือกสาขา',
+                  // 'เลือกสาขา',
+                  context.wording.chooseStore,
                   style: context.textTheme.titleMedium!.copyWith(
                     fontSize: AppDims.size_16.sp,
                   ),
