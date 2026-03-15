@@ -1,4 +1,7 @@
 # CHANGELOG
+### DONG 2026-03-15
+* แก้ไข E-Voucher กดเลือกเพื่อใช้งานจากส่วนท้ายไม่ได้
+
 ### DONG 2026-03-14
 * แก้ไข Facebook Login ไม่ได้(workaround) ด้วยการไม่ผ่าน Firebase Authen แต่ใช้ข้อมูลจาก Facebook Register ตรงแทน
  - upgrade version firebase packages, version facebook_auth

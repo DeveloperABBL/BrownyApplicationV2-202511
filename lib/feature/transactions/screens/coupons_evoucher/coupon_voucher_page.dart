@@ -975,29 +975,31 @@ class _CustomerWashDryCouponWidgetState
     BuildContext context,
     CustomerCouponModel customerDiscount,
   ) {
+    void onTap() {
+      switch (widget._viewModel.couponState) {
+        case CouponVoucherState.using:
+          widget._viewModel.onCustomerDiscountSelected(
+            customerDiscount,
+          );
+          context.pop(
+            widget._viewModel.customerCouponModelSelected,
+          );
+          break;
+        case CouponVoucherState.purshasing:
+          widget._viewModel.goSelectedPage(
+            context,
+            customerDiscount,
+          );
+        case CouponVoucherState.redeeming:
+        case CouponVoucherState.brownyShop:
+          break;
+        default:
+          break;
+      }
+    }
+
     return GestureDetector(
-      onTap: () {
-        switch (widget._viewModel.couponState) {
-          case CouponVoucherState.using:
-            widget._viewModel.onCustomerDiscountSelected(
-              customerDiscount,
-            );
-            context.pop(
-              widget._viewModel.customerCouponModelSelected,
-            );
-            break;
-          case CouponVoucherState.purshasing:
-            widget._viewModel.goSelectedPage(
-              context,
-              customerDiscount,
-            );
-          case CouponVoucherState.redeeming:
-          case CouponVoucherState.brownyShop:
-            break;
-          default:
-            break;
-        }
-      },
+      onTap: onTap,
       // Counpon ส่วนลดใน Tab ซักอบ
       child: CouponEVoucherCardWidget(
         initialChecked: customerDiscount.isSelected,
@@ -1019,6 +1021,8 @@ class _CustomerWashDryCouponWidgetState
         ),
         borderColor: customerDiscount.isSelected ? AppColors.primary : null,
         showCheckBox: widget._viewModel.couponState == CouponVoucherState.using,
+        onChanged: (value) => onTap(),
+        onTap: onTap,
       ),
     );
   }
@@ -1397,32 +1401,34 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
     BuildContext context,
     CustomerCouponModel customerEVoucher,
   ) {
+    void onTap() {
+      switch (widget._viewModel.couponState) {
+        case CouponVoucherState.using:
+          widget._viewModel.onCustomerEVoucherSelected(
+            customerEVoucher,
+          );
+          context.pop(
+            widget._viewModel.customerCouponModelSelected,
+          );
+          break;
+        case CouponVoucherState.purshasing:
+          widget._viewModel.goSelectedPage(
+            context,
+            customerEVoucher,
+          );
+        case CouponVoucherState.redeeming:
+          // TODO: Handle this case.
+          break;
+        case CouponVoucherState.brownyShop:
+          // TODO: Handle this case.
+          throw UnimplementedError();
+        default:
+          break;
+      }
+    }
+
     return GestureDetector(
-      onTap: () {
-        switch (widget._viewModel.couponState) {
-          case CouponVoucherState.using:
-            widget._viewModel.onCustomerEVoucherSelected(
-              customerEVoucher,
-            );
-            context.pop(
-              widget._viewModel.customerCouponModelSelected,
-            );
-            break;
-          case CouponVoucherState.purshasing:
-            widget._viewModel.goSelectedPage(
-              context,
-              customerEVoucher,
-            );
-          case CouponVoucherState.redeeming:
-            // TODO: Handle this case.
-            break;
-          case CouponVoucherState.brownyShop:
-            // TODO: Handle this case.
-            throw UnimplementedError();
-          default:
-            break;
-        }
-      },
+      onTap: onTap,
       child: CouponEVoucherCardWidget(
         initialChecked: customerEVoucher.isSelected,
         icon: Image.network(
@@ -1443,6 +1449,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
         ),
         borderColor: customerEVoucher.isSelected ? AppColors.primary : null,
         showCheckBox: widget._viewModel.couponState == CouponVoucherState.using,
+        onChanged: (value) => onTap(),
         // onChanged: widget._viewModel.couponState == CouponVoucherState.using
         //     ? (value) {
         //         widget._viewModel.onCustomerEVoucherSelected(
