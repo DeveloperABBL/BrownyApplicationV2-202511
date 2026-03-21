@@ -111,6 +111,45 @@ class AppColors {
     ],
   );
 
+  static LinearGradient popupFestiveWonGradient = LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: [
+      Color(0xFFFFFFFF), // #FFFFFF
+      Color(0xFFBFF298), // #BFF298
+    ],
+    stops: [
+      0.2194, // 21.94%
+      0.9502, // 95.02%
+    ],
+  );
+
+  static LinearGradient popupFestiveLoseGradient = LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: [
+      Color(0xFFFFFFFF), // #FFFFFF
+      Color(0xFFFE4343), // #FE4343
+    ],
+    stops: [
+      0.2194, // 21.94%
+      0.9502, // 95.02%
+    ],
+  );
+
+  static LinearGradient popupFestiveFailedGradient = LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: [
+      Color(0xFFFFFFFF), // #FFFFFF
+      Color(0xFFFFD78D), // #FFD78D
+    ],
+    stops: [
+      0.2194, // 21.94%
+      0.9502, // 95.02%
+    ],
+  );
+
   static List<BoxShadow> get defatultShadow => [
     BoxShadow(
       color: AppColors.black.withValues(alpha: 0.2),

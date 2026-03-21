@@ -1210,4 +1210,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String dryTimesLabel(String count) {
     return 'Dry\n$count times';
   }
+
+  @override
+  String get facilities => 'Facilities';
+
+  @override
+  String get locationAccessDeniedTitle => 'Location access unavailable';
+
+  @override
+  String get locationAccessDeniedMessage =>
+      'Please allow location access before using this feature';
+
+  @override
+  String get voiceSearchNotSupported =>
+      'Your device does not support voice search';
+
+  @override
+  String get machineAvailable => 'Available';
+
+  @override
+  String get machineOccupied => 'Occupied';
+
+  @override
+  String get conditionsAndDetails => 'Conditions & Details';
+
+  @override
+  String get otherCampaigns => 'Other Campaigns';
+
+  @override
+  String get scanQrActivity => 'Scan QR In-Store Activity';
+
+  @override
+  String get noLuckyScanActivityTitle => 'No Active Lucky Scan';
+
+  @override
+  String get noLuckyScanActivityMessage => 'Stay tuned for the next activity';
 }

@@ -29,6 +29,8 @@ export 'package:browny_applications_new/core/data/remote/models/response/coupon_
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/festive_history_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/festive_index_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/coupon_receipt_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
@@ -37,6 +39,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/device_
 export 'package:browny_applications_new/core/data/remote/models/response/get_pin_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/introductions_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/lucky_draw_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_status_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/machine_order_response.dart';

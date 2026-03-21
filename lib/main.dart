@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/env/dev_environment.dart';
 import 'package:browny_applications_new/core/utils/crashlytics_helper.dart';
 import 'package:browny_applications_new/core/utils/notification_helper.dart';
+import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/strings/app_localizations.dart';
 import 'package:browny_applications_new/res/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -69,45 +70,66 @@ class BrownyApp extends StatelessWidget {
         builder: (context, envNotifier, child) {
           final env = envNotifier;
 
-          return ScreenUtilInit(
-            // From Team design screen sizing
-            designSize: const Size(375, 812),
-            // minTextAdapt: true,
-            splitScreenMode: true,
-            builder: (_, _) {
-              return MaterialApp.router(
-                debugShowCheckedModeBanner: false,
-                title: 'Browny',
+          return LayoutBuilder(
+            builder: (context, boxCons) {
+              return ScreenUtilInit(
+                // From Team design screen sizing
+                designSize: const Size(375, 812),
+                // minTextAdapt: true,
+                splitScreenMode: true,
+                enableScaleWH: () => boxCons.maxWidth < 600,
+                // fontSizeResolver: FontSizeResolvers.radius,
+                builder: (_, _) {
+                  return MaterialApp.router(
+                    debugShowCheckedModeBanner: false,
+                    title: 'Browny',
 
-                // ============================================================
-                // Localization (th, en, zh)
-                // ============================================================
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: AppLocalizations.supportedLocales,
-                locale: env.appPreferences.getLocalLanguage(),
-                // Fallback เป็นภาษาไทยถ้าไม่เจอ locale ที่ต้องการ
-                localeResolutionCallback: (locale, supportedLocales) {
-                  // ตรวจสอบว่า locale ที่ระบุรองรับหรือไม่
-                  if (locale != null) {
-                    for (final supportedLocale in supportedLocales) {
-                      if (supportedLocale.languageCode == locale.languageCode) {
-                        return supportedLocale;
+                    // ============================================================
+                    // Localization (th, en, zh)
+                    // ============================================================
+                    localizationsDelegates:
+                        AppLocalizations.localizationsDelegates,
+                    supportedLocales: AppLocalizations.supportedLocales,
+                    locale: env.appPreferences.getLocalLanguage(),
+                    // Fallback เป็นภาษาไทยถ้าไม่เจอ locale ที่ต้องการ
+                    localeResolutionCallback: (locale, supportedLocales) {
+                      // ตรวจสอบว่า locale ที่ระบุรองรับหรือไม่
+                      if (locale != null) {
+                        for (final supportedLocale in supportedLocales) {
+                          if (supportedLocale.languageCode ==
+                              locale.languageCode) {
+                            return supportedLocale;
+                          }
+                        }
                       }
-                    }
-                  }
-                  // ถ้าไม่เจอให้ใช้อังกฤษเป็นค่าเริ่มต้น
-                  return const Locale('en');
+                      // ถ้าไม่เจอให้ใช้ไทยเป็นค่าเริ่มต้น
+                      return const Locale('th');
+                    },
+
+                    // ============================================================
+                    // Theme
+                    // ============================================================
+                    theme: AppTheme.lightTheme,
+
+                    // ============================================================
+                    // Routing (go_router)
+                    // ============================================================
+                    routerConfig: env.appRouter.router,
+
+                    builder: (context, widget) => Container(
+                      color: AppColors.black,
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: 560, // ความกว้างประมาณ iPhone 17 Pro Max
+                            maxHeight: 956,
+                          ),
+                          child: widget,
+                        ),
+                      ),
+                    ),
+                  );
                 },
-
-                // ============================================================
-                // Theme
-                // ============================================================
-                theme: AppTheme.lightTheme,
-
-                // ============================================================
-                // Routing (go_router)
-                // ============================================================
-                routerConfig: env.appRouter.router,
               );
             },
           );

@@ -694,4 +694,44 @@ abstract class AppClient {
   /// API fetch Content OnBoarding
   @GET('/introductions')
   Future<HttpResponse<List<IntroductionsResponse>?>> fetchIntroductions();
+
+  /// DONG 2026-03-19
+  ///
+  /// API fetch รายการ Festive Event (Lucky Scan campaigns)
+  ///
+  /// Response:
+  /// - has_event: bool (มี event หรือไม่)
+  /// - data: List<FestiveData> (รายการ campaign)
+  @GET('/festive/index')
+  Future<HttpResponse<FestiveIndexResponse>> fetchFestiveIndex();
+
+  /// DONG 2026-03-20
+  ///
+  /// API fetch ประวัติการร่วมกิจกรรม Lucky Scan ของลูกค้า
+  ///
+  /// Body:
+  /// - customer_id: String (uuid)
+  ///
+  /// Response: FestiveHistoryResponse
+  /// - data: List<FestiveHistoryData> (ประวัติ)
+  @POST('/festive/history')
+  Future<HttpResponse<FestiveHistoryResponse>> fetchFestiveHistory(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// DONG 2026-03-20
+  ///
+  /// API สแกน QR Lucky Draw
+  ///
+  /// Body:
+  /// - customer_id: String (uuid)
+  /// - qr_code: String (QR code URL)
+  ///
+  /// Response: LuckyDrawResponse
+  /// - type: "won" / "lose" / "limit_reached" / "scanned_today"
+  /// - status: "error" (กรณี QR ไม่ถูกต้อง)
+  @POST('/lucky/draw')
+  Future<HttpResponse<LuckyDrawResponse>> postLuckyDraw(
+    @Body() Map<String, dynamic> body,
+  );
 }

@@ -389,5 +389,18 @@
     "cannotLoadCouponData": "ไม่สามารถโหลดข้อมูลคูปองได้",
     "dataNotFound": "ไม่พบข้อมูล",
     "washTimesLabel": "ซัก\n{count} ครั้ง",
-    "dryTimesLabel": "อบ\n{count} ครั้ง"
+    "dryTimesLabel": "อบ\n{count} ครั้ง",
+    "facilities": "สิ่งอำนวยความสะดวก",
+    "locationAccessDeniedTitle": "ไม่สามารถเข้าถึงตำแหน่งได้",
+    "locationAccessDeniedMessage": "กรุณาให้สิทธิ์เข้าถึงตำแหน่งก่อนใช้งาน",
+    "openSettings": "เปิด Setting",
+    "voiceSearchNotSupported": "อุปกรณ์ของคุณไม่รองรับการค้นหาด้วยเสียง",
+    "machineAvailable": "ว่าง",
+    "machineOccupied": "เต็ม",
+    "conditionsAndDetails": "รายละเอียดเงื่อนไข",
+    "otherCampaigns": "แคมเปญอื่นๆ",
+    "scanQrActivity": "สแกน QR กิจกรรมภายในร้าน",
+    "noLuckyScanActivityTitle": "ขณะนี้ยังไม่มีกิจกรรม Lucky Scan",
+    "noLuckyScanActivityMessage": "รอติดตามกิจกรรมครั้งถัดไปนะ",
+    "backToHome": "กลับสู่หน้าหลัก"
 }

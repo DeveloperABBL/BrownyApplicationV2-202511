@@ -438,5 +438,18 @@
                 "type": "String"
             }
         }
-    }
+    },
+    "facilities": "Facilities",
+    "locationAccessDeniedTitle": "Location access unavailable",
+    "locationAccessDeniedMessage": "Please allow location access before using this feature",
+    "openSettings": "Open Settings",
+    "voiceSearchNotSupported": "Your device does not support voice search",
+    "machineAvailable": "Available",
+    "machineOccupied": "Occupied",
+    "conditionsAndDetails": "Conditions & Details",
+    "otherCampaigns": "Other Campaigns",
+    "scanQrActivity": "Scan QR In-Store Activity",
+    "noLuckyScanActivityTitle": "No Active Lucky Scan",
+    "noLuckyScanActivityMessage": "Stay tuned for the next activity",
+    "backToHome": "Back to Home"
 }

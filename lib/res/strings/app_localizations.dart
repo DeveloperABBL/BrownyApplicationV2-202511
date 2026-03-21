@@ -2415,6 +2415,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dry\n{count} times'**
   String dryTimesLabel(String count);
+
+  /// No description provided for @facilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get facilities;
+
+  /// No description provided for @locationAccessDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access unavailable'**
+  String get locationAccessDeniedTitle;
+
+  /// No description provided for @locationAccessDeniedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please allow location access before using this feature'**
+  String get locationAccessDeniedMessage;
+
+  /// No description provided for @voiceSearchNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device does not support voice search'**
+  String get voiceSearchNotSupported;
+
+  /// No description provided for @machineAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get machineAvailable;
+
+  /// No description provided for @machineOccupied.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupied'**
+  String get machineOccupied;
+
+  /// No description provided for @conditionsAndDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions & Details'**
+  String get conditionsAndDetails;
+
+  /// No description provided for @otherCampaigns.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Campaigns'**
+  String get otherCampaigns;
+
+  /// No description provided for @scanQrActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR In-Store Activity'**
+  String get scanQrActivity;
+
+  /// No description provided for @noLuckyScanActivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Active Lucky Scan'**
+  String get noLuckyScanActivityTitle;
+
+  /// No description provided for @noLuckyScanActivityMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay tuned for the next activity'**
+  String get noLuckyScanActivityMessage;
 }
 
 class _AppLocalizationsDelegate

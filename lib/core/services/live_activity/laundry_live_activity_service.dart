@@ -107,8 +107,8 @@ class LaundryLiveActivityService {
       // ผู้ใช้ปิด Live Activities หรือ iOS รุ่นเก่า
       return;
     }
+    await _plugin.endAllActivities();
 
-    // จบ activity เดิมก่อน (ถ้ามี)
     if (_currentActivityId != null) {
       await _endCurrentActivity(isCompleted: false);
     }
@@ -118,6 +118,8 @@ class LaundryLiveActivityService {
       'browny_machine_${data.machineId}',
       data.toActivityMap(),
     );
+
+    _currentActivityId ??= 'browny_machine_${data.machineId}';
   }
 
   /// อัพเดทเวลาที่เหลือ

@@ -96,9 +96,12 @@ class _MapContentState extends State<MapContent> {
         AppOverlays.showBrownyDialog(
           context,
           imageAsset: Assets.png.brownyError2.path,
-          title: 'ไม่สามารถเข้าถึงตำแหน่งได้',
-          message: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งก่อนใช้งาน',
-          confirmText: 'เปิด Setting',
+          // ไม่สามารถเข้าถึงตำแหน่งได้,
+          title: context.wording.locationAccessDeniedTitle,
+          // กรุณาให้สิทธิ์เข้าถึงตำแหน่งก่อนใช้งาน,
+          message: context.wording.locationAccessDeniedMessage,
+          // เปิด Setting,
+          confirmText: context.wording.openSettings,
           onConfirm: () async {
             await PermissionHelper.openAppSettings();
             // recursive
@@ -200,7 +203,8 @@ class _MapContentState extends State<MapContent> {
     if (storeResult.isEmpty || storeResult.hasError) {
       AppOverlays.showBrownyDialog(
         context,
-        title: 'ไม่พบข้อมูล',
+        // ไม่พบข้อมูล,
+        title: context.wording.dataNotFound,
         message: context.wording.errorUi,
       );
       return;
@@ -237,8 +241,10 @@ class _MapContentState extends State<MapContent> {
         AppOverlays.showBrownyDialog(
           context,
           imageAsset: Assets.png.brownyError2.path,
-          title: 'ไม่สามารถใช้งานได้',
-          message: 'อุปกรณ์ของคุณไม่รองรับการค้นหาด้วยเสียง',
+          // เกิดข้อผิดพลาด,
+          title: context.wording.errorOccurred,
+          // อุปกรณ์ของคุณไม่รองรับการค้นหาด้วยเสียง,
+          message: context.wording.voiceSearchNotSupported,
           confirmText: context.wording.confirm,
         );
       }
@@ -604,12 +610,14 @@ class _MapContentState extends State<MapContent> {
           String subTitle;
           TextStyle subTitleStyle;
           if (data.isMachineAvailable) {
-            subTitle = 'ว่าง';
+            // ว่าง;
+            subTitle = context.wording.machineAvailable;
             subTitleStyle = context.textTheme.labelLarge!.copyWith(
               color: AppColors.primary,
             );
           } else {
-            subTitle = 'เต็ม';
+            // เต็ม;
+            subTitle = context.wording.machineOccupied;
             subTitleStyle = context.textTheme.labelLarge!.copyWith(
               color: AppColors.error,
             );

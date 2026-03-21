@@ -1179,4 +1179,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String dryTimesLabel(String count) {
     return '烘\n$count 次';
   }
+
+  @override
+  String get facilities => '设施';
+
+  @override
+  String get locationAccessDeniedTitle => '无法获取位置权限';
+
+  @override
+  String get locationAccessDeniedMessage => '请在使用前允许访问位置';
+
+  @override
+  String get voiceSearchNotSupported => '您的设备不支持语音搜索';
+
+  @override
+  String get machineAvailable => '空闲';
+
+  @override
+  String get machineOccupied => '占用';
+
+  @override
+  String get conditionsAndDetails => '详情与条件';
+
+  @override
+  String get otherCampaigns => '其他活动';
+
+  @override
+  String get scanQrActivity => '扫描店内活动二维码';
+
+  @override
+  String get noLuckyScanActivityTitle => '目前没有幸运扫描活动';
+
+  @override
+  String get noLuckyScanActivityMessage => '敬请期待下次活动';
 }

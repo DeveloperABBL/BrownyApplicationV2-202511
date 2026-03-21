@@ -1,6 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:flutter/foundation.dart';
 
 class StoreDetailPage extends StatelessWidget {
   const StoreDetailPage({
@@ -93,7 +94,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           onPressed: null,
           icon: Assets.services.icWasher.svg(),
           label: AppText(
-            'เครื่องอบ',
+            // 'เครื่องอบ',
+            context.wording.dryer,
             style: context.textTheme.labelLarge!.copyWith(
               fontSize: AppDims.size_16.sp,
             ),
@@ -118,7 +120,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
               final machine = store.machines!.dryer![index];
               return _cardMachine(
                 machineImage: Assets.services.storeDryer,
-                machine: 'เครื่องอบ\n${machine.name.orEmpty}',
+                // เครื่องอบ\n${machine.name.orEmpty}',
+                machine: '${context.wording.dryer}\n${machine.name.orEmpty}',
                 status: machine.status!.getTextByLocale(context.languageCode),
                 active: machine.isMachineAcive,
                 available: machine.isAvailable(context.languageCode),
@@ -141,7 +144,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           onPressed: null,
           icon: Assets.services.icWasher.svg(),
           label: AppText(
-            'เครื่องซักผ้า',
+            // 'เครื่องซักผ้า',
+            context.wording.washer,
             style: context.textTheme.labelLarge!.copyWith(
               fontSize: AppDims.size_16.sp,
             ),
@@ -253,7 +257,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           onPressed: null,
           icon: Assets.svg.icHeartRoundedGreen.svg(),
           label: AppText(
-            'สิ่งอำนวยความสะดวก',
+            // 'สิ่งอำนวยความสะดวก',
+            context.wording.facilities,
             style: context.textTheme.labelLarge!.copyWith(
               fontSize: AppDims.size_16.sp,
             ),
@@ -317,7 +322,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           onPressed: null,
           icon: Assets.svg.icPawRoundedGreen.svg(),
           label: AppText(
-            'บริการ',
+            // 'บริการ',
+            context.wording.services,
             style: context.textTheme.labelLarge!.copyWith(
               fontSize: AppDims.size_16.sp,
             ),
@@ -348,7 +354,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: AppText(
-                      'เครื่องซัก',
+                      // 'เครื่องซัก',
+                      context.wording.washer,
                       style: context.textTheme.labelLarge!.copyWith(
                         color: AppColors.textWhite,
                       ),
@@ -359,8 +366,11 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
                   bottom: 0,
                   left: 0,
                   child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    padding: const EdgeInsets.all(8.0),
+                    margin: EdgeInsets.all(8.0.r),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.0.r,
+                      horizontal: 4.r,
+                    ),
                     width: AppDims.size_24.w,
                     decoration: BoxDecoration(
                       color: AppColors.ci3,
@@ -394,7 +404,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: AppText(
-                      'เครื่องอบ',
+                      // 'เครื่องอบ',
+                      context.wording.dryer,
                       style: context.textTheme.labelLarge!.copyWith(
                         color: AppColors.textWhite,
                       ),
@@ -405,8 +416,11 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
                   bottom: 0,
                   left: 0,
                   child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    padding: const EdgeInsets.all(8.0),
+                    margin: EdgeInsets.all(8.0.r),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.0.r,
+                      horizontal: 4.r,
+                    ),
                     width: AppDims.size_24.w,
                     decoration: BoxDecoration(
                       color: AppColors.ci3,

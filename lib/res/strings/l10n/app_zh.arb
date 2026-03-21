@@ -387,5 +387,18 @@
   "cannotLoadCouponData": "无法加载优惠券数据",
   "dataNotFound": "未找到数据",
   "washTimesLabel": "洗\n{count} 次",
-  "dryTimesLabel": "烘\n{count} 次"
+  "dryTimesLabel": "烘\n{count} 次",
+  "facilities": "设施",
+  "locationAccessDeniedTitle": "无法获取位置权限",
+  "locationAccessDeniedMessage": "请在使用前允许访问位置",
+  "openSettings": "打开设置",
+  "voiceSearchNotSupported": "您的设备不支持语音搜索",
+  "machineAvailable": "空闲",
+  "machineOccupied": "占用",
+  "conditionsAndDetails": "详情与条件",
+  "otherCampaigns": "其他活动",
+  "scanQrActivity": "扫描店内活动二维码",
+  "noLuckyScanActivityTitle": "目前没有幸运扫描活动",
+  "noLuckyScanActivityMessage": "敬请期待下次活动",
+  "backToHome": "返回主页"
 }

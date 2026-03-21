@@ -124,42 +124,42 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
     MachineOrderRequest request,
   ) async {
     // ========== Mock Data for Debug Mode (priceFinal = 0.0) ==========
-    // if (kDebugMode) {
-    //   // Mock response สำหรับทดสอบกรณีลด 100% (priceFinal = 0.0)
-    //   final mockTimestamp = DateTime.now().millisecondsSinceEpoch;
-    //   final mockResponse = MachineOrderResponse(
-    //     message: 'Mock: Free order created successfully (100% discount)',
-    //     data: MachineOrderData(
-    //       id: 'mock-order-$mockTimestamp',
-    //       customerId: request.customerId,
-    //       customerPhone: request.customerPhone,
-    //       storeMachineId: request.storeMachineId,
-    //       programCode: request.programCode,
-    //       programName: 'Mock Program',
-    //       addTimeValue: request.addTimeValue,
-    //       couponCustomerId: request.couponCustomerId,
-    //       discountId: request.discountId,
-    //       priceOriginal: '100.0',
-    //       priceFinal: '0.0', // ← สำคัญที่สุด: ราคาสุดท้าย = 0
-    //       discountAmount: '100.0',
-    //       couponDiscount: '0',
-    //       systemDiscount: '100.0',
-    //       paymentMethod: request.paymentMethod,
-    //       paymentStatus: 'paid', // ถือว่าจ่ายเงินแล้ว (เพราะไม่ต้องจ่าย)
-    //       paymentRef: '20260307134508',
-    //       machineStatus: 'pending',
-    //       deviceLogId: 'mock-device-log-$mockTimestamp',
-    //       createdAt: DateTime.now().toIso8601String(),
-    //       updatedAt: DateTime.now().toIso8601String(),
-    //       responsePayload: null,
-    //     ),
-    //     redirectUrl: null,
-    //     qrAndWechat: null,
-    //   );
+    if (kDebugMode) {
+      // Mock response สำหรับทดสอบกรณีลด 100% (priceFinal = 0.0)
+      final mockTimestamp = DateTime.now().millisecondsSinceEpoch;
+      final mockResponse = MachineOrderResponse(
+        message: 'Mock: Free order created successfully (100% discount)',
+        data: MachineOrderData(
+          id: 'mock-order-$mockTimestamp',
+          customerId: request.customerId,
+          customerPhone: request.customerPhone,
+          storeMachineId: request.storeMachineId,
+          programCode: request.programCode,
+          programName: 'Mock Program',
+          addTimeValue: request.addTimeValue,
+          couponCustomerId: request.couponCustomerId,
+          discountId: request.discountId,
+          priceOriginal: '100.0',
+          priceFinal: '0.0', // ← สำคัญที่สุด: ราคาสุดท้าย = 0
+          discountAmount: '100.0',
+          couponDiscount: '0',
+          systemDiscount: '100.0',
+          paymentMethod: request.paymentMethod,
+          paymentStatus: 'paid', // ถือว่าจ่ายเงินแล้ว (เพราะไม่ต้องจ่าย)
+          paymentRef: '20260307134508',
+          machineStatus: 'pending',
+          deviceLogId: 'mock-device-log-$mockTimestamp',
+          createdAt: DateTime.now().toIso8601String(),
+          updatedAt: DateTime.now().toIso8601String(),
+          responsePayload: null,
+        ),
+        redirectUrl: null,
+        qrAndWechat: null,
+      );
 
-    //   debugPrint('🧪 [DEBUG] Mock Order Created: priceFinal = 0.0');
-    //   return RepoResult.success(data: mockResponse);
-    // }
+      debugPrint('🧪 [DEBUG] Mock Order Created: priceFinal = 0.0');
+      return RepoResult.success(data: mockResponse);
+    }
     // ========== End Mock Data ==========
 
     try {

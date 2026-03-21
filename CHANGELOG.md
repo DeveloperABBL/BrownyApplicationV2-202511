@@ -1,4 +1,10 @@
 # CHANGELOG
+### DONG 2026-03-19
+* เพิ่มหน้า LuckDraw (ยังไม่สมบูรณ์)
+
+### DONG 2026-03-16
+* Bumped Kotlin plugin 2.1.0 → 2.3.10
+
 ### DONG 2026-03-15
 * Implement Notification Live Activites iOS
  - วางโครงสร้างการทำงานเบื้องต้นที่เกี่ยวข้อง

@@ -11,6 +11,8 @@ import 'package:browny_applications_new/feature/contacts/screens/contact_page.da
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/models/customer_services_working_model.dart';
 import 'package:browny_applications_new/feature/home/screens/app_notifications_page.dart';
+import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_mockup.dart';
+import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
@@ -31,6 +33,11 @@ class HomePage extends StatelessWidget {
 
   static final pagePath = '/home_page';
   static final pageName = 'HomePage';
+
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(BuildContext context) async {
+    return await context.pushNamed(HomePage.pageName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -268,17 +275,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     ),
                     // TODO ต้องเอาออก
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (kDebugMode) {
                           final data = Uri.parse(
-                            'http://brownypay.com/wash/dry/13',
+                            'http://brownypay.com/wash/dry/2',
                             // 'http://brownypay.com/wash/dry/2',
                           );
                           if (data.pathSegments.isNotEmpty) {
-                            MachineTransactionPage2.goToPage(
+                            await MachineTransactionPage2.goToPage(
                               context,
                               machineId: data.pathSegments.last,
                             );
+                            if (mounted) {
+                              await _viewmodel.fetchWorkingMachines();
+                            }
                           }
 
                           // MachineStatusPage.goToPage(context, machineId: '13');
@@ -341,18 +351,34 @@ class _HomePageWidgetState extends State<HomePageWidget>
         ),
         bottomNavigationBar: BrownyBottomNav(
           currentIndex: 0,
-          onTap: (context, index) {
+          onCenterTap: () async {
+            // Default ไปหน้า Scan
+            await ScannerPage.goToPage(
+              context,
+              initialIndex: 0,
+            );
+            if (mounted) {
+              await _viewmodel.fetchWorkingMachines();
+            }
+          },
+          onTap: (context, index) async {
             debugPrint(index.toString());
             if (index == 1) {
               // context.pushNamed(CouponVoucherPage.pageName);
-              CouponVoucherPage.goToPage(
+              await CouponVoucherPage.goToPage(
                 context,
               );
+              if (mounted) {
+                await _viewmodel.fetchWorkingMachines();
+              }
               return;
             }
 
             if (index == 2) {
-              context.pushNamed(MapPage.pageName);
+              await context.pushNamed(MapPage.pageName);
+              if (mounted) {
+                await _viewmodel.fetchWorkingMachines();
+              }
               return;
             }
           },
@@ -621,23 +647,32 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
               ),
 
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
-                  // vertical: AppDims.size_8.h,
-                ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscLuckyScan.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      'Lucky\nScan',
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+              GestureDetector(
+                onTap: () {
+                  if (kDebugMode) {
+                    LuckyMockupPage.goToPage(context);
+                    return;
+                  }
+                  LuckyScanPage.goToPage(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDims.size_8.w,
+                    // vertical: AppDims.size_8.h,
+                  ),
+                  child: Column(
+                    children: [
+                      Assets.iconShortcut.iscLuckyScan.image(
+                        width: AppDims.size_64.w,
+                        height: AppDims.size_32.h,
+                      ),
+                      AppText(
+                        'Lucky\nScan',
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

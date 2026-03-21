@@ -887,7 +887,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'กรุณาอนุญาตการเข้าถึงคลังรูปภาพในการตั้งค่า';
 
   @override
-  String get openSettings => 'เปิดการตั้งค่า';
+  String get openSettings => 'เปิด Setting';
 
   @override
   String get errorOccurred => 'เกิดข้อผิดพลาด';
@@ -1205,4 +1205,39 @@ class AppLocalizationsTh extends AppLocalizations {
   String dryTimesLabel(String count) {
     return 'อบ\n$count ครั้ง';
   }
+
+  @override
+  String get facilities => 'สิ่งอำนวยความสะดวก';
+
+  @override
+  String get locationAccessDeniedTitle => 'ไม่สามารถเข้าถึงตำแหน่งได้';
+
+  @override
+  String get locationAccessDeniedMessage =>
+      'กรุณาให้สิทธิ์เข้าถึงตำแหน่งก่อนใช้งาน';
+
+  @override
+  String get voiceSearchNotSupported =>
+      'อุปกรณ์ของคุณไม่รองรับการค้นหาด้วยเสียง';
+
+  @override
+  String get machineAvailable => 'ว่าง';
+
+  @override
+  String get machineOccupied => 'เต็ม';
+
+  @override
+  String get conditionsAndDetails => 'รายละเอียดเงื่อนไข';
+
+  @override
+  String get otherCampaigns => 'แคมเปญอื่นๆ';
+
+  @override
+  String get scanQrActivity => 'สแกน QR กิจกรรมภายในร้าน';
+
+  @override
+  String get noLuckyScanActivityTitle => 'ขณะนี้ยังไม่มีกิจกรรม Lucky Scan';
+
+  @override
+  String get noLuckyScanActivityMessage => 'รอติดตามกิจกรรมครั้งถัดไปนะ';
 }

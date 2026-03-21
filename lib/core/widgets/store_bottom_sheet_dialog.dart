@@ -195,8 +195,11 @@ class StoreBottomSheetDialog extends StatelessWidget {
                 bottom: 0,
                 left: 0,
                 child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
+                  margin: EdgeInsets.all(8.0.r),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.0.r,
+                    horizontal: 4.r,
+                  ),
                   width: AppDims.size_24.w,
                   decoration: BoxDecoration(
                     color: AppColors.ci3,
@@ -241,8 +244,11 @@ class StoreBottomSheetDialog extends StatelessWidget {
                 bottom: 0,
                 left: 0,
                 child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
+                  margin: EdgeInsets.all(8.0.r),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.0.r,
+                    horizontal: 4.r,
+                  ),
                   width: AppDims.size_24.w,
                   decoration: BoxDecoration(
                     color: AppColors.ci3,

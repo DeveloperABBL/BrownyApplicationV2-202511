@@ -267,6 +267,44 @@ class $AssetsIconShortcutGen {
   ];
 }
 
+class $AssetsLuckyScanGen {
+  const $AssetsLuckyScanGen();
+
+  /// File path: assets/lucky_scan/02 - Login - 1094.png
+  AssetGenImage get a02Login1094 =>
+      const AssetGenImage('assets/lucky_scan/02 - Login - 1094.png');
+
+  /// File path: assets/lucky_scan/bg_fest_mock.png
+  AssetGenImage get bgFestMock =>
+      const AssetGenImage('assets/lucky_scan/bg_fest_mock.png');
+
+  /// File path: assets/lucky_scan/browny_failed.png
+  AssetGenImage get brownyFailed =>
+      const AssetGenImage('assets/lucky_scan/browny_failed.png');
+
+  /// File path: assets/lucky_scan/browny_lose.png
+  AssetGenImage get brownyLose =>
+      const AssetGenImage('assets/lucky_scan/browny_lose.png');
+
+  /// File path: assets/lucky_scan/browny_won.png
+  AssetGenImage get brownyWon =>
+      const AssetGenImage('assets/lucky_scan/browny_won.png');
+
+  /// File path: assets/lucky_scan/ic_clock.svg
+  SvgGenImage get icClock =>
+      const SvgGenImage('assets/lucky_scan/ic_clock.svg');
+
+  /// List of all assets
+  List<dynamic> get values => [
+    a02Login1094,
+    bgFestMock,
+    brownyFailed,
+    brownyLose,
+    brownyWon,
+    icClock,
+  ];
+}
+
 class $AssetsPngGen {
   const $AssetsPngGen();
 
@@ -1134,6 +1172,7 @@ class Assets {
   static const $AssetsIconProfilePreferencesGen iconProfilePreferences =
       $AssetsIconProfilePreferencesGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();
+  static const $AssetsLuckyScanGen luckyScan = $AssetsLuckyScanGen();
   static const $AssetsPngGen png = $AssetsPngGen();
   static const $AssetsProfileQuickActionGen profileQuickAction =
       $AssetsProfileQuickActionGen();
