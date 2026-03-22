@@ -7,6 +7,10 @@ import 'package:browny_applications_new/feature/lucky_scan/repository/lucky_repo
 import 'package:browny_applications_new/feature/lucky_scan/viewmodel/lucky_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LuckyScanPage extends StatelessWidget {
   const LuckyScanPage({super.key});
@@ -43,6 +47,10 @@ class _LuckyScanContentState extends State<LuckyScanContent>
   late TabController _tabController;
   late LuckyViewmodel _viewmodel;
 
+  /// ความสูงจริงของ image container — ใช้คำนวณจุด overlap คงที่
+  double _imageHeight = 0;
+  final _imageKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -78,8 +86,11 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     if (result.isSuccess && result.data?.hasEvent == false) {
       AppOverlays.showBrownyDialog(
         context,
+        // ขณะนี้ยังไม่มีกิจกรรม Lucky Scan
         title: context.wording.noLuckyScanActivityTitle,
+        // รอติดตามกิจกรรมครั้งถัดไปนะ
         message: context.wording.noLuckyScanActivityMessage,
+        // กลับสู่หน้าหลัก
         confirmText: context.wording.backToHome,
         onConfirm: () => context.pop(),
       );
@@ -92,11 +103,23 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     super.dispose();
   }
 
+  /// วัดความสูงจริงของ image container แล้ว setState เพื่อคำนวณ overlap
+  void _measureImage() {
+    final box = _imageKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      final h = box.size.height;
+      if (h > 0 && h != _imageHeight) {
+        setState(() => _imageHeight = h);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.transparent,
         flexibleSpace: SafeArea(
@@ -130,6 +153,7 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                         color: AppColors.primary,
                       ),
                       AppText(
+                        // ย้อนกลับ
                         context.wording.back,
                         style: context.textTheme.labelLarge!.copyWith(
                           color: AppColors.primary,
@@ -139,38 +163,44 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                   ),
                 ),
                 // ประวัติ
-                ClipRect(
-                  clipBehavior: Clip.antiAlias,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                    child: Container(
-                      padding: EdgeInsets.only(
-                        left: AppDims.size_6.w,
-                        top: AppDims.size_2.h,
-                        right: AppDims.size_6.w,
-                        bottom: AppDims.size_2.h,
-                      ),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(32.r),
-                        color: Colors.grey.shade200.withValues(
-                          alpha: 0.10,
-                        ), // Tint for glass effect
-                      ),
-                      child: Row(
-                        spacing: AppDims.size_4.w,
-                        children: [
-                          Assets.luckyScan.icClock.svg(
-                            color: AppColors.background,
-                          ),
-                          AppText(
-                            // ประวัติ
-                            context.wording.history,
-                            style: context.textTheme.labelLarge!.copyWith(
+                GestureDetector(
+                  onTap: () async {
+                    await _showFestiveHistory(context);
+                    _viewmodel.resetFestiveHistoryNotifier();
+                  },
+                  child: ClipRect(
+                    clipBehavior: Clip.antiAlias,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: Container(
+                        padding: EdgeInsets.only(
+                          left: AppDims.size_6.w,
+                          top: AppDims.size_2.h,
+                          right: AppDims.size_6.w,
+                          bottom: AppDims.size_2.h,
+                        ),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(32.r),
+                          color: Colors.grey.shade200.withValues(
+                            alpha: 0.10,
+                          ), // Tint for glass effect
+                        ),
+                        child: Row(
+                          spacing: AppDims.size_4.w,
+                          children: [
+                            Assets.luckyScan.icClock.svg(
                               color: AppColors.background,
                             ),
-                          ),
-                        ],
+                            AppText(
+                              // ประวัติ
+                              context.wording.history,
+                              style: context.textTheme.labelLarge!.copyWith(
+                                color: AppColors.background,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -186,6 +216,12 @@ class _LuckyScanContentState extends State<LuckyScanContent>
           return ValueListenableBuilder(
             valueListenable: _viewmodel.festiveIndexNotifier,
             builder: (context, festiveResult, _) {
+              if (festiveResult.isLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
               final locale = context.languageCode;
               final bannerUrl =
                   selected?.getBannerUrl(
@@ -199,94 +235,120 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Blue zone — image fills width; white-zone rounded header overlaps at bottom
+                    // Blue zone — image fills width; white-zone overlaps at fixed offset
+                    // แสดงรูปภาพ Festive ที่ได้จาก API แบบเต็มหน้าจอ
                     Stack(
-                      alignment: Alignment.bottomCenter,
                       children: [
+                        // Image — non-positioned, กำหนดขนาด Stack ตาม image
                         Container(
+                          key: _imageKey,
                           width: double.infinity,
-                          padding: EdgeInsets.only(bottom: 125.h),
                           color: AppColors.primary,
-                          // child: Assets.luckyScan.bgFestMock.image(
                           child: Image.network(
                             bannerUrl,
                             fit: BoxFit.fitWidth,
                             width: double.infinity,
-                            errorBuilder: (_, _, _) => Container(
-                              color: AppColors.background,
-                              height: MediaQuery.of(context).size.height,
+                            frameBuilder: (_, child, frame, _) {
+                              if (frame != null) {
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (mounted) _measureImage();
+                                });
+                              }
+                              return child;
+                            },
+                            errorBuilder: (_, _, _) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) _measureImage();
+                              });
+                              return Container(
+                                color: AppColors.background,
+                                height: MediaQuery.of(context).size.height,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Assets.png.brownyError2.image(width: 120.w),
+                                    AppDims.vericalPadding_8,
+                                    AppText(context.wording.errorUi),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        // White zone — เริ่มที่ตำแหน่งคงที่ (imageHeight - overlap)
+                        // แสดง Text Content และ TabBar
+                        // ไม่ว่า content จะมากหรือน้อย จุด overlap จะไม่เปลี่ยน
+                        if (_imageHeight > 0 && bannerUrl.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.only(
+                              // กำหนดจุดที่ White zone จะเริ่ม Overlap
+                              top: _imageHeight - 155.h,
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(AppDims.size_16.r),
+                                  topRight: Radius.circular(AppDims.size_16.r),
+                                ),
+                              ),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Assets.png.brownyError2.image(width: 120.w),
-                                  AppDims.vericalPadding_8,
-                                  AppText(context.wording.errorUi),
+                                  // TabBar
+                                  TabBar(
+                                    controller: _tabController,
+                                    dividerColor: AppColors.transparent,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    labelStyle: context.textTheme.titleMedium!
+                                        .copyWith(
+                                          fontSize: AppDims.size_16.sp,
+                                          color: AppColors.primary,
+                                        ),
+                                    unselectedLabelStyle: context
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                          fontSize: AppDims.size_16.sp,
+                                          color: AppColors.gray500,
+                                        ),
+                                    tabs: [
+                                      Tab(
+                                        child: AppText(
+                                          // รายละเอียดเงื่อนไข
+                                          context.wording.conditionsAndDetails,
+                                        ),
+                                      ),
+                                      Tab(
+                                        child: AppText(
+                                          // แคมเปญอื่นๆ
+                                          context.wording.otherCampaigns,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Tab content
+                                  if (_tabController.index == 0)
+                                    _buildConditionsTab(
+                                      context,
+                                      selected,
+                                      locale,
+                                    )
+                                  else
+                                    // TabBar
+                                    _buildCampaignsTab(
+                                      context,
+                                      festiveResult.data?.data,
+                                      selected,
+                                      locale,
+                                    ),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                        // White zone — sized by content, aligned to bottom of image
-                        Container(
-                          width: double.infinity,
-                          // height: 300,
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(AppDims.size_16.r),
-                              topRight: Radius.circular(AppDims.size_16.r),
-                            ),
-                          ),
-                          child: bannerUrl.isNotEmpty
-                              ? Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // TabBar
-                                    TabBar(
-                                      controller: _tabController,
-                                      dividerColor: AppColors.transparent,
-                                      indicatorSize: TabBarIndicatorSize.tab,
-                                      labelStyle: context.textTheme.titleMedium!
-                                          .copyWith(
-                                            color: AppColors.primary,
-                                          ),
-                                      unselectedLabelStyle: context
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(color: AppColors.gray500),
-                                      tabs: [
-                                        Tab(
-                                          child: AppText(
-                                            context
-                                                .wording
-                                                .conditionsAndDetails,
-                                          ),
-                                        ),
-                                        Tab(
-                                          child: AppText(
-                                            context.wording.otherCampaigns,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    // Tab content
-                                    if (_tabController.index == 0)
-                                      _buildConditionsTab(
-                                        context,
-                                        selected,
-                                        locale,
-                                      )
-                                    else
-                                      _buildCampaignsTab(
-                                        context,
-                                        festiveResult.data?.data,
-                                        selected,
-                                        locale,
-                                      ),
-                                  ],
-                                )
-                              : null,
-                        ),
                       ],
                     ),
                   ],
@@ -299,78 +361,244 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     );
   }
 
+  Future<dynamic> _showFestiveHistory(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Allow content to exceed half screen
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.65,
+      ),
+      builder: (context) {
+        return Container(
+          // height: MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.horizontal(
+              left: Radius.circular(16.r),
+              right: Radius.circular(16.r),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppDims.vericalPadding_16,
+              Center(
+                child: AppText(
+                  // ประวัติ Lucky Scan ทั้งหมด
+                  context.wording.luckyScanHistoryTitle,
+                  style: context.textTheme.labelLarge!.copyWith(
+                    fontSize: AppDims.size_16.sp,
+                    color: AppColors.textBare,
+                  ),
+                ),
+              ),
+              AppDims.vericalPadding_14,
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: _viewmodel.festiveHistoryNotifier,
+                  builder: (context, result, child) {
+                    if (result.isLoading) {
+                      Future.microtask(_viewmodel.fetchFestiveHistory);
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (result.hasError) {
+                      return Center(
+                        child: AppText(
+                          result.error.toString(),
+                        ),
+                      );
+                    }
+
+                    if (result.isEmpty ||
+                        result.data?.data.orEmpty.isEmpty == true) {
+                      return Center(
+                        child: SizedBox(
+                          height: double.infinity,
+                          child: Column(
+                            spacing: AppDims.size_8.h,
+                            children: [
+                              Assets.png.brownyError1.image(width: 90.w),
+                              AppText(
+                                // ไม่พบประวัติ Lucky Scan
+                                context.wording.noLuckyScanHistory,
+                                style: context.textTheme.labelLarge!.copyWith(
+                                  fontSize: AppDims.size_16.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    final histories = result.data!.data!;
+                    return ListView.separated(
+                      separatorBuilder: (_, _) => Divider(),
+                      padding: EdgeInsets.only(
+                        left: AppDims.size_16.w,
+                        right: AppDims.size_16.w,
+                        bottom: AppDims.size_24.w,
+                      ),
+                      itemCount: histories.length,
+                      itemBuilder: (context, index) {
+                        final data = histories[index];
+                        final locale = context.languageCode;
+                        final isWon = data.isWon;
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Assets.svg.icScanFestiveHistory.svg(
+                            width: AppDims.size_44.w,
+                            height: AppDims.size_44.h,
+                          ),
+                          title: AppText(
+                            data.getTitleDisplay(locale),
+                            style: context.textTheme.labelMedium,
+                          ),
+                          subtitle: AppText(
+                            data.getCreateAtDisplay(locale),
+                            style: context.textTheme.labelSmall!.copyWith(
+                              color: AppColors.gray600,
+                            ),
+                          ),
+                          trailing: Column(
+                            spacing: AppDims.size_4.h,
+                            children: [
+                              AppText(
+                                isWon
+                                    // ได้รางวัล
+                                    ? context.wording.luckyScanWon
+                                    // ไม่ได้รับรางวัล
+                                    : context.wording.luckyScanNotWon,
+                                style: context.textTheme.labelMedium!.copyWith(
+                                  color: isWon
+                                      ? AppColors.primary
+                                      : AppColors.gray500,
+                                ),
+                              ),
+                              if (isWon)
+                                GestureDetector(
+                                  onTap: () {
+                                    CouponVoucherPage.goToPage(
+                                      context,
+                                      state: CouponVoucherState.redeeming,
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: AppDims.size_4.h,
+                                      horizontal: AppDims.size_12.w,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(32.r),
+                                      color: AppColors.ci3,
+                                    ),
+                                    child: AppText(
+                                      // ดูคูปอง
+                                      context.wording.viewCoupon,
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.primary,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildConditionsTab(
     BuildContext context,
     FestiveData? selected,
     String locale,
   ) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppDims.size_16.w,
-        AppDims.size_16.h,
-        AppDims.size_16.w,
-        32.h,
+      padding: EdgeInsets.only(
+        bottom: 32.h,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Numbered condition list
-          AppText(
-            selected?.getMessageDisplay(locale) ?? '',
-            //             '''
-            // 'เฉพาะสาขาที่ร่วมรายการ',
-            // 'สาขา อนุสาวรีย์ชัยสมรภูมิ ราชวิถี ช.7',
-            // 'รับฟรี! ส่วนลดราคาซักน้ำเย็นทุกเครื่อง เหลือเพียงเครื่องละ 20 บาท',
-            // 'จำกัด 1 สิทธิ์ / สมาชิก',
-            // '''
+          Html(
+            data: selected?.getMessageDisplay(locale) ?? '',
+            style: {
+              "body": Style(
+                fontSize: FontSize(AppDims.size_15.sp),
+                fontFamily: GoogleFonts.prompt().fontFamily,
+                padding: HtmlPaddings.zero,
+                textAlign: TextAlign.start,
+                margin: Margins.all(0),
+                fontWeight: FontWeight.w400,
+                color: AppColors.gray600,
+              ),
+            },
           ),
+
           SizedBox(height: AppDims.size_16.h),
           // Scan QR button
-          ElevatedButton.icon(
-            onPressed: () async {
-              ScannerPage.goToPage(
-                context,
-                process: ScannerProcess.needResult,
-              ).then((qrData) async {
-                if (qrData != null && context.mounted) {
-                  AppOverlays.showLoading(context);
-                  final result = await _viewmodel.postLuckyDraw(
-                    qrCode: qrData,
-                  );
-
-                  if (!context.mounted) return;
-                  AppOverlays.hideLoading();
-
-                  if (result.hasError) {
-                    AppOverlays.showBrownyDialog(
-                      context,
-                      title: context.wording.errorOccurred,
-                      message: result.error.toString(),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                ScannerPage.goToPage(
+                  context,
+                  process: ScannerProcess.needResult,
+                ).then((qrData) async {
+                  if (qrData != null && context.mounted) {
+                    AppOverlays.showLoading(context);
+                    final result = await _viewmodel.postLuckyDraw(
+                      qrCode: qrData,
                     );
-                    return;
-                  }
 
-                  if (result.isEmpty) {
-                    AppOverlays.showBrownyDialog(
-                      context,
-                      title: context.wording.errorOccurred,
-                      message: context.wording.errorUi,
-                    );
-                    return;
-                  }
+                    if (!context.mounted) return;
+                    AppOverlays.hideLoading();
 
-                  _showLucyScanResult(context, result.data!);
-                }
-              });
-            },
-            iconAlignment: IconAlignment.end,
-            icon: Assets.svg.icScan2.svg(
-              colorFilter: ColorFilter.mode(
-                AppColors.white,
-                BlendMode.srcIn,
+                    if (result.hasError) {
+                      AppOverlays.showBrownyDialog(
+                        context,
+                        title: context.wording.errorOccurred,
+                        message: result.error.toString(),
+                      );
+                      return;
+                    }
+
+                    if (result.isEmpty) {
+                      AppOverlays.showBrownyDialog(
+                        context,
+                        title: context.wording.errorOccurred,
+                        message: context.wording.errorUi,
+                      );
+                      return;
+                    }
+
+                    _showLucyScanResult(context, result.data!);
+                  }
+                });
+              },
+              iconAlignment: IconAlignment.end,
+              icon: Assets.svg.icScan2.svg(
+                colorFilter: ColorFilter.mode(
+                  AppColors.white,
+                  BlendMode.srcIn,
+                ),
               ),
+              label: AppText(context.wording.scanQrActivity),
             ),
-            label: AppText(context.wording.scanQrActivity),
           ),
         ],
       ),
@@ -533,7 +761,7 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                         onTap: () => dialogContext.pop(),
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 8.h),
-                          child: Assets.svg.icUnchecked.svg(
+                          child: Assets.svg.icClosePopup.svg(
                             width: 20.w,
                             height: 20.h,
                           ),

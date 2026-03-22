@@ -147,16 +147,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePasswordHam => 'Password';
 
   @override
-  String get changePin => 'Change PIN';
-
-  @override
   String get referralRewards => 'Referral rewards';
 
   @override
   String get getReward => 'Get reward';
-
-  @override
-  String get allNotifications => 'All Notifications';
 
   @override
   String get promotions => 'Promotions';
@@ -257,6 +251,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get camera => 'Camera';
+
+  @override
+  String get changePin => 'Change PIN';
 
   @override
   String get enterTheCurrentPin => 'Enter the current PIN';
@@ -648,9 +645,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creditBalance => 'Credit Balance';
 
   @override
-  String get history => 'History';
-
-  @override
   String get savedItems => 'Saved Items';
 
   @override
@@ -675,7 +669,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeEmail => 'Change Email';
 
   @override
-  String get generalNotifications => 'General Notifications';
+  String get generalNotifications => 'All Notifications';
 
   @override
   String get workOrderStatus => 'Work/Order Status';
@@ -801,7 +795,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginWelcomeDescription =>
-      'Browny welcomes you, let\'s do laundry together';
+      'Browny welcomes you, let\'s do laundry together!';
 
   @override
   String get loginWith => 'Login with';
@@ -853,6 +847,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPhoneNumber => 'Add phone number';
+
+  @override
+  String get history => 'History';
 
   @override
   String get balanceRemaining => 'Balance Remaining';
@@ -952,6 +949,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsTitle => 'Rewards';
 
   @override
+  String get termsAndConditions2 => 'Terms and Conditions';
+
+  @override
   String get referralCode => 'Referral Code';
 
   @override
@@ -1039,7 +1039,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get used => 'Used';
 
   @override
-  String get usageStatus => 'Usage Status';
+  String get usageStatus => 'Working Status';
 
   @override
   String get loveAnyoneDoLaundry => '#Love Anyone Do Laundry';
@@ -1245,4 +1245,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noLuckyScanActivityMessage => 'Stay tuned for the next activity';
+
+  @override
+  String get luckyScanHistoryTitle => 'All Lucky Scan History';
+
+  @override
+  String get noLuckyScanHistory => 'No Lucky Scan History Found';
+
+  @override
+  String get luckyScanWon => 'Won';
+
+  @override
+  String get luckyScanNotWon => 'Not Won';
+
+  @override
+  String get viewCoupon => 'View Coupon';
+
+  @override
+  String get washDry => 'Wash-Dry';
+
+  @override
+  String get hideForToday => 'Hide for today';
+
+  @override
+  String get receiptNotFound => 'Receipt not found';
+
+  @override
+  String get operationSuccessful => 'Operation successful';
+
+  @override
+  String get totalAmount => 'Total amount';
+
+  @override
+  String get qrCodeForSupportOnly => 'QR Code for Browny Support only';
+
+  @override
+  String get rateStoreCleanlinessTitle => 'Rate the store cleanliness';
+
+  @override
+  String get reviewVeryBad => 'Very bad';
+
+  @override
+  String get reviewDissatisfied => 'Dissatisfied';
+
+  @override
+  String get reviewNeutral => 'Neutral';
+
+  @override
+  String get reviewGood => 'Good';
+
+  @override
+  String get reviewExcellent => 'Excellent';
+
+  @override
+  String get brownyReceipt => 'Browny Receipt';
+
+  @override
+  String get backToEvoucher => 'Back to E-Voucher';
+
+  @override
+  String get orderLabel => 'Order';
+
+  @override
+  String get savedAmount => 'Saved';
+
+  @override
+  String get disableLocationTitle => 'Disable location access';
+
+  @override
+  String get disableLocationMessage =>
+      'To disable location access, please go to the device settings';
 }

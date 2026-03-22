@@ -1,4 +1,14 @@
 # CHANGELOG
+### DONG 2026-03-22
+* ปรับปรุงหน้า Festive scan ให้แสดง UI ตรงตาม Design
+  - ปรับเพิ่มการทำงานปุ่ม ประวัติ
+
+### DONG 2026-03-21
+* แก้ไข Issue ตาม Feedback
+ - ปรับ Icon Sizing
+ - Wording ผิด
+ - Localized wording
+
 ### DONG 2026-03-19
 * เพิ่มหน้า LuckDraw (ยังไม่สมบูรณ์)
 

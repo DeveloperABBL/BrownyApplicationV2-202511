@@ -22,7 +22,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get signUp => 'สมัคร';
 
   @override
-  String get emailOrPhone => 'อีเมล / เบอร์มือถือ';
+  String get emailOrPhone => 'อีเมล / เบอร์โทรศัพท์';
 
   @override
   String get back => 'ย้อนกลับ';
@@ -146,16 +146,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get changePasswordHam => 'เปลี่ยนรหัสผ่าน';
 
   @override
-  String get changePin => 'เปลี่ยนรหัส PIN';
-
-  @override
   String get referralRewards => 'แนะนำเพื่อน';
 
   @override
   String get getReward => 'รับรางวัล';
-
-  @override
-  String get allNotifications => 'การแจ้งเตือนทั้งหมด';
 
   @override
   String get promotions => 'โปรโมชั่น';
@@ -174,7 +168,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get termsOfUseAndPrivacy =>
-      'เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว';
+      'เงื่อนไขการใช้งาน และนโยบายความเป็นส่วนตัว';
 
   @override
   String get changePassword => 'เปลี่ยนรหัสผ่าน';
@@ -257,6 +251,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get camera => 'กล้อง';
+
+  @override
+  String get changePin => 'เปลี่ยนรหัส PIN';
 
   @override
   String get enterTheCurrentPin => 'ใส่รหัส PIN ปัจจุบัน';
@@ -468,7 +465,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get cancel => 'ยกเลิก';
 
   @override
-  String get next => 'ต่อไป';
+  String get next => 'ถัดไป';
 
   @override
   String get extraDrying => 'ต่อเวลาอบผ้า';
@@ -649,9 +646,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get creditBalance => 'ยอดเงินคงเหลือ';
 
   @override
-  String get history => 'ประวัติ';
-
-  @override
   String get savedItems => 'สินค้าที่บันทึกไว้';
 
   @override
@@ -676,7 +670,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get changeEmail => 'เปลี่ยน e-mail';
 
   @override
-  String get generalNotifications => 'การแจ้งเตือนทั่วไป';
+  String get generalNotifications => 'การแจ้งเตือนทั้งหมด';
 
   @override
   String get workOrderStatus => 'สถานะการทำงาน/การสั่งซื้อ';
@@ -800,7 +794,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get passwordMustContainNumber => 'ต้องมีตัวเลขอย่างน้อย 1 ตัว';
 
   @override
-  String get loginWelcomeDescription => 'Browny ยินดีต้อนรับ มาซักผ้ากัน';
+  String get loginWelcomeDescription => 'Browny ยินดีต้อนรับ มาซักผ้ากัน!';
 
   @override
   String get loginWith => 'เข้าสู่ระบบด้วย';
@@ -852,6 +846,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get addPhoneNumber => 'เพิ่มเบอร์โทรศัพท์';
 
   @override
+  String get history => 'ประวัติ';
+
+  @override
   String get balanceRemaining => 'ยอดเงินคงเหลือ';
 
   @override
@@ -887,7 +884,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'กรุณาอนุญาตการเข้าถึงคลังรูปภาพในการตั้งค่า';
 
   @override
-  String get openSettings => 'เปิด Setting';
+  String get openSettings => 'เปิดการตั้งค่า';
 
   @override
   String get errorOccurred => 'เกิดข้อผิดพลาด';
@@ -946,6 +943,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get rewardsTitle => 'รางวัล';
+
+  @override
+  String get termsAndConditions2 => 'ข้อกำหนดและเงื่อนไข';
 
   @override
   String get referralCode => 'รหัสชวนเพื่อน';
@@ -1035,7 +1035,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get used => 'ที่ถูกใช้';
 
   @override
-  String get usageStatus => 'สถานะการใช้งาน';
+  String get usageStatus => 'สถานะการทำงาน';
 
   @override
   String get loveAnyoneDoLaundry => '#รักใครให้ซักผ้า';
@@ -1240,4 +1240,75 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get noLuckyScanActivityMessage => 'รอติดตามกิจกรรมครั้งถัดไปนะ';
+
+  @override
+  String get luckyScanHistoryTitle => 'ประวัติ Lucky Scan ทั้งหมด';
+
+  @override
+  String get noLuckyScanHistory => 'ไม่พบประวัติ Lucky Scan';
+
+  @override
+  String get luckyScanWon => 'ได้รางวัล';
+
+  @override
+  String get luckyScanNotWon => 'ไม่ได้รับรางวัล';
+
+  @override
+  String get viewCoupon => 'ดูคูปอง';
+
+  @override
+  String get washDry => 'ซัก-อบ';
+
+  @override
+  String get hideForToday => 'ปิดการแสดงหน้าสำหรับวันนี้';
+
+  @override
+  String get receiptNotFound => 'ไม่พบข้อมูลใบเสร็จ';
+
+  @override
+  String get operationSuccessful => 'ดำเนินการสำเร็จ';
+
+  @override
+  String get totalAmount => 'ยอดรวมทั้งหมด';
+
+  @override
+  String get qrCodeForSupportOnly =>
+      'QR Code สำหรับฝ่าย Browny Support เท่านั้น';
+
+  @override
+  String get rateStoreCleanlinessTitle => 'ให้คะแนนความสะอาดของร้าน';
+
+  @override
+  String get reviewVeryBad => 'แย่มาก';
+
+  @override
+  String get reviewDissatisfied => 'ไม่พอใจ';
+
+  @override
+  String get reviewNeutral => 'เฉยๆ';
+
+  @override
+  String get reviewGood => 'ดี';
+
+  @override
+  String get reviewExcellent => 'ดีเยี่ยม';
+
+  @override
+  String get brownyReceipt => 'ใบเสร็จ Browny';
+
+  @override
+  String get backToEvoucher => 'กลับสู่ E-Voucher';
+
+  @override
+  String get orderLabel => 'การสั่งซื้อ';
+
+  @override
+  String get savedAmount => 'ประหยัดไป';
+
+  @override
+  String get disableLocationTitle => 'ปิดการเข้าถึงตำแหน่ง';
+
+  @override
+  String get disableLocationMessage =>
+      'หากต้องการปิดสิทธิ์ การเข้าถึงตำแหน่ง กรุณาไปปิดในการตั้งค่าของอุปกรณ์';
 }

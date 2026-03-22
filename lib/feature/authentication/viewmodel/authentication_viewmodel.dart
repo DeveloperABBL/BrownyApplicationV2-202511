@@ -319,6 +319,16 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     return text;
   }
 
+  String get otpTitleByState {
+    if (currentProcess == AuthenProcess.signupOTP) {
+      return ContentLocalizeData(
+        en: 'ยืนยัน OTP สำหรับสมัครบัญชี',
+        zh: 'ยืนยัน OTP สำหรับสมัครบัญชี',
+        th: 'ยืนยัน OTP สำหรับสมัครบัญชี',
+      ).getTextByLocale(context.languageCode);
+    }
+    return context.wording.confirmOTP;
+  }
   // =========== validation ===========
 
   String? validatorEmailOrPhone(String? value) {

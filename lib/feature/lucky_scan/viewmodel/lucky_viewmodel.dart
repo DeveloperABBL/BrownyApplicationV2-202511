@@ -1,7 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/festive_history_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/festive_index_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/lucky_draw_response.dart';
-import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/lucky_scan/repository/lucky_repo.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +19,7 @@ class LuckyViewmodel extends AppViewModel {
   void dispose() {
     _festiveIndexNotifier.dispose();
     _selectedFestiveNotifier.dispose();
+    _festiveHistoryNotifier.dispose();
     super.dispose();
   }
 
@@ -33,6 +34,11 @@ class LuckyViewmodel extends AppViewModel {
   );
   ValueListenable<FestiveData?> get selectedFestiveNotifier =>
       _selectedFestiveNotifier;
+
+  final ValueNotifier<UiResult<FestiveHistoryResponse>>
+  _festiveHistoryNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<FestiveHistoryResponse>>
+  get festiveHistoryNotifier => _festiveHistoryNotifier;
 
   // ========== Logic ==========
   /// API fetch รายการ Festive Event (Lucky Scan campaigns)
@@ -58,8 +64,32 @@ class LuckyViewmodel extends AppViewModel {
         ? response.data!.first
         : null;
     _selectedFestiveNotifier.value = firstItem;
-
     _festiveIndexNotifier.value = UiResult.success(data: response);
+  }
+
+  void resetFestiveHistoryNotifier() {
+    _festiveHistoryNotifier.value = UiResult.loading();
+  }
+
+  /// API fetch ประวัติการร่วมกิจกรรม Lucky Scan ของลูกค้า
+  Future<void> fetchFestiveHistory() async {
+    _festiveHistoryNotifier.value = UiResult.loading();
+
+    final result = await repo.fetchFestiveHistory(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+    );
+
+    if (result.hasError) {
+      _festiveHistoryNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    if (result.isEmpty) {
+      _festiveHistoryNotifier.value = UiResult.empty();
+      return;
+    }
+
+    _festiveHistoryNotifier.value = UiResult.success(data: result.data);
   }
 
   /// เลือก campaign ที่จะแสดงใน Blue zone / Conditions tab

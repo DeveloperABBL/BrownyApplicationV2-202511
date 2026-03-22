@@ -85,28 +85,27 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
   Widget build(BuildContext context) {
     items = [
       BottomNavigationBarItem(
-        icon: Assets.svg.icHome.svg(),
-        activeIcon: Assets.svg.icHomeActive.svg(),
+        icon: Assets.icMenu.icHome.image(width: 28.w),
+        activeIcon: Assets.icMenu.icHomeActive.image(width: 28.w),
         label: context.wording.home,
       ),
       BottomNavigationBarItem(
-        icon: Assets.svg.icTicket.svg(),
-        activeIcon: Assets.svg.icTicketActive.svg(),
+        icon: Assets.icMenu.icTicket.image(width: 28.w),
+        activeIcon: Assets.icMenu.icTicketActive.image(width: 28.w),
         label: context.wording.rewards,
       ),
       BottomNavigationBarItem(
-        icon: Assets.svg.icBranch.svg(),
-        activeIcon: Assets.svg.icBranchActive.svg(),
+        icon: Assets.icMenu.icLocation.image(width: 28.w),
+        activeIcon: Assets.icMenu.icLocationActive.image(width: 28.w),
         label: context.wording.branch,
       ),
       BottomNavigationBarItem(
-        icon: Assets.svg.icShop.svg(
-          colorFilter: ColorFilter.mode(
-            AppColors.gray500,
-            BlendMode.srcIn,
-          ),
+        icon: Assets.icMenu.icShop.image(
+          color: AppColors.gray500,
+          colorBlendMode: BlendMode.srcIn,
+          width: 28.w,
         ),
-        activeIcon: Assets.svg.icShopActive.svg(),
+        activeIcon: Assets.icMenu.icShopActive.image(width: 28.w),
         label: context.wording.shop,
       ),
     ];

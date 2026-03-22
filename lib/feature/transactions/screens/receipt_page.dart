@@ -107,7 +107,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
       await ShareHelper.shareImage(
         imageBytes,
         fileName: 'browny_receipt_${DateTime.now().millisecondsSinceEpoch}.png',
-        text: 'ใบเสร็จ Browny',
+        text: context.wording.brownyReceipt, // ใบเสร็จ Browny
       );
     } catch (e) {
       if (mounted) {
@@ -252,7 +252,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
         //   onPressed: () => context.pop(),
         // ),
         title: AppText(
-          'ใบเสร็จ',
+          context.wording.receipt, // ใบเสร็จ
           style: context.textTheme.titleLarge!.copyWith(
             color: AppColors.textPrimary,
           ),
@@ -276,7 +276,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
               );
             },
             child: AppText(
-              'กลับสู่ E-Voucher',
+              context.wording.backToEvoucher, // กลับสู่ E-Voucher
             ),
           ),
         ),
@@ -302,7 +302,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                       child: AppText(
                         result.error?.toString() ??
                             result.data?.error?.toString() ??
-                            'เกิดข้อผิดพลาด',
+                            context.wording.errorOccurred, // เกิดข้อผิดพลาด
                       ),
                     );
                   }
@@ -310,7 +310,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                   // No receipt data
                   if (!result.data!.hasReceipt) {
                     return Center(
-                      child: AppText('ไม่พบข้อมูลใบเสร็จ'),
+                      child: AppText(
+                        context.wording.receiptNotFound,
+                      ), // ไม่พบข้อมูลใบเสร็จ
                     );
                   }
 
@@ -330,7 +332,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             AppDims.vericalPadding_4,
 
                             AppText(
-                              'ดำเนินการสำเร็จ',
+                              context
+                                  .wording
+                                  .operationSuccessful, // ดำเนินการสำเร็จ
                               style: context.textTheme.titleMedium!.copyWith(
                                 color: AppColors.textBlack,
                               ),
@@ -372,14 +376,16 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             ),
                             _listTile(
                               // Date
-                              leading: 'วัน / เวลา',
+                              leading: context.wording.dateTime, // วัน / เวลา
                               trailing: receiptData.receiptDateDisplay(
                                 context,
                               ),
                             ),
                             _listTile(
                               // Payment Method
-                              leading: 'ช่องทางการชำระเงิน',
+                              leading: context
+                                  .wording
+                                  .paymentMethod, // ช่องทางการชำระเงิน
                               trailing: receiptData.paymentMethodNameDisplay(
                                 context,
                               ),
@@ -412,10 +418,12 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                           horizontal: AppDims.size_24.w,
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             _listTile(
                               // การสั่งซื้อ
-                              leading: 'การสั่งซื้อ',
+                              leading:
+                                  context.wording.orderLabel, // การสั่งซื้อ
                               trailing: '',
                             ),
                             _listTile(
@@ -435,7 +443,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             ),
                             _listTile(
                               // คูปองส่วนลด
-                              leading: 'ประหยัดไป',
+                              leading: context.wording.savedAmount, // ประหยัดไป
                               trailing: '',
                               trailingWidget: AppText(
                                 receiptData.savePriceFormatted,
@@ -448,7 +456,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             ),
                             _listTile(
                               // E-Voucher
-                              leading: 'ยอดชำระทั้งหมด',
+                              leading: context
+                                  .wording
+                                  .totalPayment, // ยอดชำระทั้งหมด
                               trailing: '',
                               trailingWidget: AppText(
                                 receiptData.netPriceFormatted,
@@ -477,23 +487,23 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                                   ),
                                 ),
                                 child: AppText(
-                                  'QR Code สำหรับฝ่าย Browny Support เท่านั้น',
+                                  context
+                                      .wording
+                                      .qrCodeForSupportOnly, // QR Code สำหรับฝ่าย Browny Support เท่านั้น
                                   style: context.textTheme.labelSmall!.copyWith(
                                     fontSize: AppDims.size_10.sp,
                                   ),
                                 ),
                               ),
                             ),
-                            AppDims.vericalPadding_24,
-                            _listTile(
-                              // Icon
-                              leading: '',
-                              trailing: '',
-                              trailingWidget: Image.network(
-                                receiptData.qrImage.orEmpty,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    SizedBox(),
-                              ),
+                            // AppDims.vericalPadding_10,
+                            Image.network(
+                              receiptData.qrImage.orEmpty,
+                              width: 90.w,
+                              height: 90.w,
+                              fit: BoxFit.fill,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  SizedBox(),
                             ),
                           ],
                         ),

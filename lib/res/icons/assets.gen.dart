@@ -14,6 +14,52 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart' as _svg;
 import 'package:vector_graphics/vector_graphics.dart' as _vg;
 
+class $AssetsIcMenuGen {
+  const $AssetsIcMenuGen();
+
+  /// File path: assets/ic_menu/ic_home.png
+  AssetGenImage get icHome => const AssetGenImage('assets/ic_menu/ic_home.png');
+
+  /// File path: assets/ic_menu/ic_home_active.png
+  AssetGenImage get icHomeActive =>
+      const AssetGenImage('assets/ic_menu/ic_home_active.png');
+
+  /// File path: assets/ic_menu/ic_location.png
+  AssetGenImage get icLocation =>
+      const AssetGenImage('assets/ic_menu/ic_location.png');
+
+  /// File path: assets/ic_menu/ic_location_active.png
+  AssetGenImage get icLocationActive =>
+      const AssetGenImage('assets/ic_menu/ic_location_active.png');
+
+  /// File path: assets/ic_menu/ic_shop.png
+  AssetGenImage get icShop => const AssetGenImage('assets/ic_menu/ic_shop.png');
+
+  /// File path: assets/ic_menu/ic_shop_active.png
+  AssetGenImage get icShopActive =>
+      const AssetGenImage('assets/ic_menu/ic_shop_active.png');
+
+  /// File path: assets/ic_menu/ic_ticket.png
+  AssetGenImage get icTicket =>
+      const AssetGenImage('assets/ic_menu/ic_ticket.png');
+
+  /// File path: assets/ic_menu/ic_ticket_active.png
+  AssetGenImage get icTicketActive =>
+      const AssetGenImage('assets/ic_menu/ic_ticket_active.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [
+    icHome,
+    icHomeActive,
+    icLocation,
+    icLocationActive,
+    icShop,
+    icShopActive,
+    icTicket,
+    icTicketActive,
+  ];
+}
+
 class $AssetsIcPaymentGen {
   const $AssetsIcPaymentGen();
 
@@ -785,6 +831,14 @@ class $AssetsSvgGen {
   SvgGenImage get icClockRoundedGreen =>
       const SvgGenImage('assets/svg/ic_clock_rounded_green.svg');
 
+  /// File path: assets/svg/ic_close_popup.svg
+  SvgGenImage get icClosePopup =>
+      const SvgGenImage('assets/svg/ic_close_popup.svg');
+
+  /// File path: assets/svg/ic_coin_condition.svg
+  SvgGenImage get icCoinCondition =>
+      const SvgGenImage('assets/svg/ic_coin_condition.svg');
+
   /// File path: assets/svg/ic_copy.svg
   SvgGenImage get icCopy => const SvgGenImage('assets/svg/ic_copy.svg');
 
@@ -998,6 +1052,10 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_scan_3.svg
   SvgGenImage get icScan3 => const SvgGenImage('assets/svg/ic_scan_3.svg');
 
+  /// File path: assets/svg/ic_scan_festive_history.svg
+  SvgGenImage get icScanFestiveHistory =>
+      const SvgGenImage('assets/svg/ic_scan_festive_history.svg');
+
   /// File path: assets/svg/ic_share.svg
   SvgGenImage get icShare => const SvgGenImage('assets/svg/ic_share.svg');
 
@@ -1085,6 +1143,8 @@ class $AssetsSvgGen {
     icChecked2,
     icCheckedTrans,
     icClockRoundedGreen,
+    icClosePopup,
+    icCoinCondition,
     icCopy,
     icCouponCheckRoundedGreen,
     icCouponDryRoundedGreen,
@@ -1144,6 +1204,7 @@ class $AssetsSvgGen {
     icScan,
     icScan2,
     icScan3,
+    icScanFestiveHistory,
     icShare,
     icShop,
     icShopActive,
@@ -1167,6 +1228,7 @@ class $AssetsSvgGen {
 class Assets {
   const Assets._();
 
+  static const $AssetsIcMenuGen icMenu = $AssetsIcMenuGen();
   static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
   static const $AssetsIcReviewsGen icReviews = $AssetsIcReviewsGen();
   static const $AssetsIconProfilePreferencesGen iconProfilePreferences =

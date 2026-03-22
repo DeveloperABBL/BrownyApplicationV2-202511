@@ -696,6 +696,7 @@ class _MapContentState extends State<MapContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AppDims.vericalPadding_12,
           AppText(
             service.getTypeToTypeName(context.languageCode),
             style: context.textTheme.labelMedium!.copyWith(

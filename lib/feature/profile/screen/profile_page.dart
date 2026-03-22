@@ -20,6 +20,7 @@ import 'package:browny_applications_new/models/user_model.dart';
 import 'package:browny_applications_new/res/styles/app_text_style.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -324,7 +325,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             AppDims.vericalPadding_8,
 
             AppTextFormField(
-              enabled: widget.isFirstSignup,
+              // enabled: widget.isFirstSignup,
               focusNode: _birthDatefocusNode,
               controller: _viewModel.dateOfBirth,
               readOnly: true,
@@ -939,7 +940,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         onTap: () => dialogContext.pop(),
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 8.h),
-                          child: Assets.svg.icUnchecked.svg(
+                          child: Assets.svg.icClosePopup.svg(
                             width: 20.w,
                             height: 20.h,
                           ),
@@ -978,16 +979,62 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           ),
                                     ),
                                     AppDims.vericalPadding_10,
-
-                                    AppText(
-                                      _viewModel.descriptionPopupBirthDayOffers(
-                                        context,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(
-                                            color: AppColors.gray600,
+                                    // ข้อความใน Popup
+                                    // รายละเอียดเงื่อนไข
+                                    Html(
+                                      data: _viewModel
+                                          .descriptionPopupBirthDayOffers(
+                                            context,
                                           ),
+                                      style: {
+                                        "p": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "p.fancy": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "ul": Style(
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          padding: HtmlPaddings.only(
+                                            left: 16,
+                                          ), // ลด indent ของ bullet list
+                                          margin: Margins.zero,
+                                        ),
+                                        "li": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          margin: Margins.only(
+                                            bottom: 2,
+                                          ), // ลดช่องว่างระหว่าง item
+                                          color: AppColors.gray600,
+                                        ),
+                                      },
                                     ),
                                     AppDims.vericalPadding_16,
 

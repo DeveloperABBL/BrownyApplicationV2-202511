@@ -1000,8 +1000,8 @@ class _MyProfileAndPreferencesContentState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  // เงื่อนไขและการให้บริการ
-                  context.wording.termsAndConditions,
+                  // ข้อกำหนดและเงื่อไข
+                  context.wording.termsAndConditions2,
                   style: _defaultPreferencesTextStyle,
                 ),
                 AppDims.vericalPadding_8,

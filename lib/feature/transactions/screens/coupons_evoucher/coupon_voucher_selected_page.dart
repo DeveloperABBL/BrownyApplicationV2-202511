@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -65,7 +66,9 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
               ),
             ), //
             iconAlignment: IconAlignment.end,
-            onPressed: () {},
+            onPressed: () {
+              ScannerPage.goToPage(context);
+            },
             // เริ่มต้นใช้บริการ
             label: AppText(context.wording.startService),
           ),

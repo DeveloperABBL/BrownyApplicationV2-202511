@@ -263,7 +263,8 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     "google_map_link": "https://line.me/R/ti/p/%40browny",
     "lucky_no": "96",
     "lucky_image": "https://dev.abgroup.co.th/images/lucky_no/96.png",
-    "review_score": null
+    "review_score": null,
+    "qr_image": "https://dev.abgroup.co.th/storage/qrcodes/21.png"
 }
 '''),
           ),

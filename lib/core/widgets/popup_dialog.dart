@@ -60,120 +60,128 @@ class _PopupDialogState extends State<PopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppColors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Close button
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              visualDensity: VisualDensity.compact,
-              onPressed: () {
-                context.pop();
-                widget.onDismiss?.call(_dismissPopupForToday);
-              },
-              icon: Assets.svg.icUnchecked.svg(
-                width: 20.w,
-                height: 20.h,
-              ),
-            ),
-          ),
-
-          // Popup image carousel with dot indicator
-          Flexible(
-            child: Stack(
-              alignment: Alignment.bottomCenter,
+    return SizedBox(
+      height: double.infinity,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // CarouselSlider
-                CarouselSlider.builder(
-                  itemCount: widget.popups.length,
-                  itemBuilder: (context, index, realIndex) {
-                    final popup = widget.popups[index];
-                    final imageUrl =
-                        popup.image.getByLocaleCode(widget.locale) ?? '';
+                Spacer(),
+                Expanded(
+                  flex: 5,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      // CarouselSlider
+                      CarouselSlider.builder(
+                        itemCount: widget.popups.length,
+                        itemBuilder: (context, index, realIndex) {
+                          final popup = widget.popups[index];
+                          final imageUrl =
+                              popup.image.getByLocaleCode(widget.locale) ?? '';
 
-                    return GestureDetector(
-                      onTap: () {
-                        widget.onPopupImagePressed?.call(popup);
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(16.r),
-                        ),
-                        child: Image.network(
-                          imageUrl,
-                          fit: BoxFit.fill,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 200,
-                              color: AppColors.gray500,
-                              child: const Center(
-                                child: Icon(Icons.error_outline, size: 48),
+                          return GestureDetector(
+                            onTap: () {
+                              widget.onPopupImagePressed?.call(popup);
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(16.r),
                               ),
-                            );
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.fill,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    color: AppColors.gray500,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.error_outline,
+                                        size: 48,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        options: CarouselOptions(
+                          aspectRatio: 0.75, // อัตราส่วนกว้าง:สูง (เช่น 3:4)
+                          viewportFraction: 1,
+                          enableInfiniteScroll: widget.popups.length > 1,
+                          autoPlay: widget.popups.length > 1,
+                          autoPlayInterval: const Duration(seconds: 3),
+                          autoPlayAnimationDuration: const Duration(
+                            milliseconds: 800,
+                          ),
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
                           },
                         ),
                       ),
-                    );
-                  },
-                  options: CarouselOptions(
-                    aspectRatio: 0.75, // อัตราส่วนกว้าง:สูง (เช่น 3:4)
-                    viewportFraction: 1.0,
-                    enableInfiniteScroll: widget.popups.length > 1,
-                    autoPlay: widget.popups.length > 1,
-                    autoPlayInterval: const Duration(seconds: 3),
-                    autoPlayAnimationDuration: const Duration(
-                      milliseconds: 800,
-                    ),
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                  ),
-                ),
 
-                // Dot indicator
-                if (widget.popups.length > 1)
-                  Positioned(
-                    bottom: 16.h,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        widget.popups.length,
-                        (index) => Container(
-                          width: 8.w,
-                          height: 8.h,
-                          margin: EdgeInsets.symmetric(horizontal: 4.w),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentIndex == index
-                                ? AppColors.primary
-                                : AppColors.white.withValues(alpha: 0.5),
+                      // Dot indicator
+                      if (widget.popups.length > 1)
+                        Positioned(
+                          bottom: 8.h,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              widget.popups.length,
+                              (index) => Container(
+                                width: 8.w,
+                                height: 8.h,
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _currentIndex == index
+                                      ? AppColors.primary
+                                      : AppColors.white.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    // visualDensity: VisualDensity.compact,
+                    onTap: () {
+                      context.pop();
+                      widget.onDismiss?.call(_dismissPopupForToday);
+                    },
+                    child: Assets.svg.icClosePopup.svg(
+                      width: 20.w,
+                      height: 20.h,
                     ),
                   ),
+                ),
               ],
             ),
-          ),
-          AppDims.vericalPadding_16,
+            AppDims.vericalPadding_10,
 
-          CustomCheckboxTile(
-            onChanged: (value) {
-              setState(() {
-                _dismissPopupForToday = value!;
-              });
-            },
-          ),
-        ],
+            CustomCheckboxTile(
+              onChanged: (value) {
+                setState(() {
+                  _dismissPopupForToday = value!;
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -222,16 +230,17 @@ class _CustomCheckboxTileState extends State<CustomCheckboxTile> {
               padding: const EdgeInsets.all(2),
               child: _isChecked
                   ? Assets.svg.icCheckboxCheckedReg.svg(
-                      width: AppDims.size_16.w,
+                      width: AppDims.size_14.w,
                     )
                   : Assets.svg.icCheckboxReg.svg(
-                      width: AppDims.size_16.w,
+                      width: AppDims.size_14.w,
                     ),
             ),
             AppDims.horizonPadding_12,
             // ส่วนของข้อความ
             AppText(
-              'ปิดการแสดงหน้าสำหรับวันนี้',
+              // ปิดการแสดงหน้าสำหรับวันนี้
+              context.wording.hideForToday,
               style: context.textTheme.labelMedium!.copyWith(
                 color: AppColors.primary,
               ),

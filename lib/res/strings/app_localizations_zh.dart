@@ -144,16 +144,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changePasswordHam => '密码';
 
   @override
-  String get changePin => '更改 PIN';
-
-  @override
   String get referralRewards => '推荐奖励';
 
   @override
   String get getReward => '获取奖励';
-
-  @override
-  String get allNotifications => '所有通知';
 
   @override
   String get promotions => '促销';
@@ -255,6 +249,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get camera => '相机';
 
   @override
+  String get changePin => '更改 PIN';
+
+  @override
   String get enterTheCurrentPin => '输入当前 PIN';
 
   @override
@@ -330,7 +327,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dryingCount => '烘干次数';
 
   @override
-  String get totalPayment => '总支付';
+  String get totalPayment => '实付总额';
 
   @override
   String get paymentMethod => '支付方式';
@@ -636,9 +633,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get creditBalance => '账户余额';
 
   @override
-  String get history => '历史记录';
-
-  @override
   String get savedItems => '已保存的商品';
 
   @override
@@ -663,13 +657,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changeEmail => '更改电子邮件';
 
   @override
-  String get generalNotifications => '常规通知';
+  String get generalNotifications => '所有通知';
 
   @override
   String get workOrderStatus => '工作/订单状态';
 
   @override
-  String get termsAndConditions => '条款和服务';
+  String get termsAndConditions => '条款和条件';
 
   @override
   String get helpAndSupport => '帮助与支持';
@@ -783,7 +777,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordMustContainNumber => '至少包含一个数字';
 
   @override
-  String get loginWelcomeDescription => 'Browny欢迎您，让我们一起洗衣吧';
+  String get loginWelcomeDescription => 'Browny欢迎您，让我们一起洗衣吧!';
 
   @override
   String get loginWith => '登录方式';
@@ -828,10 +822,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get otpExpiredError => '验证码已过期';
 
   @override
-  String get ddMMyy => 'DD/MM/YY';
+  String get ddMMyy => '日/月/年';
 
   @override
   String get addPhoneNumber => '添加电话号码';
+
+  @override
+  String get history => '历史记录';
 
   @override
   String get balanceRemaining => '余额';
@@ -927,6 +924,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rewardsTitle => '奖励';
 
   @override
+  String get termsAndConditions2 => '条款和服务';
+
+  @override
   String get referralCode => '推荐码';
 
   @override
@@ -1014,7 +1014,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get used => '已使用';
 
   @override
-  String get usageStatus => '使用状态';
+  String get usageStatus => '工作状态';
 
   @override
   String get loveAnyoneDoLaundry => '#爱就帮TA洗衣服';
@@ -1212,4 +1212,73 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noLuckyScanActivityMessage => '敬请期待下次活动';
+
+  @override
+  String get luckyScanHistoryTitle => '所有幸运扫描记录';
+
+  @override
+  String get noLuckyScanHistory => '暂无幸运扫描记录';
+
+  @override
+  String get luckyScanWon => '已获奖';
+
+  @override
+  String get luckyScanNotWon => '未获奖';
+
+  @override
+  String get viewCoupon => '查看优惠券';
+
+  @override
+  String get washDry => '洗-烘';
+
+  @override
+  String get hideForToday => '今日不再显示';
+
+  @override
+  String get receiptNotFound => '未找到收据信息';
+
+  @override
+  String get operationSuccessful => '操作成功';
+
+  @override
+  String get totalAmount => '总金额';
+
+  @override
+  String get qrCodeForSupportOnly => '此QR Code仅供Browny Support使用';
+
+  @override
+  String get rateStoreCleanlinessTitle => '为店铺清洁度评分';
+
+  @override
+  String get reviewVeryBad => '非常差';
+
+  @override
+  String get reviewDissatisfied => '不满意';
+
+  @override
+  String get reviewNeutral => '一般';
+
+  @override
+  String get reviewGood => '好';
+
+  @override
+  String get reviewExcellent => '非常好';
+
+  @override
+  String get brownyReceipt => 'Browny收据';
+
+  @override
+  String get backToEvoucher => '返回E-Voucher';
+
+  @override
+  String get orderLabel => '订单';
+
+  @override
+  String get savedAmount => '已优惠';
+
+  @override
+  String get disableLocationTitle => '关闭位置访问';
+
+  @override
+  String get disableLocationMessage => '如需关闭位置访问权限，请前往设备设置中关闭';
 }

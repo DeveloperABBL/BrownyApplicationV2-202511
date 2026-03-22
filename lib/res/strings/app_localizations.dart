@@ -370,12 +370,6 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get changePasswordHam;
 
-  /// No description provided for @changePin.
-  ///
-  /// In en, this message translates to:
-  /// **'Change PIN'**
-  String get changePin;
-
   /// No description provided for @referralRewards.
   ///
   /// In en, this message translates to:
@@ -387,12 +381,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get reward'**
   String get getReward;
-
-  /// No description provided for @allNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'All Notifications'**
-  String get allNotifications;
 
   /// No description provided for @promotions.
   ///
@@ -591,6 +579,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera'**
   String get camera;
+
+  /// No description provided for @changePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get changePin;
 
   /// No description provided for @enterTheCurrentPin.
   ///
@@ -1354,12 +1348,6 @@ abstract class AppLocalizations {
   /// **'Credit Balance'**
   String get creditBalance;
 
-  /// No description provided for @history.
-  ///
-  /// In en, this message translates to:
-  /// **'History'**
-  String get history;
-
   /// No description provided for @savedItems.
   ///
   /// In en, this message translates to:
@@ -1411,7 +1399,7 @@ abstract class AppLocalizations {
   /// No description provided for @generalNotifications.
   ///
   /// In en, this message translates to:
-  /// **'General Notifications'**
+  /// **'All Notifications'**
   String get generalNotifications;
 
   /// No description provided for @workOrderStatus.
@@ -1651,7 +1639,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginWelcomeDescription.
   ///
   /// In en, this message translates to:
-  /// **'Browny welcomes you, let\'s do laundry together'**
+  /// **'Browny welcomes you, let\'s do laundry together!'**
   String get loginWelcomeDescription;
 
   /// No description provided for @loginWith.
@@ -1749,6 +1737,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add phone number'**
   String get addPhoneNumber;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
 
   /// No description provided for @balanceRemaining.
   ///
@@ -1936,6 +1930,12 @@ abstract class AppLocalizations {
   /// **'Rewards'**
   String get rewardsTitle;
 
+  /// No description provided for @termsAndConditions2.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get termsAndConditions2;
+
   /// No description provided for @referralCode.
   ///
   /// In en, this message translates to:
@@ -2113,7 +2113,7 @@ abstract class AppLocalizations {
   /// No description provided for @usageStatus.
   ///
   /// In en, this message translates to:
-  /// **'Usage Status'**
+  /// **'Working Status'**
   String get usageStatus;
 
   /// No description provided for @loveAnyoneDoLaundry.
@@ -2481,6 +2481,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stay tuned for the next activity'**
   String get noLuckyScanActivityMessage;
+
+  /// No description provided for @luckyScanHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All Lucky Scan History'**
+  String get luckyScanHistoryTitle;
+
+  /// No description provided for @noLuckyScanHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Lucky Scan History Found'**
+  String get noLuckyScanHistory;
+
+  /// No description provided for @luckyScanWon.
+  ///
+  /// In en, this message translates to:
+  /// **'Won'**
+  String get luckyScanWon;
+
+  /// No description provided for @luckyScanNotWon.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Won'**
+  String get luckyScanNotWon;
+
+  /// No description provided for @viewCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'View Coupon'**
+  String get viewCoupon;
+
+  /// No description provided for @washDry.
+  ///
+  /// In en, this message translates to:
+  /// **'Wash-Dry'**
+  String get washDry;
+
+  /// No description provided for @hideForToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide for today'**
+  String get hideForToday;
+
+  /// No description provided for @receiptNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt not found'**
+  String get receiptNotFound;
+
+  /// No description provided for @operationSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation successful'**
+  String get operationSuccessful;
+
+  /// No description provided for @totalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total amount'**
+  String get totalAmount;
+
+  /// No description provided for @qrCodeForSupportOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code for Browny Support only'**
+  String get qrCodeForSupportOnly;
+
+  /// No description provided for @rateStoreCleanlinessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the store cleanliness'**
+  String get rateStoreCleanlinessTitle;
+
+  /// No description provided for @reviewVeryBad.
+  ///
+  /// In en, this message translates to:
+  /// **'Very bad'**
+  String get reviewVeryBad;
+
+  /// No description provided for @reviewDissatisfied.
+  ///
+  /// In en, this message translates to:
+  /// **'Dissatisfied'**
+  String get reviewDissatisfied;
+
+  /// No description provided for @reviewNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get reviewNeutral;
+
+  /// No description provided for @reviewGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get reviewGood;
+
+  /// No description provided for @reviewExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get reviewExcellent;
+
+  /// No description provided for @brownyReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Receipt'**
+  String get brownyReceipt;
+
+  /// No description provided for @backToEvoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to E-Voucher'**
+  String get backToEvoucher;
+
+  /// No description provided for @orderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get orderLabel;
+
+  /// No description provided for @savedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get savedAmount;
+
+  /// No description provided for @disableLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable location access'**
+  String get disableLocationTitle;
+
+  /// No description provided for @disableLocationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To disable location access, please go to the device settings'**
+  String get disableLocationMessage;
 }
 
 class _AppLocalizationsDelegate

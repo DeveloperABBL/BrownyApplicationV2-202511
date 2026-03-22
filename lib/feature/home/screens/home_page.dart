@@ -405,7 +405,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 label: Column(
                   children: [
                     AppText(
-                      // สถานะการใช้งาน
+                      // สถานะการทำงาน
                       context.wording.usageStatus,
                       style: context.textTheme.labelLarge,
                     ),
@@ -428,7 +428,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   // ทั้งหมด
                   AppToggleData(lable: context.wording.all, value: 0),
                   // ซักอบ
-                  AppToggleData(lable: context.wording.sakob, value: 1),
+                  AppToggleData(lable: context.wording.washDry, value: 1),
                   // การสั่งซื้อ
                   AppToggleData(
                     lable: context.wording.orderPlacement,
@@ -649,10 +649,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
               GestureDetector(
                 onTap: () {
-                  if (kDebugMode) {
-                    LuckyMockupPage.goToPage(context);
-                    return;
-                  }
+                  // if (kDebugMode) {
+                  //   LuckyMockupPage.goToPage(context);
+                  //   return;
+                  // }
                   LuckyScanPage.goToPage(context);
                 },
                 child: Container(
@@ -1019,82 +1019,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                                 ),
                                 AppDims.horizonPadding_16,
 
-                                // สร้าง button TP+ Wallet
-                                Builder(
-                                  builder: (context) {
-                                    final icon = isGuest
-                                        ? Assets.svg.icLogin.svg(
-                                            width: AppDims.size_12.w,
-                                            height: AppDims.size_12.h,
-                                          )
-                                        : Assets.svg.icPlus.svg(
-                                            width: AppDims.size_12.w,
-                                            height: AppDims.size_12.h,
-                                          );
-
-                                    final onPressed = provider.current.isGuest
-                                        ? () => context.pushNamed(
-                                            AuthenticationPage.pageName,
-                                            extra: {
-                                              AuthenProcess:
-                                                  AuthenProcess.login,
-                                            },
-                                          )
-                                        : () {
-                                            context.pushNamed(
-                                              WalletPage.pageName,
-                                            );
-                                          };
-
-                                    final label = provider.current.isGuest
-                                        ? context.wording.login
-                                        : context.wording.topup;
-
-                                    return ElevatedButton.icon(
-                                      icon: icon,
-                                      // icon: Icon(Icons.login),
-                                      iconAlignment: IconAlignment.end,
-                                      onPressed: onPressed,
-                                      style: context
-                                          .appTheme
-                                          .elevatedButtonTheme
-                                          .style!
-                                          .copyWith(
-                                            shape: WidgetStatePropertyAll(
-                                              RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                      AppDims.size_4,
-                                                    ),
-                                              ),
-                                            ),
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
-                                            padding: WidgetStatePropertyAll(
-                                              EdgeInsets.symmetric(
-                                                horizontal: AppDims.size_4,
-                                              ),
-                                            ),
-                                            minimumSize: WidgetStatePropertyAll(
-                                              Size(70.w, 22.h),
-                                            ), // Set this
-                                            textStyle: WidgetStatePropertyAll(
-                                              context.textTheme.bodySmall!
-                                                  .copyWith(
-                                                    color: AppColors.white,
-                                                  ),
-                                            ),
-                                          ),
-                                      label: AppText(
-                                        label,
-                                        style: context.textTheme.titleSmall!
-                                            .copyWith(
-                                              color: AppColors.white,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                // สร้าง button เข้าสู่ระบบ หรือ TP+ Wallet
+                                _buildButtonLoginOrTopUp(isGuest, provider),
                               ],
                             ),
                             Selector<CustomerProvider, String>(
@@ -1108,6 +1034,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                                     ),
                               ),
                             ),
+
+                            AppDims.vericalPadding_2,
                           ],
                         ),
                         // AppDims.horizonPadding_12,
@@ -1306,6 +1234,80 @@ class _HomePageWidgetState extends State<HomePageWidget>
           );
         },
       ),
+    );
+  }
+
+  Widget _buildButtonLoginOrTopUp(bool isGuest, CustomerProvider provider) {
+    return Builder(
+      builder: (context) {
+        final icon = isGuest
+            ? Assets.svg.icLogin.svg(
+                width: AppDims.size_12.w,
+                height: AppDims.size_12.h,
+              )
+            : Assets.svg.icPlus.svg(
+                width: AppDims.size_12.w,
+                height: AppDims.size_12.h,
+              );
+
+        final onPressed = provider.current.isGuest
+            ? () => context.pushNamed(
+                AuthenticationPage.pageName,
+                extra: {
+                  AuthenProcess: AuthenProcess.login,
+                },
+              )
+            : () {
+                context.pushNamed(
+                  WalletPage.pageName,
+                );
+              };
+
+        final label = provider.current.isGuest
+            // เข้าสู่ระบบ
+            ? context.wording.login
+            // เติมเงิน
+            : context.wording.topup;
+
+        return ElevatedButton(
+          onPressed: onPressed,
+          style: context.appTheme.elevatedButtonTheme.style!.copyWith(
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  AppDims.size_4.r,
+                ),
+              ),
+            ),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: WidgetStatePropertyAll(
+              EdgeInsets.symmetric(
+                horizontal: AppDims.size_10.w,
+              ),
+            ),
+            minimumSize: WidgetStatePropertyAll(
+              Size(70.w, 20.h),
+            ), // Set this
+            textStyle: WidgetStatePropertyAll(
+              context.textTheme.bodySmall!.copyWith(
+                color: AppColors.white,
+              ),
+            ),
+          ),
+          child: Row(
+            spacing: AppDims.size_4.w,
+            children: [
+              AppText(
+                label,
+                style: context.textTheme.titleSmall!.copyWith(
+                  color: AppColors.white,
+                ),
+              ),
+              icon,
+            ],
+          ),
+        );
+      },
     );
   }
 

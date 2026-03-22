@@ -113,7 +113,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
       await ShareHelper.shareImage(
         imageBytes,
         fileName: 'browny_receipt_${DateTime.now().millisecondsSinceEpoch}.png',
-        text: 'ใบเสร็จ Browny',
+        text: context.wording.brownyReceipt, // ใบเสร็จ Browny
       );
     } catch (e) {
       if (mounted) {
@@ -262,7 +262,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
           },
         ),
         title: AppText(
-          'ใบเสร็จ',
+          context.wording.receipt, // ใบเสร็จ
           style: context.textTheme.titleLarge!.copyWith(
             color: AppColors.textPrimary,
           ),
@@ -290,7 +290,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
               );
             },
             child: AppText(
-              'กลับสู่หน้าหลัก',
+              context.wording.backToHome, // กลับสู่หน้าหลัก
             ),
           ),
         ),
@@ -299,6 +299,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
             left: AppDims.size_24.w,
             right: AppDims.size_24.w,
             top: AppDims.size_8.h,
+            bottom: AppDims.size_26.w,
           ),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -322,14 +323,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
               );
             },
             child: AppText(
-              'ตรวจสอบสถานะ',
+              context.wording.checkStatus, // ตรวจสอบสถานะ
             ),
           ),
-        ),
-
-        SafeArea(
-          top: false,
-          child: SizedBox(),
         ),
       ],
       body: SingleChildScrollView(
@@ -353,7 +349,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                       child: AppText(
                         result.error?.toString() ??
                             result.data?.error?.toString() ??
-                            'เกิดข้อผิดพลาด',
+                            context.wording.errorOccurred, // เกิดข้อผิดพลาด
                       ),
                     );
                   }
@@ -361,7 +357,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                   // No receipt data
                   if (!result.data!.hasReceipt) {
                     return Center(
-                      child: AppText('ไม่พบข้อมูลใบเสร็จ'),
+                      child: AppText(
+                        context.wording.receiptNotFound,
+                      ), // ไม่พบข้อมูลใบเสร็จ
                     );
                   }
 
@@ -381,7 +379,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             AppDims.vericalPadding_4,
 
                             AppText(
-                              'ดำเนินการสำเร็จ',
+                              context
+                                  .wording
+                                  .operationSuccessful, // ดำเนินการสำเร็จ
                               style: context.textTheme.titleMedium!.copyWith(
                                 color: AppColors.textBlack,
                               ),
@@ -423,29 +423,34 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             ),
                             _listTile(
                               // สาขา
-                              leading: 'สาขา',
+                              leading: context.wording.branch, // สาขา
                               trailing: receiptData.branchNameDisplay(context),
                             ),
                             _listTile(
                               // ประเภทเครื่อง
-                              leading: 'ประเภทเครื่อง',
+                              leading:
+                                  context.wording.machineType, // ประเภทเครื่อง
                               trailing: receiptData.machineTypeDisplay(context),
                             ),
                             _listTile(
                               // หมายเลขเครื่อง
-                              leading: 'หมายเลขเครื่อง',
+                              leading: context
+                                  .wording
+                                  .machineNumber, // หมายเลขเครื่อง
                               trailing: receiptData.machineNoDisplay,
                             ),
                             _listTile(
                               // Date
-                              leading: 'วัน / เวลา',
+                              leading: context.wording.dateTime, // วัน / เวลา
                               trailing: receiptData.receiptDateDisplay(
                                 context,
                               ),
                             ),
                             _listTile(
                               // Payment Method
-                              leading: 'ช่องทางการชำระเงิน',
+                              leading: context
+                                  .wording
+                                  .paymentMethod, // ช่องทางการชำระเงิน
                               trailing: receiptData.paymentMethodNameDisplay(
                                 context,
                               ),
@@ -478,10 +483,11 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                           horizontal: AppDims.size_24.w,
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             _listTile(
                               // บริการ
-                              leading: 'บริการ',
+                              leading: context.wording.services, // บริการ
                               trailing: '',
                             ),
                             if (receiptData.hasSummary &&
@@ -509,7 +515,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                                         .getTextByLocale(
                                           context.languageCode,
                                         )
-                                  : 'โปรโมชั่นสาขา',
+                                  : context
+                                        .wording
+                                        .storePromotion, // โปรโมชั่นสาขา
                               trailing: '',
                               trailingWidget: AppText(
                                 receiptData.discountAmount,
@@ -529,7 +537,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                                   ? receiptData.couponDiscountNameDisplay(
                                       context,
                                     )
-                                  : 'คูปองส่วนลด',
+                                  : context
+                                        .wording
+                                        .discountCoupon, // คูปองส่วนลด
                               trailing: '',
                               trailingWidget: AppText(
                                 receiptData.couponDiscountAmount,
@@ -564,7 +574,8 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                             ),
                             _listTile(
                               // ยอดรวมทั้งหมด
-                              leading: 'ยอดรวมทั้งหมด',
+                              leading:
+                                  context.wording.totalAmount, // ยอดรวมทั้งหมด
                               trailing: '',
                               trailingWidget: AppText(
                                 receiptData.totalFormatted,
@@ -593,22 +604,23 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                                   ),
                                 ),
                                 child: AppText(
-                                  'QR Code สำหรับฝ่าย Browny Support เท่านั้น',
+                                  context
+                                      .wording
+                                      .qrCodeForSupportOnly, // QR Code สำหรับฝ่าย Browny Support เท่านั้น
                                   style: context.textTheme.labelSmall!.copyWith(
                                     fontSize: AppDims.size_10.sp,
                                   ),
                                 ),
                               ),
                             ),
-                            AppDims.vericalPadding_24,
-                            _listTile(
-                              leading: '',
-                              trailing: '',
-                              trailingWidget: Image.network(
-                                receiptData.qrImage.orEmpty,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    SizedBox(),
-                              ),
+                            // AppDims.vericalPadding_10,
+                            Image.network(
+                              receiptData.qrImage.orEmpty,
+                              width: 90.w,
+                              height: 90.w,
+                              fit: BoxFit.fill,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  SizedBox(),
                             ),
                           ],
                         ),
@@ -716,7 +728,9 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                         width: AppDims.size_77.w,
                       ),
                       AppText(
-                        'ให้คะแนนความสะอาดของร้าน',
+                        context
+                            .wording
+                            .rateStoreCleanlinessTitle, // ให้คะแนนความสะอาดของร้าน
                         style: context.textTheme.labelLarge,
                       ),
                       AppDims.vericalPadding_2,
@@ -729,35 +743,35 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
 
                           children: [
                             _buildReviewScoreItem(
-                              'แย่มาก',
+                              context.wording.reviewVeryBad, // แย่มาก
                               icon: Assets.icReviews.icLv1,
                               context: context,
                               reviewScore: reviewScore,
                               selfScore: 1,
                             ),
                             _buildReviewScoreItem(
-                              'ไม่พอใจ',
+                              context.wording.reviewDissatisfied, // ไม่พอใจ
                               icon: Assets.icReviews.icLv2,
                               context: context,
                               reviewScore: reviewScore,
                               selfScore: 2,
                             ),
                             _buildReviewScoreItem(
-                              'เฉยๆ',
+                              context.wording.reviewNeutral, // เฉยๆ
                               icon: Assets.icReviews.icLv3,
                               context: context,
                               reviewScore: reviewScore,
                               selfScore: 3,
                             ),
                             _buildReviewScoreItem(
-                              'ดี',
+                              context.wording.reviewGood, // ดี
                               icon: Assets.icReviews.icLv4,
                               context: context,
                               reviewScore: reviewScore,
                               selfScore: 4,
                             ),
                             _buildReviewScoreItem(
-                              'ดีเยี่ยม',
+                              context.wording.reviewExcellent, // ดีเยี่ยม
                               icon: Assets.icReviews.icLv5,
                               context: context,
                               reviewScore: reviewScore,
@@ -904,10 +918,18 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
             icon.image(
               width: AppDims.size_44.w,
             ),
-            AppText(
-              // 'แย่มาก,
-              text,
-              style: context.textTheme.labelMedium,
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: AppDims.size_44.w,
+              ),
+              child: AppText(
+                // 'แย่มาก,
+                text,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelMedium,
+              ),
             ),
           ],
         ),

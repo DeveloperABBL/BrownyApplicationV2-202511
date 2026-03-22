@@ -258,6 +258,7 @@ class __ScannerWidgetState extends State<_ScannerWidget>
           : AppColors.primary,
       bottom: TabBar(
         indicatorColor: tabIndex == 0 ? AppColors.primary : AppColors.white,
+        dividerColor: AppColors.transparent,
         labelStyle: context.textTheme.titleMedium!.copyWith(
           color: tabIndex == 0 ? AppColors.primary : AppColors.white,
         ),

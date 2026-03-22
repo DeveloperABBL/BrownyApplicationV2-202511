@@ -839,7 +839,10 @@ class _OTPContent extends _SignUpWidget {
                 children: [
                   // หัวเรื่อง "ยืนยันรหัส OTP"
                   AppText(
-                    context.wording.confirmOTP,
+                    // context.wording.confirmOTP,
+                    // ยืนยัน OTP สำหรับสมัครบัญชี
+                    // ยืนยันรหัสใช้ครั้งเดียว (OTP)
+                    viewmodel(context).otpTitleByState,
                     style: context.textTheme.titleLarge!.copyWith(
                       fontSize: AppDims.size_24.sp,
                     ),
@@ -1142,7 +1145,7 @@ class _PinputWidgetState extends State<_PinputWidget> {
         fontWeight: FontWeight.w600,
       ),
       decoration: BoxDecoration(
-        color: AppColors.inputFieldDefaultBg,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: AppColors.inputFieldDefaultBorder,
@@ -1154,7 +1157,7 @@ class _PinputWidgetState extends State<_PinputWidget> {
     // Focused: กำลัง focus อยู่
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
-        color: AppColors.inputFieldDefaultBg,
+        color: AppColors.background,
         border: Border.all(
           color: AppColors.primary, // Border เปลี่ยนเป็นสีหลัก
           width: 1,
@@ -1345,7 +1348,11 @@ class _LoginWidget extends _SignUpWidget {
         return SizedBox(
           height: AppDims.size_40.h,
           width: double.infinity,
-          child: ElevatedButton(
+          child: ElevatedButton.icon(
+            iconAlignment: IconAlignment.end,
+            icon: Assets.svg.icLogin.svg(
+              width: AppDims.size_20.w,
+            ),
             onPressed: () async {
               FocusManager.instance.primaryFocus?.unfocus();
 
@@ -1381,7 +1388,8 @@ class _LoginWidget extends _SignUpWidget {
                 // context.pop();
               }
             },
-            child: AppText(context.wording.login),
+            // เข้าสู่ระบบ
+            label: AppText(context.wording.login),
           ),
         );
       },
@@ -1724,8 +1732,8 @@ class _ForgotPasswordWidget extends _SignUpWidget {
   Widget contentTitle(BuildContext context, {required String wording}) {
     return super.contentTitle(
       context,
-      // ลืมรหัสผ่าน?
-      wording: context.wording.forgotYourPassword,
+      // ลืมรหัสผ่าน
+      wording: context.wording.forgotPassword,
     );
   }
 

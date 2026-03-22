@@ -29,7 +29,9 @@ FestiveHistoryData _$FestiveHistoryDataFromJson(Map<String, dynamic> json) =>
           : ContentLocalizeData.fromJson(json['title'] as Map<String, dynamic>),
       type: json['type'] as String?,
       reward: FestiveHistoryData._rewardFromJson(json['reward']),
-      createdAt: json['created_at'] as String?,
+      createdAt: const DateTimeConverter().fromJson(
+        json['created_at'] as String?,
+      ),
     );
 
 Map<String, dynamic> _$FestiveHistoryDataToJson(FestiveHistoryData instance) =>
@@ -40,7 +42,7 @@ Map<String, dynamic> _$FestiveHistoryDataToJson(FestiveHistoryData instance) =>
       'title': instance.title,
       'type': instance.type,
       'reward': FestiveHistoryData._rewardToJson(instance.reward),
-      'created_at': instance.createdAt,
+      'created_at': const DateTimeConverter().toJson(instance.createdAt),
     };
 
 FestiveHistoryReward _$FestiveHistoryRewardFromJson(

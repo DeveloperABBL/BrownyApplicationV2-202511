@@ -147,25 +147,46 @@ class CoinViewmModel extends AppViewModel {
   String descriptionPopupCondition(BuildContext context) {
     switch (context.languageCode) {
       case 'en':
+        // Terms and Conditions
+        // • For every XX THB spent on washing and drying, receive 1 Browny Coin
+        // • Every 10 Browny Coins have a value of 1 THB
+        // • You have XXX coins that will expire in October X, 202X
         return '''
-Terms and Conditions
-• For every XX THB spent on washing and drying, receive 1 Browny Coin
-• Every 10 Browny Coins have a value of 1 THB
-• You have XXX coins that will expire in October X, 202X
+<p>Terms and Conditions</p>
+<ul>
+<li>For every XX THB spent on washing and drying, receive 1 Browny Coin</li>
+<li>Every 10 Browny Coins have a value of 1 THB</li>
+<li>You have XXX coins that will expire in October X, 202X</li>
+</ul>
 ''';
       case 'zh':
+        // 条款和条件
+        // • 每消费XX泰铢洗烘服务，可获得1个Browny Coin
+        // • 每10个Browny Coin价值1泰铢
+        // • 您有XXX个硬币将于202X年10月X日到期
         return '''
-条款和条件
-• 每消费XX泰铢洗烘服务，可获得1个Browny Coin
-• 每10个Browny Coin价值1泰铢
-• 您有XXX个硬币将于202X年10月X日到期
+<p>条款和条件</p>
+<ul>
+<li>每消费XX泰铢洗烘服务，可获得1个Browny Coin</li>
+<li>每10个Browny Coin价值1泰铢</li>
+<li>您有XXX个硬币将于202X年10月X日到期</li>
+</ul>
 ''';
       default:
-        return '''
-เงื่อนไข
-• ทุกๆ XX บาท ในการซักอบ ได้รับ 1 Browny Coin
-• ทุกๆ 10 Browny Coin มีมูลค่า 1 บาท
-• คุณมี XXX เหรียญ ที่จะหมดอายุใน X ตุลาคม 202X
+        return
+        // '''
+        // เงื่อนไข
+        // • ทุกๆ XX บาท ในการซักอบ ได้รับ 1 Browny Coin
+        // • ทุกๆ 10 Browny Coin มีมูลค่า 1 บาท
+        // • คุณมี XXX เหรียญ ที่จะหมดอายุใน X ตุลาคม 202X
+        // ''';
+        '''
+<p>เงื่อนไข</p>
+<ul>
+<li>ทุกๆ XX บาท ในการซักอบ ได้รับ 1 Browny Coin</li>
+<li>ทุกๆ 10 Browny Coin มีมูลค่า 1 บาท</li>
+<li>คุณมี XXX เหรียญ ที่จะหมดอายุใน X ตุลาคม 202X</li>
+</ul>
 ''';
     }
   }

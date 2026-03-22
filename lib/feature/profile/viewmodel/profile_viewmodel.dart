@@ -80,25 +80,49 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
   String descriptionPopupBirthDayOffers(BuildContext context) {
     switch (context.languageCode) {
       case 'en':
+        //         return '''
+        // Terms and Conditions
+        // • Receive special gifts and exclusive member promotions during your birth month
+        // • To ensure benefit accuracy, birthdate cannot be self-edited. If you need to change it, please contact admin with your ID card attached
+        // • If birthday privileges have already been used, birthdate cannot be modified
+        // ''';
         return '''
-Terms and Conditions
-• Receive special gifts and exclusive member promotions during your birth month
-• To ensure benefit accuracy, birthdate cannot be self-edited. If you need to change it, please contact admin with your ID card attached
-• If birthday privileges have already been used, birthdate cannot be modified
+<p>Terms and Conditions</p>
+<ul>
+<li>Receive special gifts and exclusive member promotions during your birth month</li>
+<li>To ensure benefit accuracy, birthdate cannot be self-edited. If you need to change it, please contact admin with your ID card attached</li>
+<li>If birthday privileges have already been used, birthdate cannot be modified</li>
+</ul>
 ''';
       case 'zh':
+        //         return '''
+        // 条款和条件
+        // • 在您的生日月份获得特别礼物和会员专属促销
+        // • 为确保福利的准确性，生日日期无法自行编辑。如需更改，请联系管理员并附上您的身份证
+        // • 如果已使用生日特权，则无法修改生日日期
+        // ''';
         return '''
-条款和条件
-• 在您的生日月份获得特别礼物和会员专属促销
-• 为确保福利的准确性，生日日期无法自行编辑。如需更改，请联系管理员并附上您的身份证
-• 如果已使用生日特权，则无法修改生日日期
+<p>条款和条件</p>
+<ul>
+<li>在您的生日月份获得特别礼物和会员专属促销</li>
+<li>为确保福利的准确性，生日日期无法自行编辑。如需更改，请联系管理员并附上您的身份证</li>
+<li>如果已使用生日特权，则无法修改生日日期</li>
+</ul>
 ''';
       default:
+        //         return '''
+        // เงื่อนไข
+        // • รับของขวัญพิเศษ และโปรลับเฉพาะสมาชิกในเดือนเกิด
+        // • เพื่อความถูกต้องของสิทธิประโยชน์ วันเกิดจะไม่สามารถแก้ไขได้เอง หากต้องการเปลี่ยน โปรดติดต่อแอดมินพร้อมแนบรูปบัตรประชาชน
+        // • ถ้าหากใช้สิทธิพิเศษวันเกิดไปแล้ว จะไม่สามารถแก้ไขวันเกิดได้
+        // ''';
         return '''
-เงื่อนไข
-• รับของขวัญพิเศษ และโปรลับเฉพาะสมาชิกในเดือนเกิด
-• เพื่อความถูกต้องของสิทธิประโยชน์ วันเกิดจะไม่สามารถแก้ไขได้เอง หากต้องการเปลี่ยน โปรดติดต่อแอดมินพร้อมแนบรูปบัตรประชาชน
-• ถ้าหากใช้สิทธิพิเศษวันเกิดไปแล้ว จะไม่สามารถแก้ไขวันเกิดได้
+<p>เงื่อนไข</p>
+<ul>
+<li>รับของขวัญพิเศษ และโปรลับเฉพาะสมาชิกในเดือนเกิด</li>
+<li>เพื่อความถูกต้องของสิทธิประโยชน์ วันเกิดจะไม่สามารถแก้ไขได้เอง หากต้องการเปลี่ยน โปรดติดต่อแอดมินพร้อมแนบรูปบัตรประชาชน</li>
+<li>ถ้าหากใช้สิทธิพิเศษวันเกิดไปแล้ว จะไม่สามารถแก้ไขวันเกิดได้</li>
+</ul>
 ''';
     }
   }
@@ -489,8 +513,10 @@ Terms and Conditions
 
     await AppOverlays.showBrownyDialog(
       context,
-      title: 'ปิด Location',
-      message: 'หากต้องการปิดสิทธิ์ Location กรุณาไปปิดในการตั้งค่าของอุปกรณ์',
+      // ปิดการเข้าถึงตำแหน่ง
+      title: context.wording.disableLocationTitle,
+      // หากต้องการปิดสิทธิ์ การเข้าถึงตำแหน่ง กรุณาไปปิดในการตั้งค่าของอุปกรณ์
+      message: context.wording.disableLocationMessage,
       confirmText: context.wording.openSettings,
       onConfirm: () async {
         await LocationHelper.openLocationSettings();

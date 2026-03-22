@@ -14,6 +14,7 @@ import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,6 +57,9 @@ class __CoinContentState extends State<_CoinContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // โหลดข้อมูล CoinClaim
       await _viewModel.fetchCoinCliamData();
+      if (!mounted) return;
+
+      _showCondition(context);
     });
   }
 
@@ -180,7 +184,7 @@ class __CoinContentState extends State<_CoinContent> {
                                       //     },
                                       //   ),
                                       // ),
-                                      AppDims.vericalPadding_4,
+                                      // AppDims.vericalPadding_2,
 
                                       // แถวเงื่อนไข
                                       Padding(
@@ -292,39 +296,21 @@ class __CoinContentState extends State<_CoinContent> {
   }
 
   Widget _buildButtonCondition(BuildContext context) {
-    return Row(
-      children: [
-        Spacer(),
-        TextButton.icon(
-          onPressed: () {
-            _showCondition(context);
-          },
-          style: context.appTheme.textButtonTheme.style!.copyWith(
-            minimumSize: WidgetStatePropertyAll(
-              Size(
-                AppDims.size_50.w,
-                AppDims.size_18.h,
-              ),
-            ),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            padding: WidgetStatePropertyAll(
-              EdgeInsets.only(
-                top: AppDims.size_2.h,
-              ),
-            ),
-          ),
-          icon: Icon(
-            Icons.info_outline_rounded,
-            color: AppColors.gray500,
-          ),
-          label: AppText(
+    return GestureDetector(
+      onTap: () => _showCondition(context),
+      child: Row(
+        spacing: AppDims.size_2.w,
+        children: [
+          Spacer(),
+          Assets.svg.icCoinCondition.svg(),
+          AppText(
             'เงื่อนไข',
-            style: context.textTheme.labelMedium!.copyWith(
-              color: AppColors.gray500,
+            style: context.textTheme.labelSmall!.copyWith(
+              color: AppColors.gray400,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -350,7 +336,7 @@ class __CoinContentState extends State<_CoinContent> {
                         onTap: () => dialogContext.pop(),
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 8.h),
-                          child: Assets.svg.icUnchecked.svg(
+                          child: Assets.svg.icClosePopup.svg(
                             width: 20.w,
                             height: 20.h,
                           ),
@@ -388,16 +374,61 @@ class __CoinContentState extends State<_CoinContent> {
                                     ),
                                     AppDims.vericalPadding_10,
 
-                                    AppText(
-                                      _viewModel.descriptionPopupCondition(
-                                        context,
-                                      ),
-                                      textAlign: TextAlign.start,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(
-                                            color: AppColors.gray600,
+                                    // รายละเอียดเงื่อนไข
+                                    Html(
+                                      data: _viewModel
+                                          .descriptionPopupCondition(context),
+                                      style: {
+                                        "p": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
                                           ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "p.fancy": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "ul": Style(
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          padding: HtmlPaddings.only(
+                                            left: 16,
+                                          ), // ลด indent ของ bullet list
+                                          margin: Margins.zero,
+                                        ),
+                                        "li": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          margin: Margins.only(
+                                            bottom: 2,
+                                          ), // ลดช่องว่างระหว่าง item
+                                          color: AppColors.gray600,
+                                        ),
+                                      },
                                     ),
+
                                     AppDims.vericalPadding_16,
 
                                     ElevatedButton(
@@ -458,36 +489,28 @@ class __CoinContentState extends State<_CoinContent> {
     }
   }
 
-  TextButton _buildHistory(BuildContext context) {
-    return TextButton.icon(
-      onPressed: () {
-        context.pushNamed(CoinHistoryPage.pageName, extra: _viewModel);
-      },
-      style: context.appTheme.textButtonTheme.style!.copyWith(
-        minimumSize: WidgetStatePropertyAll(
-          Size(
-            AppDims.size_50.w,
-            AppDims.size_18.h,
-          ),
-        ),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.only(
-            top: AppDims.size_2.h,
-          ),
-        ),
+  Widget _buildHistory(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.pushNamed(
+        CoinHistoryPage.pageName,
+        extra: _viewModel,
       ),
-      icon: Assets.svg.icHistory2.svg(
-        colorFilter: ColorFilter.mode(
-          AppColors.primary,
-          BlendMode.srcIn,
-        ),
-      ),
-      label: AppText(
-        context.wording.history,
-        style: context.textTheme.titleSmall!.copyWith(
-          color: AppColors.textPrimary,
-        ),
+      child: Row(
+        spacing: AppDims.size_2.w,
+        children: [
+          Assets.svg.icHistory2.svg(
+            colorFilter: ColorFilter.mode(
+              AppColors.primary,
+              BlendMode.srcIn,
+            ),
+          ),
+          AppText(
+            context.wording.history,
+            style: context.textTheme.titleSmall!.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -667,7 +690,7 @@ class __CoinContentState extends State<_CoinContent> {
                   children: [
                     AppDims.vericalPadding_8,
                     Container(
-                      margin: EdgeInsets.only(right: 3),
+                      margin: EdgeInsets.only(right: 3.w),
                       width: double.infinity,
                       color: isHighlight ? AppColors.borderError : null,
                       child: Align(

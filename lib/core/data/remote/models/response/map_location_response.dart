@@ -233,9 +233,9 @@ class StoreLocationItem {
     final distanceDisplay = getDistaceDisplay(locale);
     switch (locale) {
       case 'zh':
-        return 'ใกล้ที่สุด $distanceDisplay';
+        return '最近 $distanceDisplay';
       case 'en':
-        return 'ใกล้ที่สุด $distanceDisplay';
+        return 'Nearest $distanceDisplay';
       default:
         return 'ใกล้ที่สุด $distanceDisplay';
     }

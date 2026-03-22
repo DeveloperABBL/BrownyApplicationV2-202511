@@ -259,8 +259,22 @@ class TransactionsViewmodel extends AppViewModel
 
         // ใส่กลับไปที่ index 0 และ mark เป็น selected
         finalList.insert(0, selected.copyWith(isSelected: true));
+        // เอาตัวที่เลือก หรือ TPWallet ขึ้นด้านบน
+        finalList.sort((l, r) {
+          if (l.isSelected) return 0;
+          if (l.isTpWallet) return 0;
+          return 1;
+        });
       }
     } else {
+      // เอา TPWallet ขึ้นตัวแรกเสมอ
+      finalList.sort((l, r) {
+        if (l.isTpWallet) {
+          return 0;
+        }
+        return 1;
+      });
+
       // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
       finalList = finalList.asMap().entries.map((entry) {
         // ตัวแรก (index 0) จะถูก mark เป็น selected

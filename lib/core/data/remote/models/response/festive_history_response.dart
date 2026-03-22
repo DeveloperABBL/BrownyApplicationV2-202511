@@ -1,4 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'festive_history_response.g.dart';
@@ -57,8 +59,9 @@ class FestiveHistoryData {
   @JsonKey(name: 'reward', fromJson: _rewardFromJson, toJson: _rewardToJson)
   final FestiveHistoryReward? reward;
 
+  @DateTimeConverter()
   @JsonKey(name: 'created_at')
-  final String? createdAt;
+  final DateTime? createdAt;
 
   static FestiveHistoryReward? _rewardFromJson(dynamic value) {
     if (value is Map<String, dynamic>) {
@@ -72,6 +75,18 @@ class FestiveHistoryData {
 
   /// ดึง title ตาม locale
   String getTitleDisplay(String locale) => title?.getByLocaleCode(locale) ?? '';
+
+  String getCreateAtDisplay(String locale) {
+    String prefix = '';
+    if (locale == 'th') {
+      prefix = 'วันที่ ';
+    }
+    return createdAt?.formatDateLocale(
+          locale,
+          pattern: '${prefix}dd MMM yyyy',
+        ) ??
+        '-';
+  }
 
   /// ได้รับรางวัล
   bool get isWon => type == 'won';
