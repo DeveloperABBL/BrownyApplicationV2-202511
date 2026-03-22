@@ -583,19 +583,21 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     horizontal: AppDims.size_8.w,
                     // vertical: AppDims.size_8.h,
                   ),
-                  child: Column(
-                    children: [
-                      Assets.iconShortcut.iscCoupon.image(
-                        width: AppDims.size_64.w,
-                        height: AppDims.size_32.h,
-                      ),
-                      AppText(
-                        // คูปอง
-                        context.wording.rewards,
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleSmall,
-                      ),
-                    ],
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscCoupon,
+                    title: context.wording.rewards,
+                    // children: [
+                    //   Assets.iconShortcut.iscCoupon.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     // คูปอง
+                    //     context.wording.rewards,
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
                   ),
                 ),
               ),
@@ -607,18 +609,21 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
                 child: GestureDetector(
                   onTap: () => onBrownyClubClick(highlight: null),
-                  child: Column(
-                    children: [
-                      Assets.iconShortcut.iscBrownyClub.image(
-                        width: AppDims.size_64.w,
-                        height: AppDims.size_32.h,
-                      ),
-                      AppText(
-                        'Browny\nClub',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleSmall,
-                      ),
-                    ],
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscBrownyClub,
+                    title: 'Browny\nClub',
+                    //  Column(
+                    // children: [
+                    //   Assets.iconShortcut.iscBrownyClub.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     'Browny\nClub',
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
                   ),
                 ),
               ),
@@ -632,18 +637,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   horizontal: AppDims.size_8.w,
                   // vertical: AppDims.size_8.h,
                 ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscBrownyShop.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      'Browny\nShop',
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+                child: _buldIconShortCut(
+                  icon: Assets.iconShortcut.iscBrownyShop,
+                  title: 'Browny\nShop',
+                  // children: [
+                  //   Assets.iconShortcut.iscBrownyShop.image(
+                  //     width: AppDims.size_74.w,
+                  //     height: AppDims.size_42.h,
+                  //   ),
+                  //   AppText(
+                  //     'Browny\nShop',
+                  //     textAlign: TextAlign.center,
+                  //     style: context.textTheme.titleSmall,
+                  //   ),
+                  // ],
                 ),
               ),
 
@@ -660,18 +667,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     horizontal: AppDims.size_8.w,
                     // vertical: AppDims.size_8.h,
                   ),
-                  child: Column(
-                    children: [
-                      Assets.iconShortcut.iscLuckyScan.image(
-                        width: AppDims.size_64.w,
-                        height: AppDims.size_32.h,
-                      ),
-                      AppText(
-                        'Lucky\nScan',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleSmall,
-                      ),
-                    ],
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscLuckyScan,
+                    title: 'Lucky\nScan',
+                    // children: [
+                    //   Assets.iconShortcut.iscLuckyScan.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     'Lucky\nScan',
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
                   ),
                 ),
               ),
@@ -681,19 +690,22 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   horizontal: AppDims.size_8.w,
                   // vertical: AppDims.size_8.h,
                 ),
-                child: Column(
-                  children: [
-                    Assets.iconShortcut.iscTransactionHistory.image(
-                      width: AppDims.size_64.w,
-                      height: AppDims.size_32.h,
-                    ),
-                    AppText(
-                      // ประวัติ\nการใช้งาน
-                      context.wording.usageHistory,
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.titleSmall,
-                    ),
-                  ],
+                child: _buldIconShortCut(
+                  icon: Assets.iconShortcut.iscTransactionHistory,
+                  // ประวัติ\nการใช้งาน
+                  title: context.wording.usageHistory,
+                  // children: [
+                  //   Assets.iconShortcut.iscTransactionHistory.image(
+                  //     width: AppDims.size_74.w,
+                  //     height: AppDims.size_42.h,
+                  //   ),
+                  //   AppText(
+                  //     // ประวัติ\nการใช้งาน
+                  //     context.wording.usageHistory,
+                  //     textAlign: TextAlign.center,
+                  //     style: context.textTheme.titleSmall,
+                  //   ),
+                  // ],
                 ),
               ),
 
@@ -707,19 +719,22 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     horizontal: AppDims.size_8.w,
                     // vertical: AppDims.size_8.h,
                   ),
-                  child: Column(
-                    children: [
-                      Assets.iconShortcut.iscContact.image(
-                        width: AppDims.size_64.w,
-                        height: AppDims.size_32.h,
-                      ),
-                      AppText(
-                        // ติดต่อ\nสอบถาม
-                        context.wording.contactInquiry,
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleSmall,
-                      ),
-                    ],
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscContact,
+                    // ติดต่อ\nสอบถาม
+                    title: context.wording.contactInquiry,
+                    // children: [
+                    //   Assets.iconShortcut.iscContact.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     // ติดต่อ\nสอบถาม
+                    //     context.wording.contactInquiry,
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
                   ),
                 ),
               ),
@@ -735,18 +750,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     horizontal: AppDims.size_8.w,
                     // vertical: AppDims.size_8.h,
                   ),
-                  child: Column(
-                    children: [
-                      Assets.iconShortcut.iscBrownyId.image(
-                        width: AppDims.size_64.w,
-                        height: AppDims.size_32.h,
-                      ),
-                      AppText(
-                        'Browny ID',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleSmall,
-                      ),
-                    ],
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscBrownyId,
+                    title: 'Browny ID',
+                    // children: [
+                    //   Assets.iconShortcut.iscBrownyId.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     'Browny ID',
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
                   ),
                 ),
               ),
@@ -754,6 +771,25 @@ class _HomePageWidgetState extends State<HomePageWidget>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buldIconShortCut({
+    required AssetGenImage icon,
+    required String title,
+  }) {
+    return Column(
+      children: [
+        icon.image(
+          width: AppDims.size_74.w,
+          height: AppDims.size_42.h,
+        ),
+        AppText(
+          title,
+          textAlign: TextAlign.center,
+          style: context.textTheme.titleSmall,
+        ),
+      ],
     );
   }
 

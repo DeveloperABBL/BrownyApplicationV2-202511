@@ -157,15 +157,21 @@ class _PopupDialogState extends State<PopupDialog> {
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    // visualDensity: VisualDensity.compact,
-                    onTap: () {
-                      context.pop();
-                      widget.onDismiss?.call(_dismissPopupForToday);
-                    },
-                    child: Assets.svg.icClosePopup.svg(
-                      width: 20.w,
-                      height: 20.h,
+                  child: Align(
+                    alignment: AlignmentGeometry.topStart,
+                    child: GestureDetector(
+                      // visualDensity: VisualDensity.compact,
+                      onTap: () {
+                        context.pop();
+                        widget.onDismiss?.call(_dismissPopupForToday);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(left: AppDims.size_8.w),
+                        child: Assets.svg.icClosePopup.svg(
+                          width: 20.w,
+                          height: 20.h,
+                        ),
+                      ),
                     ),
                   ),
                 ),

@@ -1,5 +1,6 @@
 # CHANGELOG
 ### DONG 2026-03-22
+* เพิ่มขนาด Icon Browny หน้า home
 * ปรับปรุงหน้า Festive scan ให้แสดง UI ตรงตาม Design
   - ปรับเพิ่มการทำงานปุ่ม ประวัติ
 
