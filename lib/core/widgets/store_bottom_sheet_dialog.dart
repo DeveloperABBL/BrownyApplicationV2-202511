@@ -95,7 +95,8 @@ class StoreBottomSheetDialog extends StatelessWidget {
         onPressed: null,
         icon: Assets.svg.icHeartRoundedGreen.svg(),
         label: AppText(
-          'สิ่งอำนวยความสะดวก',
+          // 'สิ่งอำนวยความสะดวก',
+          context.wording.facilities,
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: AppDims.size_16.sp,
           ),
@@ -155,7 +156,8 @@ class StoreBottomSheetDialog extends StatelessWidget {
         onPressed: null,
         icon: Assets.svg.icPawRoundedGreen.svg(),
         label: AppText(
-          'บริการ',
+          // 'บริการ',
+          context.wording.services,
           style: context.textTheme.labelLarge!.copyWith(
             fontSize: AppDims.size_16.sp,
           ),

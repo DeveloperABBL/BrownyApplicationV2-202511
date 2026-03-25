@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/festive
 import 'package:browny_applications_new/core/data/remote/models/response/lucky_draw_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/lucky_scan/repository/lucky_repo.dart';
+import 'package:browny_applications_new/feature/wallet/error/wallet_exception.dart';
 import 'package:flutter/foundation.dart';
 
 class LuckyViewmodel extends AppViewModel {
@@ -68,7 +69,9 @@ class LuckyViewmodel extends AppViewModel {
   }
 
   void resetFestiveHistoryNotifier() {
-    _festiveHistoryNotifier.value = UiResult.loading();
+    _festiveHistoryNotifier.value = UiResult.empty(
+      error: PenddingException(''),
+    );
   }
 
   /// API fetch ประวัติการร่วมกิจกรรม Lucky Scan ของลูกค้า

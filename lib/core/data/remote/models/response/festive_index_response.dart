@@ -57,7 +57,7 @@ class FestiveData {
   @JsonKey(name: 'remain')
   final ContentLocalizeData? remain;
 
-  @JsonKey(name: 'expired')
+  @JsonKey(name: 'expire')
   final ContentLocalizeData? expired;
 
   String getRemainDisplay(String locale) {

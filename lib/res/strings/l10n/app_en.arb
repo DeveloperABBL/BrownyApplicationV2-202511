@@ -440,7 +440,7 @@
     "voiceSearchNotSupported": "Your device does not support voice search",
     "machineAvailable": "Available",
     "machineOccupied": "Occupied",
-    "conditionsAndDetails": "Conditions & Details",
+    "conditionsAndDetails": "Conditions",
     "otherCampaigns": "Other Campaigns",
     "scanQrActivity": "Scan QR In-Store Activity",
     "noLuckyScanActivityTitle": "No Active Lucky Scan",

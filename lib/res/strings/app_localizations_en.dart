@@ -1232,7 +1232,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get machineOccupied => 'Occupied';
 
   @override
-  String get conditionsAndDetails => 'Conditions & Details';
+  String get conditionsAndDetails => 'Conditions';
 
   @override
   String get otherCampaigns => 'Other Campaigns';

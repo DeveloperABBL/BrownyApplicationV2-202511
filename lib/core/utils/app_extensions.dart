@@ -148,6 +148,8 @@ extension ResponseExtension on Response {
   bool get isBadRequest => statusCode != null && (statusCode! == 400);
 
   bool get isForbidden => statusCode != null && (statusCode! == 403);
+
+  bool get inInternalError => statusCode != null && (statusCode! == 500);
 }
 
 /// Extension ที่จัดการกับ [List] โดยสามารถเรียกผ่านตัวแปร null ได้เลย

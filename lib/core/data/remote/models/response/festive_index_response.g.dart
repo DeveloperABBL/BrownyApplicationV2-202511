@@ -36,9 +36,9 @@ FestiveData _$FestiveDataFromJson(Map<String, dynamic> json) => FestiveData(
   remain: json['remain'] == null
       ? null
       : ContentLocalizeData.fromJson(json['remain'] as Map<String, dynamic>),
-  expired: json['expired'] == null
+  expired: json['expire'] == null
       ? null
-      : ContentLocalizeData.fromJson(json['expired'] as Map<String, dynamic>),
+      : ContentLocalizeData.fromJson(json['expire'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$FestiveDataToJson(FestiveData instance) =>
@@ -49,5 +49,5 @@ Map<String, dynamic> _$FestiveDataToJson(FestiveData instance) =>
       'title': instance.title,
       'message': instance.message,
       'remain': instance.remain,
-      'expired': instance.expired,
+      'expire': instance.expired,
     };

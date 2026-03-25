@@ -25,6 +25,11 @@ class PenddingException extends WalletException {
   PenddingException([super.message]);
 
   @override
+  String toString() {
+    return super.message.orEmpty;
+  }
+
+  @override
   String toUiMessage(BuildContext context) {
     return '';
   }

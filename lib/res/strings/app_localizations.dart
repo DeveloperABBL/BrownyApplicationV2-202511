@@ -2455,7 +2455,7 @@ abstract class AppLocalizations {
   /// No description provided for @conditionsAndDetails.
   ///
   /// In en, this message translates to:
-  /// **'Conditions & Details'**
+  /// **'Conditions'**
   String get conditionsAndDetails;
 
   /// No description provided for @otherCampaigns.

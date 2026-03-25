@@ -68,32 +68,37 @@ class _HomePageWidgetState extends State<HomePageWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _viewmodel.attachContext(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // ดึง Banner
-      await _viewmodel.fetchBannersHighlight();
-      // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
-      await _viewmodel.fetchWorkingMachines();
-
-      if (mounted) {
-        // ดึงข้อมูลแสดง Popup เพื่อนเชิญเพื่อน ของวันนี้
-        final showInvitFriendToday = await _viewmodel
-            .fetchPopupInivitFriendForToday();
-        if (mounted && showInvitFriendToday.data!) {
-          await InvitBottomSheetDialog.showInvitBottomSheet(
-            context,
-            _viewmodel,
-          );
-          // flag ว่าวันนี้ขึ้น Popup เพื่อนเชิญเพื่อน ของวันนี้
-          _viewmodel.dismissInvitFriendForToday();
-        }
-
-        if (!mounted) return;
-        // ดึง Popup โฆษณา
-        await _fetchPopups(context);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _viewmodel.attachContext(context);
+      GoRouter.of(context).routerDelegate.addListener(_onRouteChanged);
+      _initialFetch();
     });
+  }
+
+  Future<void> _initialFetch() async {
+    // ดึง Banner
+    await _viewmodel.fetchBannersHighlight();
+    // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
+    await _viewmodel.fetchWorkingMachines();
+
+    if (mounted) {
+      // ดึงข้อมูลแสดง Popup เพื่อนเชิญเพื่อน ของวันนี้
+      final showInvitFriendToday = await _viewmodel
+          .fetchPopupInivitFriendForToday();
+      if (mounted && showInvitFriendToday.data!) {
+        await InvitBottomSheetDialog.showInvitBottomSheet(
+          context,
+          _viewmodel,
+        );
+        // flag ว่าวันนี้ขึ้น Popup เพื่อนเชิญเพื่อน ของวันนี้
+        _viewmodel.dismissInvitFriendForToday();
+      }
+
+      if (!mounted) return;
+      // ดึง Popup โฆษณา
+      await _fetchPopups(context);
+    }
   }
 
   Future<void> _fetchPopups(BuildContext context) async {
@@ -120,8 +125,18 @@ class _HomePageWidgetState extends State<HomePageWidget>
     }
   }
 
+  void _onRouteChanged() {
+    final location = GoRouter.of(
+      context,
+    ).routeInformationProvider.value.uri.path;
+    if (location == HomePage.pagePath && mounted) {
+      _viewmodel.fetchWorkingMachines();
+    }
+  }
+
   @override
   void dispose() {
+    GoRouter.of(context).routerDelegate.removeListener(_onRouteChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -286,9 +301,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
                               context,
                               machineId: data.pathSegments.last,
                             );
-                            if (mounted) {
-                              await _viewmodel.fetchWorkingMachines();
-                            }
+                            // if (mounted) {
+                            //   await _viewmodel.fetchWorkingMachines();
+                            // }
                           }
 
                           // MachineStatusPage.goToPage(context, machineId: '13');
@@ -357,9 +372,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
               context,
               initialIndex: 0,
             );
-            if (mounted) {
-              await _viewmodel.fetchWorkingMachines();
-            }
+            // if (mounted) {
+            //   await _viewmodel.fetchWorkingMachines();
+            // }
           },
           onTap: (context, index) async {
             debugPrint(index.toString());
@@ -368,17 +383,17 @@ class _HomePageWidgetState extends State<HomePageWidget>
               await CouponVoucherPage.goToPage(
                 context,
               );
-              if (mounted) {
-                await _viewmodel.fetchWorkingMachines();
-              }
+              // if (mounted) {
+              //   await _viewmodel.fetchWorkingMachines();
+              // }
               return;
             }
 
             if (index == 2) {
               await context.pushNamed(MapPage.pageName);
-              if (mounted) {
-                await _viewmodel.fetchWorkingMachines();
-              }
+              // if (mounted) {
+              //   await _viewmodel.fetchWorkingMachines();
+              // }
               return;
             }
           },

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/festive_index_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/lucky_draw_response.dart';
 import 'package:browny_applications_new/feature/lucky_scan/repository/lucky_repo.dart';
@@ -8,6 +9,8 @@ import 'package:browny_applications_new/feature/lucky_scan/viewmodel/lucky_viewm
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/wallet/error/wallet_exception.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -118,6 +121,38 @@ class _LuckyScanContentState extends State<LuckyScanContent>
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      persistentFooterDecoration: BoxDecoration(),
+      persistentFooterButtons: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              if (kDebugMode) {
+                _onScanResult(
+                  'http://brownypay.com/lucky/draw/3cd789cf-0c35-4006-a5f5-fa9ef09d7e37',
+                );
+                return;
+              }
+              ScannerPage.goToPage(
+                context,
+                process: ScannerProcess.needResult,
+              ).then((qrData) async {
+                if (qrData != null && context.mounted) {
+                  _onScanResult(qrData);
+                }
+              });
+            },
+            iconAlignment: IconAlignment.end,
+            icon: Assets.svg.icScan2.svg(
+              colorFilter: ColorFilter.mode(
+                AppColors.white,
+                BlendMode.srcIn,
+              ),
+            ),
+            label: AppText(context.wording.scanQrActivity),
+          ),
+        ),
+      ],
       appBar: AppBar(
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         automaticallyImplyLeading: false,
@@ -166,7 +201,6 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                 GestureDetector(
                   onTap: () async {
                     await _showFestiveHistory(context);
-                    _viewmodel.resetFestiveHistoryNotifier();
                   },
                   child: ClipRect(
                     clipBehavior: Clip.antiAlias,
@@ -362,6 +396,7 @@ class _LuckyScanContentState extends State<LuckyScanContent>
   }
 
   Future<dynamic> _showFestiveHistory(BuildContext context) {
+    Future.microtask(_viewmodel.fetchFestiveHistory);
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Allow content to exceed half screen
@@ -399,7 +434,6 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                   valueListenable: _viewmodel.festiveHistoryNotifier,
                   builder: (context, result, child) {
                     if (result.isLoading) {
-                      Future.microtask(_viewmodel.fetchFestiveHistory);
                       return Center(
                         child: CircularProgressIndicator(),
                       );
@@ -528,7 +562,9 @@ class _LuckyScanContentState extends State<LuckyScanContent>
   ) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: 32.h,
+        left: AppDims.size_4.w,
+        right: AppDims.size_16.w,
+        // bottom: 32.h,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -549,57 +585,37 @@ class _LuckyScanContentState extends State<LuckyScanContent>
             },
           ),
 
-          SizedBox(height: AppDims.size_16.h),
+          // SizedBox(height: AppDims.size_16.h),
           // Scan QR button
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                ScannerPage.goToPage(
-                  context,
-                  process: ScannerProcess.needResult,
-                ).then((qrData) async {
-                  if (qrData != null && context.mounted) {
-                    AppOverlays.showLoading(context);
-                    final result = await _viewmodel.postLuckyDraw(
-                      qrCode: qrData,
-                    );
-
-                    if (!context.mounted) return;
-                    AppOverlays.hideLoading();
-
-                    if (result.hasError) {
-                      AppOverlays.showBrownyDialog(
-                        context,
-                        title: context.wording.errorOccurred,
-                        message: result.error.toString(),
-                      );
-                      return;
-                    }
-
-                    if (result.isEmpty) {
-                      AppOverlays.showBrownyDialog(
-                        context,
-                        title: context.wording.errorOccurred,
-                        message: context.wording.errorUi,
-                      );
-                      return;
-                    }
-
-                    _showLucyScanResult(context, result.data!);
-                  }
-                });
-              },
-              iconAlignment: IconAlignment.end,
-              icon: Assets.svg.icScan2.svg(
-                colorFilter: ColorFilter.mode(
-                  AppColors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-              label: AppText(context.wording.scanQrActivity),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+          //   child: ElevatedButton.icon(
+          //     onPressed: () async {
+          //       if (kDebugMode) {
+          //         _onScanResult(
+          //           'http://brownypay.com/lucky/draw/3cd789cf-0c35-4006-a5f5-fa9ef09d7e37',
+          //         );
+          //         return;
+          //       }
+          //       ScannerPage.goToPage(
+          //         context,
+          //         process: ScannerProcess.needResult,
+          //       ).then((qrData) async {
+          //         if (qrData != null && context.mounted) {
+          //           _onScanResult(qrData);
+          //         }
+          //       });
+          //     },
+          //     iconAlignment: IconAlignment.end,
+          //     icon: Assets.svg.icScan2.svg(
+          //       colorFilter: ColorFilter.mode(
+          //         AppColors.white,
+          //         BlendMode.srcIn,
+          //       ),
+          //     ),
+          //     label: AppText(context.wording.scanQrActivity),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -670,23 +686,21 @@ class _LuckyScanContentState extends State<LuckyScanContent>
             children: [
               AppText(
                 item.getTitleDisplay(locale),
-                style: context.textTheme.bodyMedium,
+                style: context.textTheme.labelLarge!.copyWith(
+                  fontSize: AppDims.size_16.sp,
+                ),
               ),
               SizedBox(height: AppDims.size_4.h),
               Row(
                 children: [
-                  Assets.svg.icTicket.svg(
-                    width: 14.w,
-                    colorFilter: ColorFilter.mode(
-                      AppColors.gray500,
-                      BlendMode.srcIn,
-                    ),
+                  Assets.luckyScan.icTicket.image(
+                    width: AppDims.size_16.w,
                   ),
                   SizedBox(width: AppDims.size_4.w),
                   AppText(
                     // 'เหลือ ${item.remain} สิทธิ์',
                     item.getRemainDisplay(locale),
-                    style: context.textTheme.labelSmall!.copyWith(
+                    style: context.textTheme.bodyMedium!.copyWith(
                       color: AppColors.gray500,
                     ),
                   ),
@@ -695,18 +709,14 @@ class _LuckyScanContentState extends State<LuckyScanContent>
               SizedBox(height: AppDims.size_2.h),
               Row(
                 children: [
-                  Assets.luckyScan.icClock.svg(
-                    width: 14.w,
-                    colorFilter: ColorFilter.mode(
-                      AppColors.gray500,
-                      BlendMode.srcIn,
-                    ),
+                  Assets.luckyScan.icClock2.image(
+                    width: AppDims.size_16.w,
                   ),
                   SizedBox(width: AppDims.size_4.w),
                   AppText(
                     // 'หมดเขต ${item.expiredDate}',
                     item.getExpiredDesisplay(locale),
-                    style: context.textTheme.labelSmall!.copyWith(
+                    style: context.textTheme.bodyMedium!.copyWith(
                       color: AppColors.gray500,
                     ),
                   ),
@@ -719,10 +729,77 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     );
   }
 
+  Future<void> _onScanResult(String qrData) async {
+    AppOverlays.showLoading(context);
+    final result = await _viewmodel.postLuckyDraw(
+      qrCode: qrData,
+    );
+
+    if (!mounted) return;
+    AppOverlays.hideLoading();
+
+    if (result.hasError) {
+      if (result.error is Unprocessable) {
+        AppOverlays.showBrownyDialog(
+          context,
+          title: ContentLocalizeData(
+            en: 'Invalid QR Code',
+            zh: '无效的二维码',
+            th: 'QR Code ไม่ถูกต้อง',
+          ).getTextByLocale(context.languageCode),
+          message: ContentLocalizeData(
+            en: 'Please scan the “Lucky Scan” QR Code inside Browny store',
+            zh: '请扫描Browny店内的”Lucky Scan”二维码',
+            th: 'กรุณาสแกนที่ QR Code “Lucky Scan” ภายในร้าน Browny',
+          ).getTextByLocale(context.languageCode),
+        );
+        return;
+      }
+
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: result.error.toString(),
+      );
+      return;
+    }
+
+    if (result.isEmpty) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: context.wording.errorOccurred,
+        message: context.wording.errorUi,
+      );
+      return;
+    }
+
+    _showLucyScanResult(context, result.data!);
+  }
+
+  /// DONG
+  ///
+  /// แสดงผลการ Scan festive
   Future<void> _showLucyScanResult(
     BuildContext context,
     LuckyDrawResponse type,
   ) async {
+    if (type.isScannedToday) {
+      AppOverlays.showBrownyDialog(
+        context,
+        title: ContentLocalizeData(
+          en: 'You have already scanned this activity',
+          zh: '您已扫描过此活动',
+          th: 'คุณแสกนกิจกรรมนี้ไปแล้ว',
+        ).getTextByLocale(context.languageCode),
+        message: ContentLocalizeData(
+          en: 'Please come back and play again tomorrow',
+          zh: '请明天再来参与活动吧',
+          th: 'รอเล่นกิจกรรมในวันถัดไปนะ',
+        ).getTextByLocale(context.languageCode),
+      );
+      return;
+    }
+
     Gradient gradientType = AppColors.popupFestiveFailedGradient;
     if (type.isWon) {
       gradientType = AppColors.popupFestiveWonGradient;
@@ -783,7 +860,7 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                             children: [
                               // AppDims.vericalPadding_16,
                               SizedBox(
-                                height: 200.h,
+                                height: 186.h,
                               ),
 
                               // AppDims.vericalPadding_16,
@@ -802,17 +879,71 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                                             color: AppColors.primary,
                                           ),
                                     ),
-                                    AppDims.vericalPadding_10,
+                                    // AppDims.vericalPadding_10,
 
-                                    AppText(
-                                      type.getMessageDisplay(
+                                    // AppText(
+                                    //   type.getMessageDisplay(
+                                    //     context.languageCode,
+                                    //   ),
+                                    //   textAlign: TextAlign.start,
+                                    //   style: context.textTheme.labelMedium!
+                                    //       .copyWith(
+                                    //         color: AppColors.gray600,
+                                    //       ),
+                                    // ),
+                                    Html(
+                                      data: type.getMessageDisplay(
                                         context.languageCode,
                                       ),
-                                      textAlign: TextAlign.start,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(
-                                            color: AppColors.gray600,
+                                      style: {
+                                        "p": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
                                           ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "p.fancy": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          textAlign: TextAlign.start,
+                                          margin: Margins.zero,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.gray600,
+                                        ),
+                                        "ul": Style(
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          padding: HtmlPaddings.only(
+                                            left: 16,
+                                          ), // ลด indent ของ bullet list
+                                          margin: Margins.zero,
+                                        ),
+                                        "li": Style(
+                                          fontSize: FontSize(
+                                            AppDims.size_12.sp,
+                                          ),
+                                          fontFamily:
+                                              GoogleFonts.prompt().fontFamily,
+                                          padding: HtmlPaddings.zero,
+                                          margin: Margins.only(
+                                            bottom: 2,
+                                          ), // ลดช่องว่างระหว่าง item
+                                          color: AppColors.gray600,
+                                        ),
+                                      },
                                     ),
                                     AppDims.vericalPadding_16,
 
@@ -840,6 +971,7 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                   top: -45.w,
                   child: Image.network(
                     type.getBannerDisplay(context.languageCode),
+                    fit: BoxFit.cover,
                     width: 250.w,
                     errorBuilder: (_, _, _) => Image.asset(
                       bannerDisplay,

@@ -248,8 +248,10 @@ class _WalletWidgetState extends State<WalletWidget> {
                             valueListenable: _viewModel.procesStateNotfier,
                             builder: (context, state, _) {
                               return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                spacing: AppDims.size_16.w,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                // mainAxisAlignment:
+                                //     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Column(
                                     children: [
@@ -264,6 +266,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                                       ),
                                       AppDims.vericalPadding_2,
                                       AppText(
+                                        // เติมเงิน
                                         context.wording.topup,
                                         style: context.textTheme.bodySmall!
                                             .copyWith(

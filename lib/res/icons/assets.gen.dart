@@ -340,6 +340,14 @@ class $AssetsLuckyScanGen {
   SvgGenImage get icClock =>
       const SvgGenImage('assets/lucky_scan/ic_clock.svg');
 
+  /// File path: assets/lucky_scan/ic_clock_2.png
+  AssetGenImage get icClock2 =>
+      const AssetGenImage('assets/lucky_scan/ic_clock_2.png');
+
+  /// File path: assets/lucky_scan/ic_ticket.png
+  AssetGenImage get icTicket =>
+      const AssetGenImage('assets/lucky_scan/ic_ticket.png');
+
   /// List of all assets
   List<dynamic> get values => [
     a02Login1094,
@@ -348,6 +356,8 @@ class $AssetsLuckyScanGen {
     brownyLose,
     brownyWon,
     icClock,
+    icClock2,
+    icTicket,
   ];
 }
 
