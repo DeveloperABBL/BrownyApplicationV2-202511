@@ -34,15 +34,15 @@ class DevEnvironment extends AppEvnironment {
     // 1. สร้าง API Config call ไปที่ Enviroment DEV
     apiConfig = ApiConfigs(
       // dev API
-      // baseUrl: 'https://dev.abgroup.co.th/api',
-      baseUrl: const String.fromEnvironment(
-        kBaseUrl,
-      ),
+      baseUrl: 'https://gateway2026.abgroup.co.th/api',
+      // baseUrl: const String.fromEnvironment(
+      //   kBaseUrl,
+      // ),
       // dev token
-      // token: '8074cac22d628c5d71dbb635504e25a7fc04e05a5e4b327f30a20674bead82eb',
-      token: const String.fromEnvironment(
-        kToken,
-      ),
+      token: '805013f53dd5661a17100031f32a6658cef57fba37bcfecedac0ab1d4f93169c',
+      // token: const String.fromEnvironment(
+      //   kToken,
+      // ),
       clientVersion: appVersion,
     );
 

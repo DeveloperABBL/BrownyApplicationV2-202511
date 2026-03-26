@@ -249,6 +249,9 @@ extension PackageDetailDataDisplay on PackageDetailData {
   /// แปลง qty_dryer เป็น int
   int get qtyDryerValue => int.tryParse(qtyDryer ?? '0') ?? 0;
 
+  /// แปลง qty_shared เป็น int
+  int get qtySharedValue => int.tryParse(qtyShared ?? '0') ?? 0;
+
   /// แปลง distance meters เป็น double
   double get distanceMetersValue =>
       double.tryParse(store?.distanceMeters ?? '0') ?? 0.0;

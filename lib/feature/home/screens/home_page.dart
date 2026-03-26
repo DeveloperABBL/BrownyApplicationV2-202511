@@ -63,15 +63,17 @@ class HomePageWidget extends StatefulWidget {
 class _HomePageWidgetState extends State<HomePageWidget>
     with WidgetsBindingObserver {
   HomePageViewmodel get _viewmodel => context.read<HomePageViewmodel>();
+  late final GoRouterDelegate _routerDelegate;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _routerDelegate = GoRouter.of(context).routerDelegate;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _viewmodel.attachContext(context);
-      GoRouter.of(context).routerDelegate.addListener(_onRouteChanged);
+      _routerDelegate.addListener(_onRouteChanged);
       _initialFetch();
     });
   }
@@ -136,7 +138,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   @override
   void dispose() {
-    GoRouter.of(context).routerDelegate.removeListener(_onRouteChanged);
+    _routerDelegate.removeListener(_onRouteChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -567,9 +569,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
                           }
                         : null,
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppDims.size_8.w,
-                        // vertical: AppDims.size_8.h,
+                      padding: EdgeInsets.only(
+                        left: AppDims.size_4.w,
+                        right: AppDims.size_18.w,
                       ),
                       child: Column(
                         children: [
@@ -595,7 +597,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: AppDims.size_8.w,
+                    horizontal: AppDims.size_2.w,
                     // vertical: AppDims.size_8.h,
                   ),
                   child: _buldIconShortCut(
@@ -619,7 +621,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
+                  horizontal: AppDims.size_2.w,
                   // vertical: AppDims.size_8.h,
                 ),
                 child: GestureDetector(
@@ -649,7 +651,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 //   backgroundBlendMode: BlendMode.saturation,
                 // ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
+                  horizontal: AppDims.size_2.w,
                   // vertical: AppDims.size_8.h,
                 ),
                 child: _buldIconShortCut(
@@ -679,7 +681,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: AppDims.size_8.w,
+                    horizontal: AppDims.size_2.w,
                     // vertical: AppDims.size_8.h,
                   ),
                   child: _buldIconShortCut(
@@ -702,7 +704,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_8.w,
+                  horizontal: AppDims.size_2.w,
                   // vertical: AppDims.size_8.h,
                 ),
                 child: _buldIconShortCut(
@@ -731,7 +733,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: AppDims.size_8.w,
+                    horizontal: AppDims.size_2.w,
                     // vertical: AppDims.size_8.h,
                   ),
                   child: _buldIconShortCut(
@@ -762,7 +764,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: AppDims.size_8.w,
+                    horizontal: AppDims.size_2.w,
                     // vertical: AppDims.size_8.h,
                   ),
                   child: _buldIconShortCut(

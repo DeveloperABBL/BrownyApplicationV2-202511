@@ -2,7 +2,6 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -96,7 +95,7 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
                 backgroundBlendMode: BlendMode.saturation,
               )
             : null,
-        height: 90.h,
+        height: 86.h,
         margin: EdgeInsets.only(bottom: AppDims.size_12),
         decoration: BoxDecoration(
           border: BoxBorder.all(
@@ -111,22 +110,11 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
             // Icon
             Container(
               width: 85.w,
-              // height: 85.h,
-              padding: EdgeInsets.all(12),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                // border: BoxBorder.fromLTRB(
-                //   right: BorderSide(
-                //     width: 1,
-                //     color: AppColors.primary,
-                //   ),
-                // ),
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: Assets.png.cardIcBackground.provider(),
-                ),
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(8.r),
                   topLeft: Radius.circular(8.r),
+                  bottomLeft: Radius.circular(8.r),
                 ),
               ),
               child: widget.icon,

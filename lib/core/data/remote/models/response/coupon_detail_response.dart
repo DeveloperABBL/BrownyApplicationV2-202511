@@ -122,6 +122,9 @@ class PackageDetailData {
   @JsonKey(name: 'qty_dryer')
   final String? qtyDryer;
 
+  @JsonKey(name: 'qty_shared')
+  final String? qtyShared;
+
   @JsonKey(name: 'normal_price')
   final String? normalPrice;
 
@@ -143,6 +146,7 @@ class PackageDetailData {
     this.price,
     this.qtyWasher,
     this.qtyDryer,
+    this.qtyShared,
     this.normalPrice,
     this.discountPercent,
     this.brownyCoin,
