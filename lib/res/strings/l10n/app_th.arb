@@ -384,6 +384,7 @@
     "cannotLoadCouponData": "ไม่สามารถโหลดข้อมูลคูปองได้",
     "dataNotFound": "ไม่พบข้อมูล",
     "washTimesLabel": "ซัก\n{count} ครั้ง",
+    "washAndDryTimesLabel": "ซัก/อบ\n{count} ครั้ง",
     "dryTimesLabel": "อบ\n{count} ครั้ง",
     "facilities": "สิ่งอำนวยความสะดวก",
     "locationAccessDeniedTitle": "ไม่สามารถเข้าถึงตำแหน่งได้",
@@ -419,5 +420,12 @@
   "savedAmount": "ประหยัดไป",
   "totalPayment": "ยอดชำระทั้งหมด",
   "disableLocationTitle": "ปิดการเข้าถึงตำแหน่ง",
-  "disableLocationMessage": "หากต้องการปิดสิทธิ์ การเข้าถึงตำแหน่ง กรุณาไปปิดในการตั้งค่าของอุปกรณ์"
+  "disableLocationMessage": "หากต้องการปิดสิทธิ์ การเข้าถึงตำแหน่ง กรุณาไปปิดในการตั้งค่าของอุปกรณ์",
+  "helpCenter": "ศูนย์ความช่วยเหลือ",
+  "conditions": "เงื่อนไข",
+  "collectCoins": "รับคอยน์",
+  "collectTomorrow": "รับพรุ่งนี้",
+  "collectCoinSuccess": "รับ Browny Coin สำเร็จ",
+  "collectCoinMotivation": "เก็บต่อทุกวัน สิทธิประโยชน์ดีๆ รออยู่เพียบ!",
+  "today": "วันนี้"
 }

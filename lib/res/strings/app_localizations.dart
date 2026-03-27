@@ -2410,6 +2410,12 @@ abstract class AppLocalizations {
   /// **'Wash\n{count} times'**
   String washTimesLabel(String count);
 
+  /// No description provided for @washAndDryTimesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wash/Dry\n{count} times'**
+  String washAndDryTimesLabel(String count);
+
   /// No description provided for @dryTimesLabel.
   ///
   /// In en, this message translates to:
@@ -2619,6 +2625,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To disable location access, please go to the device settings'**
   String get disableLocationMessage;
+
+  /// No description provided for @helpCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center'**
+  String get helpCenter;
+
+  /// No description provided for @conditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions'**
+  String get conditions;
+
+  /// No description provided for @collectCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect Coins'**
+  String get collectCoins;
+
+  /// No description provided for @collectTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect Tomorrow'**
+  String get collectTomorrow;
+
+  /// No description provided for @collectCoinSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Coin Collected Successfully'**
+  String get collectCoinSuccess;
+
+  /// No description provided for @collectCoinMotivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep collecting every day, great benefits await!'**
+  String get collectCoinMotivation;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
 }
 
 class _AppLocalizationsDelegate

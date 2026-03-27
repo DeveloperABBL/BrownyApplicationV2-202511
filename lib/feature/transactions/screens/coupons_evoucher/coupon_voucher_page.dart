@@ -1016,10 +1016,10 @@ class _CustomerWashDryCouponWidgetState
           customerDiscount.imageUrlDisplay(context),
           errorBuilder: (_, _, _) => _onImageError(),
         ),
-        title: customerDiscount.nameDisplay(
+        title: customerDiscount.packageNameDisplay(
           context,
         ),
-        description: customerDiscount.couponDescriptionNonHTMLDisplay(
+        description: customerDiscount.storeNameDisplay(
           context,
         ),
         detailUsing: customerDiscount.usageLabelDisplay(
@@ -1313,7 +1313,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                 Expanded(
                   child: AppText(
                     // 'แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.',
-                    'แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.',
+                    context.wording.showNearbyEVoucherPackages,
                     style: context.textTheme.titleSmall!.copyWith(
                       color: AppColors.gray600,
                     ),

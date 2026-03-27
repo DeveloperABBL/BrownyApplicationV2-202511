@@ -37,9 +37,9 @@ class CoinHistoryData {
   @JsonKey(name: 'expire_coin')
   final String? expireCoin;
 
-  @DateTimeConverter()
+  // @DateTimeConverter()
   @JsonKey(name: 'expire_date')
-  final DateTime? expireDate;
+  final ContentLocalizeData? expireDate;
 
   @JsonKey(name: 'history')
   final List<CoinHistoryItem>? history;
@@ -69,19 +69,20 @@ class CoinHistoryData {
   }
 
   String getExpiredDateDisplay(String locale) {
-    if (expireDate == null) return '-';
-    final dateFormat = expireDate!.formatDateLocale(
-      locale,
-      pattern: 'dd MMMM yyyy',
-    );
-    switch (locale) {
-      case 'en':
-        return 'You have ${expireCoin.ifNullOrEmpty('-')} coins expiring on $dateFormat';
-      case 'zh':
-        return '您有${expireCoin.ifNullOrEmpty('-')}枚硬币将在$dateFormat过期';
-      default:
-        return 'คุณมี ${expireCoin.ifNullOrEmpty('-')} คอยน์ ที่จะหมดอายุใน $dateFormat';
-    }
+    return expireDate?.getByLocaleCode(locale) ?? '-';
+    // if (expireDate == null) return '-';
+    // final dateFormat = expireDate!.formatDateLocale(
+    //   locale,
+    //   pattern: 'dd MMMM yyyy',
+    // );
+    // switch (locale) {
+    //   case 'en':
+    //     return 'You have ${expireCoin.ifNullOrEmpty('-')} coins expiring on $dateFormat';
+    //   case 'zh':
+    //     return '您有${expireCoin.ifNullOrEmpty('-')}枚硬币将在$dateFormat过期';
+    //   default:
+    //     return 'คุณมี ${expireCoin.ifNullOrEmpty('-')} คอยน์ ที่จะหมดอายุใน $dateFormat';
+    // }
   }
 }
 

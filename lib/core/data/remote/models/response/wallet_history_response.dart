@@ -90,27 +90,27 @@ class WalletHistoryItem {
     if (type.orEmpty == 'purchase') {
       switch (locale) {
         case 'en':
-          return 'โอนเงิน/ชำระเงิน';
+          return 'Transfer / Payment';
         case 'zh':
-          return 'โอนเงิน/ชำระเงิน';
+          return '转账 / 支付';
         default:
           return 'โอนเงิน/ชำระเงิน';
       }
     } else if (type.orEmpty == 'refund') {
       switch (locale) {
         case 'en':
-          return 'คืนเงิน';
+          return 'Refund';
         case 'zh':
-          return 'คืนเงิน';
+          return '退款';
         default:
           return 'คืนเงิน';
       }
     } else if (type.orEmpty == 'top_up') {
       switch (locale) {
         case 'en':
-          return 'เติมเงิน';
+          return 'Top-up';
         case 'zh':
-          return 'เติมเงิน';
+          return '充值';
         default:
           return 'เติมเงิน';
       }

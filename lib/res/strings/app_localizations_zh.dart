@@ -1176,6 +1176,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String washAndDryTimesLabel(String count) {
+    return '洗/烘\n$count 次';
+  }
+
+  @override
   String dryTimesLabel(String count) {
     return '烘\n$count 次';
   }
@@ -1281,4 +1286,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get disableLocationMessage => '如需关闭位置访问权限，请前往设备设置中关闭';
+
+  @override
+  String get helpCenter => '帮助中心';
+
+  @override
+  String get conditions => '条件';
+
+  @override
+  String get collectCoins => '领取金币';
+
+  @override
+  String get collectTomorrow => '明天领取';
+
+  @override
+  String get collectCoinSuccess => '成功领取Browny金币';
+
+  @override
+  String get collectCoinMotivation => '每天坚持领取，丰厚奖励等着你！';
+
+  @override
+  String get today => '今天';
 }

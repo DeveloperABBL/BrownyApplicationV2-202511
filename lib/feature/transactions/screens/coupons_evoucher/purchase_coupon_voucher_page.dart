@@ -356,7 +356,7 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
 
                   if (packageData.qtySharedValue > 0)
                     _buildConditionItem(
-                      wording: context.wording.washTimesLabel(
+                      wording: context.wording.washAndDryTimesLabel(
                         '${packageData.qtySharedValue}',
                       ),
                       icon: Assets.svg.icWashRoundedGreen.svg(

@@ -127,12 +127,12 @@ class _LuckyScanContentState extends State<LuckyScanContent>
           padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
           child: ElevatedButton.icon(
             onPressed: () async {
-              if (kDebugMode) {
-                _onScanResult(
-                  'http://brownypay.com/lucky/draw/3cd789cf-0c35-4006-a5f5-fa9ef09d7e37',
-                );
-                return;
-              }
+              // if (kDebugMode) {
+              //   _onScanResult(
+              //     'http://brownypay.com/lucky/draw/3cd789cf-0c35-4006-a5f5-fa9ef09d7e37',
+              //   );
+              //   return;
+              // }
               ScannerPage.goToPage(
                 context,
                 process: ScannerProcess.needResult,

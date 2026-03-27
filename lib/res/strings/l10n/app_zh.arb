@@ -381,6 +381,7 @@
   "cannotLoadCouponData": "无法加载优惠券数据",
   "dataNotFound": "未找到数据",
   "washTimesLabel": "洗\n{count} 次",
+  "washAndDryTimesLabel": "洗/烘\n{count} 次",
   "dryTimesLabel": "烘\n{count} 次",
   "facilities": "设施",
   "locationAccessDeniedTitle": "无法获取位置权限",
@@ -417,5 +418,12 @@
   "savedAmount": "已优惠",
   "totalPayment": "实付总额",
   "disableLocationTitle": "关闭位置访问",
-  "disableLocationMessage": "如需关闭位置访问权限，请前往设备设置中关闭"
+  "disableLocationMessage": "如需关闭位置访问权限，请前往设备设置中关闭",
+  "helpCenter": "帮助中心",
+  "conditions": "条件",
+  "collectCoins": "领取金币",
+  "collectTomorrow": "明天领取",
+  "collectCoinSuccess": "成功领取Browny金币",
+  "collectCoinMotivation": "每天坚持领取，丰厚奖励等着你！",
+  "today": "今天"
 }

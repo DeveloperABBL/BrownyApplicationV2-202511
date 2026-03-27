@@ -1,6 +1,7 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class CustomerCouponModel extends CouponData {
@@ -23,8 +24,13 @@ class CustomerCouponModel extends CouponData {
     super.store,
     super.qtyWasher,
     super.qtyDryer,
+    super.qtyTotal,
+    super.qtyShared,
     super.remainWasher,
     super.remainDryer,
+    super.remainTotal,
+    super.remainShared,
+    super.usageMode,
     super.totalUses,
     super.redemptionLimit,
     super.redeemPrice,
@@ -59,8 +65,13 @@ class CustomerCouponModel extends CouponData {
       store: data.store,
       qtyWasher: data.qtyWasher,
       qtyDryer: data.qtyDryer,
+      qtyTotal: data.qtyTotal,
+      qtyShared: data.qtyShared,
       remainWasher: data.remainWasher,
       remainDryer: data.remainDryer,
+      remainTotal: data.remainTotal,
+      remainShared: data.remainShared,
+      usageMode: data.usageMode,
       totalUses: data.totalUses,
       redemptionLimit: data.redemptionLimit,
       redeemPrice: data.redeemPrice,
@@ -89,8 +100,13 @@ class CustomerCouponModel extends CouponData {
     CouponStoreData? store,
     String? qtyWasher,
     String? qtyDryer,
+    String? qtyTotal,
+    String? qtyShared,
     String? remainWasher,
     String? remainDryer,
+    String? remainTotal,
+    String? remainShared,
+    String? usageMode,
     String? totalUses,
     String? redemptionLimit,
     String? redeemPrice,
@@ -117,8 +133,13 @@ class CustomerCouponModel extends CouponData {
       store: store ?? this.store,
       qtyWasher: qtyWasher ?? this.qtyWasher,
       qtyDryer: qtyDryer ?? this.qtyDryer,
+      qtyTotal: qtyTotal ?? this.qtyTotal,
+      qtyShared: qtyShared ?? this.qtyShared,
       remainWasher: remainWasher ?? this.remainWasher,
       remainDryer: remainDryer ?? this.remainDryer,
+      remainTotal: remainTotal ?? this.remainTotal,
+      remainShared: remainShared ?? this.remainShared,
+      usageMode: usageMode ?? this.usageMode,
       totalUses: totalUses ?? this.totalUses,
       redemptionLimit: redemptionLimit ?? this.redemptionLimit,
       redeemPrice: redeemPrice ?? this.redeemPrice,
@@ -126,6 +147,39 @@ class CustomerCouponModel extends CouponData {
       appliesTo: appliesTo ?? this.appliesTo,
       isSelected: isSelected ?? this.isSelected,
     );
+  }
+
+  /// ใช้สำหรับปั้น wording แสดงที่ AppBar หน้า [CouponVoucherSelected]
+  String getSelectedTitleDisplay(BuildContext context) {
+    final typeText = typeLabel?.en ?? '';
+    final locales = context.languageCode;
+    if (typeText == 'E-Voucher') {
+      return context.wording.eVoucherDetails;
+    }
+
+    context.wording.details;
+
+    if (typeText == 'Discount') {
+      if (appliesTo.orEmpty.toLowerCase() == 'both') {
+        if (locales == 'en' || locales == 'zh') {
+          return '${context.wording.washerDryerCoupon} ${context.wording.details}';
+        }
+        return '${context.wording.details} ${context.wording.washerDryerCoupon}';
+      }
+      if (appliesTo.orEmpty.toLowerCase() == 'dryer') {
+        if (locales == 'en' || locales == 'zh') {
+          return '${context.wording.dryerCoupon} ${context.wording.details}';
+        }
+        return '${context.wording.details} ${context.wording.dryerCoupon}';
+      }
+      if (appliesTo.orEmpty.toLowerCase() == 'washer') {
+        if (locales == 'en' || locales == 'zh') {
+          return '${context.wording.washerCoupon} ${context.wording.details}';
+        }
+        return '${context.wording.details} ${context.wording.washerCoupon}';
+      }
+    }
+    return typeLabelDisplay(context);
   }
 
   /// ดึง localized package name ตาม locale ปัจจุบัน
@@ -137,7 +191,7 @@ class CustomerCouponModel extends CouponData {
   /// ดึง localized package name ตาม locale ปัจจุบัน
   String packageNameDisplay(BuildContext context) {
     final locale = context.languageCode;
-    return packageName?.getByLocaleCode(locale) ?? '';
+    return packageName?.getByLocaleCode(locale) ?? nameDisplay(context);
   }
 
   /// ดึง localized usage label ตาม locale ปัจจุบัน
@@ -149,7 +203,8 @@ class CustomerCouponModel extends CouponData {
   /// ดึง localized store name ตาม locale ปัจจุบัน
   String storeNameDisplay(BuildContext context) {
     final locale = context.languageCode;
-    return store?.name?.getByLocaleCode(locale) ?? '';
+    return store?.name?.getByLocaleCode(locale) ??
+        context.wording.participatingStoresOnly;
   }
 
   /// ดึง localized description ตาม locale ปัจจุบัน
@@ -291,6 +346,21 @@ class CustomerCouponModel extends CouponData {
   /// จำนวนเครื่องอบที่เหลือ
   int get remainDryerCount => int.tryParse(remainDryer ?? '0') ?? 0;
 
+  /// จำนวนรวมทั้งหมด (washer + dryer)
+  int get qtyTotalCount => int.tryParse(qtyTotal ?? '0') ?? 0;
+
+  /// จำนวนที่แชร์ออกไป
+  int get qtySharedCount => int.tryParse(qtyShared ?? '0') ?? 0;
+
+  /// จำนวนรวมที่เหลือ
+  int get remainTotalCount => int.tryParse(remainTotal ?? '0') ?? 0;
+
+  /// จำนวนที่แชร์ที่เหลือ
+  int get remainSharedCount => int.tryParse(remainShared ?? '0') ?? 0;
+
+  /// ตรวจสอบว่าเป็น split mode (แยกซัก/อบ) หรือไม่
+  bool get isSplitMode => usageMode == 'split' && appliesTo != 'both';
+
   /// แสดงจำนวนการใช้งาน Washer/Dryer
   String washDryDisplay(BuildContext context) {
     final locale = context.languageCode;
@@ -309,6 +379,11 @@ class CustomerCouponModel extends CouponData {
 
   /// แสดงจำนวนการใช้งาน Washer/Dryer
   String get washRemainDisplay {
+    if (!isSplitMode) {
+      return remainSharedCount > 0
+          ? '$remainSharedCount'
+          : remaining.ifNullOrEmpty('0');
+    }
     final washer = qtyWasherCount;
     final remain = remainWasher;
 

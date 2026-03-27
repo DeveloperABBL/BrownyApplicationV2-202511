@@ -109,6 +109,7 @@ PackageDetailData _$PackageDetailDataFromJson(Map<String, dynamic> json) =>
       discountPercent: json['discount_percent'] as String?,
       brownyCoin: json['browny_coin'] as String?,
       saved: json['saved'] as String?,
+      usageMode: json['usage_mode'] as String?,
     );
 
 Map<String, dynamic> _$PackageDetailDataToJson(PackageDetailData instance) =>
@@ -126,6 +127,7 @@ Map<String, dynamic> _$PackageDetailDataToJson(PackageDetailData instance) =>
       'discount_percent': instance.discountPercent,
       'browny_coin': instance.brownyCoin,
       'saved': instance.saved,
+      'usage_mode': instance.usageMode,
     };
 
 StoreData _$StoreDataFromJson(Map<String, dynamic> json) => StoreData(

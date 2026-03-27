@@ -137,6 +137,9 @@ class PackageDetailData {
   @JsonKey(name: 'saved')
   final String? saved;
 
+  @JsonKey(name: 'usage_mode')
+  final String? usageMode;
+
   PackageDetailData({
     this.packageId,
     this.packageName,
@@ -151,6 +154,7 @@ class PackageDetailData {
     this.discountPercent,
     this.brownyCoin,
     this.saved,
+    this.usageMode,
   });
 
   factory PackageDetailData.fromJson(Map<String, dynamic> json) =>

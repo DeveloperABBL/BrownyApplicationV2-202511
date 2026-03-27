@@ -123,7 +123,10 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
             // Title, Description ต่างๆ
             Expanded(
               child: Container(
-                padding: EdgeInsets.all(AppDims.size_8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_8.w,
+                  vertical: AppDims.size_4.w,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

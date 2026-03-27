@@ -1202,6 +1202,11 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String washAndDryTimesLabel(String count) {
+    return 'ซัก/อบ\n$count ครั้ง';
+  }
+
+  @override
   String dryTimesLabel(String count) {
     return 'อบ\n$count ครั้ง';
   }
@@ -1311,4 +1316,26 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get disableLocationMessage =>
       'หากต้องการปิดสิทธิ์ การเข้าถึงตำแหน่ง กรุณาไปปิดในการตั้งค่าของอุปกรณ์';
+
+  @override
+  String get helpCenter => 'ศูนย์ความช่วยเหลือ';
+
+  @override
+  String get conditions => 'เงื่อนไข';
+
+  @override
+  String get collectCoins => 'รับคอยน์';
+
+  @override
+  String get collectTomorrow => 'รับพรุ่งนี้';
+
+  @override
+  String get collectCoinSuccess => 'รับ Browny Coin สำเร็จ';
+
+  @override
+  String get collectCoinMotivation =>
+      'เก็บต่อทุกวัน สิทธิประโยชน์ดีๆ รออยู่เพียบ!';
+
+  @override
+  String get today => 'วันนี้';
 }

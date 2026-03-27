@@ -426,6 +426,14 @@
             }
         }
     },
+    "washAndDryTimesLabel": "Wash/Dry\n{count} times",
+    "@washAndDryTimesLabel": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
     "dryTimesLabel": "Dry\n{count} times",
     "@dryTimesLabel": {
         "placeholders": {
@@ -468,5 +476,12 @@
   "savedAmount": "Saved",
   "totalPayment": "Total payment",
   "disableLocationTitle": "Disable location access",
-  "disableLocationMessage": "To disable location access, please go to the device settings"
+  "disableLocationMessage": "To disable location access, please go to the device settings",
+  "helpCenter": "Help Center",
+  "conditions": "Conditions",
+  "collectCoins": "Collect Coins",
+  "collectTomorrow": "Collect Tomorrow",
+  "collectCoinSuccess": "Browny Coin Collected Successfully",
+  "collectCoinMotivation": "Keep collecting every day, great benefits await!",
+  "today": "Today"
 }

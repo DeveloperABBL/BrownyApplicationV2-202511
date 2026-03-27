@@ -310,7 +310,10 @@ class __CoinContentState extends State<_CoinContent> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppText(
-              coinData.claimableToday! ? 'รับคอนย์' : 'รับพรุ่งนี้',
+              // รับคอนย์ : รับพรุ่งนี้
+              coinData.claimableToday!
+                  ? context.wording.collectCoins
+                  : context.wording.collectTomorrow,
               style: context.textTheme.headlineSmall!.copyWith(
                 fontSize: AppDims.size_14.sp,
                 color: AppColors.textWhite,
@@ -334,7 +337,8 @@ class __CoinContentState extends State<_CoinContent> {
           Spacer(),
           Assets.svg.icCoinCondition.svg(),
           AppText(
-            'เงื่อนไข',
+            // 'เงื่อนไข',
+            context.wording.conditions,
             style: context.textTheme.labelSmall!.copyWith(
               color: AppColors.gray400,
             ),
@@ -524,8 +528,10 @@ class __CoinContentState extends State<_CoinContent> {
       AppOverlays.showBrownyDialog(
         context,
         imageAsset: Assets.png.brownyCoinClaimed.path,
-        title: 'รับ Browny Coin สำเร็จ',
-        message: 'เก็บต่อทุกวัน สิทธิประโยชน์ดีๆ รออยู่เพียบ!',
+        // รับ Browny Coin สำเร็จ,
+        title: context.wording.collectCoinSuccess,
+        // เก็บต่อทุกวัน สิทธิประโยชน์ดีๆ รออยู่เพียบ!,
+        message: context.wording.collectCoinMotivation,
       );
     }
   }
@@ -772,9 +778,7 @@ class __CoinContentState extends State<_CoinContent> {
         AppDims.vericalPadding_4,
 
         AppText(
-          item.isToday
-              ? (context.languageCode == 'th' ? 'วันนี้' : 'Today')
-              : item.dayDisplay,
+          item.isToday ? context.wording.today : item.dayDisplay,
           style: context.textTheme.labelSmall!.copyWith(
             color: AppColors.textPrimary,
           ),

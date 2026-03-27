@@ -66,11 +66,26 @@ class CouponData {
   @JsonKey(name: 'qty_dryer')
   final String? qtyDryer;
 
+  @JsonKey(name: 'qty_total')
+  final String? qtyTotal;
+
+  @JsonKey(name: 'qty_shared')
+  final String? qtyShared;
+
   @JsonKey(name: 'remain_washer')
   final String? remainWasher;
 
   @JsonKey(name: 'remain_dryer')
   final String? remainDryer;
+
+  @JsonKey(name: 'remain_total')
+  final String? remainTotal;
+
+  @JsonKey(name: 'remain_shared')
+  final String? remainShared;
+
+  @JsonKey(name: 'usage_mode')
+  final String? usageMode;
 
   // ฟิลด์พิเศษสำหรับ Discount
   @JsonKey(name: 'total_uses')
@@ -108,8 +123,13 @@ class CouponData {
     this.store,
     this.qtyWasher,
     this.qtyDryer,
+    this.qtyTotal,
+    this.qtyShared,
     this.remainWasher,
     this.remainDryer,
+    this.remainTotal,
+    this.remainShared,
+    this.usageMode,
     this.totalUses,
     this.redemptionLimit,
     this.redeemPrice,

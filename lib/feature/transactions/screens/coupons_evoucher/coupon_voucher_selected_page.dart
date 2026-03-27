@@ -17,6 +17,17 @@ class CouponVoucherSelected extends StatefulWidget {
   static final pagePath = '/CouponVoucherSelected';
   static final pageName = 'CouponVoucherSelected';
 
+  /// util function route to pageName
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    required CouponVoucherSelectedViewmodelDelegate viewmodel,
+  }) async {
+    return await context.pushNamed(
+      CouponVoucherSelected.pageName,
+      extra: viewmodel,
+    );
+  }
+
   @override
   State<CouponVoucherSelected> createState() => _CouponVoucherSelectedState();
 }
@@ -32,8 +43,13 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // รายละเอียด E-Voucher
-        title: AppText(context.wording.eVoucherDetails),
+        // รายละเอียด Coupon / E-Voucher
+        title: AppText(
+          widget._viewmodel.customerCouponModelDelegate!
+              .getSelectedTitleDisplay(
+                context,
+              ),
+        ),
         leading: BackButton(
           color: AppColors.textPrimary,
           onPressed: () => context.pop(),
@@ -174,38 +190,51 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                     ),
                   ),
 
-                  _buildConditionItem(
-                    // 'ซัก\nwashRemainDisplay',
-                    wording: context.wording.washRemainLabel(
-                      data.washRemainDisplay,
+                  if (!data.isSplitMode)
+                    _buildConditionItem(
+                      // 'ซัก\nwashRemainDisplay',
+                      wording: context.wording.washAndDryTimesLabel(
+                        data.washRemainDisplay,
+                      ),
+                      icon: Assets.svg.icWashRoundedGreen.svg(
+                        width: AppDims.size_28.w,
+                        height: AppDims.size_28.h,
+                      ),
+                    )
+                  else ...[
+                    _buildConditionItem(
+                      // 'ซัก\nwashRemainDisplay',
+                      wording: context.wording.washRemainLabel(
+                        data.washRemainDisplay,
+                      ),
+                      icon: Assets.svg.icWashRoundedGreen.svg(
+                        width: AppDims.size_28.w,
+                        height: AppDims.size_28.h,
+                      ),
                     ),
-                    icon: Assets.svg.icWashRoundedGreen.svg(
-                      width: AppDims.size_28.w,
-                      height: AppDims.size_28.h,
-                    ),
-                  ),
 
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: AppDims.size_4.w,
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_4.w,
+                      ),
+                      width: AppDims.size_1.w,
+                      height: AppDims.size_40.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.ci7,
+                      ),
                     ),
-                    width: AppDims.size_1.w,
-                    height: AppDims.size_40.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.ci7,
-                    ),
-                  ),
 
-                  _buildConditionItem(
-                    // อบ\ndryRemainDisplay',
-                    wording: context.wording.dryRemainLabel(
-                      data.dryRemainDisplay,
+                    _buildConditionItem(
+                      // อบ\ndryRemainDisplay',
+                      wording: context.wording.dryRemainLabel(
+                        data.dryRemainDisplay,
+                      ),
+                      icon: Assets.svg.icDryRoundedGreen.svg(
+                        width: AppDims.size_28.w,
+                        height: AppDims.size_28.h,
+                      ),
                     ),
-                    icon: Assets.svg.icDryRoundedGreen.svg(
-                      width: AppDims.size_28.w,
-                      height: AppDims.size_28.h,
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),

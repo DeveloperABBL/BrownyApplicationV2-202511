@@ -197,79 +197,79 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     String orderId,
   ) async {
     try {
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: MachineOrderReceiptResponse.fromJson(
-            jsonDecode('''
-{
-    "lucky_number": null,
-    "total": "60.00",
-    "receipt_no": "BNP20260224-225349211346",
-    "branch": {
-        "th": "ตลาดคูล - บางกรวย",
-        "en": "Cool Market - Bang Kruai",
-        "zh": null
-    },
-    "machine_type": {
-        "th": "เครื่องซัก",
-        "en": "Washer",
-        "zh": "洗衣机"
-    },
-    "machine_no": 1,
-    "payment_icon": "https://dev.abgroup.co.th/assets/images/customerNotificationIconPaymnet/tp_wallet.png",
-    "payment_channel": "tp_wallet",
-    "payment_display": {
-        "th": "TP Wallet",
-        "en": "TP Wallet",
-        "zh": "TP 钱包"
-    },
-    "paid_at": "2026-02-24 / 22:53",
-    "summary": {
-        "program": {
-            "wording": {
-                "th": "น้ำร้อน",
-                "en": "Hot Water",
-                "zh": "热水"
-            },
-            "amount": "70.00"
-        },
-        "discount": {
-            "wording": {
-                "th": "Test",
-                "en": "TEst",
-                "zh": "Test"
-            },
-            "amount": "-10.00"
-        },
-        "coupon_discount": {
-            "wording": {
-                "th": "",
-                "en": "",
-                "zh": ""
-            },
-            "amount": ""
-        },
-        "coupon_evoucher": {
-            "wording": {
-                "th": "",
-                "en": "",
-                "zh": ""
-            },
-            "amount": ""
-        }
-    },
-    "call_center": "099-635-1211",
-    "line_link": "https://line.me/R/ti/p/%40browny",
-    "google_map_link": "https://line.me/R/ti/p/%40browny",
-    "lucky_no": "96",
-    "lucky_image": "https://dev.abgroup.co.th/images/lucky_no/96.png",
-    "review_score": null,
-    "qr_image": "https://dev.abgroup.co.th/storage/qrcodes/21.png"
-}
-'''),
-          ),
-        );
-      }
+      //       if (kDebugMode) {
+      //         return RepoResult.success(
+      //           data: MachineOrderReceiptResponse.fromJson(
+      //             jsonDecode('''
+      // {
+      //     "lucky_number": null,
+      //     "total": "60.00",
+      //     "receipt_no": "BNP20260224-225349211346",
+      //     "branch": {
+      //         "th": "ตลาดคูล - บางกรวย",
+      //         "en": "Cool Market - Bang Kruai",
+      //         "zh": null
+      //     },
+      //     "machine_type": {
+      //         "th": "เครื่องซัก",
+      //         "en": "Washer",
+      //         "zh": "洗衣机"
+      //     },
+      //     "machine_no": 1,
+      //     "payment_icon": "https://dev.abgroup.co.th/assets/images/customerNotificationIconPaymnet/tp_wallet.png",
+      //     "payment_channel": "tp_wallet",
+      //     "payment_display": {
+      //         "th": "TP Wallet",
+      //         "en": "TP Wallet",
+      //         "zh": "TP 钱包"
+      //     },
+      //     "paid_at": "2026-02-24 / 22:53",
+      //     "summary": {
+      //         "program": {
+      //             "wording": {
+      //                 "th": "น้ำร้อน",
+      //                 "en": "Hot Water",
+      //                 "zh": "热水"
+      //             },
+      //             "amount": "70.00"
+      //         },
+      //         "discount": {
+      //             "wording": {
+      //                 "th": "Test",
+      //                 "en": "TEst",
+      //                 "zh": "Test"
+      //             },
+      //             "amount": "-10.00"
+      //         },
+      //         "coupon_discount": {
+      //             "wording": {
+      //                 "th": "",
+      //                 "en": "",
+      //                 "zh": ""
+      //             },
+      //             "amount": ""
+      //         },
+      //         "coupon_evoucher": {
+      //             "wording": {
+      //                 "th": "",
+      //                 "en": "",
+      //                 "zh": ""
+      //             },
+      //             "amount": ""
+      //         }
+      //     },
+      //     "call_center": "099-635-1211",
+      //     "line_link": "https://line.me/R/ti/p/%40browny",
+      //     "google_map_link": "https://line.me/R/ti/p/%40browny",
+      //     "lucky_no": "96",
+      //     "lucky_image": "https://dev.abgroup.co.th/images/lucky_no/96.png",
+      //     "review_score": null,
+      //     "qr_image": "https://dev.abgroup.co.th/storage/qrcodes/21.png"
+      // }
+      // '''),
+      //           ),
+      //         );
+      //       }
       final response = await requireRemote.fetchMachineOrderReceipt(orderId);
 
       if (response.isSuccessful) {
@@ -301,19 +301,19 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     PaymentCheck paymentCheck,
   ) async {
     try {
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: PaymentStatusCheckResponse.fromJson(
-            jsonDecode('''
-{
-    "status": "paid",
-    "order_id": "019cc70a-eef8-7285-8dc9-5bf006b6ca48",
-    "redirect": "https://dev.abgroup.co.th/receipt/019cc70a-eef8-7285-8dc9-5bf006b6ca48"
-}
-'''),
-          ),
-        );
-      }
+      //       if (kDebugMode) {
+      //         return RepoResult.success(
+      //           data: PaymentStatusCheckResponse.fromJson(
+      //             jsonDecode('''
+      // {
+      //     "status": "paid",
+      //     "order_id": "019cc70a-eef8-7285-8dc9-5bf006b6ca48",
+      //     "redirect": "https://dev.abgroup.co.th/receipt/019cc70a-eef8-7285-8dc9-5bf006b6ca48"
+      // }
+      // '''),
+      //           ),
+      //         );
+      //       }
       final response = await requireRemote.checkMachineOrderPaymentStatus(
         paymentCheck,
       );

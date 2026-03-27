@@ -29,9 +29,11 @@ CoinHistoryData _$CoinHistoryDataFromJson(Map<String, dynamic> json) =>
     CoinHistoryData(
       brownyCoin: json['browny_coin'] as String?,
       expireCoin: json['expire_coin'] as String?,
-      expireDate: const DateTimeConverter().fromJson(
-        json['expire_date'] as String?,
-      ),
+      expireDate: json['expire_date'] == null
+          ? null
+          : ContentLocalizeData.fromJson(
+              json['expire_date'] as Map<String, dynamic>,
+            ),
       history: (json['history'] as List<dynamic>?)
           ?.map((e) => CoinHistoryItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -41,7 +43,7 @@ Map<String, dynamic> _$CoinHistoryDataToJson(CoinHistoryData instance) =>
     <String, dynamic>{
       'browny_coin': instance.brownyCoin,
       'expire_coin': instance.expireCoin,
-      'expire_date': const DateTimeConverter().toJson(instance.expireDate),
+      'expire_date': instance.expireDate,
       'history': instance.history,
     };
 

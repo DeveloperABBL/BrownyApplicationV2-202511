@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/widgets/invit_bottom_sheet_dialog.dart';
 import 'package:browny_applications_new/core/widgets/popup_dialog.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
@@ -1267,7 +1268,11 @@ class _HomePageWidgetState extends State<HomePageWidget>
                               formatCurrency(
                                 string: value,
                                 decimal: false,
-                                trailingSign: ' ใบ',
+                                trailingSign: ContentLocalizeData(
+                                  en: ' Rewards',
+                                  zh: ' 张',
+                                  th: ' ใบ',
+                                ).getByLocaleCode(context.languageCode),
                               ),
                               style: context.textTheme.titleSmall!.copyWith(
                                 fontSize: AppDims.size_16.sp,

@@ -269,26 +269,26 @@ class HomePageViewmodel extends AppViewModel {
       _workingMachinesNotifier.value = UiResult.success(data: result.data);
 
       // [DEBUG] POC: เริ่ม Live Activity จากเครื่องแรกที่กำลังทำงาน
-      if (kDebugMode) {
-        final machines = result.data.data;
-        if (machines != null && machines.isNotEmpty) {
-          final machine = machines.first;
-          final remaining =
-              CustomerServicesWorkingModel.fromWorkingMachineResponse(
-                machine,
-              ).remainingTimeDuration;
-          await LaundryLiveActivityService.instance.startActivity(
-            data: LaundryLiveActivityData(
-              machineId: '${machine.id ?? 0}',
-              machineNumber: machine.getNameDisplay('th'),
-              serviceType: 'wash',
-              branchName: '',
-              remainingSeconds: remaining.inSeconds,
-              totalSeconds: remaining.inSeconds,
-            ),
-          );
-        }
-      }
+      // if (kDebugMode) {
+      //   final machines = result.data.data;
+      //   if (machines != null && machines.isNotEmpty) {
+      //     final machine = machines.first;
+      //     final remaining =
+      //         CustomerServicesWorkingModel.fromWorkingMachineResponse(
+      //           machine,
+      //         ).remainingTimeDuration;
+      //     await LaundryLiveActivityService.instance.startActivity(
+      //       data: LaundryLiveActivityData(
+      //         machineId: '${machine.id ?? 0}',
+      //         machineNumber: machine.getNameDisplay('th'),
+      //         serviceType: 'wash',
+      //         branchName: '',
+      //         remainingSeconds: remaining.inSeconds,
+      //         totalSeconds: remaining.inSeconds,
+      //       ),
+      //     );
+      //   }
+      // }
     } on Exception catch (e) {
       _workingMachinesNotifier.value = UiResult.error(error: e);
     }

@@ -75,7 +75,8 @@ class __ContactContentState extends State<_ContactContent> {
           ),
         ),
         title: AppText(
-          'ศูนย์ความช่วยเหลือ',
+          // ศูนย์ความช่วยเหลือ
+          context.wording.helpCenter,
           style: context.textTheme.titleLarge!.copyWith(
             color: AppColors.textWhite,
           ),

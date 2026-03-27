@@ -1207,6 +1207,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String washAndDryTimesLabel(String count) {
+    return 'Wash/Dry\n$count times';
+  }
+
+  @override
   String dryTimesLabel(String count) {
     return 'Dry\n$count times';
   }
@@ -1315,4 +1320,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get disableLocationMessage =>
       'To disable location access, please go to the device settings';
+
+  @override
+  String get helpCenter => 'Help Center';
+
+  @override
+  String get conditions => 'Conditions';
+
+  @override
+  String get collectCoins => 'Collect Coins';
+
+  @override
+  String get collectTomorrow => 'Collect Tomorrow';
+
+  @override
+  String get collectCoinSuccess => 'Browny Coin Collected Successfully';
+
+  @override
+  String get collectCoinMotivation =>
+      'Keep collecting every day, great benefits await!';
+
+  @override
+  String get today => 'Today';
 }

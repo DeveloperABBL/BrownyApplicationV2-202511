@@ -73,7 +73,7 @@ class WalletHistoryDetailPage extends StatelessWidget {
         ...group.items.sortByDateDesc().map((history) {
           return _buildSingleItem(
             context,
-            title: history.description ?? '-',
+            title: history.getDescriptionDisplay(context.languageCode),
             date:
                 history.dateTime?.formatDateDDMMMMyyyyHHmmMinText(
                   context.languageCode,
