@@ -41,7 +41,9 @@ class CoinClaimRepo extends CustomerDataRepo with CoinDataSourceMixin {
   @override
   Future<RepoResult<CoinClaimResponse>> fetchCoinClaimData(String id) async {
     try {
-      final response = await requireRemote.getCoinClaimData(id);
+      final response = await requireRemote.getCoinClaimData({
+        "customer_id": id,
+      });
       if (!response.isSuccessful) {
         return RepoResult.empty();
       }

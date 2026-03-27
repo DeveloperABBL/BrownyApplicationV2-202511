@@ -48,6 +48,36 @@ class _CoinContent extends StatefulWidget {
 class __CoinContentState extends State<_CoinContent> {
   late final CoinViewmModel _viewModel;
 
+  String _popupConditionImageUrl(BuildContext context) {
+    final result = _viewModel.coinClaimDataNotifier.value;
+    if (!result.isSuccess || result.data == null) return '';
+
+    final imageUrl = result.data!.popupImages
+        ?.getByLocaleCode(context.languageCode)
+        .orEmpty;
+    return imageUrl.orEmpty;
+  }
+
+  /// รายละเอียดเงื่อนไขจาก API `popup_details` (HTML) ตามภาษา — ถ้า null/ว่างทุกภาษาให้ว่าง
+  String _conditionPopupHtml(BuildContext context) {
+    final result = _viewModel.coinClaimDataNotifier.value;
+    if (!result.isSuccess || result.data == null) return '';
+    return result.data!.popupDetailsDisplay.trim();
+  }
+
+  String _formatTodayDateDisplay(BuildContext context, String rawDate) {
+    final parsedDate = rawDate.convertToDateTime(
+      'yyyy-MM-dd',
+      context.languageCode,
+    );
+    if (parsedDate == null) return rawDate;
+
+    return parsedDate.formatDateLocale(
+      context.languageCode,
+      pattern: 'dd MMM yyyy',
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -315,6 +345,8 @@ class __CoinContentState extends State<_CoinContent> {
   }
 
   Future<void> _showCondition(BuildContext context) async {
+    final popupImageUrl = _popupConditionImageUrl(context);
+
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -374,10 +406,9 @@ class __CoinContentState extends State<_CoinContent> {
                                     ),
                                     AppDims.vericalPadding_10,
 
-                                    // รายละเอียดเงื่อนไข
+                                    // รายละเอียดเงื่อนไข (จาก API popup_details เท่านั้น)
                                     Html(
-                                      data: _viewModel
-                                          .descriptionPopupCondition(context),
+                                      data: _conditionPopupHtml(context),
                                       style: {
                                         "p": Style(
                                           fontSize: FontSize(
@@ -453,9 +484,19 @@ class __CoinContentState extends State<_CoinContent> {
                 Positioned(
                   top: -35.w,
                   right: 10.w,
-                  child: Assets.png.brownyCoinclaimCondition.image(
-                    width: 330.w,
-                  ),
+                  child: popupImageUrl.isNotEmpty
+                      ? Image.network(
+                          popupImageUrl,
+                          width: 330.w,
+                          errorBuilder: (_, _, _) {
+                            return Assets.png.brownyCoinclaimCondition.image(
+                              width: 330.w,
+                            );
+                          },
+                        )
+                      : Assets.png.brownyCoinclaimCondition.image(
+                          width: 330.w,
+                        ),
                 ),
               ],
             ),
@@ -542,7 +583,7 @@ class __CoinContentState extends State<_CoinContent> {
             ),
           ),
           label: AppText(
-            'วันที่ ${value.data}',
+            _formatTodayDateDisplay(context, value.data.orEmpty),
             style: context.textTheme.titleSmall!.copyWith(
               color: AppColors.textPrimary,
             ),
@@ -731,7 +772,9 @@ class __CoinContentState extends State<_CoinContent> {
         AppDims.vericalPadding_4,
 
         AppText(
-          item.isToday ? 'วันนี้' : item.dayDisplay,
+          item.isToday
+              ? (context.languageCode == 'th' ? 'วันนี้' : 'Today')
+              : item.dayDisplay,
           style: context.textTheme.labelSmall!.copyWith(
             color: AppColors.textPrimary,
           ),

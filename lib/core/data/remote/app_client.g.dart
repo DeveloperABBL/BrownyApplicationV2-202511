@@ -873,17 +873,18 @@ class _AppClient implements AppClient {
 
   @override
   Future<HttpResponse<CoinClaimResponse>> getCoinClaimData(
-    String customerId,
+    Map<String, dynamic> body,
   ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'customer_id': customerId};
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<HttpResponse<CoinClaimResponse>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/coin',
+            '/coin/calendar',
             queryParameters: queryParameters,
             data: _data,
           )

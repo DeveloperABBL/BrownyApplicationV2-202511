@@ -354,36 +354,6 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                     decoration: BoxDecoration(color: AppColors.ci7),
                   ),
 
-                  if (packageData.qtySharedValue <= 0)
-                    _buildConditionItem(
-                      wording: context.wording.washTimesLabel(
-                        '${packageData.qtyWasherValue}',
-                      ),
-                      icon: Assets.svg.icWashRoundedGreen.svg(
-                        width: 28.w,
-                        height: 28.h,
-                      ),
-                    ),
-
-                  if (packageData.qtySharedValue <= 0)
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 4.w),
-                      width: 1.w,
-                      height: 40.h,
-                      decoration: BoxDecoration(color: AppColors.ci7),
-                    ),
-
-                  if (packageData.qtySharedValue <= 0)
-                    _buildConditionItem(
-                      wording: context.wording.dryTimesLabel(
-                        '${packageData.qtyDryerValue}',
-                      ),
-                      icon: Assets.svg.icDryRoundedGreen.svg(
-                        width: 28.w,
-                        height: 28.h,
-                      ),
-                    ),
-
                   if (packageData.qtySharedValue > 0)
                     _buildConditionItem(
                       wording: context.wording.washTimesLabel(
@@ -393,7 +363,33 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                         width: 28.w,
                         height: 28.h,
                       ),
+                    )
+                  else ...[
+                    _buildConditionItem(
+                      wording: context.wording.washTimesLabel(
+                        '${packageData.qtyWasherValue}',
+                      ),
+                      icon: Assets.svg.icWashRoundedGreen.svg(
+                        width: 28.w,
+                        height: 28.h,
+                      ),
                     ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                      width: 1.w,
+                      height: 40.h,
+                      decoration: BoxDecoration(color: AppColors.ci7),
+                    ),
+                    _buildConditionItem(
+                      wording: context.wording.dryTimesLabel(
+                        '${packageData.qtyDryerValue}',
+                      ),
+                      icon: Assets.svg.icDryRoundedGreen.svg(
+                        width: 28.w,
+                        height: 28.h,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

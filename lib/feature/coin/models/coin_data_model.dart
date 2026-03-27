@@ -96,6 +96,12 @@ class CoinDataModel extends CoinClaimData {
     super.maxDay,
     super.streaks,
     super.banners,
+    super.todayHighlight,
+    super.todayCalendarDate,
+    super.defaultDailyCoin,
+    super.popupImages,
+    super.popupDetails,
+    super.coinSettings,
     required this.locale,
     required this.streaksDisplay,
   });
@@ -106,69 +112,44 @@ class CoinDataModel extends CoinClaimData {
     String locale,
     CoinClaimData data,
   ) {
-    StreakModelItem itemBuild(StreakItem item) {
-      bool isToday = false;
-      String dayDisplay = '-';
-      // ถ้า streakDay คือ 0 หมายความว่า ยังไม่เคยรับ Coin มาก่อน
-      if ((data.streakDay ?? 0) == 0) {
-        DateTime dateFromDay = DateTime.now();
-        // ถ้า day == 1 จะ assign ให้เป็นวันนี้ทันที
-        if ((item.day ?? 0) == 1) {
-          isToday = true;
-          dateFromDay = DateTime.now();
-        } else {
-          dateFromDay = dateFromDay.add(Duration(days: (item.day! - 1)));
-        }
+    DateTime? parseDate(String? value) {
+      if (value.orEmpty.isEmpty) return null;
+      try {
+        return DateFormat('yyyy-MM-dd', locale).parse(value!);
+      } catch (_) {
+        return null;
+      }
+    }
 
-        dayDisplay = dateFromDay
-            .formatDateLocale(locale, pattern: 'dd MMM')
-            .replaceAll('.', '');
-      } else {
-        try {
-          // ถ้าตก else แสดงว่ามีการ claimed ไปแล้ว จะ getFirst มาเพื่อหาวันปัจจุบัน
-          final firstDayClaimed =
-              DateFormat(
-                'yyyy-MM-dd',
-                locale,
-              ).parse(
-                data.streaks!.first.claimedAt.orEmpty.ifEmpty(
-                  data.lastClaimedDate.orEmpty,
-                ),
-              );
+    StreakModelItem itemBuild(StreakItem item, int index) {
+      final fallbackDate = DateTime.now().add(Duration(days: index));
+      final streakDate = parseDate(item.calendarDate) ?? parseDate(item.day);
+      final displayDate = (streakDate ?? fallbackDate)
+          .formatDateLocale(locale, pattern: 'dd MMM')
+          .replaceAll('.', '');
 
-          // นับจำนวนวันที่ผ่านไปตั้งแต่วันแรกที่ claimed
-          final today = DateTime.now();
-          final daysPassed = today.difference(firstDayClaimed).inDays;
+      // API ใหม่ส่ง today_calendar_date มาให้ จึงใช้ค่านี้เป็นหลัก
+      final todayDateString = data.todayCalendarDate.orEmpty;
+      final isTodayByApiDate =
+          todayDateString.isNotEmpty &&
+          (item.calendarDate == todayDateString || item.day == todayDateString);
 
-          // เช็คว่า daysPassed เกิน maxDay หรือไม่ (streak ขาดไปแล้ว)
-          if (daysPassed >= (data.maxDay ?? 7)) {
-            // Reset streak: day 1 = today
-            isToday = item.day == 1;
-            dayDisplay = DateTime.now()
-                .add(Duration(days: (item.day ?? 1) - 1))
-                .formatDateLocale(locale, pattern: 'dd MMM');
-          } else {
-            // วันปัจจุบันใน streak คือ daysPassed + 1 (เพราะ day 1 = วันแรกที่รับ)
-            final currentStreakDay = daysPassed + 1;
-            isToday = item.day == currentStreakDay;
-
-            // คำนวณวันที่แสดงสำหรับแต่ละ day (day 1 = firstDayClaimed, day 2 = +1 วัน, etc.)
-            dayDisplay = firstDayClaimed
-                .add(Duration(days: (item.day ?? 1) - 1))
-                .formatDateLocale(locale, pattern: 'dd MMM');
-          }
-        } catch (e) {
-          debugPrint(e.toString());
-        }
+      // fallback เดิมไว้รองรับ API เก่าที่ยังส่ง day เป็นลำดับวัน
+      // ใช้เมื่อไม่มี today_calendar_date เท่านั้น — ถ้ามีแล้วต้องอิงวันที่จริงจาก API ไม่ให้ index 0 เป็นวันนี้ซ้ำ
+      bool isTodayByLegacyRule = false;
+      if (todayDateString.isEmpty &&
+          !isTodayByApiDate &&
+          (data.streakDay ?? 0) == 0) {
+        isTodayByLegacyRule = index == 0;
       }
 
       return StreakModelItem(
-        isToday: isToday,
+        isToday: isTodayByApiDate || isTodayByLegacyRule,
         amount: (item.amount ?? 0.0).toString(),
         highlight: item.highlight ?? false,
         claimedAtDisplay: item.claimedAt.orEmpty,
-        day: item.day.toString(),
-        dayDisplay: dayDisplay,
+        day: item.day.orEmpty.ifEmpty((index + 1).toString()),
+        dayDisplay: displayDate,
       );
     }
 
@@ -194,15 +175,29 @@ class CoinDataModel extends CoinClaimData {
       // raw list streaks
       streaks: data.streaks,
       // streak ที่ mapping ข้อมูลสำหรับ display แล้ว
-      streaksDisplay: data.streaks?.map((e) => itemBuild(e)).toList() ?? [],
+      streaksDisplay:
+          data.streaks?.asMap().entries.map((e) {
+            return itemBuild(e.value, e.key);
+          }).toList() ??
+          [],
       // url banner ยังไม่แน่ใจจุดที่ใช้แสดง
       banners: data.banners,
+      todayHighlight: data.todayHighlight,
+      todayCalendarDate: data.todayCalendarDate,
+      defaultDailyCoin: data.defaultDailyCoin,
+      popupImages: data.popupImages,
+      popupDetails: data.popupDetails,
+      coinSettings: data.coinSettings,
     );
   }
 
   final String locale;
 
   String get bannerDisplay => super.banners?.getByLocaleCode(locale) ?? '';
+
+  /// รายละเอียดเงื่อนไข popup (HTML) ตามภาษา จาก API `popup_details`
+  String get popupDetailsDisplay =>
+      super.popupDetails?.getByLocaleCode(locale) ?? '';
 }
 
 class StreakModelItem {

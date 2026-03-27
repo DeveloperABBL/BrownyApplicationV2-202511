@@ -108,7 +108,8 @@ class CoinViewmModel extends AppViewModel {
       );
 
       _toDayDataNotifier.value = UiResult.success(
-        data: data.streaksDisplay.firstWhere((e) => e.isToday).day,
+        data: data.todayCalendarDate.orEmpty,
+        // data: data.streaksDisplay.firstWhere((e) => e.isToday).day,
       );
 
       _coinClaimDataNotifier.value = UiResult.success(

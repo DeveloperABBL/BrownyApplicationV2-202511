@@ -513,13 +513,18 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     final fcmToken = await FirebaseMessaging.instance.getToken();
 
     try {
+      // add_time_value ใช้ค่า net จาก API machine/{id}/programs
+      final addTimeValue = double.tryParse(
+        programData.selectedAddTime?.net ?? '',
+      )?.toInt();
+
       // สร้าง request object
       final request = MachineOrderRequest(
         customerId: customerId,
         customerPhone: currentCustomerProvider.current.phone ?? '',
         storeMachineId: int.tryParse(machineId) ?? 0,
         programCode: programCode,
-        addTimeValue: programData.selectedAddTime?.index,
+        addTimeValue: addTimeValue,
         paymentMethod: _paymentSelected!.method,
         couponCustomerId: programData.selectedCoupon?.id,
         discountId: programData.selectedProgram?.discount?.id,
