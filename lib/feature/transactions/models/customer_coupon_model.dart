@@ -359,7 +359,7 @@ class CustomerCouponModel extends CouponData {
   int get remainSharedCount => int.tryParse(remainShared ?? '0') ?? 0;
 
   /// ตรวจสอบว่าเป็น split mode (แยกซัก/อบ) หรือไม่
-  bool get isSplitMode => usageMode == 'split' && appliesTo != 'both';
+  bool get isSplitMode => usageMode == 'split';
 
   /// แสดงจำนวนการใช้งาน Washer/Dryer
   String washDryDisplay(BuildContext context) {
@@ -375,6 +375,25 @@ class CustomerCouponModel extends CouponData {
       default:
         return 'ซัก $washer / อบ $dryer ครั้ง';
     }
+  }
+
+  String sharedOrApplieBothWordingDisplay(BuildContext context) {
+    final typeText = typeLabel?.en ?? '';
+    if (typeText == 'E-Voucher' || appliesTo.orEmpty == 'both') {
+      return context.wording.washAndDryTimesLabel(
+        washRemainDisplay,
+      );
+    }
+
+    if (appliesTo.orEmpty == 'washer') {
+      return context.wording.washTimesLabel(
+        washRemainDisplay,
+      );
+    }
+
+    return context.wording.dryTimesLabel(
+      washRemainDisplay,
+    );
   }
 
   /// แสดงจำนวนการใช้งาน Washer/Dryer

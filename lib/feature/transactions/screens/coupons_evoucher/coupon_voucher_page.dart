@@ -255,7 +255,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                           if (context.mounted && data != null) {
                             try {
                               final qrdata = data as String;
-                              _viewmodel.collectCoupon(qrdata);
+                              _viewmodel.collectCoupon(qrdata, 'qr');
                             } catch (_) {
                               // cast type เป็น String ไม่ได้ ไม่ควรเกิดขึ้น
                               AppOverlays.showBrownyDialog(

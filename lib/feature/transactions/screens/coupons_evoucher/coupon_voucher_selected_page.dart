@@ -193,9 +193,8 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                   if (!data.isSplitMode)
                     _buildConditionItem(
                       // 'ซัก\nwashRemainDisplay',
-                      wording: context.wording.washAndDryTimesLabel(
-                        data.washRemainDisplay,
-                      ),
+                      // ซัก/อบ n ครั้ง
+                      wording: data.sharedOrApplieBothWordingDisplay(context),
                       icon: Assets.svg.icWashRoundedGreen.svg(
                         width: AppDims.size_28.w,
                         height: AppDims.size_28.h,

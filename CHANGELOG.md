@@ -1,5 +1,7 @@
 # CHANGELOG
 ### DONG 2026-03-28
+* แก้จังหวะ Scan QR เก็บ Coupon ส่ง type ผิดทำให้เก็บ coupon ไม่ได้
+* แก้ไขหน้าแสดง Coupon แสดงคำ ซัก, อบ, ซักอบ ไม่ถูกต้อง
 * Localize wording
 * แก้ไขการแสดงข้อมูลใน E-Voucher, Coupon
 
