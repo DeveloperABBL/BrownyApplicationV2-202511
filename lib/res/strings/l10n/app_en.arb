@@ -483,5 +483,15 @@
   "collectTomorrow": "Collect Tomorrow",
   "collectCoinSuccess": "Browny Coin Collected Successfully",
   "collectCoinMotivation": "Keep collecting every day, great benefits await!",
-  "today": "Today"
+  "today": "Today",
+  "ok": "OK",
+  "makeOrder": "Make Order",
+  "processingPleaseWait": "Processing, please wait...",
+  "selectPaymentMethod": "Select Payment Method",
+  "orderSummary": "Order Summary",
+  "productDiscount": "Product Discount",
+  "coinValue": "Value",
+  "insufficientCoinTitle": "Browny Coin Insufficient",
+  "changePaymentMethod": "Please change payment method",
+  "incompletePaymentData": "Incomplete payment data, please try again"
 }

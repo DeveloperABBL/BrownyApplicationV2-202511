@@ -1338,4 +1338,35 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get today => 'วันนี้';
+
+  @override
+  String get ok => 'ตกลง';
+
+  @override
+  String get makeOrder => 'ทำการสั่งซื้อ';
+
+  @override
+  String get processingPleaseWait => 'กำลังดำเนินการ กรุณารอซักครู่...';
+
+  @override
+  String get selectPaymentMethod => 'เลือกวิธีการชำระเงิน';
+
+  @override
+  String get orderSummary => 'สรุปการสั่งซื้อ';
+
+  @override
+  String get productDiscount => 'ส่วนลดสินค้า';
+
+  @override
+  String get coinValue => 'มูลค่า';
+
+  @override
+  String get insufficientCoinTitle => 'Browny Coin ไม่เพียงพอ';
+
+  @override
+  String get changePaymentMethod => 'กรุณาเปลี่ยนวิธีชำระเงิน';
+
+  @override
+  String get incompletePaymentData =>
+      'ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง';
 }

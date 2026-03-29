@@ -202,6 +202,8 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
             profile = profile.copyWith(
               creditBalance: creditData.data.creditBalance,
               brownyCoin: creditData.data.brownyCoin,
+              coinValue: creditData.data.coinValue,
+              currentCoin: creditData.data.currentCoin,
             );
 
             profileResult = profileResult.copyWith(
@@ -283,6 +285,8 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
           profileDataLocal = profileDataLocal.copyWith(
             creditBalance: creditData.data.creditBalance,
             brownyCoin: creditData.data.brownyCoin,
+            currentCoin: creditData.data.currentCoin,
+            coinValue: creditData.data.coinValue,
           );
         }
 

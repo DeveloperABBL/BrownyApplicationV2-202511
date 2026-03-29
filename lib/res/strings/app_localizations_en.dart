@@ -1342,4 +1342,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get today => 'Today';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get makeOrder => 'Make Order';
+
+  @override
+  String get processingPleaseWait => 'Processing, please wait...';
+
+  @override
+  String get selectPaymentMethod => 'Select Payment Method';
+
+  @override
+  String get orderSummary => 'Order Summary';
+
+  @override
+  String get productDiscount => 'Product Discount';
+
+  @override
+  String get coinValue => 'Value';
+
+  @override
+  String get insufficientCoinTitle => 'Browny Coin Insufficient';
+
+  @override
+  String get changePaymentMethod => 'Please change payment method';
+
+  @override
+  String get incompletePaymentData =>
+      'Incomplete payment data, please try again';
 }

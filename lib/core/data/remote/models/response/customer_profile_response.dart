@@ -57,6 +57,8 @@ class CustomerProfileData {
     this.couponsDiscount,
     this.couponsEVoucher,
     this.totalCoupons,
+    this.coinValue,
+    this.currentCoin,
   });
 
   @JsonKey(name: 'id')
@@ -101,6 +103,12 @@ class CustomerProfileData {
   @JsonKey(name: 'total_coupons')
   final int? totalCoupons;
 
+  @JsonKey(name: 'coin_value')
+  final String? coinValue;
+
+  @JsonKey(name: 'current_coin')
+  final String? currentCoin;
+
   CustomerProfileData copyWith({
     String? id,
     String? name,
@@ -116,6 +124,8 @@ class CustomerProfileData {
     int? couponsDiscount,
     int? couponsEVoucher,
     int? totalCoupons,
+    String? coinValue,
+    String? currentCoin,
   }) {
     return CustomerProfileData(
       id: id ?? this.id,
@@ -132,6 +142,8 @@ class CustomerProfileData {
       couponsDiscount: couponsDiscount ?? this.couponsDiscount,
       couponsEVoucher: couponsEVoucher ?? this.couponsEVoucher,
       totalCoupons: totalCoupons ?? this.totalCoupons,
+      coinValue: coinValue ?? this.coinValue,
+      currentCoin: currentCoin ?? this.currentCoin,
     );
   }
 

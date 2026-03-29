@@ -39,6 +39,8 @@ class WalletModel extends CustomerProfileData {
     int? couponsDiscount,
     int? couponsEVoucher,
     int? totalCoupons,
+    String? coinValue,
+    String? currentCoin,
   }) {
     return WalletModel._fromCustomerProfileData(
         CustomerProfileData(
@@ -48,6 +50,8 @@ class WalletModel extends CustomerProfileData {
           phone: phone ?? this.phone,
           creditBalance: creditBalance ?? super.creditBalance,
           image: image ?? this.image,
+          coinValue: coinValue ?? super.coinValue,
+          currentCoin: currentCoin ?? super.currentCoin,
         ),
       )
       ..amountBadge = amountBadge ?? this.amountBadge

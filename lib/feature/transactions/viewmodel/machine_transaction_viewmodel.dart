@@ -246,9 +246,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     BuildContext context, {
     bool fetchAll = false,
   }) async {
-    // ดึง payment methods จาก couponDetail ตามภาษาปัจจุบัน
+    final localed = context.languageCode;
+    // ดึง payment methods จาก /payment-methods API แล้ว cache ไว้
+    final paymentMethodsResult = await repoDelegate.fetchPaymentMethods();
+    _cachedPaymentMethods = paymentMethodsResult.data.payments ?? [];
+
+    // ดึง payment methods กรองตาม cached methods
     final listPayment = _machineProgramsNotifier.value.data!
-        .paymentMethodsAvailable(context.languageCode);
+        .paymentMethodsAvailable(localed, _cachedPaymentMethods);
 
     // ถ้าไม่มี payment method ให้เลือก
     if (listPayment.isEmpty) {
@@ -291,20 +296,20 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
         // ใส่กลับไปที่ index 0 และ mark เป็น selected
         finalList.insert(0, selected.copyWith(isSelected: true));
         // เอาตัวที่เลือก หรือ TPWallet ขึ้นด้านบน
-        finalList.sort((l, r) {
-          if (l.isSelected) return 0;
-          if (l.isTpWallet) return 0;
-          return 1;
-        });
+        // finalList.sort((l, r) {
+        //   if (l.isSelected) return 0;
+        //   if (l.isTpWallet) return 1;
+        //   if (l.isCoin) return 2;
+        //   return 3;
+        // });
       }
     } else {
       // เอา TPWallet ขึ้นตัวแรกเสมอ
-      finalList.sort((l, r) {
-        if (l.isTpWallet) {
-          return 0;
-        }
-        return 1;
-      });
+      // finalList.sort((l, r) {
+      //   if (l.isTpWallet) return 0;
+      //   if (l.isCoin) return 1;
+      //   return 2;
+      // });
 
       // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
       finalList = finalList.asMap().entries.map((entry) {
@@ -332,10 +337,11 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     // ตรวจสอบว่า couponDetail พร้อมใช้งาน
     if (!_machineProgramsNotifier.value.isSuccess) return;
 
-    // ดึง payment methods ทั้งหมดจาก couponDetail (ไม่ดึงจาก notifier เพราะอาจมีแค่ 3 ตัว)
+    // ดึง payment methods ทั้งหมดกรองตาม cached methods
     final fullList = _machineProgramsNotifier.value.data!
         .paymentMethodsAvailable(
           context.languageCode,
+          _cachedPaymentMethods,
         );
 
     // Mark ทุกตัวเป็น unselected ก่อน
@@ -431,7 +437,8 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   @override
   Future<UiResult<double>> verifyOrder() async {
     try {
-      if (paymentSelected?.isTpWallet == true) {
+      if (paymentSelected?.isTpWallet == true ||
+          paymentSelected?.isCoin == true) {
         final result = await _couponRepo.fetchCustomerCredit(
           currentCustomerProvider.current.id!,
         );
@@ -447,12 +454,19 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
         }
         // update ข้อมูล User ด้วย
         currentCustomerProvider.updateCreditAndCoinBalance(result.data);
-        final tpWalletBalance = double.tryParse(
-          result.data.creditBalance!.replaceAll(',', ''),
-        )!;
+        final double balance;
+        if (paymentSelected?.isTpWallet == true) {
+          balance = double.tryParse(
+            result.data.creditBalance!.replaceAll(',', ''),
+          )!;
+        } else {
+          balance = double.tryParse(
+            result.data.currentCoin!.replaceAll(',', ''),
+          )!;
+        }
 
         final machinePrice = _machineProgramsNotifier.value.data!.getNetPrice();
-        if (tpWalletBalance >= machinePrice) {
+        if (balance >= machinePrice) {
           return UiResult.success(data: machinePrice);
         }
 

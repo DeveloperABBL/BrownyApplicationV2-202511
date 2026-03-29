@@ -27,6 +27,8 @@ class UserModel extends CustomerProfileData {
     required super.brownyCoin,
     required super.avatars,
     required super.totalCoupons,
+    super.coinValue,
+    super.currentCoin,
     List<AvatarData>? avatarDataList,
   }) : avatarDataList = avatarDataList ?? [];
 
@@ -47,6 +49,7 @@ class UserModel extends CustomerProfileData {
     avatarDataList: [],
     isGuest: true,
   );
+
 
   factory UserModel.fromCustomerProfileData(
     CustomerProfileData data, {
@@ -74,6 +77,8 @@ class UserModel extends CustomerProfileData {
       isFriendRewardOn: isFriendRewardOn,
       isGuest: false,
       totalCoupons: data.totalCoupons,
+      coinValue: data.coinValue,
+      currentCoin: data.currentCoin,
     );
   }
 
@@ -97,6 +102,8 @@ class UserModel extends CustomerProfileData {
     int? couponsDiscount,
     int? couponsEVoucher,
     int? totalCoupons,
+    String? coinValue,
+    String? currentCoin,
   }) {
     return UserModel(
       loginPlatform: loginPlatform ?? this.loginPlatform,
@@ -114,6 +121,8 @@ class UserModel extends CustomerProfileData {
       avatars: avatars ?? this.avatars,
       avatarDataList: avatarDataList ?? this.avatarDataList,
       totalCoupons: totalCoupons ?? this.totalCoupons,
+      coinValue: coinValue ?? this.coinValue,
+      currentCoin: currentCoin ?? this.currentCoin,
     );
   }
 

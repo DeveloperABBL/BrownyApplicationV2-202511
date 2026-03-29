@@ -1,4 +1,6 @@
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
@@ -111,7 +113,8 @@ class _AvailablePaymentMethodPageState
                           context.pop();
                         }
                       : null,
-                  child: AppText('เลือก'),
+                  // เลือก
+                  child: AppText(context.wording.select),
                 ),
               );
             },
@@ -119,7 +122,8 @@ class _AvailablePaymentMethodPageState
         ],
         appBar: AppBar(
           title: AppText(
-            'เลือกวิธีการชำระเงิน',
+            // เลือกวิธีการชำระเงิน
+            context.wording.selectPaymentMethod,
             style: context.appBarTextThemeWhite,
           ),
           flexibleSpace: FlexibleSpaceBar(
@@ -129,65 +133,79 @@ class _AvailablePaymentMethodPageState
           ),
         ),
         backgroundColor: AppColors.bareBackground,
-        body: ValueListenableBuilder(
-          valueListenable: widget._viewmodel.paymentMethodNotifier,
-          builder: (context, value, child) {
-            if (value.isLoading) {
-              return _card(
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
+        body: SingleChildScrollView(
+          child: ValueListenableBuilder(
+            valueListenable: widget._viewmodel.paymentMethodNotifier,
+            builder: (context, value, child) {
+              if (value.isLoading) {
+                return _card(
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
 
-            if (value.hasError) {
-              return _card(
-                child: AppText(context.wording.errorUi),
-              );
-            }
+              if (value.hasError) {
+                return _card(
+                  child: AppText(context.wording.errorUi),
+                );
+              }
 
-            return _card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ประเภทชำระแต่ละละแบบ ตามที่ API ส่งมา
-                  ...value.data!.map(
-                    (payment) => _cardPaymentDependOnState(
-                      context,
-                      isTPWallet:
-                          payment.isSelected && payment.method == 'tp_wallet',
-                      selected: payment.isSelected,
-                      child: ListTile(
-                        minVerticalPadding: 0,
-                        contentPadding: EdgeInsets.zero,
-                        minTileHeight: 0,
-                        horizontalTitleGap: AppDims.size_8.w,
-                        leading: payment.icon,
-                        title: AppText(
-                          payment.name,
-                          style: payment.isSelected
-                              ? _textPrimarySelected(context)
-                              : _textPrimary(context),
-                        ),
-                        onTap: () {
-                          widget._viewmodel.onPaymentChanged(
-                            payment,
-                            fetchAll: true,
-                          );
-                        },
-                        trailing: payment.isSelected
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                  right: 6.0.w,
-                                ),
-                                child: Assets.svg.icChecked.svg(),
-                              )
-                            : null,
+              return _card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ประเภทชำระแต่ละละแบบ ตามที่ API ส่งมา
+                    ...value.data!.map(
+                      (payment) => _cardPaymentDependOnState(
+                        payment,
+                        // context,
+                        // isTPWallet:
+                        //     payment.isSelected && payment.method == 'tp_wallet',
+                        // selected: payment.isSelected,
+                        // child: ListTile(
+                        //   minVerticalPadding: 0,
+                        //   contentPadding: EdgeInsets.zero,
+                        //   minTileHeight: 0,
+                        //   horizontalTitleGap: AppDims.size_8.w,
+                        //   leading: payment.imageUrl != null
+                        //       ? CachedNetworkImage(
+                        //           imageUrl: payment.imageUrl!,
+                        //           width: 22.w,
+                        //           height: 22.h,
+                        //           fit: BoxFit.contain,
+                        //           placeholder: (_, __) =>
+                        //               SizedBox(width: 22.w, height: 22.h),
+                        //           errorWidget: (_, __, ___) =>
+                        //               SizedBox(width: 22.w, height: 22.h),
+                        //         )
+                        //       : null,
+                        //   title: AppText(
+                        //     payment.name,
+                        //     style: payment.isSelected
+                        //         ? _textPrimarySelected(context)
+                        //         : _textPrimary(context),
+                        //   ),
+                        //   onTap: () {
+                        //     widget._viewmodel.onPaymentChanged(
+                        //       payment,
+                        //       fetchAll: true,
+                        //     );
+                        //   },
+                        //   trailing: payment.isSelected
+                        //       ? Padding(
+                        //           padding: EdgeInsets.only(
+                        //             right: 6.0.w,
+                        //           ),
+                        //           child: Assets.svg.icChecked.svg(),
+                        //         )
+                        //       : null,
+                        // ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -209,79 +227,193 @@ class _AvailablePaymentMethodPageState
   }
 
   Widget _cardPaymentDependOnState(
-    BuildContext context, {
-    bool selected = false,
-    required bool isTPWallet,
-    required Widget child,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDims.size_16.w,
-        vertical: AppDims.size_16.h,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: selected
-            ? BoxBorder.all(
-                color: AppColors.primary,
-                width: AppDims.size_2.h,
-              )
-            : BoxBorder.all(
-                color: AppColors.border,
-                width: AppDims.size_1.h,
-              ),
-        borderRadius: BorderRadius.circular(
-          AppDims.size_8.r,
+    PaymentMethodModel payment,
+    //   BuildContext context, {
+    //   bool selected = false,
+    //   required bool isTPWallet,
+    //   required Widget child,
+    // }
+  ) {
+    final isSelected = payment.isSelected;
+    final isTPWallet = payment.isTpWallet;
+    final isCoin = payment.isCoin;
+    return GestureDetector(
+      onTap: () {
+        widget._viewmodel.onPaymentChanged(
+          payment,
+          fetchAll: true,
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDims.size_16.w,
+          vertical: AppDims.size_16.h,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          child,
-          if (isTPWallet) ...[
-            Consumer<CustomerProvider>(
-              builder: (context, provider, _) {
-                return ListTile(
-                  minVerticalPadding: AppDims.size_8.h,
-                  contentPadding: EdgeInsets.zero,
-                  minTileHeight: 0,
-                  horizontalTitleGap: AppDims.size_8.w,
-                  title: AppText(
-                    'จำนวนเงินคงเหลือ',
-                    style: _textPrimary(context),
-                  ),
-                  trailing: AppText(
-                    formatCurrency(
-                      leadingSign: '฿ ',
-                      string: provider.current.creditBalance,
-                      decimal: true,
-                    ),
-                    style: _textPrimarySelected(context).copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            ElevatedButton(
-              onPressed: () {
-                context.pushNamed(WalletPage.pageName);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size(54.w, 30.h),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          border: isSelected
+              ? BoxBorder.all(
+                  color: AppColors.primary,
+                  width: AppDims.size_2.h,
+                )
+              : BoxBorder.all(
+                  color: AppColors.border,
+                  width: AppDims.size_1.h,
+                ),
+          borderRadius: BorderRadius.circular(
+            AppDims.size_8.r,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ListTile(
+              minVerticalPadding: 0,
+              contentPadding: EdgeInsets.zero,
+              minTileHeight: 0,
+              horizontalTitleGap: AppDims.size_8.w,
+              leading: payment.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: payment.imageUrl!,
+                      width: 22.w,
+                      height: 22.h,
+                      fit: BoxFit.contain,
+                      placeholder: (_, _) =>
+                          SizedBox(width: 22.w, height: 22.h),
+                      errorWidget: (_, _, _) =>
+                          SizedBox(width: 22.w, height: 22.h),
+                    )
+                  : null,
+              title: AppText(
+                payment.name,
+                style: payment.isSelected
+                    ? _textPrimarySelected(context)
+                    : _textPrimary(context),
               ),
-              child: AppText(
-                context.wording.topup,
-                style: context.textTheme.labelMedium!.copyWith(
-                  color: AppColors.textWhite,
+              trailing: payment.isSelected
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        right: 6.0.w,
+                      ),
+                      child: Assets.svg.icChecked.svg(),
+                    )
+                  : null,
+            ),
+            if (isTPWallet && isSelected) ...[
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return ListTile(
+                    minVerticalPadding: AppDims.size_8.h,
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 0,
+                    horizontalTitleGap: AppDims.size_8.w,
+                    title: AppText(
+                      // จำนวนเงินคงเหลือ
+                      context.wording.balanceRemaining,
+                      style: _textPrimary(context),
+                    ),
+                    trailing: AppText(
+                      formatCurrency(
+                        leadingSign: '฿ ',
+                        string: provider.current.creditBalance,
+                        decimal: true,
+                      ),
+                      style: _textPrimarySelected(context).copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  context.pushNamed(WalletPage.pageName);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(54.w, 30.h),
+                ),
+                child: AppText(
+                  context.wording.topup,
+                  style: context.textTheme.labelMedium!.copyWith(
+                    color: AppColors.textWhite,
+                  ),
                 ),
               ),
-            ),
+            ],
+            if (isCoin) ...[
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return ListTile(
+                    minVerticalPadding: AppDims.size_8.h,
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 0,
+                    horizontalTitleGap: AppDims.size_8.w,
+                    title: AppText(
+                      // มูลค่า
+                      context.wording.coinValue,
+                      style: _textPrimary(context),
+                    ),
+                    trailing: AppText(
+                      formatCurrency(
+                        leadingSign: '฿ ',
+                        string: provider.current.currentCoin,
+                        decimal: true,
+                      ),
+                      style: _textPrimarySelected(context).copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: AppDims.size_4.w,
+                    children: [
+                      payment.imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: payment.imageUrl!,
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                              fit: BoxFit.contain,
+                              placeholder: (_, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                              errorWidget: (_, _, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                            )
+                          : SizedBox(
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                            ),
+                      AppText(
+                        formatCurrency(
+                          string: provider.current.brownyCoin,
+                          decimal: true,
+                          // คอยน์
+                          trailingSign: ' ${context.wording.coin}',
+                        ),
+                        style: _textPrimarySelected(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
@@ -450,7 +451,18 @@ class __MachineContentState extends State<_MachineContent> {
                           contentPadding: EdgeInsets.zero,
                           minTileHeight: 0,
                           horizontalTitleGap: AppDims.size_8.w,
-                          leading: payment.icon,
+                          leading: payment.imageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: payment.imageUrl!,
+                                  width: 22.w,
+                                  height: 22.h,
+                                  fit: BoxFit.contain,
+                                  placeholder: (_, __) =>
+                                      SizedBox(width: 22.w, height: 22.h),
+                                  errorWidget: (_, __, ___) =>
+                                      SizedBox(width: 22.w, height: 22.h),
+                                )
+                              : null,
                           title: AppText(
                             payment.name,
                             style: payment.isSelected

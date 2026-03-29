@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
@@ -264,13 +266,30 @@ class __MachineContentState extends State<_MachineContent>
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
-    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
+    if (result.isEmpty &&
+        (_viewmodel.paymentSelected!.isTpWallet ||
+            _viewmodel.paymentSelected!.isCoin)) {
+      final String title;
+      final String message;
+
+      if (_viewmodel.paymentSelected!.isTpWallet) {
+        // TP+ Wallet เงินไม่เพียงพอ
+        title = context.wording.insufficientWalletBalanceTitle;
+        // กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
+        message = context.wording.insufficientWalletBalanceMessage;
+      } else {
+        // ชำระด้วย Browny Coin ไม่พอ
+        // Browny Coin ไม่เพียงพอ
+        title = context.wording.insufficientCoinTitle;
+        // กรุณาเปลี่ยนวิธีชำระเงิน
+        message = context.wording.changePaymentMethod;
+      }
       AppOverlays.showBrownyDialog(
         context,
         // เดิม: TP+ Wallet เงินไม่เพียงพอ
-        title: context.wording.insufficientWalletBalanceTitle,
+        title: title,
         // เดิม: กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
-        message: context.wording.insufficientWalletBalanceMessage,
+        message: message,
       );
       return;
     }
@@ -340,7 +359,8 @@ class __MachineContentState extends State<_MachineContent>
             if (qrData == null) {
               AppOverlays.showBrownyDialog(
                 context,
-                message: 'ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง',
+                // ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง
+                message: context.wording.incompletePaymentData,
               );
               return;
             }
@@ -412,7 +432,8 @@ class __MachineContentState extends State<_MachineContent>
                             CircularProgressIndicator(),
 
                             AppText(
-                              'กำลังดำเนินการ กรุณารอซักครู่...',
+                              // กำลังดำเนินการ กรุณารอซักครู่...,
+                              context.wording.processingPleaseWait,
                               style: context.textTheme.labelLarge,
                             ),
                           ],
@@ -860,36 +881,48 @@ class __MachineContentState extends State<_MachineContent>
                       .take(3)
                       .map(
                         (payment) => _cardPaymentDependOnState(
-                          isTPWallet:
-                              payment.isSelected &&
-                              payment.method == 'tp_wallet',
-                          selected: payment.isSelected,
-                          child: ListTile(
-                            minVerticalPadding: 0,
-                            contentPadding: EdgeInsets.zero,
-                            minTileHeight: 0,
-                            horizontalTitleGap: AppDims.size_8.w,
-                            leading: payment.icon,
-                            title: AppText(
-                              payment.name,
-                              style: payment.isSelected
-                                  ? _textPrimarySelected
-                                  : _textPrimary,
-                            ),
-                            onTap: () {
-                              _viewmodel.onPaymentChanged(
-                                payment,
-                              );
-                            },
-                            trailing: payment.isSelected
-                                ? Padding(
-                                    padding: EdgeInsets.only(
-                                      right: 6.0.w,
-                                    ),
-                                    child: Assets.svg.icChecked.svg(),
-                                  )
-                                : null,
-                          ),
+                          payment,
+                          // isTPWallet:
+                          //     payment.isSelected &&
+                          //     payment.method == 'tp_wallet',
+                          // selected: payment.isSelected,
+                          // child: ListTile(
+                          //   minVerticalPadding: 0,
+                          //   contentPadding: EdgeInsets.zero,
+                          //   minTileHeight: 0,
+                          //   horizontalTitleGap: AppDims.size_8.w,
+                          //   leading: payment.imageUrl != null
+                          //       ? CachedNetworkImage(
+                          //           imageUrl: payment.imageUrl!,
+                          //           width: 22.w,
+                          //           height: 22.h,
+                          //           fit: BoxFit.contain,
+                          //           placeholder: (_, __) =>
+                          //               SizedBox(width: 22.w, height: 22.h),
+                          //           errorWidget: (_, __, ___) =>
+                          //               SizedBox(width: 22.w, height: 22.h),
+                          //         )
+                          //       : null,
+                          //   title: AppText(
+                          //     payment.name,
+                          //     style: payment.isSelected
+                          //         ? _textPrimarySelected
+                          //         : _textPrimary,
+                          //   ),
+                          //   onTap: () {
+                          //     _viewmodel.onPaymentChanged(
+                          //       payment,
+                          //     );
+                          //   },
+                          //   trailing: payment.isSelected
+                          //       ? Padding(
+                          //           padding: EdgeInsets.only(
+                          //             right: 6.0.w,
+                          //           ),
+                          //           child: Assets.svg.icChecked.svg(),
+                          //         )
+                          //       : null,
+                          // ),
                         ),
                       ),
                 ],
@@ -989,16 +1022,24 @@ class __MachineContentState extends State<_MachineContent>
     );
   }
 
-  Widget _cardPaymentDependOnState({
-    bool selected = false,
-    required bool isTPWallet,
-    required Widget child,
-  }) {
-    return Theme(
-      data: context.appTheme.copyWith(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-      ),
+  Widget _cardPaymentDependOnState(
+    PaymentMethodModel payment,
+    //   , {
+    //   bool selected = false,
+    //   bool isCoin = false,
+    //   required bool isTPWallet,
+    //   required Widget child,
+    // }
+  ) {
+    final isSelected = payment.isSelected;
+    final isTPWallet = payment.isTpWallet;
+    final isCoin = payment.isCoin;
+    return GestureDetector(
+      onTap: () {
+        _viewmodel.onPaymentChanged(
+          payment,
+        );
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
         padding: EdgeInsets.symmetric(
@@ -1007,8 +1048,8 @@ class __MachineContentState extends State<_MachineContent>
         ),
         decoration: BoxDecoration(
           border: BoxBorder.all(
-            color: selected ? AppColors.primary : AppColors.border,
-            width: selected ? AppDims.size_2.h : AppDims.size_1.h,
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? AppDims.size_2.h : AppDims.size_1.h,
           ),
           borderRadius: BorderRadius.circular(
             AppDims.size_8.r,
@@ -1018,8 +1059,37 @@ class __MachineContentState extends State<_MachineContent>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            child,
-            if (isTPWallet) ...[
+            ListTile(
+              minVerticalPadding: 0,
+              contentPadding: EdgeInsets.zero,
+              minTileHeight: 0,
+              horizontalTitleGap: AppDims.size_8.w,
+              leading: payment.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: payment.imageUrl!,
+                      width: 22.w,
+                      height: 22.h,
+                      fit: BoxFit.contain,
+                      placeholder: (_, __) =>
+                          SizedBox(width: 22.w, height: 22.h),
+                      errorWidget: (_, __, ___) =>
+                          SizedBox(width: 22.w, height: 22.h),
+                    )
+                  : null,
+              title: AppText(
+                payment.name,
+                style: payment.isSelected ? _textPrimarySelected : _textPrimary,
+              ),
+              trailing: payment.isSelected
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        right: 6.0.w,
+                      ),
+                      child: Assets.svg.icChecked.svg(),
+                    )
+                  : null,
+            ),
+            if (isTPWallet && isSelected) ...[
               Consumer<CustomerProvider>(
                 builder: (context, provider, _) {
                   return ListTile(
@@ -1061,6 +1131,76 @@ class __MachineContentState extends State<_MachineContent>
                     color: AppColors.textWhite,
                   ),
                 ),
+              ),
+            ],
+            if (isCoin) ...[
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return ListTile(
+                    minVerticalPadding: AppDims.size_8.h,
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 0,
+                    horizontalTitleGap: AppDims.size_8.w,
+                    title: AppText(
+                      // มูลค่า
+                      context.wording.coinValue,
+                      style: _textPrimary,
+                    ),
+                    trailing: AppText(
+                      formatCurrency(
+                        leadingSign: '฿ ',
+                        string: provider.current.currentCoin,
+                        decimal: true,
+                      ),
+                      style: _textPrimarySelected.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: AppDims.size_4.w,
+                    children: [
+                      payment.imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: payment.imageUrl!,
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                              fit: BoxFit.contain,
+                              placeholder: (_, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                              errorWidget: (_, _, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                            )
+                          : SizedBox(
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                            ),
+                      AppText(
+                        formatCurrency(
+                          string: provider.current.brownyCoin,
+                          decimal: true,
+                          // คอยน์
+                          trailingSign: ' ${context.wording.coin}',
+                        ),
+                        style: _textPrimarySelected.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ],

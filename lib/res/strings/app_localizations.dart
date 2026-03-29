@@ -2667,6 +2667,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today'**
   String get today;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @makeOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Make Order'**
+  String get makeOrder;
+
+  /// No description provided for @processingPleaseWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing, please wait...'**
+  String get processingPleaseWait;
+
+  /// No description provided for @selectPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Payment Method'**
+  String get selectPaymentMethod;
+
+  /// No description provided for @orderSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Summary'**
+  String get orderSummary;
+
+  /// No description provided for @productDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Discount'**
+  String get productDiscount;
+
+  /// No description provided for @coinValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get coinValue;
+
+  /// No description provided for @insufficientCoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Coin Insufficient'**
+  String get insufficientCoinTitle;
+
+  /// No description provided for @changePaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Please change payment method'**
+  String get changePaymentMethod;
+
+  /// No description provided for @incompletePaymentData.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete payment data, please try again'**
+  String get incompletePaymentData;
 }
 
 class _AppLocalizationsDelegate

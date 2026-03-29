@@ -2,6 +2,8 @@
 
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_order_response.dart';
 import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
@@ -134,9 +136,12 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
         AppOverlays.showBrownyDialog(
           context,
           imageAsset: Assets.png.brownyError2.path,
-          title: 'ไม่พบรายการ',
-          message: 'ไม่พบรายการสั่งซื้อนี้',
-          confirmText: 'ตกลง',
+          // ไม่พบรายการ
+          title: context.wording.orderNotFoundTitle,
+          // ไม่พบรายการสั่งซื้อนี้
+          message: context.wording.orderNotFoundMessage,
+          // ตกลง
+          confirmText: context.wording.ok,
           onConfirm: () {},
         );
       }
@@ -148,11 +153,28 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
-    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
+    if (result.isEmpty &&
+        (_viewmodel.paymentSelected!.isTpWallet ||
+            _viewmodel.paymentSelected!.isCoin)) {
+      final String title;
+      final String message;
+
+      if (_viewmodel.paymentSelected!.isTpWallet) {
+        // TP+ Wallet เงินไม่เพียงพอ
+        title = context.wording.insufficientWalletBalanceTitle;
+        // กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
+        message = context.wording.insufficientWalletBalanceMessage;
+      } else {
+        // ชำระด้วย Browny Coin ไม่พอ
+        // Browny Coin ไม่เพียงพอ
+        title = context.wording.insufficientCoinTitle;
+        // กรุณาเปลี่ยนวิธีชำระเงิน
+        message = context.wording.changePaymentMethod;
+      }
       AppOverlays.showBrownyDialog(
         context,
-        title: 'TP+ Wallet เงินไม่เพียงพอ',
-        message: 'กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน',
+        title: title,
+        message: message,
       );
       return;
     }
@@ -179,7 +201,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
             if (orderData == null) {
               AppOverlays.showBrownyDialog(
                 context,
-                message: 'ไม่สามารถสร้างคำสั่งซื้อได้',
+                // ไม่สามารถสร้างคำสั่งซื้อได้
+                message: context.wording.cannotCreateOrder,
               );
               return;
             }
@@ -199,7 +222,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
             if (qrData == null) {
               AppOverlays.showBrownyDialog(
                 context,
-                message: 'ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง',
+                // ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง
+                message: context.wording.incompletePaymentData,
               );
               return;
             }
@@ -273,7 +297,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                             CircularProgressIndicator(),
 
                             AppText(
-                              'กำลังดำเนินการ กรุณารอซักครู่...',
+                              // กำลังดำเนินการ กรุณารอซักครู่...
+                              context.wording.processingPleaseWait,
                               style: context.textTheme.labelLarge,
                             ),
                           ],
@@ -340,7 +365,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
       ],
       appBar: AppBar(
         title: AppText(
-          'ทำการสั่งซื้อ',
+          // ทำการสั่งซื้อ
+          context.wording.makeOrder,
           style: context.appBarTextThemeWhite,
         ),
         actions: [
@@ -519,7 +545,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
 
                                 Expanded(
                                   child: AppText(
-                                    'เลือกวิธีชำระเงิน',
+                                    // เลือกวิธีชำระเงิน
+                                    context.wording.selectPaymentMethod,
                                     style: _textPrimary,
                                   ),
                                 ),
@@ -535,7 +562,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                                   child: Row(
                                     children: [
                                       AppText(
-                                        'ดูทั้งหมด',
+                                        // ดูทั้งหมด
+                                        context.wording.seeAll,
                                         style: _textPrimary,
                                       ),
                                       AppDims.horizonPadding_8,
@@ -552,36 +580,53 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                                 .take(3)
                                 .map(
                                   (payment) => _cardPaymentDependOnState(
-                                    isTPWallet:
-                                        payment.isSelected &&
-                                        payment.method == 'tp_wallet',
-                                    selected: payment.isSelected,
-                                    child: ListTile(
-                                      minVerticalPadding: 0,
-                                      contentPadding: EdgeInsets.zero,
-                                      minTileHeight: 0,
-                                      horizontalTitleGap: AppDims.size_8.w,
-                                      leading: payment.icon,
-                                      title: AppText(
-                                        payment.name,
-                                        style: payment.isSelected
-                                            ? _textPrimarySelected
-                                            : _textPrimary,
-                                      ),
-                                      onTap: () {
-                                        _viewmodel.onPaymentChanged(
-                                          payment,
-                                        );
-                                      },
-                                      trailing: payment.isSelected
-                                          ? Padding(
-                                              padding: EdgeInsets.only(
-                                                right: 6.0.w,
-                                              ),
-                                              child: Assets.svg.icChecked.svg(),
-                                            )
-                                          : null,
-                                    ),
+                                    payment,
+                                    // isTPWallet:
+                                    //     payment.isSelected &&
+                                    //     payment.method == 'tp_wallet',
+                                    // selected: payment.isSelected,
+                                    // child: ListTile(
+                                    //   minVerticalPadding: 0,
+                                    //   contentPadding: EdgeInsets.zero,
+                                    //   minTileHeight: 0,
+                                    //   horizontalTitleGap: AppDims.size_8.w,
+                                    //   leading: payment.imageUrl != null
+                                    //       ? CachedNetworkImage(
+                                    //           imageUrl: payment.imageUrl!,
+                                    //           width: 22.w,
+                                    //           height: 22.h,
+                                    //           fit: BoxFit.contain,
+                                    //           placeholder: (_, _) => SizedBox(
+                                    //             width: 22.w,
+                                    //             height: 22.h,
+                                    //           ),
+                                    //           errorWidget: (_, _, _) =>
+                                    //               SizedBox(
+                                    //                 width: 22.w,
+                                    //                 height: 22.h,
+                                    //               ),
+                                    //         )
+                                    //       : null,
+                                    //   title: AppText(
+                                    //     payment.name,
+                                    //     style: payment.isSelected
+                                    //         ? _textPrimarySelected
+                                    //         : _textPrimary,
+                                    //   ),
+                                    //   onTap: () {
+                                    //     _viewmodel.onPaymentChanged(
+                                    //       payment,
+                                    //     );
+                                    //   },
+                                    //   trailing: payment.isSelected
+                                    //       ? Padding(
+                                    //           padding: EdgeInsets.only(
+                                    //             right: 6.0.w,
+                                    //           ),
+                                    //           child: Assets.svg.icChecked.svg(),
+                                    //         )
+                                    //       : null,
+                                    // ),
                                   ),
                                 ),
                           ],
@@ -603,7 +648,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                             AppDims.horizonPadding_8,
 
                             AppText(
-                              'สรุปการสั่งซื้อ',
+                              // สรุปการสั่งซื้อ
+                              context.wording.orderSummary,
                               style: _textPrimary,
                             ),
                           ],
@@ -613,19 +659,22 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                         // detail
                         // Title
                         _lineSummay(
-                          title: 'สรุปการสั่งซื้อ',
+                          // สรุปการสั่งซื้อ
+                          title: context.wording.orderSummary,
                           price: package.price.ifNullOrEmpty('0.0'),
                         ),
                         AppDims.vericalPadding_16,
                         // ส่วนลดถ้ามี
                         _lineSummay(
-                          title: 'ส่วนลดสินค้า',
+                          // ส่วนลดสินค้า
+                          title: context.wording.productDiscount,
                           price: '0',
                         ),
                         AppDims.vericalPadding_16,
                         // สรุปยอด
                         _lineSummay(
-                          title: 'ยอดชำระทั้งหมด',
+                          // ยอดชำระทั้งหมด
+                          title: context.wording.totalPayment,
                           price: package.price.ifNullOrEmpty('0.0'),
                           textPriceColor: AppColors.primary,
                         ),
@@ -707,75 +756,192 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
     );
   }
 
-  Widget _cardPaymentDependOnState({
-    bool selected = false,
-    required bool isTPWallet,
-    required Widget child,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: selected ? AppDims.size_16.w : AppDims.size_8.w,
-        vertical: selected ? AppDims.size_16.h : AppDims.size_8.h,
-      ),
-      decoration: selected
-          ? BoxDecoration(
-              border: BoxBorder.all(
-                color: AppColors.primary,
-                width: AppDims.size_2.h,
+  Widget _cardPaymentDependOnState(
+    PaymentMethodModel payment,
+    //   , {
+    //   bool selected = false,
+    //   bool isCoin = false,
+    //   required bool isTPWallet,
+    //   required Widget child,
+    // }
+  ) {
+    final isSelected = payment.isSelected;
+    final isTPWallet = payment.isTpWallet;
+    final isCoin = payment.isCoin;
+    return GestureDetector(
+      onTap: () {
+        _viewmodel.onPaymentChanged(
+          payment,
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? AppDims.size_16.w : AppDims.size_8.w,
+          vertical: isSelected ? AppDims.size_16.h : AppDims.size_8.h,
+        ),
+        decoration: isSelected
+            ? BoxDecoration(
+                border: BoxBorder.all(
+                  color: AppColors.primary,
+                  width: AppDims.size_2.h,
+                ),
+                borderRadius: BorderRadius.circular(
+                  AppDims.size_8.r,
+                ),
+              )
+            : null,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ListTile(
+              minVerticalPadding: 0,
+              contentPadding: EdgeInsets.zero,
+              minTileHeight: 0,
+              horizontalTitleGap: AppDims.size_8.w,
+              leading: payment.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: payment.imageUrl!,
+                      width: AppDims.size_22.w,
+                      height: AppDims.size_22.h,
+                      fit: BoxFit.contain,
+                      placeholder: (_, _) => SizedBox(
+                        width: AppDims.size_22.w,
+                        height: AppDims.size_22.h,
+                      ),
+                      errorWidget: (_, _, _) => SizedBox(
+                        width: AppDims.size_22.w,
+                        height: AppDims.size_22.h,
+                      ),
+                    )
+                  : null,
+              title: AppText(
+                payment.name,
+                style: payment.isSelected ? _textPrimarySelected : _textPrimary,
               ),
-              borderRadius: BorderRadius.circular(
-                AppDims.size_8.r,
-              ),
-            )
-          : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          child,
-          if (isTPWallet) ...[
-            Consumer<CustomerProvider>(
-              builder: (context, provider, _) {
-                return ListTile(
-                  minVerticalPadding: AppDims.size_8.h,
-                  contentPadding: EdgeInsets.zero,
-                  minTileHeight: 0,
-                  horizontalTitleGap: AppDims.size_8.w,
-                  title: AppText(
-                    'จำนวนเงินคงเหลือ',
-                    style: _textPrimary,
-                  ),
-                  trailing: AppText(
-                    formatCurrency(
-                      leadingSign: '฿ ',
-                      string: provider.current.creditBalance,
-                      decimal: true,
-                    ),
-                    style: _textPrimarySelected.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              },
+              trailing: payment.isSelected
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        right: AppDims.size_6.w,
+                      ),
+                      child: Assets.svg.icChecked.svg(),
+                    )
+                  : null,
             ),
-
-            ElevatedButton(
-              onPressed: () {
-                context.pushNamed(WalletPage.pageName);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size(54.w, 30.h),
+            if (isTPWallet && isSelected) ...[
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return ListTile(
+                    minVerticalPadding: AppDims.size_8.h,
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 0,
+                    horizontalTitleGap: AppDims.size_8.w,
+                    title: AppText(
+                      // จำนวนเงินคงเหลือ
+                      context.wording.balanceRemaining,
+                      style: _textPrimary,
+                    ),
+                    trailing: AppText(
+                      formatCurrency(
+                        leadingSign: '฿ ',
+                        string: provider.current.creditBalance,
+                        decimal: true,
+                      ),
+                      style: _textPrimarySelected.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                },
               ),
-              child: AppText(
-                context.wording.topup,
-                style: context.textTheme.labelMedium!.copyWith(
-                  color: AppColors.textWhite,
+              ElevatedButton(
+                onPressed: () {
+                  context.pushNamed(WalletPage.pageName);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(54.w, 30.h),
+                ),
+                child: AppText(
+                  context.wording.topup,
+                  style: context.textTheme.labelMedium!.copyWith(
+                    color: AppColors.textWhite,
+                  ),
                 ),
               ),
-            ),
+            ],
+            if (isCoin) ...[
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return ListTile(
+                    minVerticalPadding: AppDims.size_8.h,
+                    contentPadding: EdgeInsets.zero,
+                    minTileHeight: 0,
+                    horizontalTitleGap: AppDims.size_8.w,
+                    title: AppText(
+                      // มูลค่า
+                      context.wording.coinValue,
+                      style: _textPrimary,
+                    ),
+                    trailing: AppText(
+                      formatCurrency(
+                        leadingSign: '฿ ',
+                        string: provider.current.currentCoin,
+                        decimal: true,
+                      ),
+                      style: _textPrimarySelected.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              Consumer<CustomerProvider>(
+                builder: (context, provider, _) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: AppDims.size_4.w,
+                    children: [
+                      payment.imageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: payment.imageUrl!,
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                              fit: BoxFit.contain,
+                              placeholder: (_, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                              errorWidget: (_, _, _) => SizedBox(
+                                width: AppDims.size_12.w,
+                                height: AppDims.size_12.h,
+                              ),
+                            )
+                          : SizedBox(
+                              width: AppDims.size_12.w,
+                              height: AppDims.size_12.h,
+                            ),
+                      AppText(
+                        formatCurrency(
+                          string: provider.current.brownyCoin,
+                          decimal: true,
+                          // คอยน์
+                          trailingSign: ' ${context.wording.coin}',
+                        ),
+                        style: _textPrimarySelected.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -1307,4 +1307,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get today => '今天';
+
+  @override
+  String get ok => '确定';
+
+  @override
+  String get makeOrder => '下单';
+
+  @override
+  String get processingPleaseWait => '处理中，请稍候...';
+
+  @override
+  String get selectPaymentMethod => '选择付款方式';
+
+  @override
+  String get orderSummary => '订单摘要';
+
+  @override
+  String get productDiscount => '商品折扣';
+
+  @override
+  String get coinValue => '价值';
+
+  @override
+  String get insufficientCoinTitle => 'Browny Coin 余额不足';
+
+  @override
+  String get changePaymentMethod => '请更换付款方式';
+
+  @override
+  String get incompletePaymentData => '付款信息不完整，请重试';
 }

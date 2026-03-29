@@ -427,5 +427,15 @@
   "collectTomorrow": "รับพรุ่งนี้",
   "collectCoinSuccess": "รับ Browny Coin สำเร็จ",
   "collectCoinMotivation": "เก็บต่อทุกวัน สิทธิประโยชน์ดีๆ รออยู่เพียบ!",
-  "today": "วันนี้"
+  "today": "วันนี้",
+  "ok": "ตกลง",
+  "makeOrder": "ทำการสั่งซื้อ",
+  "processingPleaseWait": "กำลังดำเนินการ กรุณารอซักครู่...",
+  "selectPaymentMethod": "เลือกวิธีการชำระเงิน",
+  "orderSummary": "สรุปการสั่งซื้อ",
+  "productDiscount": "ส่วนลดสินค้า",
+  "coinValue": "มูลค่า",
+  "insufficientCoinTitle": "Browny Coin ไม่เพียงพอ",
+  "changePaymentMethod": "กรุณาเปลี่ยนวิธีชำระเงิน",
+  "incompletePaymentData": "ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง"
 }

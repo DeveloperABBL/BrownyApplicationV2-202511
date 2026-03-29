@@ -425,5 +425,15 @@
   "collectTomorrow": "明天领取",
   "collectCoinSuccess": "成功领取Browny金币",
   "collectCoinMotivation": "每天坚持领取，丰厚奖励等着你！",
-  "today": "今天"
+  "today": "今天",
+  "ok": "确定",
+  "makeOrder": "下单",
+  "processingPleaseWait": "处理中，请稍候...",
+  "selectPaymentMethod": "选择付款方式",
+  "orderSummary": "订单摘要",
+  "productDiscount": "商品折扣",
+  "coinValue": "价值",
+  "insufficientCoinTitle": "Browny Coin 余额不足",
+  "changePaymentMethod": "请更换付款方式",
+  "incompletePaymentData": "付款信息不完整，请重试"
 }

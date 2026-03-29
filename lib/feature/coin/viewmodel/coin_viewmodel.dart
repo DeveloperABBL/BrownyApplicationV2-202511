@@ -97,6 +97,8 @@ class CoinViewmModel extends AppViewModel {
       profileResult.data.copyWith(
         creditBalance: profileDataLocal.data.creditBalance,
         brownyCoin: profileDataLocal.data.brownyCoin,
+        coinValue: profileDataLocal.data.coinValue,
+        currentCoin: profileDataLocal.data.currentCoin,
       ),
     );
 

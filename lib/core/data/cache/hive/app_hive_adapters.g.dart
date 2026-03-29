@@ -83,13 +83,15 @@ class CustomerProfileDataAdapter extends TypeAdapter<CustomerProfileData> {
       couponsDiscount: (fields[11] as num?)?.toInt(),
       couponsEVoucher: (fields[12] as num?)?.toInt(),
       totalCoupons: (fields[13] as num?)?.toInt(),
+      coinValue: fields[14] as String?,
+      currentCoin: fields[15] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CustomerProfileData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -117,7 +119,11 @@ class CustomerProfileDataAdapter extends TypeAdapter<CustomerProfileData> {
       ..writeByte(12)
       ..write(obj.couponsEVoucher)
       ..writeByte(13)
-      ..write(obj.totalCoupons);
+      ..write(obj.totalCoupons)
+      ..writeByte(14)
+      ..write(obj.coinValue)
+      ..writeByte(15)
+      ..write(obj.currentCoin);
   }
 
   @override
