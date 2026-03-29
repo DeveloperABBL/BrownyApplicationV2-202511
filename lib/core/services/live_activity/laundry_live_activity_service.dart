@@ -10,6 +10,9 @@ class LaundryLiveActivityData {
   final String machineNumber;
   final String serviceType; // "wash" / "dry" / "wash_dry"
   final String branchName;
+  final String machineName; // ชื่อเครื่อง เช่น "เครื่องซัก 2 - 16 กก."
+  final String startTime; // เวลาเริ่มต้น เช่น "16:00"
+  final String finishTime; // เวลาเสร็จสิ้น เช่น "16:30"
   final int remainingSeconds;
   final int totalSeconds;
   final bool isCompleted;
@@ -19,6 +22,9 @@ class LaundryLiveActivityData {
     required this.machineNumber,
     required this.serviceType,
     required this.branchName,
+    this.machineName = '',
+    this.startTime = '',
+    this.finishTime = '',
     required this.remainingSeconds,
     required this.totalSeconds,
     this.isCompleted = false,
@@ -33,6 +39,9 @@ class LaundryLiveActivityData {
     'machine_number': machineNumber,
     'service_type': serviceType,
     'branch_name': branchName,
+    'machine_name': machineName,
+    'start_time': startTime,
+    'finish_time': finishTime,
     'remaining_seconds': remainingSeconds,
     'total_seconds': totalSeconds,
     'is_completed': isCompleted,
@@ -46,6 +55,9 @@ class LaundryLiveActivityData {
     machineNumber: machineNumber,
     serviceType: serviceType,
     branchName: branchName,
+    machineName: machineName,
+    startTime: startTime,
+    finishTime: finishTime,
     remainingSeconds: remainingSeconds ?? this.remainingSeconds,
     totalSeconds: totalSeconds,
     isCompleted: isCompleted ?? this.isCompleted,

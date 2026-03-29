@@ -126,11 +126,38 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
           // เริ่ม Timer เพื่ออัพเดท UI
           _startStatusTimer(machineDetail);
+
+          // เริ่ม Live Activity (iOS)
+          _startLiveActivity(machineDetail);
         }
       }
     } catch (e) {
       debugPrint('Error calculating slider values: $e');
     }
+  }
+
+  /// เริ่ม Live Activity สำหรับแสดงสถานะเครื่องบน Lock Screen / Dynamic Island
+  Future<void> _startLiveActivity(MachineDetailResponse machineDetail) async {
+    final remaining = _remainingDurationNotifier.value;
+    if (remaining == null) return;
+
+    final startTimeStr = machineDetail.startTime != null
+        ? '${machineDetail.startTime!.hour.toString().padLeft(2, '0')}:${machineDetail.startTime!.minute.toString().padLeft(2, '0')}'
+        : '';
+
+    await LaundryLiveActivityService.instance.startActivity(
+      data: LaundryLiveActivityData(
+        machineId: '${machineDetail.id ?? 0}',
+        machineNumber: machineDetail.machineNo ?? '',
+        serviceType: machineDetail.isDryer ? 'dry' : 'wash',
+        branchName: machineDetail.getStoreNameDisplay('th'),
+        machineName: machineDetail.getMachineNameDisplay('th'),
+        startTime: startTimeStr,
+        finishTime: machineDetail.finishDatatime ?? '',
+        remainingSeconds: remaining.inSeconds,
+        totalSeconds: _totalDurationInSeconds.toInt(),
+      ),
+    );
   }
 
   /// เริ่ม Timer สำหรับอัพเดท remaining time ทุก 1 วินาที
@@ -144,13 +171,19 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     _statusUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final currentDuration = _remainingDurationNotifier.value;
       if (currentDuration != null && currentDuration.inSeconds > 0) {
+        final newSeconds = currentDuration.inSeconds - 1;
         // อัพเดทเฉพาะ ValueNotifier ไม่ทำให้ rebuild ทั้ง widget
-        _remainingDurationNotifier.value = Duration(
-          seconds: currentDuration.inSeconds - 1,
-        );
+        _remainingDurationNotifier.value = Duration(seconds: newSeconds);
+
+        // อัพเดท Live Activity ทุก 15 วินาที
+        if (newSeconds % 15 == 0) {
+          LaundryLiveActivityService.instance
+              .updateRemainingTime(remainingSeconds: newSeconds);
+        }
       } else {
-        // หมดเวลาแล้ว หยุด timer
+        // หมดเวลาแล้ว หยุด timer + จบ Live Activity
         timer.cancel();
+        LaundryLiveActivityService.instance.endActivity(isCompleted: true);
       }
     });
   }

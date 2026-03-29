@@ -17,6 +17,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A33673FBF61927724E94992E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2B4C829835514D633132DCD8 /* GoogleService-Info.plist */; };
+		B2322B202F77E7F4007A9269 /* Prompt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B2322B1F2F77E7F4007A9269 /* Prompt-Medium.ttf */; };
 		B2C969332F66C1ED00CE993D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2C969322F66C1ED00CE993D /* WidgetKit.framework */; };
 		B2C969352F66C1ED00CE993D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2C969342F66C1ED00CE993D /* SwiftUI.framework */; };
 		B2C969442F66C1EF00CE993D /* BrownyLiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B2C969312F66C1ED00CE993D /* BrownyLiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -85,6 +86,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9B7A61E3979AA5944BAF05A7 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		9E5F6474ABE50D29E4B00E18 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2322B1F2F77E7F4007A9269 /* Prompt-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Prompt-Medium.ttf"; sourceTree = "<group>"; };
 		B2C969312F66C1ED00CE993D /* BrownyLiveActivityExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrownyLiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2C969322F66C1ED00CE993D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B2C969342F66C1ED00CE993D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -171,6 +173,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				B2322B1F2F77E7F4007A9269 /* Prompt-Medium.ttf */,
 				B2C9694F2F66C27100CE993D /* BrownyLiveActivityExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
@@ -369,6 +372,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2322B202F77E7F4007A9269 /* Prompt-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,7 @@ import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_vo
 import 'package:browny_applications_new/feature/transactions/viewmodel/purchase_coupon_viewmodel_delegate.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:browny_applications_new/core/services/live_activity/laundry_live_activity_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;

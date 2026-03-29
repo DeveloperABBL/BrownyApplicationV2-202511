@@ -268,27 +268,22 @@ class HomePageViewmodel extends AppViewModel {
 
       _workingMachinesNotifier.value = UiResult.success(data: result.data);
 
-      // [DEBUG] POC: เริ่ม Live Activity จากเครื่องแรกที่กำลังทำงาน
-      // if (kDebugMode) {
-      //   final machines = result.data.data;
-      //   if (machines != null && machines.isNotEmpty) {
-      //     final machine = machines.first;
-      //     final remaining =
-      //         CustomerServicesWorkingModel.fromWorkingMachineResponse(
-      //           machine,
-      //         ).remainingTimeDuration;
-      //     await LaundryLiveActivityService.instance.startActivity(
-      //       data: LaundryLiveActivityData(
-      //         machineId: '${machine.id ?? 0}',
-      //         machineNumber: machine.getNameDisplay('th'),
-      //         serviceType: 'wash',
-      //         branchName: '',
-      //         remainingSeconds: remaining.inSeconds,
-      //         totalSeconds: remaining.inSeconds,
-      //       ),
-      //     );
-      //   }
-      // }
+      // [DEBUG] POC: เริ่ม Live Activity ด้วยข้อมูล mockup เพื่อดู design
+      if (kDebugMode) {
+        await LaundryLiveActivityService.instance.startActivity(
+          data: LaundryLiveActivityData(
+            machineId: 'mock_001',
+            machineNumber: '5',
+            serviceType: 'wash',
+            branchName: 'สาขาปั้มเทสโก้ บางหว้า เพชรเกษม 33',
+            machineName: 'เครื่องซัก 2 - 16 กก.',
+            startTime: '16:00',
+            finishTime: '16:30',
+            remainingSeconds: 21 * 60, // 21 นาที
+            totalSeconds: 30 * 60, // 30 นาที
+          ),
+        );
+      }
     } on Exception catch (e) {
       _workingMachinesNotifier.value = UiResult.error(error: e);
     }

@@ -58,6 +58,9 @@ BrownyLiveActivity Widget Extension
 | `machine_number` | String | หมายเลขเครื่อง |
 | `service_type` | String | `"wash"` / `"dry"` / `"wash_dry"` |
 | `branch_name` | String | ชื่อสาขา |
+| `machine_name` | String | ชื่อเครื่อง เช่น "เครื่องซัก 2 - 16 กก." |
+| `start_time` | String | เวลาเริ่มต้น เช่น "16:00" |
+| `finish_time` | String | เวลาเสร็จสิ้น เช่น "16:30" |
 
 ### ActivityAttributes (Static — กำหนดตอน start ไม่เปลี่ยน)
 
