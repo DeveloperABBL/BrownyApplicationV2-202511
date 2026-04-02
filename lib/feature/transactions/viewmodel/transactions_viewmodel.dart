@@ -363,14 +363,16 @@ class TransactionsViewmodel extends AppViewModel
           context,
           // ไม่สามารถเข้าถึงตำแหน่งได้,
           title: context.wording.locationAccessDeniedTitle,
+          // กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ
           message: ContentLocalizeData(
-            en: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
-            zh: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
+            en: 'Please grant location access to show nearest branches',
+            zh: '请授予位置权限以显示最近的分支机构',
             th: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
           ).getTextByLocale(context.languageCode),
+          // เปิด Setting
           confirmText: ContentLocalizeData(
-            en: 'เปิด Setting',
-            zh: 'เปิด Setting',
+            en: 'Open Settings',
+            zh: '打开设置',
             th: 'เปิด Setting',
           ).getTextByLocale(context.languageCode),
           onConfirm: () async {
@@ -637,7 +639,7 @@ class TransactionsViewmodel extends AppViewModel
     // ตรวจสอบว่ามี payment method ที่เลือกหรือไม่
     if (_paymentSelected == null) {
       return UiResult.empty(
-        error: Exception('กรุณาเลือกวิธีชำระเงิน'),
+        error: Exception(context.wording.selectPaymentMethodRequired),
       );
     }
 
@@ -645,7 +647,7 @@ class TransactionsViewmodel extends AppViewModel
     final customerId = currentCustomerProvider.current.id;
     if (customerId == null || customerId.isEmpty) {
       return UiResult.error(
-        error: Exception('ไม่พบข้อมูลผู้ใช้'),
+        error: Exception(context.wording.userDataNotFound),
       );
     }
 
@@ -952,8 +954,10 @@ class TransactionsViewmodel extends AppViewModel
       await AppOverlays.showBrownyDialog(
         context,
         imageAsset: Assets.png.brownySuccess2.path,
-        title: 'ยินดีด้วย',
-        message: 'คุณได้ทำการเพิ่มคูปองสำเร็จ',
+        // ยินดีด้วย,
+        title: context.wording.congratulations,
+        // คุณได้ทำการเพิ่มคูปองสำเร็จ,
+        message: context.wording.couponAddedSuccessfully,
       );
     }
 

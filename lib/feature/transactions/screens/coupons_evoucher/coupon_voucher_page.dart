@@ -482,6 +482,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             AppDims.vericalPadding_16,
 
             AppText(
+              // พบกันเร็ว ๆ นี้
               ContentLocalizeData(
                 en: 'Coming Soon.',
                 zh: '敬请期待',

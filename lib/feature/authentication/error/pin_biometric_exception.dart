@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/widgets.dart';
 
 // ========== PIN Exceptions ==========
@@ -8,7 +9,8 @@ sealed class PinExceptions implements Exception {
   PinExceptions([this.message]);
 
   String toUiMessage(BuildContext context) {
-    return message ?? 'เกิดข้อผิดพลาด';
+    // เกิดข้อผิดพลาด
+    return message ?? context.wording.error;
   }
 }
 
@@ -78,7 +80,8 @@ sealed class BiometricExceptions implements Exception {
   BiometricExceptions([this.message]);
 
   String toUiMessage(BuildContext context) {
-    return message ?? 'เกิดข้อผิดพลาด';
+    // เกิดข้อผิดพลาด
+    return message ?? context.wording.error;
   }
 }
 
@@ -112,9 +115,8 @@ class BiometricUserCanceled extends BiometricExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    // TODO: Add to localization file
-    return 'คุณยกเลิกการยืนยันตัวตน';
-    // return context.wording.biometricUserCanceled;
+    // คุณยกเลิกการยืนยันตัวตน
+    return context.wording.userCancelledBiometric;
   }
 }
 
@@ -124,9 +126,8 @@ class BiometricLockedOut extends BiometricExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    // TODO: Add to localization file
-    return 'ลองผิดหลายครั้งเกินไป\nกรุณารอสักครู่หรือใช้ PIN';
-    // return context.wording.biometricLockedOut;
+    // ลองผิดหลายครั้งเกินไป กรุณารอสักครู่หรือใช้ PIN
+    return context.wording.biometricLockedOut;
   }
 }
 
@@ -136,9 +137,8 @@ class BiometricPermanentlyLockedOut extends BiometricExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    // TODO: Add to localization file
-    return 'Biometric ถูกล็อกถาวร\nกรุณาใช้ PIN';
-    // return context.wording.biometricPermanentlyLockedOut;
+    // Biometric ถูกล็อกถาวร กรุณาใช้ PIN
+    return context.wording.biometricPermanentlyLocked;
   }
 }
 
@@ -148,9 +148,8 @@ class BiometricAuthFailed extends BiometricExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    // TODO: Add to localization file
-    return 'การยืนยันตัวตนล้มเหลว';
-    // return context.wording.biometricAuthFailed;
+    // การยืนยันตัวตนล้มเหลว
+    return context.wording.biometricAuthFailed;
   }
 }
 

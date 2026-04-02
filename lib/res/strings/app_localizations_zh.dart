@@ -954,7 +954,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scanCoupon => '扫描优惠券';
 
   @override
-  String get sakob => 'Sakob';
+  String get sakob => '洗-烘';
 
   @override
   String get all => '全部';
@@ -1337,4 +1337,181 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get incompletePaymentData => '付款信息不完整，请重试';
+
+  @override
+  String get alreadyClaimed => '已领取';
+
+  @override
+  String get claimExpired => '已过期';
+
+  @override
+  String get claimsFullyAllocated => '配额已满';
+
+  @override
+  String get claimReward => '领取奖励';
+
+  @override
+  String get claimSuccessMessage => '成功领取奖励';
+
+  @override
+  String get noArticlesData => '未找到文章';
+
+  @override
+  String get noArticlesInCategory => '此类别中没有文章';
+
+  @override
+  String get viewMore => '查看更多';
+
+  @override
+  String get invalidCouponCode => '您的优惠券代码无效';
+
+  @override
+  String get couponAlreadyCollected => '您已经领取过此优惠券';
+
+  @override
+  String get invalidOldPassword => '旧密码不正确';
+
+  @override
+  String get newPasswordSameAsOld => '新密码不能与旧密码相同';
+
+  @override
+  String get error => '发生错误';
+
+  @override
+  String get userCancelledBiometric => '您已取消身份验证';
+
+  @override
+  String get biometricLockedOut => '尝试次数过多\\n请稍候或使用PIN码';
+
+  @override
+  String get biometricPermanentlyLocked => '生物识别已永久锁定\\n请使用PIN码';
+
+  @override
+  String get biometricAuthFailed => '身份验证失败';
+
+  @override
+  String get verifyIdentityToContinue => '请验证身份以继续';
+
+  @override
+  String get passwordMismatch => '密码不匹配';
+
+  @override
+  String get cannotSelfInvite => '无法输入您自己的电话号码';
+
+  @override
+  String get unsupported => '不支持';
+
+  @override
+  String get noNotifications => '没有通知';
+
+  @override
+  String get copied => '已复制';
+
+  @override
+  String get scannedActivityAlready => '您已扫描过此活动';
+
+  @override
+  String get tryActivityNextDay => '请明天再试一次';
+
+  @override
+  String get scanToStart => '扫描开始';
+
+  @override
+  String get confirmSkip => '确认跳过';
+
+  @override
+  String get confirmSkipMessage => '您是否想跳过保存档案信息？';
+
+  @override
+  String get requestLocation => '请求位置';
+
+  @override
+  String get locationPermissionMessage => '请在设备设置中启用位置访问权限';
+
+  @override
+  String get cameraAccessDenied => '无法打开摄像头';
+
+  @override
+  String get cameraPermissionRequired => '请在使用此功能前授予摄像头权限';
+
+  @override
+  String get locationForNearestBranch => '请授予位置权限以显示最近的分支机构';
+
+  @override
+  String get machineInUse => '机器正在使用中';
+
+  @override
+  String get tryOtherMachine => '请尝试另一台机器';
+
+  @override
+  String get machineUnavailable => '此时机器不可用';
+
+  @override
+  String get extendDryingTime => '延长烘干时间';
+
+  @override
+  String get paymentMethods => '付款方式';
+
+  @override
+  String get priceSummary => '价格总结';
+
+  @override
+  String get branchPromotion => '分支促销';
+
+  @override
+  String get discountLabel => '折扣';
+
+  @override
+  String get startMachine => '启动机器';
+
+  @override
+  String get washerProgram => '洗衣程序';
+
+  @override
+  String get dryerProgram => '烘干程序';
+
+  @override
+  String get washerPrice => '洗衣机价格';
+
+  @override
+  String get dryerPrice => '烘干机价格';
+
+  @override
+  String get selectBranch => '选择分支';
+
+  @override
+  String get others => '其他';
+
+  @override
+  String get termsAndPrivacy => '服务条款和隐私政策';
+
+  @override
+  String get selectPaymentMethodRequired => '请选择付款方式';
+
+  @override
+  String get userDataNotFound => '未找到用户数据';
+
+  @override
+  String get congratulations => '恭喜';
+
+  @override
+  String get couponAddedSuccessfully => '优惠券添加成功';
+
+  @override
+  String get comingSoon => '即将推出';
+
+  @override
+  String get inviteFriendsToBrowny => '邀请朋友一起使用Browny洗衣';
+
+  @override
+  String get pinSetupNotFound => '未找到PIN设置';
+
+  @override
+  String get pleaseSetupPinFirst => '请在使用此功能前设置PIN码';
+
+  @override
+  String get setupPin => '设置PIN码';
+
+  @override
+  String get pleaseConfirmPin => '请验证您的PIN码';
 }

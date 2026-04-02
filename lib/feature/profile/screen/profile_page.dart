@@ -446,11 +446,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   onPressed: () {
                     AppOverlays.showBrownyDialog(
                       context,
+                      // ยืนยันการข้าม
                       title: ContentLocalizeData(
                         en: 'Confirm Skip',
                         zh: '确认跳过',
                         th: 'ยืนยันการข้าม',
                       ).getTextByLocale(context.languageCode),
+                      // คุณต้องการข้ามการบันทึกข้อมูลโปรไฟล์?
                       message: ContentLocalizeData(
                         en: 'Are you sure you want to skip saving your profile?',
                         zh: '确定要跳过保存个人资料吗？',

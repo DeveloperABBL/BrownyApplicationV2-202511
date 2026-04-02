@@ -88,7 +88,8 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
               result.data!.data!.isEmpty) {
             return Center(
               child: AppText(
-                'ไม่มีการแจ้งเตือน',
+                // ไม่มีการแจ้งเตือน
+                context.wording.noNotifications,
                 style: context.textTheme.labelMedium,
               ),
             );

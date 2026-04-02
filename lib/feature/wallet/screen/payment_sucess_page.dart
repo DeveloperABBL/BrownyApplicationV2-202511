@@ -124,7 +124,7 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
       await ShareHelper.shareImage(
         imageBytes,
         fileName: 'browny_receipt_${DateTime.now().millisecondsSinceEpoch}.png',
-        text: 'ใบเสร็จการเติมเงิน Browny TP+ Wallet',
+        text: 'Browny TP+ Wallet',
       );
     } catch (e) {
       if (mounted) {

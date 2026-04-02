@@ -676,7 +676,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get workOrderStatus => 'สถานะการทำงาน/การสั่งซื้อ';
 
   @override
-  String get termsAndConditions => 'เงื่อนไขและการให้บริการ';
+  String get termsAndConditions => 'เงื่อนไข';
 
   @override
   String get helpAndSupport => 'ความช่วยเหลือ/แจ้งปัญหาการใช้งาน';
@@ -975,7 +975,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get scanCoupon => 'สแกนคูปอง';
 
   @override
-  String get sakob => 'ซักอบ';
+  String get sakob => 'ซัก-อบ';
 
   @override
   String get all => 'ทั้งหมด';
@@ -1369,4 +1369,185 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get incompletePaymentData =>
       'ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง';
+
+  @override
+  String get alreadyClaimed => 'รับสิทธิ์แล้ว';
+
+  @override
+  String get claimExpired => 'หมดเขต';
+
+  @override
+  String get claimsFullyAllocated => 'สิทธิ์เต็มแล้ว';
+
+  @override
+  String get claimReward => 'รับสิทธิ์';
+
+  @override
+  String get claimSuccessMessage => 'รับสิทธิ์เรียบร้อยแล้ว';
+
+  @override
+  String get noArticlesData => 'ไม่มีข้อมูลบทความ';
+
+  @override
+  String get noArticlesInCategory => 'ไม่มีบทความในหมวดหมู่นี้';
+
+  @override
+  String get viewMore => 'ดูเพิ่มเติม';
+
+  @override
+  String get invalidCouponCode => 'รหัสคูปองของคุณไม่ถูกต้อง';
+
+  @override
+  String get couponAlreadyCollected => 'คุณได้รับคูปองนี้ไปแล้ว';
+
+  @override
+  String get invalidOldPassword => 'รหัสผ่านเดิมไม่ถูกต้อง';
+
+  @override
+  String get newPasswordSameAsOld => 'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม';
+
+  @override
+  String get error => 'เกิดข้อผิดพลาด';
+
+  @override
+  String get userCancelledBiometric => 'คุณยกเลิกการยืนยันตัวตน';
+
+  @override
+  String get biometricLockedOut =>
+      'ลองผิดหลายครั้งเกินไป\\nกรุณารอสักครู่หรือใช้ PIN';
+
+  @override
+  String get biometricPermanentlyLocked =>
+      'Biometric ถูกล็อกถาวร\\nกรุณาใช้ PIN';
+
+  @override
+  String get biometricAuthFailed => 'การยืนยันตัวตนล้มเหลว';
+
+  @override
+  String get verifyIdentityToContinue => 'กรุณายืนยันตัวตนเพื่อดำเนินการต่อ';
+
+  @override
+  String get passwordMismatch => 'รหัสผ่านไม่ตรงกัน';
+
+  @override
+  String get cannotSelfInvite => 'ไม่สามารถกรอกเบอร์ตัวเองได้';
+
+  @override
+  String get unsupported => 'ไม่รองรับ';
+
+  @override
+  String get noNotifications => 'ไม่มีการแจ้งเตือน';
+
+  @override
+  String get copied => 'คัดลอกแล้ว';
+
+  @override
+  String get scannedActivityAlready => 'คุณแสกนกิจกรรมนี้ไปแล้ว';
+
+  @override
+  String get tryActivityNextDay => 'รอเล่นกิจกรรมในวันถัดไปนะ';
+
+  @override
+  String get scanToStart => 'สแกนเพื่อเริ่มใช้งาน';
+
+  @override
+  String get confirmSkip => 'ยืนยันการข้าม';
+
+  @override
+  String get confirmSkipMessage => 'คุณต้องการข้ามการบันทึกข้อมูลโปรไฟล์?';
+
+  @override
+  String get requestLocation => 'เข้าถึงตำแหน่ง';
+
+  @override
+  String get locationPermissionMessage =>
+      'กรุณาไปเปิดสิทธิ์เข้าถึงตำแหน่งในการตั้งค่าของอุปกรณ์';
+
+  @override
+  String get cameraAccessDenied => 'ไม่สามารถเปิดกล้องได้';
+
+  @override
+  String get cameraPermissionRequired => 'กรุณาให้สิทธิ์ใช้งานกล้องก่อนใช้งาน';
+
+  @override
+  String get locationForNearestBranch =>
+      'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ';
+
+  @override
+  String get machineInUse => 'เครื่องกำลังทำงาน';
+
+  @override
+  String get tryOtherMachine => 'กรุณาลองเครื่องอื่น';
+
+  @override
+  String get machineUnavailable => 'เครื่องไม่สามารถใช้งานได้ในขณะนี้';
+
+  @override
+  String get extendDryingTime => 'ต่อเวลาอบผ้า';
+
+  @override
+  String get paymentMethods => 'วิธีการชำระเงิน';
+
+  @override
+  String get priceSummary => 'สรุปราคา';
+
+  @override
+  String get branchPromotion => 'โปรโมชั่นสาขา';
+
+  @override
+  String get discountLabel => 'ลดราคา';
+
+  @override
+  String get startMachine => 'เริ่มต้นทำงาน';
+
+  @override
+  String get washerProgram => 'โปรแกรมซัก';
+
+  @override
+  String get dryerProgram => 'โปรแกรมอบ';
+
+  @override
+  String get washerPrice => 'ราคาเครื่องซัก';
+
+  @override
+  String get dryerPrice => 'ราคาเครื่องอบ';
+
+  @override
+  String get selectBranch => 'เลือกสาขา';
+
+  @override
+  String get others => 'อื่นๆ';
+
+  @override
+  String get termsAndPrivacy => 'เงื่อนไขการใช้บริการและนโยบายความเป็นส่วนตัว';
+
+  @override
+  String get selectPaymentMethodRequired => 'กรุณาเลือกวิธีชำระเงิน';
+
+  @override
+  String get userDataNotFound => 'ไม่พบข้อมูลผู้ใช้';
+
+  @override
+  String get congratulations => 'ยินดีด้วย';
+
+  @override
+  String get couponAddedSuccessfully => 'คุณได้ทำการเพิ่มคูปองสำเร็จ';
+
+  @override
+  String get comingSoon => 'พบกันเร็ว ๆ นี้';
+
+  @override
+  String get inviteFriendsToBrowny => 'ชวนเพื่อนมาซักกับ Browny';
+
+  @override
+  String get pinSetupNotFound => 'ไม่พบการตั้งค่า PIN';
+
+  @override
+  String get pleaseSetupPinFirst => 'กรุณาตั้งค่า PIN ก่อนใช้งานฟีเจอร์นี้';
+
+  @override
+  String get setupPin => 'ตั้งค่า PIN';
+
+  @override
+  String get pleaseConfirmPin => 'กรุณายืนยันรหัส PIN';
 }

@@ -1,4 +1,8 @@
 # CHANGELOG
+### DONG 2026-04-02
+* เก็บ Localize wording ส่วนที่ยังไม่เรียบร้อย
+* ยกเลิก gitignore Podfile
+
 ### DONG 2026-03-29
 * เพิ่มการชำระเงินด้วย browny coin
  - ซื้อ E-Vouvher

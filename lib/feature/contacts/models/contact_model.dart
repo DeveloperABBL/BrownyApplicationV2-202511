@@ -46,6 +46,7 @@ enum ContactProvider {
   String getNameDisplay(String locale) {
     switch (this) {
       case ContactProvider.problemLink:
+        // ติดต่อแจ้งปัญหา (reportProblem)
         return ContentLocalizeData(
           en: 'Contact Problem',
           zh: '联系问题',
@@ -80,6 +81,7 @@ enum ContactProvider {
         ).getByLocaleCode(locale)!;
 
       case ContactProvider.registerTermsLink:
+        // เงื่อนไขการใช้บริการและนโยบายความเป็นส่วนตัว (termsAndPrivacy)
         return ContentLocalizeData(
           en: 'Terms of Service and Privacy Policy',
           zh: '服务条款和隐私政策',

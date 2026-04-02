@@ -786,11 +786,13 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     if (type.isScannedToday) {
       AppOverlays.showBrownyDialog(
         context,
+        // คุณแสกนกิจกรรมนี้ไปแล้ว
         title: ContentLocalizeData(
           en: 'You have already scanned this activity',
           zh: '您已扫描过此活动',
           th: 'คุณแสกนกิจกรรมนี้ไปแล้ว',
         ).getTextByLocale(context.languageCode),
+        // รอเล่นกิจกรรมในวันถัดไปนะ
         message: ContentLocalizeData(
           en: 'Please come back and play again tomorrow',
           zh: '请明天再来参与活动吧',

@@ -57,7 +57,8 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
             icon: Assets.svg.icScan2.svg(
               colorFilter: ColorFilter.mode(AppColors.white, BlendMode.srcIn),
             ),
-            label: AppText('สแกนเพื่อเริ่มใช้งาน'),
+            // สแกนเพื่อเริ่มใช้งาน
+            label: AppText(context.wording.scanToStart),
           ),
         ),
       ],
@@ -170,7 +171,7 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
               final machine = store.machines!.washer![index];
               return _cardMachine(
                 machineImage: Assets.services.storeWasher,
-                machine: 'เครื่องซักผ้า\n${machine.name.orEmpty}',
+                machine: '${context.wording.washer}\n${machine.name.orEmpty}',
                 status: machine.status!.getTextByLocale(context.languageCode),
                 active: machine.isMachineAcive,
                 available: machine.isAvailable(context.languageCode),

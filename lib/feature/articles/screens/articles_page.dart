@@ -125,7 +125,8 @@ class _ArticlesPageState extends State<ArticlesPage> {
                       horizontal: AppDims.size_16.w,
                     ),
                     child: AppText(
-                      'กิจกรรม',
+                      // กิจกรรม
+                      context.wording.activities,
                       style: context.textTheme.titleLarge?.copyWith(
                         fontSize: AppDims.size_16.sp,
                       ),
@@ -338,11 +339,8 @@ class _ArticlesPageState extends State<ArticlesPage> {
               // First item is "ทั้งหมด" (All)
               if (index == 0) {
                 return _buildCategoryChip(
-                  label: locale == 'th'
-                      ? 'ทั้งหมด'
-                      : locale == 'zh'
-                      ? '全部'
-                      : 'All',
+                  // ทั้งหมด
+                  label: context.wording.all,
                   isSelected: _selectedCategoryId == 0,
                   onTap: () {
                     setState(() {
@@ -432,7 +430,8 @@ class _ArticlesPageState extends State<ArticlesPage> {
             ),
             child: Center(
               child: AppText(
-                'ไม่มีข้อมูลบทความ',
+                // ไม่มีข้อมูลบทความ
+                context.wording.noArticlesData,
                 style: context.textTheme.bodyMedium,
               ),
             ),
@@ -455,7 +454,8 @@ class _ArticlesPageState extends State<ArticlesPage> {
             ),
             child: Center(
               child: AppText(
-                'ไม่มีบทความในหมวดหมู่นี้',
+                // ไม่มีบทความในหมวดหมู่นี้
+                context.wording.noArticlesInCategory,
                 style: context.textTheme.bodyMedium,
               ),
             ),
@@ -632,7 +632,8 @@ class _ArticlesPageState extends State<ArticlesPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               AppText(
-                'ดูเพิ่มเติม',
+                // ดูเพิ่มเติม
+                context.wording.viewMore,
                 style: context.textTheme.bodyMedium?.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w600,

@@ -75,12 +75,14 @@ class MachineProgramModel extends MachineProgramsResponse {
   @override
   String getMachineTypeDisplay(String locale) {
     if (isWasher) {
+      // โปรแกรมซัก
       return ContentLocalizeData(
         en: 'Washing Program',
         zh: '洗衣程序',
         th: 'โปรแกรมซัก',
       ).getTextByLocale(locale);
     } else {
+      // โปรแกรมอบ
       return ContentLocalizeData(
         en: 'Drying Program',
         zh: '烘干程序',
@@ -91,12 +93,14 @@ class MachineProgramModel extends MachineProgramsResponse {
 
   String getSummaryMachineTypeDisplay(String locale) {
     if (isWasher) {
+      // ราคาเครื่องซัก
       return ContentLocalizeData(
         en: 'Washing Machine Price',
         zh: '洗衣机价格',
         th: 'ราคาเครื่องซัก',
       ).getTextByLocale(locale);
     } else {
+      // ราคาเครื่องอบ
       return ContentLocalizeData(
         en: 'Drying Machine Price',
         zh: '烘干机价格',
@@ -112,20 +116,25 @@ class MachineProgramModel extends MachineProgramsResponse {
     List<PaymentMethodData> methods,
   ) {
     try {
-      return methods.map((m) {
-        final code = m.code ?? '';
-        // final isActive = super.paymentMethods?.isMethodActive(code) ?? true;
-        return PaymentMethodModel(
-          method: code,
-          name: m.name ?? '',
-          imageUrl: m.image,
-          isSelected: false,
-          isActive: true,
-        );
-      }).where((e) => e.isActive).toList().mapIndex((index, e) {
-        if (index == 0) return e.copyWith(isSelected: true);
-        return e;
-      }).toList();
+      return methods
+          .map((m) {
+            final code = m.code ?? '';
+            // final isActive = super.paymentMethods?.isMethodActive(code) ?? true;
+            return PaymentMethodModel(
+              method: code,
+              name: m.name ?? '',
+              imageUrl: m.image,
+              isSelected: false,
+              isActive: true,
+            );
+          })
+          .where((e) => e.isActive)
+          .toList()
+          .mapIndex((index, e) {
+            if (index == 0) return e.copyWith(isSelected: true);
+            return e;
+          })
+          .toList();
     } catch (_) {
       return [];
     }

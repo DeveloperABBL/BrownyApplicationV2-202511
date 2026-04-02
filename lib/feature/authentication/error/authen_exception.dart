@@ -1,4 +1,3 @@
-import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:flutter/widgets.dart';
@@ -121,11 +120,8 @@ class CollectCouponNotFound extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return ContentLocalizeData(
-      en: 'Your coupon code is invalid',
-      zh: '您的优惠券代码无效',
-      th: 'รหัสคูปองของคุณไม่ถูกต้อง',
-    ).getTextByLocale(context.languageCode);
+    // รหัสคูปองของคุณไม่ถูกต้อง
+    return context.wording.invalidCouponCode;
   }
 
   @override
@@ -139,11 +135,8 @@ class CollectCouponCollected extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return ContentLocalizeData(
-      en: 'You have already collected this coupon',
-      zh: '您已经领取了此优惠券',
-      th: 'คุณได้รับคูปองนี้ไปแล้ว',
-    ).getTextByLocale(context.languageCode);
+    // คุณได้รับคูปองนี้ไปแล้ว
+    return context.wording.couponAlreadyCollected;
   }
 
   @override
@@ -157,11 +150,8 @@ class ChangePasswordInvalidOldPassword extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return ContentLocalizeData(
-      en: 'Old password is incorrect',
-      zh: '旧密码不正确',
-      th: 'รหัสผ่านเดิมไม่ถูกต้อง',
-    ).getTextByLocale(context.languageCode);
+    // รหัสผ่านเดิมไม่ถูกต้อง
+    return context.wording.invalidOldPassword;
   }
 
   @override
@@ -175,11 +165,8 @@ class ChangePasswordReused extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return ContentLocalizeData(
-      en: 'New password must not be the same as the old password',
-      zh: '新密码不能与旧密码相同',
-      th: 'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม',
-    ).getTextByLocale(context.languageCode);
+    // รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม
+    return context.wording.newPasswordSameAsOld;
   }
 
   @override

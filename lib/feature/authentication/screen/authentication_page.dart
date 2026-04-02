@@ -898,6 +898,7 @@ class _OTPContent extends _SignUpWidget {
                   AppDims.vericalPadding_24,
 
                   // รหัสอ้างอิง (Reference Code)
+                  // TODO: Refactor to use context.wording - needs dynamic string with variable
                   ValueListenableBuilder(
                     valueListenable: viewmodel(context).requestOtpNotifier,
                     builder: (context, value, _) {
@@ -1029,6 +1030,7 @@ class _OTPContent extends _SignUpWidget {
                 return Padding(
                   padding: EdgeInsets.only(top: AppDims.size_8.h),
                   child: AppText(
+                    // ขอรหัสใหม่ใน $seconds วินาที (resendIn)
                     ContentLocalizeData(
                       en: 'Resend in $seconds seconds',
                       zh: '$seconds 秒后可重发',
