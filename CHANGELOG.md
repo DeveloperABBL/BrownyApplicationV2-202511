@@ -1,4 +1,9 @@
 # CHANGELOG
+### DONG 2026-04-03
+* v3.0.0(47)
+* เปลี่ยน env prd เป็น url, token ที่จะใช้งานจริง
+* แก้ไข logic กรณีประเภทชำระไม่มีส่งมาจะเกิด Error
+
 ### DONG 2026-04-02
 * เก็บ Localize wording ส่วนที่ยังไม่เรียบร้อย
 * ยกเลิก gitignore Podfile

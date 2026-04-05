@@ -877,7 +877,7 @@ class __MachineContentState extends State<_MachineContent>
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ...value.data!
+                  ...value.data.orEmpty
                       .take(3)
                       .map(
                         (payment) => _cardPaymentDependOnState(

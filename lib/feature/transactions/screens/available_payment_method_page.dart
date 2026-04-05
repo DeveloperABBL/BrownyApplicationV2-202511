@@ -154,7 +154,7 @@ class _AvailablePaymentMethodPageState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ประเภทชำระแต่ละละแบบ ตามที่ API ส่งมา
-                    ...value.data!.map(
+                    ...value.data.orEmpty.map(
                       (payment) => _cardPaymentDependOnState(
                         payment,
                         // context,
