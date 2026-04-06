@@ -1,0 +1,284 @@
+# CHANGELOG
+### DONG 2026-04-06
+* Prepare Release v3.0.0
+* แก้ไขลบ User Permission ที่ไม่จำเป็นออก
+
+### DONG 2026-04-03
+* v3.0.0(47)
+* เปลี่ยน env prd เป็น url, token ที่จะใช้งานจริง
+* แก้ไข logic กรณีประเภทชำระไม่มีส่งมาจะเกิด Error
+
+### DONG 2026-04-02
+* เก็บ Localize wording ส่วนที่ยังไม่เรียบร้อย
+* ยกเลิก gitignore Podfile
+
+### DONG 2026-03-29
+* เพิ่มการชำระเงินด้วย browny coin
+ - ซื้อ E-Vouvher
+ - สั่งการทำงานเครื่องซักอบ
+
+### DONG 2026-03-28
+* แก้จังหวะ Scan QR เก็บ Coupon ส่ง type ผิดทำให้เก็บ coupon ไม่ได้
+* แก้ไขหน้าแสดง Coupon แสดงคำ ซัก, อบ, ซักอบ ไม่ถูกต้อง
+* Localize wording
+* แก้ไขการแสดงข้อมูลใน E-Voucher, Coupon
+
+### DONG 2026-03-23
+* รายละเอียดเงื่อนไข ระยะห่างซ้ายขวาไม่พอดีกัน
+* ประวัติยังมีบัคอยู่ เพราะไม่ได้ login ก่อน
+* อยากให้ปุ่ม fix ข้างล่างของจอ เพราะตอนนี้ทำให้ไม่รู้ว่ากดสแกนได้ 
+* บัค scan event ที่เคยสแกนแล้ว แสดงไม่ถูกต้อง
+* หลังสแกนแล้วต้องขึ้นประวัติทันที
+* เมนูใต้ wallet อยากให้ ชิดกันเพิ่มอีก
+* รายละเอียดให้หน้าแผนที่ยังแปลภาษาไม่ครบ
+
+### DONG 2026-03-22
+* เพิ่มขนาด Icon Browny หน้า home
+* ปรับปรุงหน้า Festive scan ให้แสดง UI ตรงตาม Design
+  - ปรับเพิ่มการทำงานปุ่ม ประวัติ
+
+### DONG 2026-03-21
+* แก้ไข Issue ตาม Feedback
+ - ปรับ Icon Sizing
+ - Wording ผิด
+ - Localized wording
+
+### DONG 2026-03-19
+* เพิ่มหน้า LuckDraw (ยังไม่สมบูรณ์)
+
+### DONG 2026-03-16
+* Bumped Kotlin plugin 2.1.0 → 2.3.10
+
+### DONG 2026-03-15
+* Implement Notification Live Activites iOS
+ - วางโครงสร้างการทำงานเบื้องต้นที่เกี่ยวข้อง
+* ปุ่มรับสิทธิ์ หน้า Article กรณี หมดเขต ให้แสดงเป็นสีแดงตาม Design
+* localize app wording
+* แก้ไข E-Voucher กดเลือกเพื่อใช้งานจากส่วนท้ายไม่ได้
+
+### DONG 2026-03-14
+* แก้ไข Facebook Login ไม่ได้(workaround) ด้วยการไม่ผ่าน Firebase Authen แต่ใช้ข้อมูลจาก Facebook Register ตรงแทน
+ - upgrade version firebase packages, version facebook_auth
+* แก้ไข save referral ได้ response 500 แต่ App แสดง บันทึกชวนเพื่อนสำเร็จ
+* แก้ไข ปุ่มบันทึก QR ขึ้น ทั้งทีปัดออกหน้า QR มาแล้ว - ต้องปัดลงถึงจะหาย
+​ - ปรับ design ใหม่ ให้เป็นการแสดง Check ถูก แทน
+* แก้ไข กดรหัสคูปองได้ แต่คูปองไม่โชว์ และไม่สามารถใช้งานได้
+* แก้ไข UI หน้า home Spacing เหลืองเยอะไป, หูน้องบราวนี่ขาด
+
+### DONG 2026-03-08
+* เพิ่ม function การ Claim สิทธิพิเศษจาก Browny Club
+* แก้บัคไม่สามารถแสดง scored review store ในหน้าแสดง Receipt ได้
+* เก็บ UI หน้าแสดง Notification ตาม Design
+
+---
+### DONG 2026-03-07
+* แก้บัคไม่สามารถ review store ในหน้าแสดง Receipt ได้
+* เพิ่มการทำงานเมนู เปลี่ยนรหัสผ่าน, เปลี่ยน e-mail, สินค้าที่บันทึกไว้(แสดงเป็น Coming soon)
+* Localized wording ใน app ที่ยังไม่เรียบร้อย
+* แก้บัคหาก Login ผ่านหน้า User preferrence สำเร็จแล้ว ไม่ fetch user notification settings
+* ปรับปรุง Logic ชำระเงินสั่งเครื่องซักอบทำงาน กรณียอดชำระเป็น 0 บาท ให้ข้ามไปหน้า Slip
+* ปรับปรุง UI รายการ สถานะบริการ ในหน้า Home เมื่อสถานะเป็นเสร็จสิ้น
+* หน้าสถานะเครื่องเพิ่ม Popup เตือนให้เริ่มการทำงานเครื่องกรณีที่เครื่องยังไม่เริ่มทำงาน
+* Localized Popup เพื่อนเชิญเพื่อน
+* ปรับ UI หน้า Wallet เมนูประวัติการขยับ ฿​ ให้เว้นวรรค
+
+---
+### DONG 2026-03-06
+* เก็บ Logic การแสดง Machine status ให้แสดงผล status ต่างๆ ถูกต้อง
+* แก้ไข ขนาด Banner ใน Browny Club แสดงไม่เท่ากัน
+* แก้ไข Banner ที่กำหนดเป็น external_link เมื่อ กดแล้วไม่สั่งเปิด Browser
+* เพิ่มการแสดง Banner WeChat Pay ที่หน้าแสดง QRCode
+* แก้ไข UI หน้า Coin History, Icon เหรียญไม่ชิดขอบ
+* แก้ไขจังหวะชำระ TPWallet แต่สั่งเปิด External Web
+
+### DONG 2026-03-03
+* เก็บ design และ ภาษาในหน้าหลัก
+* ปรับ Logic จังหวะชำระเงินให้ redirect ไปที่ External Browser แทน
+* ปรับ Api เช็ค status machine และเส้นดึง machine progress
+* เพิ่มการทำงาน กรอกรหัสคูปอง/Scan QR เพื่อรับคูปอง
+* เพิ่มการแสดงข้อมูล คูปองซักอบ
+
+---
+### DONG 2026-03-02
+* แก้ไขบัคไม่สามารถเปิดกล้องเพื่อ Scan ได้
+
+---
+### DONG 2026-03-01
+* เพิ่มการทำงานหน้า User Preferences ให้สามารถเปิดปิดตั้งค่าต่างๆ ได้จริง
+* เพิ่นเส้น API ที่จำเป็น และปรับ model ตาม API ที่แก้ไขเพิ่มเติม
+* เพิ่มหน้า Notifications (Draft)
+
+---
+### DONG 2026-02-28
+* เพิ่มการ fetch API working machine ที่หน้า home และ UI การทำงานของแต่ละเครื่อง
+* ปรับหน้า แก้ไขจังหวัดเลือกประเภทชำระใช้ qr, wechat ให้ดึงจาก field qr_and_wechat แทน redirect_url
+ - เปิดหน้าแสดง QRCode แทนการใช้ WebView
+* หน้าสถานะเครื่องซัก/อบ เพิ่มการทำงานให้ครบถ้วน
+
+---
+### DONG 2026-02-26
+* หน้าแสดงสถานะเครื่องซัก (ยังไม่เสร็จ แสดง UI แห้ง)
+* หน้า Receipt หลังสร้างรายการเครื่องซัก/อบเสร็จและการ review store
+* เก็บรายละเอียดหน้าสั่งทำงานเครื่องซัก/อบ และการตัดชำระเงิน
+* แก้ไขจังหวะเปิด Scan QR ด้วยภาพ ระบบไม่จับข้อมูลใน QRCode มา Process ต่อ
+
+---
+### DONG 2026-02-25
+* แก้ไขไม่สามารถเปิดหน้า Coupon/E-Voucher ได้
+
+---
+### DONG 2026-02-25
+* หน้า Receipt หลังสร้างรายการเครื่องซัก/อบเสร็จ (ยังไม่เสร็จ)
+* การเลือกคูปองมาเป็นส่วนลดในการสร้างรายการเครื่องซัก/อบ (เลือกได้แต่ Logic ยังไม่เรียบร้อยดี)
+* เพิ่มหน้าสั่งทำงานเครื่องซัก/อบ และการตัดชำระเงิน
+* เพิ่มการ Scan QRCode เพื่อเปิดหน้าเครื่องซัก
+
+---
+### DONG 2026-02-21
+* ขึ้น UI หน้าเครื่องซัก/อบ (Draft)
+
+---
+### DONG 2026-02-20
+* ปรับปรุง Logic การเช็ค Balance TP Wallet จังหวะกดชำระเงิน
+* เพิ่มหน้าแสดงช่องทางติดต่อต่างๆ 
+
+---
+### DONG 2026-02-18
+* ปรับแก้ UI หน้า Home Badge เก็บได้ทุกตัวกับ Icon Browny แสดงซ้อนทับกันไม่ถูกต้อง
+* เพิ่มหน้า Coin History
+
+---
+### DONG 2026-02-17
+* เพิ่มหน้า Browny Club และหน้าแสดงเนื้อหา
+* ปรับการแสดง Popup InvitFriend ในหน้าแรกให้แสดง 1 ครั้งต่อวัน
+
+---
+### DONG 2026-02-16
+* เพิ่มหน้า Wallet History
+* แก้ไขบัคจาก Review (15/02/2026)
+
+---
+### DONG 2026-02-15
+* upgrade version v3.0.0(25)
+* แก้ไข Icon Error ของ App ให้ใช้ BrownyError1
+* เพิ่มการทำงานหน้าแสดง Map 
+  - ปรับการแสดงช่อง Search ให้แสดง Icon ของ Store
+  - ให้สามารถดูข้อมูลของแต่ละ Store ได้
+* แก้ไข QR หน้าเติมเงิน บันทึกรูปภาพจากปุ่มบันทึกไม่ได้
+* แก้ไข Browny Coin UI แสดงไม่ครบขาดห่วงไป
+* แก้ไข เติมเงินขั้นต่ำ 100 แต่กรอกเลขเอง 1 บาทได้
+* แก้ไข กรอกู OTP ไม่ถูก แต่เข้าได้
+* แก้ไข Forgot password กำหนด endpoint ไม่ถูกต้อง
+* ปรับปรุง Process การ save PIN ให้ call API เพื่อ savePIN และ Logic การ verify PIN
+
+---
+### DONG 2026-02-14
+* เก็บ UI หน้า User Preferences ตาม Design
+  - เพิ่ม function Logout, invit friend
+
+---
+### DONG 2026-02-12
+* เพิ่มหน้า User Preferences (Draft)
+* เพิ่มการแสดง Popup ในหน้าแรก
+* เพิ่มหน้าสำหรับดู E-Voucher ของลูกค้าที่ซื้อเอาไว้
+* Setup App Notification
+  - Firebase-crashlytics สำหรับ Tracking Bug
+  - Firebase-Messaging สำหรับ getToken และรอรับ Notification จาก firebase
+
+---
+### DONG 2026-02-11
+* เพิ่ม Assets Menu หน้า home page (ยังไม่ implement การทำงาน)
+* ปรับบ model รับข้อมูล E-Voucher ที่เป็นของ Customer ให้แสดงข้อมูลได้ถูกต้อง
+* เก็บ logic การ Login ด้วย Social ให้ไปหน้า profile initial เมื่อเป็นการ login ครั้งแรก
+
+---
+### DONG 2026-02-08
+* เพิ่มการ login ด้วย Social GOOGLE, Apple, LINE, FACEBOOK
+* เพิ่ม Popup เงื่อนไขในหน้า claim coin (mockup ข้อมูล ตาม Design)
+* เพิ่ม Popup เงื่อนไขวันเกิดในหน้า Profile Initial (mockup ข้อมูล ตาม Design)
+* เพิ่ม Process การตั้งค่า PIN, Biometric หลังจากที่มีการ Login เข้าใช้งาน
+* ปรับ UI หน้าซื้อ E-Voucher ด้วย Design UX/UI ใหม่
+  - ขึ้น UI Reciept และ function การ Share, Save
+  - เก็บ Logic การสั่งซื้อ E-Voucher
+
+---
+### DONG 2026-02-01
+* ปรับ UI หน้าซื้อ E-Voucher ด้วย Design UX/UI ใหม่
+  - เก็บ Logic การสั่งซื้อ E-Voucher (ยังไม่เสร็จ)
+* เพิ่มหน้า Map สำหรับดูสาขา
+* เก็บ Process Forgot password
+* เก็บรายละเอียดตาม Review
+  - ปุ่มเปิดกล้่องที่ bottomNav
+  - สมัคร กดกลับหน้า PIN เอาปุ่มกลับออก
+  - (BUG) หน้าตั้งค่าโปรไฟล์ ข้าม ไม่ได้
+  - ออกจากระบบ -> หน้าหลัก
+  - หน้ารายละเอียด E-Voucher หัว รายละเอียด, เงื่อนไขบริการ ออก
+  - ปิด Soft-keyboard หลังกดปุ่มต่างๆ
+* Initialize app to Firebase
+
+---
+### DONG 2026-01-22
+* เก็บ Logic หน้าการรับ Coin
+* เพิ่ม Banner เก็บได้ทุกวัน จุดการ์ด Browny coin
+* เพิ่มหน้า เก็บคูปอง (กำลัง develop)
+
+---
+### DONG 2026-01-12
+* เพิ่มหน้าการรับ Coin
+  * เชื่อม API ทั้งขา fetch มาแสดงและขา claim แล้ว
+  * มีปรับแก้ฝั่ง API เพิ่มเติม ณ วันที่ comment logic การ highlight วันที่รับ Coin แล้วจะยังไม่ทำงาน
+* เพิ่ม Popup invit friend เพื่อไปหน้าข้อมูลการ ชวนเพื่อน
+  * - เปิดทุกครั้งที่เข้าหน้าแรก (ทำเพื่อทดสอบเข้าหน้า ต้องปรับ Logic ตามทีหลัง)
+
+---
+### DONG 2026-01-12
+* build 3.0.0(21) เป็นตัว update progress ล่าสุด ซึ่งยังไม่ครบใน phase1
+  * ที่เล่นได้แล้วจะมี
+    - login
+    - Register
+    - ตั้ง Pin, Biometric
+    - ตั้งค่า Profile
+    - เติมเงิน
+    - Scan QRCode (Scan ติดแล้วแต่ยังไม่มี Process อะไรต่อ)
+    - History(เป็น Mockup Data รอ API)
+
+---
+### DONG 2026-01-11
+- เพิ่มหน้า Wallet
+ - Process การ topup, QRCode Display, Slip (Mockup Data)
+- เก็บรายละเอียดหน้า ProfilePage
+- Process การสมัครสมาชิก
+ - หน้าเก็บรายละเอียดหน้า Pin input
+
+---
+### DONG 2025-12-02
+- Process การสมัครสมาชิก
+  - หน้า Pin input (ยังไม่เสร็จ)
+  - ปรับ Logic รองรับการสมัครสมาชิกและส่งค่าไปหน้า Pin input (ยังไม่เรียบร้อย)
+  - เพิ่ม Wording en, th, zh สำหรับ Process การสมัครสมาชิก
+- เพิ่มหน้า ProfilePage (ยังไม่เสร็จ)
+
+---
+### DONG 2025-11-26
+- เพิ่ม Logic การ Login ด้วย User ที่มีอยู่ในระบบแล้ว
+  - fetch data จาก API เพิ่มแสดงยอดเงินคงเหลือ, คอยน์ ในหน้า home
+  - login และ caching ข้อมูล User ที่ login ได้สำเร็จ
+  - handle การ Login ด้วย case error ต่างๆ ที่อาจเกิดขึ้น
+- เพิ่ม Logic การดึงข้อมูล customer ที่เคย Login เอาไว้แล้วมาใช้งานต่อ
+
+---
+### DONG 2025-11-19
+- ขึ้นหน้า HomePage
+  - ส่วนการแสดง TP Wallet, Coin, การ Login
+- Authen process
+  - login ```(on develop)```
+  - sign up ```(draft)```
+  - forgot password ```(draft)```
+
+---
+### DONG 2025-11-11
+- วางโครงสร้าง Project
+  - **ลบ platform ที่ไม่รองรับ windows, linux**
+- เพิ่ม BottomNavigation Design Browny
+- เพิ่มหน้า OnBoardingPage
+- ขึ้นหน้า HomePage (ยังไม่เสร็จ)

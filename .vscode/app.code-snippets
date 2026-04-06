@@ -1,0 +1,136 @@
+{
+	// Place your browny_app_v3 workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Auto JsonSerializable Class Generate": {
+		"prefix": "classjson",
+		"body": [
+			"import 'package:json_annotation/json_annotation.dart';",
+			"",
+			"part '$2.g.dart';",
+			"",
+			"// **************************************************************************",
+			"// เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal",
+			"// dart run build_runner build --delete-conflicting-outputs",
+			"// dart run build_runner watch (auto gen)",
+			"// **************************************************************************",
+			"",
+			"@JsonSerializable()",
+			"class $1 {",
+			"",
+			"\t\t",
+			"",
+			"\tfactory $1.fromJson(Map<String, dynamic> json) =>",
+			"\t_$$1FromJson(json);",
+			"\tMap<String, dynamic> toJson() => _$$1ToJson(this);",
+			"}",
+		]
+	},
+	"Auto JsonSerializable Class Generate extend BaseModel": {
+		"prefix": "classjsonbasemodel",
+		"body": [
+			"import 'package:json_annotation/json_annotation.dart';",
+			"import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';",
+			"",
+			"part '$2.g.dart';",
+			"",
+			"// **************************************************************************",
+			"// เมื่อสร้าง class ของ JsonSerializable ใหม่ ให้ run command ใน terminal",
+			"// dart run build_runner build --delete-conflicting-outputs",
+			"// dart run build_runner watch (auto gen)",
+			"// **************************************************************************",
+			"",
+			"@JsonSerializable()",
+			"class $1 extends BaseModelResponse {",
+			"",
+			"\t$1({",
+			"\t\t\tsuper.success,",
+			"\t\t\tsuper.errorType,",
+			"\t\t\tsuper.message,",
+			"\t});",
+			"",
+			"\tfactory $1.fromJson(Map<String, dynamic> json) =>",
+			"\t_$$1FromJson(json);",
+			"\tMap<String, dynamic> toJson() => baseToJson(_$$1ToJson(this));",
+			"}",
+		]
+	},
+	"Auto Comment documentation generate": {
+		"prefix": "comdoc_dong",
+		"body": [
+			"/// DONG ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+			"///",
+			"/// $1",
+			"/// Example:",
+			"/// ```dart",
+			"/// ",
+			"/// ```"
+		]
+	},
+	"Auto Comment generate": {
+		"prefix": "cmm",
+		"body": [
+			"// DONG ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+			"// $1",
+		]
+	},
+	"Auto Spearater": {
+		"prefix": "=s=",
+		"body": [
+			"// ========== $1 =========="
+		]
+	},
+	"Auto PageName": {
+		"prefix": "page_name",
+		"body": [
+			"  static final pagePath = '$1';",
+			"  static final pageName = '$1';"
+		]
+	},
+	"Auto AppDims Width": {
+		"prefix": "dimssizew",
+		"body": [
+			"AppDims.size_$1.w",
+		]
+	},
+	"Auto AppDims Height": {
+		"prefix": "dimssizeh",
+		"body": [
+			"AppDims.size_$1.h",
+		]
+	},
+	"Auto AppColors Height": {
+		"prefix": "appcolors",
+		"body": [
+			"AppColors.$1",
+		]
+	},
+	"Auto util function route to pageName": {
+		"prefix": "gotopage",
+		"body": [
+			"/// util function route to pageName",
+			"static Future<T?> goToPage<T>(BuildContext context) async {",
+			"return await context.pushNamed($1.pageName);",
+			"}"
+		]
+	},
+	"Auto addPostFrameCallback": {
+		"prefix": "postframcallback",
+		"body": [
+			"WidgetsBinding.instance.addPostFrameCallback((_) async {$1});"
+		]
+	},
+}
