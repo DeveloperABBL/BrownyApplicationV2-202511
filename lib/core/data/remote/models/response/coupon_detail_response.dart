@@ -267,6 +267,9 @@ class PaymentMethodsData {
   @JsonKey(name: 'tp_wallet')
   final bool? tpWallet;
 
+  @JsonKey(name: 'coin')
+  final bool? coin;
+
   PaymentMethodsData({
     this.qr,
     this.creditCard,
@@ -275,7 +278,35 @@ class PaymentMethodsData {
     this.wechat,
     this.rabbitLine,
     this.tpWallet,
+    this.coin,
   });
+
+  /// ตรวจสอบว่า payment method ตาม [code] ถูก enable อยู่สำหรับ context นี้หรือไม่
+  ///
+  /// payment methods ใหม่ที่ยังไม่มีใน boolean flags (เช่น coin)
+  /// จะถือว่า active เสมอ หากอยู่ใน list จาก /payment-methods API
+  bool isMethodActive(String code) {
+    switch (code) {
+      case 'qr':
+        return qr ?? false;
+      case 'credit_card':
+        return creditCard ?? false;
+      case 'true_money':
+        return trueMoney ?? false;
+      case 'shopee_pay':
+        return shopeePay ?? false;
+      case 'wechat':
+        return wechat ?? false;
+      case 'rabbit_line':
+        return rabbitLine ?? false;
+      case 'tp_wallet':
+        return tpWallet ?? false;
+      case 'coin':
+        return coin ?? false;
+      default:
+        return true;
+    }
+  }
 
   factory PaymentMethodsData.fromJson(Map<String, dynamic> json) =>
       _$PaymentMethodsDataFromJson(json);

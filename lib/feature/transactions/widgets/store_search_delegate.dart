@@ -12,6 +12,7 @@ class StoreSearchDelegate extends SearchDelegate<PackageDetailData?> {
     required this.packages,
     this.selectedPackage,
   }) : super(
+         // เลือกสาขา (selectBranch) - TODO: Refactor to use context.wording
          searchFieldLabel: 'เลือกสาขา',
          keyboardType: TextInputType.text,
        );

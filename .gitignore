@@ -44,5 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-ios/Podfile
+# ios/Podfile
 macos/Podfile

@@ -1,8 +1,7 @@
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_method_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CouponDetailModel extends CouponDetailResponse {
   CouponDetailModel({
@@ -41,89 +40,32 @@ class CouponDetailModel extends CouponDetailResponse {
   /// ตรวจสอบว่ามี Package หรือไม่
   bool get hasPackages => packages.isNotEmpty;
 
-  List<PaymentMethodModel> paymentMethodsAvailable(String locale) {
+  /// [methods] — รายการ payment methods จาก API /payment-methods
+  /// ใช้ PaymentMethodsData boolean flags เพื่อกรองว่า method ไหน active สำหรับ context นี้
+  List<PaymentMethodModel> paymentMethodsAvailable(
+    String locale,
+    List<PaymentMethodData> methods,
+  ) {
     try {
-      Map<String, dynamic> methodMap = super.paymentMethods!.toJson();
-      List<PaymentMethodModel> result = [];
-      String name = '';
-      Widget? icon;
-      for (final method in methodMap.keys) {
-        switch (method) {
-          case 'qr':
-            {
-              switch (locale) {
-                case 'en':
-                case 'zh':
-                  name = 'QR Promptpay';
-                  break;
-                default:
-                  name = 'QR พร้อมเพย์';
-                  break;
-              }
-              icon = Assets.icPayment.icPromptpay.image(
-                width: 22.w,
-                height: 22.h,
-              );
-              break;
-            }
-          case 'credit_card':
-            icon = null;
-            name = 'Credit Card';
-            break;
-          case 'true_money':
-            icon = Assets.icPayment.icTruemoney.image(
-              width: 22.w,
-              height: 22.h,
+      return methods
+          .map((m) {
+            final code = m.code ?? '';
+            // final isActive = super.paymentMethods?.isMethodActive(code) ?? true;
+            return PaymentMethodModel(
+              method: code,
+              name: m.name ?? '',
+              imageUrl: m.image,
+              isSelected: false,
+              isActive: true,
             );
-            name = 'TrueMoney Wallet';
-            break;
-          case 'shopee_pay':
-            icon = Assets.icPayment.icShopeepay.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'ShopeePay';
-            break;
-          case 'wechat':
-            icon = Assets.icPayment.icWechat.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'WeChat Pay';
-            break;
-          case 'rabbit_line':
-            icon = Assets.icPayment.icRabbitLinepay.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'Rabbit LinePay';
-            break;
-          case 'tp_wallet':
-            icon = Assets.svg.icTpWallet.svg(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'TP+ Wallet';
-            break;
-        }
-        result.add(
-          PaymentMethodModel(
-            method: method,
-            name: name,
-            isSelected: false,
-            isActive: methodMap[method] as bool,
-            icon: icon,
-          ),
-        );
-      }
-
-      return result.where((e) => e.isActive).toList().mapIndex((index, e) {
-        // select ตัวแรก ที่ active
-        if (index == 0) {
-          return e.copyWith(isSelected: true);
-        }
-        return e;
-      }).toList();
+          })
+          .where((e) => e.isActive)
+          .toList()
+          .mapIndex((index, e) {
+            if (index == 0) return e.copyWith(isSelected: true);
+            return e;
+          })
+          .toList();
     } catch (_) {
       return [];
     }
@@ -133,7 +75,7 @@ class CouponDetailModel extends CouponDetailResponse {
 class PaymentMethodModel {
   final String method;
   final String name;
-  final Widget? icon;
+  final String? imageUrl;
   final bool isSelected;
   final bool isActive;
 
@@ -142,19 +84,19 @@ class PaymentMethodModel {
     required this.isSelected,
     required this.isActive,
     required this.name,
-    this.icon,
+    this.imageUrl,
   });
 
   PaymentMethodModel copyWith({
     String? method,
     String? name,
-    Widget? icon,
+    String? imageUrl,
     bool? isSelected,
     bool? isActive,
   }) => PaymentMethodModel(
     method: method ?? this.method,
     name: name ?? this.name,
-    icon: icon ?? this.icon,
+    imageUrl: imageUrl ?? this.imageUrl,
     isSelected: isSelected ?? this.isSelected,
     isActive: isActive ?? this.isActive,
   );
@@ -162,7 +104,8 @@ class PaymentMethodModel {
   bool get isQR => method == 'qr';
   bool get isWeChat => method == 'wechat';
   bool get isTpWallet => method == 'tp_wallet';
-  bool get isLaunchExternalWeb => !isTpWallet;
+  bool get isCoin => method == 'coin';
+  bool get isLaunchExternalWeb => !isTpWallet && !isCoin;
   bool get isShowInAppQR => isQR || isWeChat;
 }
 

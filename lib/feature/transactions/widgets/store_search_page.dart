@@ -93,7 +93,8 @@ class _StoreSearchPageState extends State<StoreSearchPage> {
     final grouped = <String, List<PackageDetailData>>{};
 
     for (final package in packages) {
-      final groupKey = package.groupOption?.getByLocaleCode(locale) ?? 'อื่นๆ';
+      // อื่นๆ (others)
+      final groupKey = package.groupOption?.getByLocaleCode(locale) ?? context.wording.others;
       if (!grouped.containsKey(groupKey)) {
         grouped[groupKey] = [];
       }

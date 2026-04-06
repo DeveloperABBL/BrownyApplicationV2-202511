@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
@@ -114,6 +115,9 @@ class TransactionsViewmodel extends AppViewModel
   // เก็บค่า payment ก่อนที่จะเข้าหน้าแก้ไข (สำหรับ cancel)
   PaymentMethodModel? _paymentSelectedBeforeEdit;
 
+  /// cache รายการ payment methods จาก API /payment-methods
+  List<PaymentMethodData> _cachedPaymentMethods = [];
+
   /// Unified state สำหรับจัดการ Payment Transaction (payment status + receipt)
   /// แทนที่การใช้ paymentStatusNotifier และ couponReceiptNotifier แยกกัน
   late final ValueNotifier<UiResult<PaymentTransactionState>>
@@ -215,10 +219,14 @@ class TransactionsViewmodel extends AppViewModel
       );
       return;
     }
+    final locale = context.languageCode;
+    // ดึง payment methods จาก /payment-methods API แล้ว cache ไว้
+    final paymentMethodsResult = await repoDelegate.fetchPaymentMethods();
+    _cachedPaymentMethods = paymentMethodsResult.data.payments ?? [];
 
-    // ดึง payment methods จาก couponDetail ตามภาษาปัจจุบัน
+    // ดึง payment methods จาก couponDetail กรองตาม cached methods
     final listPayment = couponDetailNotifier!.value.data!
-        .paymentMethodsAvailable(context.languageCode);
+        .paymentMethodsAvailable(locale, _cachedPaymentMethods);
 
     // ถ้าไม่มี payment method ให้เลือก
     if (listPayment.isEmpty) {
@@ -261,20 +269,20 @@ class TransactionsViewmodel extends AppViewModel
         // ใส่กลับไปที่ index 0 และ mark เป็น selected
         finalList.insert(0, selected.copyWith(isSelected: true));
         // เอาตัวที่เลือก หรือ TPWallet ขึ้นด้านบน
-        finalList.sort((l, r) {
-          if (l.isSelected) return 0;
-          if (l.isTpWallet) return 0;
-          return 1;
-        });
+        // finalList.sort((l, r) {
+        //   if (l.isSelected) return 0;
+        //   if (l.isTpWallet) return 0;
+        //   return 1;
+        // });
       }
     } else {
       // เอา TPWallet ขึ้นตัวแรกเสมอ
-      finalList.sort((l, r) {
-        if (l.isTpWallet) {
-          return 0;
-        }
-        return 1;
-      });
+      // finalList.sort((l, r) {
+      //   if (l.isTpWallet) {
+      //     return 0;
+      //   }
+      //   return 1;
+      // });
 
       // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
       finalList = finalList.asMap().entries.map((entry) {
@@ -310,9 +318,10 @@ class TransactionsViewmodel extends AppViewModel
     // ตรวจสอบว่า couponDetail พร้อมใช้งาน
     if (!couponDetailNotifier!.value.isSuccess) return;
 
-    // ดึง payment methods ทั้งหมดจาก couponDetail (ไม่ดึงจาก notifier เพราะอาจมีแค่ 3 ตัว)
+    // ดึง payment methods ทั้งหมดจาก couponDetail กรองตาม cached methods
     final fullList = couponDetailNotifier!.value.data!.paymentMethodsAvailable(
       context.languageCode,
+      _cachedPaymentMethods,
     );
 
     // Mark ทุกตัวเป็น unselected ก่อน
@@ -353,9 +362,20 @@ class TransactionsViewmodel extends AppViewModel
         // User denied permission
         AppOverlays.showBrownyDialog(
           context,
-          title: 'ไม่สามารถเข้าถึงตำแหน่งได้',
-          message: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
-          confirmText: 'เปิด Setting',
+          // ไม่สามารถเข้าถึงตำแหน่งได้,
+          title: context.wording.locationAccessDeniedTitle,
+          // กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ
+          message: ContentLocalizeData(
+            en: 'Please grant location access to show nearest branches',
+            zh: '请授予位置权限以显示最近的分支机构',
+            th: 'กรุณาให้สิทธิ์เข้าถึงตำแหน่งเพื่อแสดงสาขาใกล้คุณ',
+          ).getTextByLocale(context.languageCode),
+          // เปิด Setting
+          confirmText: ContentLocalizeData(
+            en: 'Open Settings',
+            zh: '打开设置',
+            th: 'เปิด Setting',
+          ).getTextByLocale(context.languageCode),
           onConfirm: () async {
             await PermissionHelper.openAppSettings();
             // Retry after opening settings
@@ -620,7 +640,7 @@ class TransactionsViewmodel extends AppViewModel
     // ตรวจสอบว่ามี payment method ที่เลือกหรือไม่
     if (_paymentSelected == null) {
       return UiResult.empty(
-        error: Exception('กรุณาเลือกวิธีชำระเงิน'),
+        error: Exception(context.wording.selectPaymentMethodRequired),
       );
     }
 
@@ -628,7 +648,7 @@ class TransactionsViewmodel extends AppViewModel
     final customerId = currentCustomerProvider.current.id;
     if (customerId == null || customerId.isEmpty) {
       return UiResult.error(
-        error: Exception('ไม่พบข้อมูลผู้ใช้'),
+        error: Exception(context.wording.userDataNotFound),
       );
     }
 
@@ -825,7 +845,8 @@ class TransactionsViewmodel extends AppViewModel
 
   Future<UiResult<void>> verifyOrder() async {
     try {
-      if (paymentSelected?.isTpWallet == true) {
+      if (paymentSelected?.isTpWallet == true ||
+          paymentSelected?.isCoin == true) {
         final result = await fetchCustomerCredit();
 
         if (result.isEmpty || result.hasError) {
@@ -837,15 +858,24 @@ class TransactionsViewmodel extends AppViewModel
             return UiResult.error(error: Unprocessable());
           }
         }
+        // update ข้อมูล User ด้วย
+        currentCustomerProvider.updateCreditAndCoinBalance(result.data!);
 
-        final tpWalletBalance = double.tryParse(
-          result.data!.creditBalance!.replaceAll(',', ''),
-        )!;
+        final double balance;
+        if (paymentSelected?.isTpWallet == true) {
+          balance = double.tryParse(
+            result.data!.creditBalance!.replaceAll(',', ''),
+          )!;
+        } else {
+          balance = double.tryParse(
+            result.data!.currentCoin!.replaceAll(',', ''),
+          )!;
+        }
 
         final packgaePrice = double.tryParse(
           selectedPackageNotifier!.value!.price!.replaceAll(',', ''),
         )!;
-        if (tpWalletBalance >= packgaePrice) {
+        if (balance >= packgaePrice) {
           return UiResult.success(data: null);
         }
 
@@ -870,6 +900,7 @@ class TransactionsViewmodel extends AppViewModel
   Future<void> collectCoupon([
     String? data,
     String type = 'code',
+    bool fromAuto = false,
   ]) async {
     FocusManager.instance.primaryFocus?.unfocus();
     AppOverlays.showLoading(context);
@@ -925,8 +956,18 @@ class TransactionsViewmodel extends AppViewModel
       await AppOverlays.showBrownyDialog(
         context,
         imageAsset: Assets.png.brownySuccess2.path,
-        title: 'ยินดีด้วย',
-        message: 'คุณได้ทำการเพิ่มคูปองสำเร็จ',
+        // ยินดีด้วย,
+        title: context.wording.congratulations,
+        // คุณได้ทำการเพิ่มคูปองสำเร็จ,
+        message: context.wording.couponAddedSuccessfully,
+        onConfirm: () {
+          // ถ้ามาจาก auto และ scan สำเร็จ เมื่อกดรับทราบจะ pop ออก
+          if (fromAuto) {
+            if (context.canPop()) {
+              context.pop();
+            }
+          }
+        },
       );
     }
 

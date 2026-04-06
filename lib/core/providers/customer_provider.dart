@@ -36,6 +36,8 @@ class CustomerProvider extends ChangeNotifier {
     newUser = current.copyWith(
       creditBalance: data.creditBalance,
       brownyCoin: data.brownyCoin,
+      currentCoin: data.currentCoin,
+      coinValue: data.coinValue,
     );
   }
 

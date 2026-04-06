@@ -68,10 +68,14 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
         AppOverlays.showBrownyDialog(
           context,
           imageAsset: Assets.png.brownyError2.path,
-          title: 'ไม่พบการตั้งค่า PIN',
-          message: 'กรุณาตั้งค่า PIN ก่อนใช้งานฟีเจอร์นี้',
-          confirmText: 'ตั้งค่า PIN',
-          cancelText: 'ยกเลิก',
+          // ไม่พบการตั้งค่า PIN
+          title: context.wording.pinSetupNotFound,
+          // กรุณาตั้งค่า PIN ก่อนใช้งานฟีเจอร์นี้
+          message: context.wording.pleaseSetupPinFirst,
+          // ตั้งค่า PIN
+          confirmText: context.wording.setupPin,
+          // ยกเลิก
+          cancelText: context.wording.cancel,
           onConfirm: () {
             if (context.mounted) {
               CreateAppPinPage.goToPage(
@@ -124,7 +128,8 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
   /// พยายาม authenticate ด้วย Biometric
   Future<void> _attemptBiometricAuth() async {
     final result = await _authViewModel.authenticateWithBiometric(
-      reason: 'กรุณายืนยันตัวตนเพื่อดำเนินการต่อ',
+      // กรุณายืนยันตัวตนเพื่อดำเนินการต่อ
+      reason: context.wording.verifyIdentityToContinue,
     );
 
     if (result.isSuccess && result.data!.isSuccess) {
@@ -144,7 +149,7 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
 
   @override
   String _getTitleText(BuildContext context, PinBiometricViewModel viewModel) {
-    return 'กรุณายืนยันรหัส PIN';
+    return context.wording.pleaseConfirmPin;
   }
 
   @override

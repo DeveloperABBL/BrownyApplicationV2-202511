@@ -606,7 +606,6 @@ class _MapContentState extends State<MapContent> {
         itemBuilder: (context, i) {
           final data = options.toList()[i];
 
-          // TODO เหลือเงื่อนไขปิดปรับปรุง
           String subTitle;
           TextStyle subTitleStyle;
           if (data.isMachineAvailable) {

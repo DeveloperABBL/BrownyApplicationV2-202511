@@ -2,11 +2,9 @@ import 'package:browny_applications_new/core/data/remote/models/content_localize
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_method_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
-import 'package:browny_applications_new/res/icons/assets.gen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MachineProgramModel extends MachineProgramsResponse {
   MachineProgramModel({
@@ -77,12 +75,14 @@ class MachineProgramModel extends MachineProgramsResponse {
   @override
   String getMachineTypeDisplay(String locale) {
     if (isWasher) {
+      // โปรแกรมซัก
       return ContentLocalizeData(
         en: 'Washing Program',
         zh: '洗衣程序',
         th: 'โปรแกรมซัก',
       ).getTextByLocale(locale);
     } else {
+      // โปรแกรมอบ
       return ContentLocalizeData(
         en: 'Drying Program',
         zh: '烘干程序',
@@ -93,12 +93,14 @@ class MachineProgramModel extends MachineProgramsResponse {
 
   String getSummaryMachineTypeDisplay(String locale) {
     if (isWasher) {
+      // ราคาเครื่องซัก
       return ContentLocalizeData(
         en: 'Washing Machine Price',
         zh: '洗衣机价格',
         th: 'ราคาเครื่องซัก',
       ).getTextByLocale(locale);
     } else {
+      // ราคาเครื่องอบ
       return ContentLocalizeData(
         en: 'Drying Machine Price',
         zh: '烘干机价格',
@@ -107,89 +109,32 @@ class MachineProgramModel extends MachineProgramsResponse {
     }
   }
 
-  List<PaymentMethodModel> paymentMethodsAvailable(String locale) {
+  /// [methods] — รายการ payment methods จาก API /payment-methods
+  /// ใช้ PaymentMethodsData boolean flags เพื่อกรองว่า method ไหน active สำหรับเครื่องนี้
+  List<PaymentMethodModel> paymentMethodsAvailable(
+    String locale,
+    List<PaymentMethodData> methods,
+  ) {
     try {
-      Map<String, dynamic> methodMap = super.paymentMethods!.toJson();
-      List<PaymentMethodModel> result = [];
-      String name = '';
-      Widget? icon;
-      for (final method in methodMap.keys) {
-        switch (method) {
-          case 'qr':
-            {
-              switch (locale) {
-                case 'en':
-                case 'zh':
-                  name = 'QR Promptpay';
-                  break;
-                default:
-                  name = 'QR พร้อมเพย์';
-                  break;
-              }
-              icon = Assets.icPayment.icPromptpay.image(
-                width: 22.w,
-                height: 22.h,
-              );
-              break;
-            }
-          case 'credit_card':
-            icon = null;
-            name = 'Credit Card';
-            break;
-          case 'true_money':
-            icon = Assets.icPayment.icTruemoney.image(
-              width: 22.w,
-              height: 22.h,
+      return methods
+          .map((m) {
+            final code = m.code ?? '';
+            // final isActive = super.paymentMethods?.isMethodActive(code) ?? true;
+            return PaymentMethodModel(
+              method: code,
+              name: m.name ?? '',
+              imageUrl: m.image,
+              isSelected: false,
+              isActive: true,
             );
-            name = 'TrueMoney Wallet';
-            break;
-          case 'shopee_pay':
-            icon = Assets.icPayment.icShopeepay.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'ShopeePay';
-            break;
-          case 'wechat':
-            icon = Assets.icPayment.icWechat.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'WeChat Pay';
-            break;
-          case 'rabbit_line':
-            icon = Assets.icPayment.icRabbitLinepay.image(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'Rabbit LinePay';
-            break;
-          case 'tp_wallet':
-            icon = Assets.svg.icTpWallet.svg(
-              width: 22.w,
-              height: 22.h,
-            );
-            name = 'TP+ Wallet';
-            break;
-        }
-        result.add(
-          PaymentMethodModel(
-            method: method,
-            name: name,
-            isSelected: false,
-            isActive: methodMap[method] as bool,
-            icon: icon,
-          ),
-        );
-      }
-
-      return result.where((e) => e.isActive).toList().mapIndex((index, e) {
-        // select ตัวแรก ที่ active
-        if (index == 0) {
-          return e.copyWith(isSelected: true);
-        }
-        return e;
-      }).toList();
+          })
+          .where((e) => e.isActive)
+          .toList()
+          .mapIndex((index, e) {
+            if (index == 0) return e.copyWith(isSelected: true);
+            return e;
+          })
+          .toList();
     } catch (_) {
       return [];
     }

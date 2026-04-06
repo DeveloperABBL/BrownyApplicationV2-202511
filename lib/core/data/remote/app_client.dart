@@ -734,4 +734,13 @@ abstract class AppClient {
   Future<HttpResponse<LuckyDrawResponse>> postLuckyDraw(
     @Body() Map<String, dynamic> body,
   );
+
+  /// DONG 2026-03-29
+  ///
+  /// API fetch รายการ Payment Methods ที่รองรับในระบบ
+  ///
+  /// Response:
+  /// - PaymentMethodResponse with list of payments (code, name, image)
+  @GET('/payment-methods')
+  Future<HttpResponse<PaymentMethodResponse>> fetchPaymentMethods();
 }

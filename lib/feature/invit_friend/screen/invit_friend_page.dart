@@ -65,7 +65,8 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
               backgroundColor: AppColors.transparent,
               leading: BackButton(),
               title: AppText(
-                'ชวนเพื่อนมาซักกับ Browny',
+                // ชวนเพื่อนมาซักกับ Browny
+                context.wording.inviteFriendsToBrowny,
                 style: context.textTheme.titleLarge!.copyWith(
                   fontSize: AppDims.size_18.sp,
                   color: AppColors.white,
@@ -252,9 +253,10 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                             ScaffoldMessenger.of(
                               context,
                             ).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
+                                // คัดลอกแล้ว
                                 content: Text(
-                                  'คัดลอกแล้ว',
+                                  context.wording.copied,
                                 ),
                               ),
                             );
@@ -426,7 +428,8 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                           children: [
                             TextSpan(text: ' '),
                             TextSpan(
-                              text: 'เงื่อนไข',
+                              // เงื่อนไข
+                              text: context.wording.termsAndConditions,
                               style: context.textTheme.labelSmall?.copyWith(
                                 color: AppColors.primary,
                                 fontSize: AppDims.size_10.sp,

@@ -91,9 +91,11 @@ class __ScannerWidgetState extends State<_ScannerWidget>
           AppOverlays.showBrownyDialog(
             context,
             imageAsset: Assets.png.brownyError2.path,
-            title: 'ไม่สามารถเปิดกล้องได้',
-            message: 'กรุณาให้สิทธิ์ใช้งานกล้องก่อนใช้งาน',
-            confirmText: 'เปิด Setting',
+            // ไม่สามารถเปิดกล้องได้
+            title: context.wording.cameraAccessDenied,
+            // กรุณาให้สิทธิ์ใช้งานกล้องก่อนใช้งาน
+            message: context.wording.cameraPermissionRequired,
+            confirmText: context.wording.openSettings,
             onConfirm: () async {
               await PermissionHelper.openAppSettings();
             },
@@ -172,7 +174,10 @@ class __ScannerWidgetState extends State<_ScannerWidget>
                               height: 100.h,
                             ),
                             AppDims.vericalPadding_8,
-                            AppText('ไม่พบข้อมูล Browny ID'),
+                            // ไม่พบข้อมูล
+                            AppText(
+                              '${context.wording.dataNotFound} Browny ID',
+                            ),
                             Spacer(),
                           ],
                         ),

@@ -16,14 +16,23 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LuckyScanPage extends StatelessWidget {
-  const LuckyScanPage({super.key});
+  const LuckyScanPage({super.key, this.autoScanQRData});
+
+  /// QR data สำหรับ auto-process เมื่อ scan จากหน้า Home
+  final String? autoScanQRData;
 
   static final pagePath = '/lucky_scan_page';
   static final pageName = 'lucky_scan_page';
 
   /// util function route to pageName
-  static Future<T?> goToPage<T>(BuildContext context) async {
-    return await context.pushNamed(LuckyScanPage.pageName);
+  static Future<T?> goToPage<T>(
+    BuildContext context, {
+    String? autoScanQRData,
+  }) async {
+    return await context.pushNamed(
+      LuckyScanPage.pageName,
+      extra: autoScanQRData,
+    );
   }
 
   @override
@@ -33,13 +42,15 @@ class LuckyScanPage extends StatelessWidget {
         context: context,
         repo: LuckyRepo(),
       ),
-      child: const LuckyScanContent(),
+      child: LuckyScanContent(autoScanQRData: autoScanQRData),
     );
   }
 }
 
 class LuckyScanContent extends StatefulWidget {
-  const LuckyScanContent({super.key});
+  const LuckyScanContent({super.key, this.autoScanQRData});
+
+  final String? autoScanQRData;
 
   @override
   State<LuckyScanContent> createState() => _LuckyScanContentState();
@@ -68,6 +79,18 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _viewmodel.fetchFestiveIndex();
       _handlePostFetch();
+
+      // Auto-process lucky draw เมื่อ scan QR จากหน้า Home
+      if (widget.autoScanQRData != null) {
+        final result = _viewmodel.festiveIndexNotifier.value;
+        if (result.isSuccess && result.data?.hasEvent == true) {
+          _onScanResult(
+            widget.autoScanQRData!,
+            // from scan auto
+            true,
+          );
+        }
+      }
     });
   }
 
@@ -729,7 +752,10 @@ class _LuckyScanContentState extends State<LuckyScanContent>
     );
   }
 
-  Future<void> _onScanResult(String qrData) async {
+  Future<void> _onScanResult(
+    String qrData, [
+    bool fromAuto = false,
+  ]) async {
     AppOverlays.showLoading(context);
     final result = await _viewmodel.postLuckyDraw(
       qrCode: qrData,
@@ -773,7 +799,11 @@ class _LuckyScanContentState extends State<LuckyScanContent>
       return;
     }
 
-    _showLucyScanResult(context, result.data!);
+    _showLucyScanResult(
+      context,
+      result.data!,
+      fromAuto,
+    );
   }
 
   /// DONG
@@ -781,21 +811,29 @@ class _LuckyScanContentState extends State<LuckyScanContent>
   /// แสดงผลการ Scan festive
   Future<void> _showLucyScanResult(
     BuildContext context,
-    LuckyDrawResponse type,
-  ) async {
+    LuckyDrawResponse type, [
+    bool fromAuto = false,
+  ]) async {
     if (type.isScannedToday) {
       AppOverlays.showBrownyDialog(
         context,
+        // คุณแสกนกิจกรรมนี้ไปแล้ว
         title: ContentLocalizeData(
           en: 'You have already scanned this activity',
           zh: '您已扫描过此活动',
           th: 'คุณแสกนกิจกรรมนี้ไปแล้ว',
         ).getTextByLocale(context.languageCode),
+        // รอเล่นกิจกรรมในวันถัดไปนะ
         message: ContentLocalizeData(
           en: 'Please come back and play again tomorrow',
           zh: '请明天再来参与活动吧',
           th: 'รอเล่นกิจกรรมในวันถัดไปนะ',
         ).getTextByLocale(context.languageCode),
+        onConfirm: () {
+          if (fromAuto && context.canPop()) {
+            context.pop();
+          }
+        },
       );
       return;
     }
@@ -950,6 +988,12 @@ class _LuckyScanContentState extends State<LuckyScanContent>
                                     ElevatedButton(
                                       onPressed: () {
                                         dialogContext.pop();
+                                        // ชนะ lucky draw
+                                        // และมาจาก scan หน้า home
+                                        // จะ popup กลับหน้าหลัก
+                                        if (fromAuto && context.canPop()) {
+                                          context.pop();
+                                        }
                                       },
                                       child: AppText(
                                         context.wording.acknowledge,

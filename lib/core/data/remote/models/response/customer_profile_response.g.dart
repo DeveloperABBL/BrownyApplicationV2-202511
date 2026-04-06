@@ -42,6 +42,8 @@ CustomerProfileData _$CustomerProfileDataFromJson(Map<String, dynamic> json) =>
       couponsDiscount: (json['coupons_discount'] as num?)?.toInt(),
       couponsEVoucher: (json['coupons_e_voucher'] as num?)?.toInt(),
       totalCoupons: (json['total_coupons'] as num?)?.toInt(),
+      coinValue: json['coin_value'] as String?,
+      currentCoin: json['current_coin'] as String?,
     );
 
 Map<String, dynamic> _$CustomerProfileDataToJson(
@@ -61,4 +63,6 @@ Map<String, dynamic> _$CustomerProfileDataToJson(
   'coupons_discount': instance.couponsDiscount,
   'coupons_e_voucher': instance.couponsEVoucher,
   'total_coupons': instance.totalCoupons,
+  'coin_value': instance.coinValue,
+  'current_coin': instance.currentCoin,
 };

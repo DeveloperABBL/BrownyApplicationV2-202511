@@ -344,6 +344,7 @@ class PinBioMetricRepository extends AppRepository
       }
 
       // ทำการ Authenticate
+      // กรุณายืนยันตัวตนเพื่อเข้าใช้งาน - เรียกโดยผู้เรียกจากวิวโมเดล (context.wording.verifyIdentityToContinue)
       final result = await _biometricHelper.authenticateWithBiometric(
         localizedReason: reason ?? 'กรุณายืนยันตัวตนเพื่อเข้าใช้งาน',
       );

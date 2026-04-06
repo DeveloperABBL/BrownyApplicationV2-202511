@@ -155,7 +155,8 @@ class __ContactContentState extends State<_ContactContent> {
             AppOverlays.showBrownyDialog(
               context,
               title: context.wording.errorOccurred,
-              message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+              // ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง,
+              message: context.wording.invalidContactInfoError,
             );
           }
           return;
@@ -166,7 +167,8 @@ class __ContactContentState extends State<_ContactContent> {
           AppOverlays.showBrownyDialog(
             context,
             title: context.wording.errorOccurred,
-            message: 'ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+            // ข้อมูลติดต่อไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง,
+            message: context.wording.invalidContactInfoError,
           );
         }
       },

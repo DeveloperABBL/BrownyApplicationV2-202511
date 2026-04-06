@@ -502,7 +502,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         ),
         ResetPasswordConditions.samePassword: false,
       };
-      return 'รหัสผ่านไม่ตรงกัน';
+      // รหัสผ่านไม่ตรงกัน
+      return context.wording.passwordMismatch;
     }
 
     _resetValidation.remove(ResetPasswordConditions.samePassword);
@@ -845,6 +846,8 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     if (currentProcess == AuthenProcess.referral) {
       _referralErrorMessageNotifier.value = null;
       if (formKeyReferral.currentState?.validate() == true) {
+        // Get locale before async operations to avoid context crossing async gaps
+        final locale = context.languageCode;
         final customerProfile = await customerDataRepo.customerProfileData();
         if (customerProfile.hasError) {
           return UiResult.error(error: customerProfile.error);
@@ -856,7 +859,14 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
         if (customerProfile.data.phone.orEmpty.isNotEmpty &&
             (usernameController.text == customerProfile.data.phone)) {
           return UiResult.error(
-            error: OTPUnauthorized('ไม่สามารถกรอกเบอร์ตัวเองได้'),
+            // ไม่สามารถกรอกเบอร์ตัวเองได้
+            error: OTPUnauthorized(
+              ContentLocalizeData(
+                en: 'Cannot enter your own phone number',
+                zh: '无法输入您自己的电话号码',
+                th: 'ไม่สามารถกรอกเบอร์ตัวเองได้',
+              ).getTextByLocale(locale),
+            ),
           );
         }
 
@@ -1026,6 +1036,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
 
             if (!available) {
               return UiResult.error(
+                // ไม่รองรับ
                 error: Unprocessable('ไม่รองรับ'),
               );
             }

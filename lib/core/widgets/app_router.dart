@@ -224,16 +224,21 @@ class AppRouter {
         builder: (context, state) {
           CouponVoucherState couponState = CouponVoucherState.purshasing;
           List<int>? customerCouponAvailables;
+          String? autoCollectQRData;
           try {
             List<Object?> list = state.extra as List<Object?>;
             couponState = list[0] as CouponVoucherState;
             customerCouponAvailables = list[1] as List<int>?;
+            if (list.length > 2) {
+              autoCollectQRData = list[2] as String?;
+            }
           } catch (_) {
             rethrow;
           }
           return CouponVoucherPage(
             state: couponState,
             customerCouponAvailables: customerCouponAvailables,
+            autoCollectQRData: autoCollectQRData,
           );
         },
       ),
@@ -381,7 +386,13 @@ class AppRouter {
       GoRoute(
         path: LuckyScanPage.pagePath,
         name: LuckyScanPage.pageName,
-        builder: (context, state) => const LuckyScanPage(),
+        builder: (context, state) {
+          String? autoScanQRData;
+          try {
+            autoScanQRData = state.extra as String?;
+          } catch (_) {}
+          return LuckyScanPage(autoScanQRData: autoScanQRData);
+        },
       ),
       GoRoute(
         path: LuckyMockupPage.pagePath,

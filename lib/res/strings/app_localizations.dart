@@ -1993,7 +1993,7 @@ abstract class AppLocalizations {
   /// No description provided for @sakob.
   ///
   /// In en, this message translates to:
-  /// **'Sakob'**
+  /// **'Wash-Dry'**
   String get sakob;
 
   /// No description provided for @all.
@@ -2667,6 +2667,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today'**
   String get today;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @makeOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Make Order'**
+  String get makeOrder;
+
+  /// No description provided for @processingPleaseWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing, please wait...'**
+  String get processingPleaseWait;
+
+  /// No description provided for @selectPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Payment Method'**
+  String get selectPaymentMethod;
+
+  /// No description provided for @orderSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Summary'**
+  String get orderSummary;
+
+  /// No description provided for @productDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Discount'**
+  String get productDiscount;
+
+  /// No description provided for @coinValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get coinValue;
+
+  /// No description provided for @insufficientCoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Coin Insufficient'**
+  String get insufficientCoinTitle;
+
+  /// No description provided for @changePaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Please change payment method'**
+  String get changePaymentMethod;
+
+  /// No description provided for @incompletePaymentData.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete payment data, please try again'**
+  String get incompletePaymentData;
+
+  /// No description provided for @alreadyClaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Claimed'**
+  String get alreadyClaimed;
+
+  /// No description provided for @claimExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get claimExpired;
+
+  /// No description provided for @claimsFullyAllocated.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully Allocated'**
+  String get claimsFullyAllocated;
+
+  /// No description provided for @claimReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim Reward'**
+  String get claimReward;
+
+  /// No description provided for @claimSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim Reward Successfully'**
+  String get claimSuccessMessage;
+
+  /// No description provided for @noArticlesData.
+  ///
+  /// In en, this message translates to:
+  /// **'No Articles Found'**
+  String get noArticlesData;
+
+  /// No description provided for @noArticlesInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Articles in This Category'**
+  String get noArticlesInCategory;
+
+  /// No description provided for @viewMore.
+  ///
+  /// In en, this message translates to:
+  /// **'View More'**
+  String get viewMore;
+
+  /// No description provided for @invalidCouponCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coupon code is invalid'**
+  String get invalidCouponCode;
+
+  /// No description provided for @couponAlreadyCollected.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already collected this coupon'**
+  String get couponAlreadyCollected;
+
+  /// No description provided for @invalidOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Old password is incorrect'**
+  String get invalidOldPassword;
+
+  /// No description provided for @newPasswordSameAsOld.
+  ///
+  /// In en, this message translates to:
+  /// **'New password must not be the same as old password'**
+  String get newPasswordSameAsOld;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred'**
+  String get error;
+
+  /// No description provided for @userCancelledBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'You cancelled authentication'**
+  String get userCancelledBiometric;
+
+  /// No description provided for @biometricLockedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many failed attempts\nPlease wait a moment or use PIN'**
+  String get biometricLockedOut;
+
+  /// No description provided for @biometricPermanentlyLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric permanently locked\nPlease use PIN'**
+  String get biometricPermanentlyLocked;
+
+  /// No description provided for @biometricAuthFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed'**
+  String get biometricAuthFailed;
+
+  /// No description provided for @verifyIdentityToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Please verify your identity to continue'**
+  String get verifyIdentityToContinue;
+
+  /// No description provided for @passwordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordMismatch;
+
+  /// No description provided for @cannotSelfInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot enter your own phone number'**
+  String get cannotSelfInvite;
+
+  /// No description provided for @unsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported'**
+  String get unsupported;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No Notifications'**
+  String get noNotifications;
+
+  /// No description provided for @copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get copied;
+
+  /// No description provided for @scannedActivityAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already scanned this activity'**
+  String get scannedActivityAlready;
+
+  /// No description provided for @tryActivityNextDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try this activity again tomorrow'**
+  String get tryActivityNextDay;
+
+  /// No description provided for @scanToStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to Start'**
+  String get scanToStart;
+
+  /// No description provided for @confirmSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Skip'**
+  String get confirmSkip;
+
+  /// No description provided for @confirmSkipMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to skip saving profile information?'**
+  String get confirmSkipMessage;
+
+  /// No description provided for @requestLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Location'**
+  String get requestLocation;
+
+  /// No description provided for @locationPermissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable location access in device settings'**
+  String get locationPermissionMessage;
+
+  /// No description provided for @cameraAccessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open camera'**
+  String get cameraAccessDenied;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please grant camera permission before using this feature'**
+  String get cameraPermissionRequired;
+
+  /// No description provided for @locationForNearestBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Please grant location access to show nearest branches'**
+  String get locationForNearestBranch;
+
+  /// No description provided for @machineInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine is in use'**
+  String get machineInUse;
+
+  /// No description provided for @tryOtherMachine.
+  ///
+  /// In en, this message translates to:
+  /// **'Please try another machine'**
+  String get tryOtherMachine;
+
+  /// No description provided for @machineUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine is not available at this time'**
+  String get machineUnavailable;
+
+  /// No description provided for @extendDryingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend Drying Time'**
+  String get extendDryingTime;
+
+  /// No description provided for @paymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Methods'**
+  String get paymentMethods;
+
+  /// No description provided for @priceSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Summary'**
+  String get priceSummary;
+
+  /// No description provided for @branchPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch Promotion'**
+  String get branchPromotion;
+
+  /// No description provided for @discountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discountLabel;
+
+  /// No description provided for @startMachine.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Machine'**
+  String get startMachine;
+
+  /// No description provided for @washerProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Washer Program'**
+  String get washerProgram;
+
+  /// No description provided for @dryerProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Dryer Program'**
+  String get dryerProgram;
+
+  /// No description provided for @washerPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Washer Price'**
+  String get washerPrice;
+
+  /// No description provided for @dryerPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Dryer Price'**
+  String get dryerPrice;
+
+  /// No description provided for @selectBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Branch'**
+  String get selectBranch;
+
+  /// No description provided for @others.
+  ///
+  /// In en, this message translates to:
+  /// **'Others'**
+  String get others;
+
+  /// No description provided for @termsAndPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service and Privacy Policy'**
+  String get termsAndPrivacy;
+
+  /// No description provided for @selectPaymentMethodRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a payment method'**
+  String get selectPaymentMethodRequired;
+
+  /// No description provided for @userDataNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User data not found'**
+  String get userDataNotFound;
+
+  /// No description provided for @congratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations'**
+  String get congratulations;
+
+  /// No description provided for @couponAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon added successfully'**
+  String get couponAddedSuccessfully;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// No description provided for @inviteFriendsToBrowny.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friends to Laundry with Browny'**
+  String get inviteFriendsToBrowny;
+
+  /// No description provided for @pinSetupNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN settings not found'**
+  String get pinSetupNotFound;
+
+  /// No description provided for @pleaseSetupPinFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please set up your PIN before using this feature'**
+  String get pleaseSetupPinFirst;
+
+  /// No description provided for @setupPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Up PIN'**
+  String get setupPin;
+
+  /// No description provided for @pleaseConfirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Please verify your PIN'**
+  String get pleaseConfirmPin;
 }
 
 class _AppLocalizationsDelegate

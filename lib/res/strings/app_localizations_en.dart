@@ -979,7 +979,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanCoupon => 'Scan Coupon';
 
   @override
-  String get sakob => 'Sakob';
+  String get sakob => 'Wash-Dry';
 
   @override
   String get all => 'All';
@@ -1342,4 +1342,221 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get today => 'Today';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get makeOrder => 'Make Order';
+
+  @override
+  String get processingPleaseWait => 'Processing, please wait...';
+
+  @override
+  String get selectPaymentMethod => 'Select Payment Method';
+
+  @override
+  String get orderSummary => 'Order Summary';
+
+  @override
+  String get productDiscount => 'Product Discount';
+
+  @override
+  String get coinValue => 'Value';
+
+  @override
+  String get insufficientCoinTitle => 'Browny Coin Insufficient';
+
+  @override
+  String get changePaymentMethod => 'Please change payment method';
+
+  @override
+  String get incompletePaymentData =>
+      'Incomplete payment data, please try again';
+
+  @override
+  String get alreadyClaimed => 'Already Claimed';
+
+  @override
+  String get claimExpired => 'Expired';
+
+  @override
+  String get claimsFullyAllocated => 'Fully Allocated';
+
+  @override
+  String get claimReward => 'Claim Reward';
+
+  @override
+  String get claimSuccessMessage => 'Claim Reward Successfully';
+
+  @override
+  String get noArticlesData => 'No Articles Found';
+
+  @override
+  String get noArticlesInCategory => 'No Articles in This Category';
+
+  @override
+  String get viewMore => 'View More';
+
+  @override
+  String get invalidCouponCode => 'Your coupon code is invalid';
+
+  @override
+  String get couponAlreadyCollected => 'You have already collected this coupon';
+
+  @override
+  String get invalidOldPassword => 'Old password is incorrect';
+
+  @override
+  String get newPasswordSameAsOld =>
+      'New password must not be the same as old password';
+
+  @override
+  String get error => 'An error occurred';
+
+  @override
+  String get userCancelledBiometric => 'You cancelled authentication';
+
+  @override
+  String get biometricLockedOut =>
+      'Too many failed attempts\nPlease wait a moment or use PIN';
+
+  @override
+  String get biometricPermanentlyLocked =>
+      'Biometric permanently locked\nPlease use PIN';
+
+  @override
+  String get biometricAuthFailed => 'Authentication failed';
+
+  @override
+  String get verifyIdentityToContinue =>
+      'Please verify your identity to continue';
+
+  @override
+  String get passwordMismatch => 'Passwords do not match';
+
+  @override
+  String get cannotSelfInvite => 'Cannot enter your own phone number';
+
+  @override
+  String get unsupported => 'Unsupported';
+
+  @override
+  String get noNotifications => 'No Notifications';
+
+  @override
+  String get copied => 'Copied';
+
+  @override
+  String get scannedActivityAlready => 'You have already scanned this activity';
+
+  @override
+  String get tryActivityNextDay => 'Please try this activity again tomorrow';
+
+  @override
+  String get scanToStart => 'Scan to Start';
+
+  @override
+  String get confirmSkip => 'Confirm Skip';
+
+  @override
+  String get confirmSkipMessage =>
+      'Do you want to skip saving profile information?';
+
+  @override
+  String get requestLocation => 'Request Location';
+
+  @override
+  String get locationPermissionMessage =>
+      'Please enable location access in device settings';
+
+  @override
+  String get cameraAccessDenied => 'Cannot open camera';
+
+  @override
+  String get cameraPermissionRequired =>
+      'Please grant camera permission before using this feature';
+
+  @override
+  String get locationForNearestBranch =>
+      'Please grant location access to show nearest branches';
+
+  @override
+  String get machineInUse => 'Machine is in use';
+
+  @override
+  String get tryOtherMachine => 'Please try another machine';
+
+  @override
+  String get machineUnavailable => 'Machine is not available at this time';
+
+  @override
+  String get extendDryingTime => 'Extend Drying Time';
+
+  @override
+  String get paymentMethods => 'Payment Methods';
+
+  @override
+  String get priceSummary => 'Price Summary';
+
+  @override
+  String get branchPromotion => 'Branch Promotion';
+
+  @override
+  String get discountLabel => 'Discount';
+
+  @override
+  String get startMachine => 'Start Machine';
+
+  @override
+  String get washerProgram => 'Washer Program';
+
+  @override
+  String get dryerProgram => 'Dryer Program';
+
+  @override
+  String get washerPrice => 'Washer Price';
+
+  @override
+  String get dryerPrice => 'Dryer Price';
+
+  @override
+  String get selectBranch => 'Select Branch';
+
+  @override
+  String get others => 'Others';
+
+  @override
+  String get termsAndPrivacy => 'Terms of Service and Privacy Policy';
+
+  @override
+  String get selectPaymentMethodRequired => 'Please select a payment method';
+
+  @override
+  String get userDataNotFound => 'User data not found';
+
+  @override
+  String get congratulations => 'Congratulations';
+
+  @override
+  String get couponAddedSuccessfully => 'Coupon added successfully';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get inviteFriendsToBrowny => 'Invite Friends to Laundry with Browny';
+
+  @override
+  String get pinSetupNotFound => 'PIN settings not found';
+
+  @override
+  String get pleaseSetupPinFirst =>
+      'Please set up your PIN before using this feature';
+
+  @override
+  String get setupPin => 'Set Up PIN';
+
+  @override
+  String get pleaseConfirmPin => 'Please verify your PIN';
 }

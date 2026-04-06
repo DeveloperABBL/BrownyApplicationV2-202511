@@ -23,6 +23,8 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       ?.map((e) => e as String)
       .toList(),
   totalCoupons: (json['total_coupons'] as num?)?.toInt(),
+  coinValue: json['coin_value'] as String?,
+  currentCoin: json['current_coin'] as String?,
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -37,6 +39,8 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'browny_coin': instance.brownyCoin,
   'avatars': instance.avatars,
   'total_coupons': instance.totalCoupons,
+  'coin_value': instance.coinValue,
+  'current_coin': instance.currentCoin,
   'loginPlatform': instance.loginPlatform,
   'isFriendRewardOn': instance.isFriendRewardOn,
   'isGuest': instance.isGuest,

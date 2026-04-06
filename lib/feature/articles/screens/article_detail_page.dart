@@ -1,5 +1,4 @@
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -100,11 +99,8 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                               context,
                               imageAsset: Assets.png.brownySuccess1.path,
                               title: context.wording.success,
-                              message: ContentLocalizeData(
-                                en: 'Claimed successfully',
-                                zh: '领取成功',
-                                th: 'รับสิทธิ์เรียบร้อยแล้ว',
-                              ).getTextByLocale(locale),
+                              // รับสิทธิ์เรียบร้อยแล้ว
+                              message: context.wording.claimSuccessMessage,
                               onConfirm: () {
                                 setState(() {
                                   // เอา state ใน Widget มารับค่าใหม่

@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/coupon_
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_package_list_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_store_list_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_method_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
@@ -59,6 +60,9 @@ mixin CouponVoucherDataSourceMixin on CustomerDataSourceMixin {
     String data,
     String customerId,
   );
+
+  /// ฟังก์ชันดึงรายการ Payment Methods ที่รองรับในระบบ
+  Future<RepoResult<PaymentMethodResponse>> fetchPaymentMethods();
 }
 
 class CouponVoucherRepo extends CustomerDataRepo
@@ -184,6 +188,16 @@ class CouponVoucherRepo extends CustomerDataRepo
         return RepoResult.error(error: CollectCouponCollected());
       }
       return RepoResult.error(error: dioEx);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<PaymentMethodResponse>> fetchPaymentMethods() async {
+    try {
+      final response = await requireRemote.fetchPaymentMethods();
+      return RepoResult.dependOn(response.data);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }

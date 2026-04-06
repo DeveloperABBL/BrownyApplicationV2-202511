@@ -186,7 +186,8 @@ class StoreBottomSheetDialog extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AppText(
-                    'เครื่องซัก',
+                    // 'เครื่องซัก',
+                    context.wording.washer,
                     style: context.textTheme.labelLarge!.copyWith(
                       color: AppColors.textWhite,
                     ),
@@ -235,7 +236,8 @@ class StoreBottomSheetDialog extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AppText(
-                    'เครื่องอบ',
+                    // เครื่องอบ,
+                    context.wording.dryer,
                     style: context.textTheme.labelLarge!.copyWith(
                       color: AppColors.textWhite,
                     ),

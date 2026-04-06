@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
@@ -92,8 +93,10 @@ class __MachineContentState extends State<_MachineContent> {
       if (machine.isBusy) {
         await AppOverlays.showBrownyDialog(
           context,
-          title: 'เครื่องกำลังทำงาน',
-          message: 'กรุณาลองเครื่องอื่น',
+          // เครื่องกำลังทำงาน
+          title: context.wording.machineInUse,
+          // กรุณาลองเครื่องอื่น
+          message: context.wording.tryOtherMachine,
           onConfirm: () {
             if (!mounted) return;
             context.pop();
@@ -106,8 +109,10 @@ class __MachineContentState extends State<_MachineContent> {
         await AppOverlays.showBrownyDialog(
           context,
           imageAsset: Assets.png.brownyMachineError1.path,
-          title: 'เครื่องไม่สามารถใช้งานได้ในขณะนี้',
-          message: 'กรุณาลองเครื่องอื่น',
+          // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+          title: context.wording.machineUnavailable,
+          // กรุณาลองเครื่องอื่น
+          message: context.wording.tryOtherMachine,
           onConfirm: () {
             if (!mounted) return;
             context.pop();
@@ -281,7 +286,8 @@ class __MachineContentState extends State<_MachineContent> {
       _mySliverToBoxAdapter(
         child: _title(
           icon: Assets.svg.icClockRoundedGreen.svg(),
-          title: 'ต่อเวลาอบผ้า',
+          // ต่อเวลาอบผ้า
+          title: context.wording.extendDryingTime,
         ),
       ),
 
@@ -392,7 +398,8 @@ class __MachineContentState extends State<_MachineContent> {
             Expanded(
               child: _title(
                 icon: Assets.svg.icWalletRoundedGreen.svg(),
-                title: 'วิธีการชำระเงิน',
+                // วิธีการชำระเงิน
+                title: context.wording.paymentMethods,
               ),
             ),
             GestureDetector(
@@ -405,7 +412,8 @@ class __MachineContentState extends State<_MachineContent> {
               child: Row(
                 children: [
                   AppText(
-                    'เลือก',
+                    // เลือก
+                    context.wording.select,
                     style: context.textTheme.labelLarge!.copyWith(
                       color: AppColors.gray500,
                     ),
@@ -450,7 +458,18 @@ class __MachineContentState extends State<_MachineContent> {
                           contentPadding: EdgeInsets.zero,
                           minTileHeight: 0,
                           horizontalTitleGap: AppDims.size_8.w,
-                          leading: payment.icon,
+                          leading: payment.imageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: payment.imageUrl!,
+                                  width: 22.w,
+                                  height: 22.h,
+                                  fit: BoxFit.contain,
+                                  placeholder: (_, __) =>
+                                      SizedBox(width: 22.w, height: 22.h),
+                                  errorWidget: (_, __, ___) =>
+                                      SizedBox(width: 22.w, height: 22.h),
+                                )
+                              : null,
                           title: AppText(
                             payment.name,
                             style: payment.isSelected
@@ -489,7 +508,8 @@ class __MachineContentState extends State<_MachineContent> {
       _mySliverToBoxAdapter(
         child: _title(
           icon: Assets.svg.icListRoundedGreen.svg(),
-          title: 'สรุปราคา',
+          // สรุปราคา
+          title: context.wording.priceSummary,
         ),
       ),
       _mySliverToBoxAdapter(
@@ -508,15 +528,15 @@ class __MachineContentState extends State<_MachineContent> {
               price: _machineProgram!.getNetPrice().toString(),
             ),
             AppDims.vericalPadding_16,
-            // ส่วนลดถ้ามี
+            // โปรโมชั่นสาขา
             _lineSummay(
-              title: 'โปรโมชั่นสาขา',
+              title: context.wording.branchPromotion,
               price: _machineProgram!.getTotalDiscountStore().toString(),
             ),
             AppDims.vericalPadding_16,
-            // สรุปยอด คูปองส่วนลด
+            // คูปองส่วนลด
             _lineSummay(
-              title: 'คูปองส่วนลด',
+              title: context.wording.discountCoupon,
               price: _machineProgram!.getTotalCouponOnlyDiscount().toString(),
               textPriceColor: AppColors.primary,
             ),
@@ -605,8 +625,9 @@ class __MachineContentState extends State<_MachineContent> {
                     contentPadding: EdgeInsets.zero,
                     minTileHeight: 0,
                     horizontalTitleGap: AppDims.size_8.w,
+                    // จำนวนเงินคงเหลือ
                     title: AppText(
-                      'จำนวนเงินคงเหลือ',
+                      context.wording.balanceRemaining,
                       style: _textPrimary,
                     ),
                     trailing: AppText(
@@ -678,7 +699,7 @@ class __MachineContentState extends State<_MachineContent> {
                   AppDims.horizonPadding_4,
                   AppText(
                     // ลดราคา
-                    'ลดราคา',
+                    context.wording.discountLabel,
                     style: context.textTheme.labelSmall!.copyWith(
                       color: AppColors.white,
                     ),
@@ -872,8 +893,9 @@ class __MachineContentState extends State<_MachineContent> {
       stretch: false,
       expandedHeight: 365.h,
       elevation: 0.0,
+      // เริ่มต้นทำงาน
       title: AppText(
-        'เริ่มต้นทำงาน',
+        context.wording.startMachine,
         style: context.appBarTextThemeWhite,
       ),
       flexibleSpace: FlexibleSpaceBar(

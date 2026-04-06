@@ -493,8 +493,10 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
     await AppOverlays.showBrownyDialog(
       context,
       imageAsset: Assets.png.brownyMoto.path,
-      title: 'เข้าถึงตำแหน่ง',
-      message: 'กรุณาไปเปิดสิทธิ์เข้าถึงตำแหน่งในการตั้งค่าของอุปกรณ์',
+      // เข้าถึงตำแหน่ง
+      title: context.wording.requestLocation,
+      // กรุณาไปเปิดสิทธิ์เข้าถึงตำแหน่งในการตั้งค่าของอุปกรณ์
+      message: context.wording.locationPermissionMessage,
 
       confirmText: context.wording.openSettings,
       onConfirm: () async {

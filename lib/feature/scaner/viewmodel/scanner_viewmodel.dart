@@ -5,6 +5,8 @@ import 'package:browny_applications_new/core/data/remote/models/response/custome
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
+import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -175,10 +177,33 @@ class ScannerViewModel extends AppViewModel {
               case ScannerProcess.machine:
                 {
                   // จะได้เป็น URL มา เอามา parse เป็น URI ไว้เช็คเงื่อนไข
-                  // parse เป็น Uri แล้วเช็คจาก path /wash/dry/{id}
                   final uri = Uri.parse(barcode.rawValue!);
+                  final segments = uri.pathSegments;
+
+                  // ตรวจสอบประเภท QR Code จาก URL path
+                  // Coupon: {url}/coupon/{uuid}
+                  if (segments.contains('coupon')) {
+                    context.pop();
+                    CouponVoucherPage.goToPage(
+                      context,
+                      autoCollectQRData: barcode.rawValue!,
+                    );
+                    return;
+                  }
+
+                  // Lucky Scan: {url}/lucky/draw/{uuid}
+                  if (segments.contains('lucky') && segments.contains('draw')) {
+                    context.pop();
+                    LuckyScanPage.goToPage(
+                      context,
+                      autoScanQRData: barcode.rawValue!,
+                    );
+                    return;
+                  }
+
+                  // Machine: {url}/wash/dry/{id} (default)
                   // ดึงเอา path สุดท้ายมาใช้ {id}
-                  if (uri.pathSegments.isNotEmpty) {
+                  if (segments.isNotEmpty) {
                     AppOverlays.showLoading(context);
 
                     final machineResult = await _machRepo.checkMachineStatus(

@@ -1,4 +1,22 @@
 # CHANGELOG
+### DONG 2026-04-06
+* Prepare Release v3.0.0
+* แก้ไขลบ User Permission ที่ไม่จำเป็นออก
+
+### DONG 2026-04-03
+* v3.0.0(47)
+* เปลี่ยน env prd เป็น url, token ที่จะใช้งานจริง
+* แก้ไข logic กรณีประเภทชำระไม่มีส่งมาจะเกิด Error
+
+### DONG 2026-04-02
+* เก็บ Localize wording ส่วนที่ยังไม่เรียบร้อย
+* ยกเลิก gitignore Podfile
+
+### DONG 2026-03-29
+* เพิ่มการชำระเงินด้วย browny coin
+ - ซื้อ E-Vouvher
+ - สั่งการทำงานเครื่องซักอบ
+
 ### DONG 2026-03-28
 * แก้จังหวะ Scan QR เก็บ Coupon ส่ง type ผิดทำให้เก็บ coupon ไม่ได้
 * แก้ไขหน้าแสดง Coupon แสดงคำ ซัก, อบ, ซักอบ ไม่ถูกต้อง
