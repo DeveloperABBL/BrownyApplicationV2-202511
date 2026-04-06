@@ -22,6 +22,7 @@ class CouponVoucherPage extends StatelessWidget {
     super.key,
     required this.state,
     this.customerCouponAvailables,
+    this.autoCollectQRData,
   });
 
   static final pagePath = '/coupon_voucher';
@@ -29,11 +30,15 @@ class CouponVoucherPage extends StatelessWidget {
   final CouponVoucherState state;
   final List<int>? customerCouponAvailables;
 
+  /// QR data สำหรับ auto-collect เมื่อ scan จากหน้า Home
+  final String? autoCollectQRData;
+
   /// util function route to pageName
   static Future<T?> goToPage<T>(
     BuildContext context, {
     CouponVoucherState state = CouponVoucherState.purshasing,
     List<int>? customerCouponAvailables,
+    String? autoCollectQRData,
   }) async {
     if (context.read<CustomerProvider>().current.isGuest) {
       return await AuthenticationPage.goToPage(
@@ -46,6 +51,7 @@ class CouponVoucherPage extends StatelessWidget {
       extra: [
         state,
         customerCouponAvailables,
+        autoCollectQRData,
       ],
     );
   }
@@ -61,6 +67,7 @@ class CouponVoucherPage extends StatelessWidget {
       child: _CouponVoucherWidget(
         state: state,
         customerCouponAvailables: customerCouponAvailables,
+        autoCollectQRData: autoCollectQRData,
       ),
     );
   }
@@ -70,10 +77,12 @@ class _CouponVoucherWidget extends StatefulWidget {
   const _CouponVoucherWidget({
     required this.state,
     this.customerCouponAvailables,
+    this.autoCollectQRData,
   });
 
   final CouponVoucherState state;
   final List<int>? customerCouponAvailables;
+  final String? autoCollectQRData;
 
   @override
   State<_CouponVoucherWidget> createState() => _CouponVoucherWidgetState();
@@ -127,6 +136,18 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
       length: 3,
       vsync: this,
     );
+
+    // Auto-collect coupon เมื่อ scan QR จากหน้า Home
+    if (widget.autoCollectQRData != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _viewmodel.collectCoupon(
+          widget.autoCollectQRData,
+          'qr',
+          // from auto scan
+          true,
+        );
+      });
+    }
   }
 
   @override

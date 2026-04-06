@@ -899,6 +899,7 @@ class TransactionsViewmodel extends AppViewModel
   Future<void> collectCoupon([
     String? data,
     String type = 'code',
+    bool fromAuto = false,
   ]) async {
     FocusManager.instance.primaryFocus?.unfocus();
     AppOverlays.showLoading(context);
@@ -958,6 +959,14 @@ class TransactionsViewmodel extends AppViewModel
         title: context.wording.congratulations,
         // คุณได้ทำการเพิ่มคูปองสำเร็จ,
         message: context.wording.couponAddedSuccessfully,
+        onConfirm: () {
+          // ถ้ามาจาก auto และ scan สำเร็จ เมื่อกดรับทราบจะ pop ออก
+          if (fromAuto) {
+            if (context.canPop()) {
+              context.pop();
+            }
+          }
+        },
       );
     }
 

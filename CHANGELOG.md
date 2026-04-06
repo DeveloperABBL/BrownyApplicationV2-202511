@@ -1,4 +1,8 @@
 # CHANGELOG
+### DONG 2026-04-06
+* Prepare Release v3.0.0
+* แก้ไขลบ User Permission ที่ไม่จำเป็นออก
+
 ### DONG 2026-04-03
 * v3.0.0(47)
 * เปลี่ยน env prd เป็น url, token ที่จะใช้งานจริง
