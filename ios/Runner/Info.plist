@@ -2,10 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+ 	<key>UIApplicationSceneManifest</key>
+ 	<dict>
+ 	 <key>UIApplicationSupportsMultipleScenes</key>
+ 	 <false/>
+ 	 <key>UISceneConfigurations</key>
+ 	 <dict>
+ 	 <key>UIWindowSceneSessionRoleApplication</key>
+ 	   <array>
+ 	     <dict>
+ 	       <key>UISceneClassName</key>
+ 	       <string>UIWindowScene</string>
+ 	       <key>UISceneDelegateClassName</key>
+ 	       <string>FlutterSceneDelegate</string>
+ 	       <key>UISceneConfigurationName</key>
+ 	       <string>flutter</string>
+ 	       <key>UISceneStoryboardFile</key>
+ 	       <string>Main</string>
+ 	     </dict>
+ 	   </array>
+ 	  </dict>
+ 	</dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Flutter Application 1</string>
+	<string>Browny</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +36,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>flutter_application_1</string>
+	<string>Browny</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -24,15 +47,26 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -41,9 +75,76 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to the camera allows you to take photos for your profile or to scan QR code to proceed the payment.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Allow application to authenticating using face Id.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow photo access to scan QR code from the photos or to select your profile photo from your gallery.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location lets us show you the nearest stores always when in use the application.</string>
+	<!-- <key>NSLocationAlwaysUsageDescription</key> -->
+	<!-- <string>This app needs access to location when in the background.</string> -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location lets us show you the nearest stores.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app needs access to speech recognition to search for stores by voice.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone to enable voice search.</string>
+	<!-- <key>NSAppleMusicUsageDescription</key> -->
+	<!-- <string>This app does not access your Apple Music library.</string> -->
+	<key>GIDClientID</key>
+	<!-- TODO Replace this value: -->
+	<!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
+	<string>261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq.apps.googleusercontent.com</string>
+	<!-- <key>NSUserTrackingUsageDescription</key> -->
+	<!-- <string>This identifier will be used to deliver personalized ads to you.</string> -->
+
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Google Sign-In URL Scheme -->
+				<!-- Replace with your REVERSED_CLIENT_ID from GoogleService-Info.plist -->
+				<string>com.googleusercontent.apps.261060252828-8fonmpfeeqkqhb420dui4q0afo7dsqlq</string>
+		        <!-- LINE Login URL Scheme -->
+				<!-- Specify URL scheme to use when returning from LINE to your app. -->
+				<string>line3rdp.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				<!-- Facebook Login URL Scheme -->
+				<!-- Replace with your Facebook App ID -->
+				<string>fb909604355579723</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>909604355579723</string>
+	<key>FacebookClientToken</key>
+	<string>1d6250d26a1b986306c6f37620b89fe1</string>
+	<key>FacebookDisplayName</key>
+	<string>brownywash</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>sms</string>
+		<string>mailto</string>
+		<string>fb</string>
+		<string>fbapi</string>
+		<string>fb-messager-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+		<string>instagram</string>
+		<string>twitter</string>
+		<string>whatsapp</string>
+		<string>line</string>
+		<string>lineauth2</string>
+		<string>comgooglemaps</string>
+	</array>
 </dict>
 </plist>
