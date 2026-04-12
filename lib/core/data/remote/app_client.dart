@@ -29,25 +29,31 @@ abstract class AppClient {
 
   factory AppClient.init(ApiConfigs config) {
     if (kDebugMode) {
-      // _instance._dio.interceptors.add(
-      //   InterceptorsWrapper(
-      //     onRequest: (options, handler) {
-      //       // ignore: avoid_print
-      //       debugPrint(
-      //         'DIO: REQUEST[${options.method}] => PATH: ${options.path}',
-      //       );
-      //       return handler.next(options); // continue
-      //     },
-      //     onResponse: (response, handler) {
-      //       debugPrint('DIO: RESPONSE : ${response.toString()}');
-      //       return handler.next(response); // continue
-      //     },
-      //     onError: (error, handler) {
-      //       debugPrint('DIO: RESPONSE : ${error.toString()}');
-      //       return handler.next(error); // continue
-      //     },
-      //   ),
-      // );
+      _instance._dio.interceptors.add(
+        LogInterceptor(
+          requestHeader: false,
+          requestBody: true,
+          responseHeader: false,
+          responseBody: true,
+        ),
+        // InterceptorsWrapper(
+        //   onRequest: (options, handler) {
+        //     // ignore: avoid_print
+        //     debugPrint(
+        //       'DIO: REQUEST[${options.method}] => PATH: ${options.path}',
+        //     );
+        //     return handler.next(options); // continue
+        //   },
+        //   onResponse: (response, handler) {
+        //     debugPrint('DIO: RESPONSE : ${response.toString()}');
+        //     return handler.next(response); // continue
+        //   },
+        //   onError: (error, handler) {
+        //     debugPrint('DIO: RESPONSE : ${error.toString()}');
+        //     return handler.next(error); // continue
+        //   },
+        // ),
+      );
     }
     return _instance
       ..baseUrl = config.baseUrl

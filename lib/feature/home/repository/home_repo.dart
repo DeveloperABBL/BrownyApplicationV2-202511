@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart';
+// ignore: unused_import for debug mode
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/banner_collect_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
@@ -9,11 +10,13 @@ import 'package:browny_applications_new/core/data/remote/models/response/browny_
 import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/home_menu_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+// ignore: unused_import for debug mode
 import 'package:browny_applications_new/core/data/remote/models/response/working_machine_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
+// ignore: unused_import for debug mode
 import 'package:flutter/foundation.dart';
 
 mixin HomeDataSourceMixin on CustomerDataSourceMixin {

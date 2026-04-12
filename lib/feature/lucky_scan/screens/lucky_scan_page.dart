@@ -10,7 +10,6 @@ import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart'
 import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/wallet/error/wallet_exception.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:google_fonts/google_fonts.dart';

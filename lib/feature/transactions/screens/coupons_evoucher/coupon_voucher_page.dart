@@ -324,7 +324,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                   tabs: [
                     Tab(child: AppText(context.wording.sakob)),
                     Tab(child: AppText(context.wording.eVouchers)),
-                    Tab(child: AppText('Browny Shop')),
+                    Tab(child: AppText(context.wording.brownyShop)),
                   ],
                 ),
               ),
@@ -360,7 +360,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               _buildTabContent(
                 context: context,
                 icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
-                title: 'Browny Shop',
+                title: context.wording.brownyShop,
               ),
             ],
           ),
@@ -1315,7 +1315,8 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
               onPressed: null, //() => _viewModel.goPurchasePage(context),
               icon: Assets.svg.icEvoucherPercentRoundedGreen.svg(),
               label: AppText(
-                'เลือกซื้อแพ็คเกจ E-Voucher',
+                // 'เลือกซื้อแพ็คเกจ E-Voucher'
+                context.wording.selectEVoucherPackage,
                 style: context.textTheme.labelLarge!.copyWith(
                   fontSize: AppDims.size_16.sp,
                 ),

@@ -4,7 +4,6 @@ import 'dart:ui' as ui;
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrPromptpayDialog extends StatefulWidget {
@@ -90,79 +89,79 @@ class _QrPromptpayDialogState extends State<QrPromptpayDialog>
   Future<void> _captureAndSaveQR() async {
     try {
       // Request storage permission using helper
-      final status = await PermissionHelper.requestStoragePermission(context);
+      // final status = await PermissionHelper.requestStoragePermission(context);
 
-      if (status.isGranted || status.isLimited) {
-        // Capture the widget
-        RenderRepaintBoundary boundary =
-            _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-        ByteData? byteData = await image.toByteData(
-          format: ui.ImageByteFormat.png,
-        );
-        Uint8List pngBytes = byteData!.buffer.asUint8List();
+      // if (status.isGranted || status.isLimited) {
+      // Capture the widget
+      RenderRepaintBoundary boundary =
+          _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-        // Save to gallery
-        final result = await ImageGallerySaverPlus.saveImage(
-          pngBytes,
-          quality: 100,
-          name: 'promptpay_qr_${DateTime.now().millisecondsSinceEpoch}',
-        );
+      // Save to gallery
+      final result = await ImageGallerySaverPlus.saveImage(
+        pngBytes,
+        quality: 100,
+        name: 'promptpay_qr_${DateTime.now().millisecondsSinceEpoch}',
+      );
 
-        if (mounted) {
-          if (result['isSuccess'] == true) {
-            await _playFlashAnimation();
+      if (mounted) {
+        if (result['isSuccess'] == true) {
+          await _playFlashAnimation();
+          setState(() {
+            _isDownloadSuccess = true;
+          });
+          await Future.delayed(const Duration(seconds: 2));
+          if (mounted) {
             setState(() {
-              _isDownloadSuccess = true;
+              _isDownloadSuccess = false;
             });
-            await Future.delayed(const Duration(seconds: 2));
-            if (mounted) {
-              setState(() {
-                _isDownloadSuccess = false;
-              });
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.cannotSaveQRCode,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(
-                  bottom: AppDims.size_16.w,
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                ),
-              ),
-            );
           }
-        }
-      } else if (status.isPermanentlyDenied) {
-        if (mounted) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: AppText(
-                context.wording.pleaseAllowPhotoLibraryAccess,
+                context.wording.cannotSaveQRCode,
                 style: context.textTheme.labelLarge!.copyWith(
                   color: AppColors.white,
                 ),
               ),
               backgroundColor: AppColors.error,
-              action: SnackBarAction(
-                label: context.wording.openSettings,
-                textColor: AppColors.white,
-                onPressed: () {
-                  PermissionHelper.openAppSettings();
-                },
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(
+                bottom: AppDims.size_16.w,
+                left: AppDims.size_16.w,
+                right: AppDims.size_16.w,
               ),
             ),
           );
         }
       }
+      // } else if (status.isPermanentlyDenied) {
+      //   if (mounted) {
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(
+      //         content: AppText(
+      //           context.wording.pleaseAllowPhotoLibraryAccess,
+      //           style: context.textTheme.labelLarge!.copyWith(
+      //             color: AppColors.white,
+      //           ),
+      //         ),
+      //         backgroundColor: AppColors.error,
+      //         action: SnackBarAction(
+      //           label: context.wording.openSettings,
+      //           textColor: AppColors.white,
+      //           onPressed: () {
+      //             PermissionHelper.openAppSettings();
+      //           },
+      //         ),
+      //       ),
+      //     );
+      //   }
+      // }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

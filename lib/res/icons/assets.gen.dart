@@ -416,6 +416,14 @@ class $AssetsPngGen {
   AssetGenImage get brownyCoinClaimed =>
       const AssetGenImage('assets/png/browny_coin_claimed.png');
 
+  /// File path: assets/png/browny_coin_claimed_en.png
+  AssetGenImage get brownyCoinClaimedEn =>
+      const AssetGenImage('assets/png/browny_coin_claimed_en.png');
+
+  /// File path: assets/png/browny_coin_claimed_zh.png
+  AssetGenImage get brownyCoinClaimedZh =>
+      const AssetGenImage('assets/png/browny_coin_claimed_zh.png');
+
   /// File path: assets/png/browny_coin_inactive.png
   AssetGenImage get brownyCoinInactive =>
       const AssetGenImage('assets/png/browny_coin_inactive.png');
@@ -512,6 +520,18 @@ class $AssetsPngGen {
   AssetGenImage get cardInvitFriend =>
       const AssetGenImage('assets/png/card_invit_friend.png');
 
+  /// File path: assets/png/card_invit_friend_en.png
+  AssetGenImage get cardInvitFriendEn =>
+      const AssetGenImage('assets/png/card_invit_friend_en.png');
+
+  /// File path: assets/png/card_invit_friend_th.png
+  AssetGenImage get cardInvitFriendTh =>
+      const AssetGenImage('assets/png/card_invit_friend_th.png');
+
+  /// File path: assets/png/card_invit_friend_zh.png
+  AssetGenImage get cardInvitFriendZh =>
+      const AssetGenImage('assets/png/card_invit_friend_zh.png');
+
   /// File path: assets/png/card_invit_title.png
   AssetGenImage get cardInvitTitle =>
       const AssetGenImage('assets/png/card_invit_title.png');
@@ -588,6 +608,8 @@ class $AssetsPngGen {
     brownyCoin2,
     brownyCoinClaimTitle,
     brownyCoinClaimed,
+    brownyCoinClaimedEn,
+    brownyCoinClaimedZh,
     brownyCoinInactive,
     brownyCoinclaimCondition,
     brownyCreatePin,
@@ -612,6 +634,9 @@ class $AssetsPngGen {
     cardCouponEvoucher2,
     cardIcBackground,
     cardInvitFriend,
+    cardInvitFriendEn,
+    cardInvitFriendTh,
+    cardInvitFriendZh,
     cardInvitTitle,
     coinCoinClaim,
     decoratCardCoinClaim,

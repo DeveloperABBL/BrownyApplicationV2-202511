@@ -397,7 +397,7 @@ class TransactionsViewmodel extends AppViewModel
       final latLng = LatLng(position.latitude, position.longitude);
       await fetchCouponPackageListDependsOn(currentLocation: latLng);
     } catch (e) {
-      print('Error getting location: $e');
+      // print('Error getting location: $e');
       // Fallback to fetch without location
       _showNearbyStoresNotifier.value = false;
       await fetchCouponPackageListDependsOn(currentLocation: null);

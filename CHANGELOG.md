@@ -1,4 +1,16 @@
 # CHANGELOG
+### DONG 2026-04-10
+* แก้ไขการดึงค่า machineID ให้ดึงจาก response ก่อน
+* เพิ่มเงื่อนไขการเข้าหน้า CoinClaim ต้อง Login เป็น สมาชิกก่อน
+* แก้ไขการแสดงเลข version ในหน้าแอพไม่ถูกต้อง
+
+### DONG 2026-04-09
+* แก้ไข Wording คงเหลือ วัน หลังซื้อ แสดงไม่ถูกประเภท Coupon/E-Voucher
+* แก้ไขการแสดงจุดแจ้งเตือนไม่ถูกต้อง
+* Android
+ - แก้ไขปัญหา Permission ไม่สามารถ Save Image QRCode ได้
+ - แก้ไขปัญหา Permission ไม่สามารถ Browse Image จาก Gallery ได้
+
 ### DONG 2026-04-06
 * Prepare Release v3.0.0
 * แก้ไขลบ User Permission ที่ไม่จำเป็นออก

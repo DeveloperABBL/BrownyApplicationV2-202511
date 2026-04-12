@@ -384,10 +384,13 @@
     "showNearbyEVoucherPackages": "Show E-Voucher packages near me within 25 km.",
     "evoucherNotFound": "E-Voucher not found",
     "startService": "Start service",
-    "afterPurchaseEVoucher": "{expireDate} after purchasing E-Voucher",
+    "afterPurchaseEVoucher": "{expireDate} after purchasing {type}",
     "@afterPurchaseEVoucher": {
         "placeholders": {
             "expireDate": {
+                "type": "String"
+            },
+            "type": {
                 "type": "String"
             }
         }
@@ -553,5 +556,7 @@
   "pinSetupNotFound": "PIN settings not found",
   "pleaseSetupPinFirst": "Please set up your PIN before using this feature",
   "setupPin": "Set Up PIN",
-  "pleaseConfirmPin": "Please verify your PIN"
+  "pleaseConfirmPin": "Please verify your PIN",
+  "brownyShop": "Browny Shop",
+  "selectEVoucherPackage": "Select E-Voucher Package"
 }

@@ -208,7 +208,14 @@ class AppRouter {
       GoRoute(
         path: CoinPage.pagePath,
         name: CoinPage.pageName,
-        builder: (context, state) => const CoinPage(),
+        builder: (context, state) {
+          if (context.read<CustomerProvider>().current.isGuest) {
+            return AuthenticationPage(
+              authenProcess: AuthenProcess.login,
+            );
+          }
+          return const CoinPage();
+        },
       ),
       GoRoute(
         path: CoinHistoryPage.pagePath,

@@ -76,7 +76,10 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
             // Icon Title
             SafeArea(
               bottom: false,
-              child: Assets.png.cardInvitTitle.image(),
+              minimum: EdgeInsets.symmetric(
+                horizontal: AppDims.size_10.w,
+              ),
+              child: _getBannerDisplay(),
             ),
 
             // Card แสดงรหัสชวนเพื่อน,​ ปุ่มแชร์ลิงก์
@@ -222,6 +225,17 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
         onTap: BrownyBottomNav.onTapAppDefault,
       ),
     );
+  }
+
+  Widget _getBannerDisplay() {
+    switch (context.languageCode) {
+      case 'zh':
+        return Assets.png.cardInvitFriendZh.image();
+      case 'en':
+        return Assets.png.cardInvitFriendEn.image();
+      default:
+        return Assets.png.cardInvitFriendTh.image();
+    }
   }
 
   Row _buildSharingContent(BuildContext context, CustomerProvider value) {

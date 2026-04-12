@@ -1,6 +1,6 @@
+// ignore: unused_import for debug mode
 import 'dart:convert';
 
-import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/festive_history_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/festive_index_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/lucky_draw_response.dart';
@@ -9,6 +9,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:dio/dio.dart';
+// ignore: unused_import for debug mode
 import 'package:flutter/foundation.dart';
 
 mixin LuckyDataSourceMixin {

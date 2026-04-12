@@ -349,19 +349,18 @@ class _MapContentState extends State<MapContent> {
                             boxShadow: AppColors.defatultShadow,
                           ),
                           child: Autocomplete<StoreLocationItem>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                                  if (textEditingValue.text.isEmpty) {
-                                    return _viewmodel.storeList.take(4);
-                                  }
-                                  return _viewmodel.storeList.where(
-                                    (item) => item
-                                        .getLocalizedName(context.languageCode)
-                                        .contains(
-                                          textEditingValue.text.toLowerCase(),
-                                        ),
-                                  );
-                                },
+                            optionsBuilder: (textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return _viewmodel.storeList.take(4);
+                              }
+                              return _viewmodel.storeList.where(
+                                (item) => item
+                                    .getLocalizedName(context.languageCode)
+                                    .contains(
+                                      textEditingValue.text.toLowerCase(),
+                                    ),
+                              );
+                            },
                             // สิ่งที่จะเอาแสดง
                             displayStringForOption: (option) {
                               return option.getLocalizedName(

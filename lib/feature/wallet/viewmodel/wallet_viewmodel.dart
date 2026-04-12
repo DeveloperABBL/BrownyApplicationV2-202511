@@ -199,19 +199,21 @@ class WalletViewModel extends AppViewModelObscureHandler {
         // return;
 
         // ======= real =======
-        final result = await repo.checkWalletStatusPayment(paymentRef);
+        try {
+          final result = await repo.checkWalletStatusPayment(paymentRef);
 
-        if (result.hasData) {
-          final data = result.data;
-          if (data.confirmedAt != null) {
-            // Payment confirmed - stop timers
-            stopPaymentStatusCheck();
+          if (result.hasData) {
+            final data = result.data;
+            if (data.confirmedAt != null) {
+              // Payment confirmed - stop timers
+              stopPaymentStatusCheck();
 
-            // Refresh credit balance
-            await fetchCredit();
-            onSuccess.call();
+              // Refresh credit balance
+              await fetchCredit();
+              onSuccess.call();
+            }
           }
-        }
+        } catch (_) {}
       },
     );
   }

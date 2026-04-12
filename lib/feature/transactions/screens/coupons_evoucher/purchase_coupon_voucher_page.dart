@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/transaction_selected_page.dart';
@@ -73,7 +74,17 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
         title: AppText(context.wording.eVoucherDetails),
         leading: BackButton(
           color: AppColors.textPrimary,
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (!mounted) {
+              return;
+            }
+
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              HomePage.goToPage(context);
+            }
+          },
         ),
       ),
       persistentFooterDecoration: BoxDecoration(

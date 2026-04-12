@@ -29,6 +29,7 @@ class AppNotificationViewmodel extends HomePageViewmodel {
   /// DONG 2026-02-28
   ///
   /// API fetch รายการ notifications ของลูกค้า
+  @override
   Future<void> fetchCustomerNotifications() async {
     // 1. Set loading state
     _customerNotificationsNotifier.value = UiResult.loading();

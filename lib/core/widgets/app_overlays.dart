@@ -1,4 +1,3 @@
-import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';

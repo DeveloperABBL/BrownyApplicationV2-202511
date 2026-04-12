@@ -90,11 +90,15 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
           ),
         ),
       ],
-      body: _buildBodyContent(),
+      body: _buildBodyContent(
+        widget._viewmodel.customerCouponModelDelegate!.getSelectedTypeDisplay(
+          context,
+        ),
+      ),
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent(String typeDisplay) {
     final data = widget._viewmodel.customerCouponModelDelegate;
     if (data == null) {
       return SizedBox();
@@ -140,6 +144,7 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                   // 'expireDateDisplay หลังซื้อ E-Voucher',
                   context.wording.afterPurchaseEVoucher(
                     data.expireDateDisplay(context),
+                    typeDisplay,
                   ),
                   style: context.textTheme.bodyMedium!.copyWith(
                     fontSize: AppDims.size_15.sp,

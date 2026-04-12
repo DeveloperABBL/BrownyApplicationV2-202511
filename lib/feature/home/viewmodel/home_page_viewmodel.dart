@@ -1,14 +1,14 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
-import 'package:browny_applications_new/core/services/live_activity/laundry_live_activity_service.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
-import 'package:browny_applications_new/feature/home/models/customer_services_working_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -34,10 +34,18 @@ class HomePageViewmodel extends AppViewModel {
     _bannerHighlightNotifier.dispose();
     _categoriesNotifier.dispose();
     _workingMachinesNotifier.dispose();
+    _customerNotificationsCountNotifier.dispose();
     super.dispose();
   }
 
   // ========== Controller, ValueNotifier ==========
+  /// Notifier สำหรับเก็บ notifications ของลูกค้า
+  final ValueNotifier<UiResult<int>> _customerNotificationsCountNotifier =
+      ValueNotifier(UiResult.loading());
+
+  ValueListenable<UiResult<int>> get customerNotificationsCountNotifier =>
+      _customerNotificationsCountNotifier;
+
   /// Notifier สำหรับคุมการแสดงผลที่หน้า home_page
   final ValueNotifier<UiResult<HomePageState>> _homePageStateNotifier =
       ValueNotifier(
@@ -105,6 +113,7 @@ class HomePageViewmodel extends AppViewModel {
     await fetchBanners();
     await fetchBannersHighlight();
     await fetchWorkingMachines();
+    unawaited(fetchCustomerNotifications());
     final profileResult = await _repo.fetchProfileInfo('');
     if (profileResult.isSuccess) {
       currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
@@ -343,5 +352,38 @@ class HomePageViewmodel extends AppViewModel {
     } on Exception catch (e) {
       return UiResult.error(error: e);
     }
+  }
+
+  Future<void> fetchCustomerNotifications() async {
+    // 1. Set loading state
+    _customerNotificationsCountNotifier.value = UiResult.loading();
+
+    String customerId = currentCustomerProvider.current.id.orEmpty;
+    if (customerId.isEmpty) {
+      _customerNotificationsCountNotifier.value = UiResult.empty();
+      return;
+    }
+
+    // 2. Call repository
+    final result = await homeRepo.fetchCustomerNotifications(customerId);
+
+    // 3. Handle error
+    if (result.hasError) {
+      _customerNotificationsCountNotifier.value = UiResult.error(
+        error: result.error,
+      );
+      return;
+    }
+
+    // 4. Handle empty
+    if (result.isEmpty) {
+      _customerNotificationsCountNotifier.value = UiResult.empty();
+      return;
+    }
+
+    // 5. Handle success
+    _customerNotificationsCountNotifier.value = UiResult.success(
+      data: result.data.data.orEmpty.length,
+    );
   }
 }

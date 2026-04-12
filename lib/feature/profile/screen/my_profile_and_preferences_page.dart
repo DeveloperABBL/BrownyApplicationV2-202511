@@ -12,6 +12,7 @@ import 'package:browny_applications_new/feature/profile/screen/profile_page.dart
 import 'package:browny_applications_new/feature/profile/viewmodel/profile_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MyProfileAndPreferencesPage extends StatelessWidget {
   const MyProfileAndPreferencesPage({super.key});
@@ -1332,11 +1333,17 @@ class _MyProfileAndPreferencesContentState
           bottom: AppDims.size_8.h,
         ),
         child: Center(
-          child: AppText(
-            '${context.wording.version} 3.0.0',
-            style: context.textTheme.bodySmall!.copyWith(
-              color: AppColors.gray500,
-            ),
+          child: FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, asyncSnapshot) {
+              return AppText(
+                // '${context.wording.version} 3.0.0',
+                '${context.wording.version} ${asyncSnapshot.data?.version ?? ''}',
+                style: context.textTheme.bodySmall!.copyWith(
+                  color: AppColors.gray500,
+                ),
+              );
+            },
           ),
         ),
       ),

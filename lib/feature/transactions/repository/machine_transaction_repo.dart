@@ -1,3 +1,4 @@
+// ignore: unused_import for debug mode
 import 'dart:convert';
 
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
@@ -12,6 +13,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:dio/dio.dart';
+// ignore: unused_import for debug mode
 import 'package:flutter/foundation.dart';
 
 mixin MachineTransactionDataSourceMixin {
@@ -169,7 +171,7 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
       }
       return RepoResult.success(data: response.data);
     } on DioException catch (dioEx) {
-      if (dioEx.response!.isDuplicated) {
+      if (dioEx.response?.isDuplicated == true) {
         final serverMessage = MachineOrderResponse.fromJson(
           dioEx.response?.data,
         );

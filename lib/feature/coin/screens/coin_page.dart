@@ -157,9 +157,7 @@ class __CoinContentState extends State<_CoinContent> {
 
                                 // SizedBox(width: 16.w), // ช่องว่างระหว่างกล่อง
                                 // กล่องขวาบน (ใหญ่) - 50% ความกว้าง
-                                Assets.png.brownyCoinClaimTitle.image(
-                                  width: 190.w,
-                                ),
+                                _getBrownyCoinClaimedDisplay(),
                               ],
                             ),
 
@@ -256,6 +254,23 @@ class __CoinContentState extends State<_CoinContent> {
         ),
       ),
     );
+  }
+
+  Widget _getBrownyCoinClaimedDisplay() {
+    switch (context.languageCode) {
+      case 'zh':
+        return Assets.png.brownyCoinClaimedZh.image(
+          width: 190.w,
+        );
+      case 'en':
+        return Assets.png.brownyCoinClaimedEn.image(
+          width: 190.w,
+        );
+      default:
+        return Assets.png.brownyCoinClaimTitle.image(
+          width: 190.w,
+        );
+    }
   }
 
   Widget _buildListClaimCoinProgress(CoinDataModel coinData) {

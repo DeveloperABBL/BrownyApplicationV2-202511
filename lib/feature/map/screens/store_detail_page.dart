@@ -1,7 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
-import 'package:flutter/foundation.dart';
 
 class StoreDetailPage extends StatelessWidget {
   const StoreDetailPage({

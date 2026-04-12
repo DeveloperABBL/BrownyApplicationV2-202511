@@ -1,4 +1,5 @@
 import 'dart:async';
+// ignore: unused_import for debug mode
 import 'dart:convert';
 
 import 'package:browny_applications_new/core/data/remote/models/request/coupon_order_request.dart';
@@ -11,6 +12,7 @@ import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
 import 'package:dio/dio.dart';
+// ignore: unused_import for debug mode
 import 'package:flutter/foundation.dart';
 
 /// Mixin สำหรับจัดการข้อมูลธุรกรรมคูปอง/e-voucher

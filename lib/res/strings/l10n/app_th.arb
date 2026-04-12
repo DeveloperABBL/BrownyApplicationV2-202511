@@ -377,7 +377,17 @@
     "showNearbyEVoucherPackages": "แสดงแพ็คเกจ E-Voucher สาขาใกล้ฉัน ระยะ 25 กม.",
     "evoucherNotFound": "ไม่พบคูปอง E-Voucher",
     "startService": "เริ่มต้นใช้บริการ",
-    "afterPurchaseEVoucher": "{expireDate} หลังซื้อ E-Voucher",
+    "afterPurchaseEVoucher": "{expireDate} หลังซื้อ {type}",
+    "@afterPurchaseEVoucher": {
+        "placeholders": {
+            "expireDate": {
+                "type": "String"
+            },
+            "type": {
+                "type": "String"
+            }
+        }
+    },
     "useWithin": "ใช้งานภายใน\n{dateLeft}",
     "washRemainLabel": "ซัก\n{washRemain}",
     "dryRemainLabel": "อบ\n{dryRemain}",
@@ -497,5 +507,7 @@
   "pinSetupNotFound": "ไม่พบการตั้งค่า PIN",
   "pleaseSetupPinFirst": "กรุณาตั้งค่า PIN ก่อนใช้งานฟีเจอร์นี้",
   "setupPin": "ตั้งค่า PIN",
-  "pleaseConfirmPin": "กรุณายืนยันรหัส PIN"
+  "pleaseConfirmPin": "กรุณายืนยันรหัส PIN",
+  "brownyShop": "Browny Shop",
+  "selectEVoucherPackage": "เลือกซื้อแพ็คเกจ E-Voucher"
 }

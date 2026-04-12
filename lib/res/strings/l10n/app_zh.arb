@@ -374,7 +374,17 @@
   "showNearbyEVoucherPackages": "显示25公里内附近门店的E-Voucher套餐",
   "evoucherNotFound": "未找到E-Voucher",
   "startService": "开始使用服务",
-  "afterPurchaseEVoucher": "{expireDate} 购买E-Voucher后",
+  "afterPurchaseEVoucher": "{expireDate} 购买{type}后",
+  "@afterPurchaseEVoucher": {
+        "placeholders": {
+            "expireDate": {
+                "type": "String"
+            },
+            "type": {
+                "type": "String"
+            }
+        }
+    },
   "useWithin": "在\n{dateLeft}内使用",
   "washRemainLabel": "洗\n{washRemain}",
   "dryRemainLabel": "烘\n{dryRemain}",
@@ -495,5 +505,7 @@
   "pinSetupNotFound": "未找到PIN设置",
   "pleaseSetupPinFirst": "请在使用此功能前设置PIN码",
   "setupPin": "设置PIN码",
-  "pleaseConfirmPin": "请验证您的PIN码"
+  "pleaseConfirmPin": "请验证您的PIN码",
+  "brownyShop": "Browny Shop",
+  "selectEVoucherPackage": "选购E-Voucher套餐"
 }

@@ -92,19 +92,19 @@ class ScannerViewModel extends AppViewModel {
       _isScanning = false;
 
       // Request photos permission
-      final hasPermission = await PermissionHelper.hasStoragePermission(
-        context,
-      );
-      if (!context.mounted) return;
+      // final hasPermission = await PermissionHelper.hasStoragePermission(
+      //   context,
+      // );
+      // if (!context.mounted) return;
 
-      if (!hasPermission) {
-        final status = await PermissionHelper.requestStoragePermission(context);
-        if (status != handler.PermissionStatus.granted &&
-            status != handler.PermissionStatus.limited) {
-          _resumeFlagScanning();
-          return;
-        }
-      }
+      // if (!hasPermission) {
+      //   final status = await PermissionHelper.requestStoragePermission(context);
+      //   if (status != handler.PermissionStatus.granted &&
+      //       status != handler.PermissionStatus.limited) {
+      //     _resumeFlagScanning();
+      //     return;
+      //   }
+      // }
 
       // Pick image
       final XFile? image = await _imagePicker.pickImage(
@@ -264,10 +264,14 @@ class ScannerViewModel extends AppViewModel {
                       );
                       return;
                     }
-
+                    // DONG 2026-04-12
+                    // แก้ไขการดึงค่า machineID ให้ดึงจาก response ก่อน
+                    // ถ้าไม่ได้ค่อยใช้ segments.last
                     MachineTransactionPage2.goReplacementPage(
                       context,
-                      machineId: uri.pathSegments.last,
+                      machineId:
+                          machine.storeMachineId?.toString() ??
+                          uri.pathSegments.last,
                     );
                     return;
                   }

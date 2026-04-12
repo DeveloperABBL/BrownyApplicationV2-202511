@@ -78,7 +78,7 @@ class WalletRepo extends CustomerDataRepo with WalletDataSourceMixin {
 
       return RepoResult.dependOn(response.data);
     } on DioException catch (dioE) {
-      if (dioE.response!.isDuplicated) {
+      if (dioE.response?.isDuplicated == true) {
         return RepoResult.empty();
       }
       return RepoResult.empty(error: Unprocessable());

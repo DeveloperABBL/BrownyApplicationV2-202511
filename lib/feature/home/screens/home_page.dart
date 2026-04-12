@@ -12,6 +12,7 @@ import 'package:browny_applications_new/feature/contacts/screens/contact_page.da
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/models/customer_services_working_model.dart';
 import 'package:browny_applications_new/feature/home/screens/app_notifications_page.dart';
+// ignore: unused_import for debug mode
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_mockup.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
@@ -101,6 +102,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
       if (!mounted) return;
       // ดึง Popup โฆษณา
       await _fetchPopups(context);
+      // fetch count notification
+      await _viewmodel.fetchCustomerNotifications();
     }
   }
 
@@ -296,7 +299,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       onTap: () async {
                         if (kDebugMode) {
                           final data = Uri.parse(
-                            'http://brownypay.com/wash/dry/2',
+                            'http://brownypay.com/wash/dry/82',
                             // 'http://brownypay.com/wash/dry/2',
                           );
                           if (data.pathSegments.isNotEmpty) {
@@ -944,17 +947,29 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 onPressed: () async {
                   AppNotificationsPage.goToPage(context);
                 },
-                icon: Badge(
-                  alignment: AlignmentGeometry.topRight,
-                  backgroundColor: AppColors.error,
-                  smallSize: 7.r,
-                  child: Assets.svg.icNotification.svg(
-                    // เปลี่ยนสี svg
-                    colorFilter: ColorFilter.mode(
-                      AppColors.primary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+                icon: ValueListenableBuilder(
+                  valueListenable:
+                      _viewmodel.customerNotificationsCountNotifier,
+                  builder: (context, result, _) {
+                    final int count;
+                    if (result.isSuccess) {
+                      count = result.data ?? 0;
+                    } else {
+                      count = 0;
+                    }
+                    return Badge(
+                      alignment: AlignmentGeometry.topRight,
+                      backgroundColor: AppColors.error,
+                      smallSize: count > 0 ? 7.r : 0,
+                      child: Assets.svg.icNotification.svg(
+                        // เปลี่ยนสี svg
+                        colorFilter: ColorFilter.mode(
+                          AppColors.primary,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

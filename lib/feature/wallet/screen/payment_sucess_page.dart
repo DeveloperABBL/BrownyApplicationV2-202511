@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
-import 'package:browny_applications_new/core/utils/permission_helper.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
@@ -16,7 +15,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class PaymentSuccessPage extends StatelessWidget {
@@ -147,95 +145,95 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
   Future<void> _captureAndSaveReceipt() async {
     try {
       // Request storage permission using helper
-      final status = await PermissionHelper.requestStoragePermission(context);
+      // final status = await PermissionHelper.requestStoragePermission(context);
 
-      if (status.isGranted || status.isLimited) {
-        // Capture the widget
-        final pngBytes = await _captureWidget();
+      // if (status.isGranted || status.isLimited) {
+      // Capture the widget
+      final pngBytes = await _captureWidget();
 
-        if (pngBytes == null) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.errorOccurred,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
-          return;
-        }
-
-        // Save to gallery
-        final result = await ImageGallerySaverPlus.saveImage(
-          pngBytes,
-          quality: 100,
-          name: 'promptpay_qr_${DateTime.now().millisecondsSinceEpoch}',
-        );
-
-        if (mounted) {
-          if (result['isSuccess'] == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.saveTheReceipt,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.walletBackground,
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(
-                  left: AppDims.size_24.w,
-                  right: AppDims.size_24.w,
-                  bottom: AppDims.size_84.w,
-                ),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: AppText(
-                  context.wording.cannotSaveQRCode,
-                  style: context.textTheme.labelLarge!.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(
-                  bottom: AppDims.size_64.w,
-                ),
-              ),
-            );
-          }
-        }
-      } else if (status.isPermanentlyDenied) {
+      if (pngBytes == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: AppText(
-                context.wording.pleaseAllowPhotoLibraryAccess,
+                context.wording.errorOccurred,
                 style: context.textTheme.labelLarge!.copyWith(
                   color: AppColors.white,
                 ),
               ),
               backgroundColor: AppColors.error,
-              action: SnackBarAction(
-                label: context.wording.openSettings,
-                textColor: AppColors.white,
-                onPressed: () {
-                  PermissionHelper.openAppSettings();
-                },
+            ),
+          );
+        }
+        return;
+      }
+
+      // Save to gallery
+      final result = await ImageGallerySaverPlus.saveImage(
+        pngBytes,
+        quality: 100,
+        name: 'promptpay_qr_${DateTime.now().millisecondsSinceEpoch}',
+      );
+
+      if (mounted) {
+        if (result['isSuccess'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: AppText(
+                context.wording.saveTheReceipt,
+                style: context.textTheme.labelLarge!.copyWith(
+                  color: AppColors.white,
+                ),
+              ),
+              backgroundColor: AppColors.walletBackground,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(
+                left: AppDims.size_24.w,
+                right: AppDims.size_24.w,
+                bottom: AppDims.size_84.w,
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: AppText(
+                context.wording.cannotSaveQRCode,
+                style: context.textTheme.labelLarge!.copyWith(
+                  color: AppColors.white,
+                ),
+              ),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(
+                bottom: AppDims.size_64.w,
               ),
             ),
           );
         }
       }
+      // } else if (status.isPermanentlyDenied) {
+      //   if (mounted) {
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(
+      //         content: AppText(
+      //           context.wording.pleaseAllowPhotoLibraryAccess,
+      //           style: context.textTheme.labelLarge!.copyWith(
+      //             color: AppColors.white,
+      //           ),
+      //         ),
+      //         backgroundColor: AppColors.error,
+      //         action: SnackBarAction(
+      //           label: context.wording.openSettings,
+      //           textColor: AppColors.white,
+      //           onPressed: () {
+      //             PermissionHelper.openAppSettings();
+      //           },
+      //         ),
+      //       ),
+      //     );
+      //   }
+      // }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

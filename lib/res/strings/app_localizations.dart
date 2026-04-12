@@ -2371,8 +2371,8 @@ abstract class AppLocalizations {
   /// No description provided for @afterPurchaseEVoucher.
   ///
   /// In en, this message translates to:
-  /// **'{expireDate} after purchasing E-Voucher'**
-  String afterPurchaseEVoucher(String expireDate);
+  /// **'{expireDate} after purchasing {type}'**
+  String afterPurchaseEVoucher(String expireDate, String type);
 
   /// No description provided for @useWithin.
   ///
@@ -3081,6 +3081,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please verify your PIN'**
   String get pleaseConfirmPin;
+
+  /// No description provided for @brownyShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Shop'**
+  String get brownyShop;
+
+  /// No description provided for @selectEVoucherPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select E-Voucher Package'**
+  String get selectEVoucherPackage;
 }
 
 class _AppLocalizationsDelegate

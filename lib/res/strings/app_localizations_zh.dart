@@ -1145,8 +1145,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get startService => '开始使用服务';
 
   @override
-  String afterPurchaseEVoucher(String expireDate) {
-    return '$expireDate 购买E-Voucher后';
+  String afterPurchaseEVoucher(String expireDate, String type) {
+    return '$expireDate 购买$type后';
   }
 
   @override
@@ -1514,4 +1514,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pleaseConfirmPin => '请验证您的PIN码';
+
+  @override
+  String get brownyShop => 'Browny Shop';
+
+  @override
+  String get selectEVoucherPackage => '选购E-Voucher套餐';
 }

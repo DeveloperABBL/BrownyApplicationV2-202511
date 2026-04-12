@@ -29,9 +29,9 @@ class OnboardingViewmodel extends AppViewModel {
   // ValueListenableProvider li =
   bool isLastPage = false;
   PageController get pageController => _pageController;
-  void nextPage() {
+  Future<void> nextPage() async {
     if (!isLastPage) {
-      _pageController.nextPage(
+      await _pageController.nextPage(
         duration: Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
