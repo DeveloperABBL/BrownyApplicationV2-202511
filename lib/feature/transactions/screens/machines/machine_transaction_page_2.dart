@@ -808,9 +808,19 @@ class __MachineContentState extends State<_MachineContent>
     CouponVoucherPage.goToPage(
       context,
       state: CouponVoucherState.using,
-      customerCouponAvailables: _machineProgram!.availableCoupons.orEmpty
-          .map((e) => e.id!)
-          .toList(),
+      customerCouponAvailables: (_machineProgram!.totalSelectedPrice == 0.0)
+          // ถ้าราคาเป็น 0.0 จะส่ง list เปล่า
+          ? []
+          : _machineProgram!.availableCoupons.orEmpty
+                // ตัดเอาเฉพาะ Coupon ที่มียอดรวมถึงยอด min
+                .where(
+                  (a) {
+                    return double.parse(a.min.ifNullOrEmpty('0.0')) <=
+                        _machineProgram!.totalSelectedPrice;
+                  },
+                )
+                .map((e) => e.id!)
+                .toList(),
     ).then((customerCouponModelSelected) {
       _viewmodel.onCustomerCouponSelected(
         customerCouponModelSelected,

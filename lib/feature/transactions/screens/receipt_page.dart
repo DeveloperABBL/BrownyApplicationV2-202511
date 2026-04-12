@@ -297,12 +297,22 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                   }
 
                   // Error state
-                  if (result.hasError || result.data?.hasError == true) {
+                  if (result.hasError) {
                     return Center(
                       child: AppText(
-                        result.error?.toString() ??
-                            result.data?.error?.toString() ??
-                            context.wording.errorOccurred, // เกิดข้อผิดพลาด
+                        // เกิดข้อผิดพลาด
+                        result.error.toString(),
+                      ),
+                    );
+                  }
+
+                  // Error state
+                  if (result.data?.hasError == true) {
+                    return Center(
+                      child: AppText(
+                        // เกิดข้อผิดพลาด
+                        result.data?.error?.toString() ??
+                            context.wording.errorOccurred,
                       ),
                     );
                   }

@@ -1556,4 +1556,15 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get selectEVoucherPackage => 'เลือกซื้อแพ็คเกจ E-Voucher';
+
+  @override
+  String get forceUpdateTitle => 'กรุณาอัปเดตแอปพลิเคชัน';
+
+  @override
+  String forceUpdateDescription(String appVersion) {
+    return 'เวอร์ชัน v$appVersion ไม่รองรับการใช้งานแล้ว\nกรุณาอัปเดตเป็นเวอร์ชันล่าสุด\nเพื่อประสบการณ์ใช้งานที่ดีที่สุด';
+  }
+
+  @override
+  String get forceUpdateButton => 'อัปเดตเดี๋ยวนี้';
 }

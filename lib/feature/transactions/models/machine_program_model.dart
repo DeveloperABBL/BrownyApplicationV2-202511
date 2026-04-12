@@ -391,7 +391,11 @@ class MachineProgramModel extends MachineProgramsResponse {
 
   /// คำนวณราคาสุทธิหลังหักส่วนลดทั้งหมด
   double getNetPrice() {
-    return totalSelectedPrice - getTotalDiscount();
+    final totalAfterDiscount = totalSelectedPrice - getTotalDiscount();
+    if (totalAfterDiscount < 0) {
+      return 0.0;
+    }
+    return totalAfterDiscount;
   }
 
   /// เช็คว่า Coupon ที่เลือกเป็น E-Voucher หรือไม่

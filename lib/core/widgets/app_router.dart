@@ -17,6 +17,7 @@ import 'package:browny_applications_new/feature/home/screens/app_notifications_p
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_mockup.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
+import 'package:browny_applications_new/feature/update/screen/force_update_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
@@ -405,6 +406,11 @@ class AppRouter {
         path: LuckyMockupPage.pagePath,
         name: LuckyMockupPage.pageName,
         builder: (context, state) => const LuckyMockupPage(),
+      ),
+      GoRoute(
+        path: ForceUpdatePage.pagePath,
+        name: ForceUpdatePage.pageName,
+        builder: (context, state) => const ForceUpdatePage(),
       ),
     ],
   );

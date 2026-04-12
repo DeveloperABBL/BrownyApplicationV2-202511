@@ -3093,6 +3093,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select E-Voucher Package'**
   String get selectEVoucherPackage;
+
+  /// No description provided for @forceUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please Update Application'**
+  String get forceUpdateTitle;
+
+  /// No description provided for @forceUpdateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Version v{appVersion} is no longer supported.\nPlease update to the latest version\nfor the best experience.'**
+  String forceUpdateDescription(String appVersion);
+
+  /// No description provided for @forceUpdateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get forceUpdateButton;
 }
 
 class _AppLocalizationsDelegate

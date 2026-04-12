@@ -749,4 +749,14 @@ abstract class AppClient {
   /// - PaymentMethodResponse with list of payments (code, name, image)
   @GET('/payment-methods')
   Future<HttpResponse<PaymentMethodResponse>> fetchPaymentMethods();
+
+  /// DONG 2026-04-12
+  ///
+  /// API ตรวจสอบความถูกต้องของ Token
+  ///
+  /// Response HTTP Codes:
+  /// - 200: Token ถูกต้อง (returns message and client info)
+  /// - 401: Token ไม่ถูกต้องหรือหมดอายุ
+  @GET('/check-token')
+  Future<HttpResponse<CheckTokenResponse>> checkToken();
 }

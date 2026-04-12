@@ -1565,4 +1565,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectEVoucherPackage => 'Select E-Voucher Package';
+
+  @override
+  String get forceUpdateTitle => 'Please Update Application';
+
+  @override
+  String forceUpdateDescription(String appVersion) {
+    return 'Version v$appVersion is no longer supported.\nPlease update to the latest version\nfor the best experience.';
+  }
+
+  @override
+  String get forceUpdateButton => 'Update Now';
 }

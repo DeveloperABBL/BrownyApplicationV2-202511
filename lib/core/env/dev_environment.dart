@@ -14,6 +14,7 @@ import 'package:browny_applications_new/core/widgets/app_router.dart';
 import 'package:browny_applications_new/feature/authentication/repository/customer_data_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/onboarding/screen/onboarding_page.dart';
+import 'package:browny_applications_new/feature/update/screen/force_update_page.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -29,17 +30,15 @@ class DevEnvironment extends AppEvnironment {
   Future<void> loadEnv() async {
     // 4. ดึง App Version
     final packageInfo = await PackageInfo.fromPlatform();
-    // "3.0.0 30"
+    // เช่น "3.0.0 30"
     final appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
     // 1. สร้าง API Config call ไปที่ Enviroment DEV
     apiConfig = ApiConfigs(
       // dev API
-      // baseUrl: 'https://dev.abgroup.co.th/api',
       baseUrl: const String.fromEnvironment(
         kBaseUrl,
       ),
       // dev token
-      // token: 'e14da670316f053dd791116bc050a2c24bc974db4aa637080daeb58dac26a970',
       token: const String.fromEnvironment(
         kToken,
       ),
@@ -106,17 +105,35 @@ class DevEnvironment extends AppEvnironment {
       }
     }
 
+    // ตรวจสอบ Token validity ก่อนเข้าสู่แอป
+    // ถ้า API ตอบกลับ 401 = version นี้ไม่รองรับแล้ว บังคับ Update
+    bool forceUpdate = false;
+    try {
+      final tokenResult = await customerDataRepo.checkToken();
+      // isEmpty หมายถึง 401 Unauthorized (UserUnauthorized error)
+      if (tokenResult.isEmpty) {
+        forceUpdate = true;
+      }
+    } catch (_) {
+      // ถ้า network error ให้ผ่านไปก่อน ไม่ block user
+    }
+
     appRouter = AppRouter(
-      // เช็คว่าเคยเปิด App และผ่านหน้า OnBoarding แล้วหรือยัง
-      initialLocation: isFirstLaunch
+      initialLocation: forceUpdate
+          // ถ้า Token ไม่รองรับ (401) บังคับไป ForceUpdatePage
+          ? ForceUpdatePage.pagePath
+          // เช็คว่าเคยเปิด App และผ่านหน้า OnBoarding แล้วหรือยัง
+          : isFirstLaunch
           // ถ้ายังไป
           ? OnBoardingPage.pagePath
           // ถ้าเคยแล้วไป
           : HomePage.pagePath,
     );
-
-    // ส่งไป saveDeviceInfo
-    unawaited(saveDeviceInfo(customerId: _current.current.id));
+    // API ปัจจุบันถึงจะ update DeviceLog
+    if (!forceUpdate) {
+      // ส่งไป saveDeviceInfo
+      unawaited(saveDeviceInfo(customerId: _current.current.id));
+    }
   }
 
   final CustomerProvider _current = CustomerProvider();
@@ -126,7 +143,7 @@ class DevEnvironment extends AppEvnironment {
 
   @override
   String get laravelAppKey {
-    // TODO: ย้ายไปเก็บใน .env file หรือ build config
+    // ย้ายไปเก็บใน .env file หรือ build config
     // แนะนำใช้ package 'flutter_dotenv' หรือ '--dart-define'
     return const String.fromEnvironment(
       'serverKey',

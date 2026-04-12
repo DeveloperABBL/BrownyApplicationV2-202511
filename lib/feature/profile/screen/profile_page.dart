@@ -412,7 +412,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       await AppOverlays.showBrownyDialog(
                         context,
                         title: context.wording.somethingWrong,
-                        message: result.error?.toString() ?? 'Update failed',
+                        message: result.error.toString(),
                         imageAsset: Assets.png.brownyError1.path,
                       );
                     }

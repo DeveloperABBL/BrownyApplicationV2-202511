@@ -16,6 +16,7 @@ export 'package:browny_applications_new/core/data/remote/models/request/update_p
 export 'package:browny_applications_new/core/data/remote/models/request/verify_otp.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/wallet_history_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/check_token_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';

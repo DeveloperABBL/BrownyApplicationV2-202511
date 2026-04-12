@@ -507,5 +507,15 @@
   "setupPin": "设置PIN码",
   "pleaseConfirmPin": "请验证您的PIN码",
   "brownyShop": "Browny Shop",
-  "selectEVoucherPackage": "选购E-Voucher套餐"
+  "selectEVoucherPackage": "选购E-Voucher套餐",
+  "forceUpdateTitle": "请更新应用程序",
+  "forceUpdateDescription": "版本 v{appVersion} 已不再受支持。\n请更新至最新版本\n以获得最佳使用体验。",
+  "@forceUpdateDescription": {
+    "placeholders": {
+      "appVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "forceUpdateButton": "立即更新"
 }

@@ -1520,4 +1520,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectEVoucherPackage => '选购E-Voucher套餐';
+
+  @override
+  String get forceUpdateTitle => '请更新应用程序';
+
+  @override
+  String forceUpdateDescription(String appVersion) {
+    return '版本 v$appVersion 已不再受支持。\n请更新至最新版本\n以获得最佳使用体验。';
+  }
+
+  @override
+  String get forceUpdateButton => '立即更新';
 }

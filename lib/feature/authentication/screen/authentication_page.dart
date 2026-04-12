@@ -1479,7 +1479,7 @@ class _ReferralWidget extends _SignUpWidget {
                             AppOverlays.showBrownyDialog(
                               context,
                               title: context.wording.errorOccurred,
-                              message: result.error!.toString(),
+                              message: result.error.toString(),
                             );
                             return;
                           }
@@ -1521,9 +1521,7 @@ class _ReferralWidget extends _SignUpWidget {
                             AppOverlays.showBrownyDialog(
                               context,
                               title: context.wording.errorOccurred,
-                              message:
-                                  result.error?.toString() ??
-                                  context.wording.errorUi,
+                              message: result.error.toString(),
                             );
                           }
                         }

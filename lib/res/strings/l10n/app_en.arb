@@ -558,5 +558,15 @@
   "setupPin": "Set Up PIN",
   "pleaseConfirmPin": "Please verify your PIN",
   "brownyShop": "Browny Shop",
-  "selectEVoucherPackage": "Select E-Voucher Package"
+  "selectEVoucherPackage": "Select E-Voucher Package",
+  "forceUpdateTitle": "Please Update Application",
+  "forceUpdateDescription": "Version v{appVersion} is no longer supported.\nPlease update to the latest version\nfor the best experience.",
+  "@forceUpdateDescription": {
+    "placeholders": {
+      "appVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "forceUpdateButton": "Update Now"
 }

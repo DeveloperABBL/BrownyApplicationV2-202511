@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/change_p
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/check_token_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_qr_response.dart';
@@ -72,6 +73,12 @@ mixin CustomerDataSourceMixin {
   /// - old_password: String (รหัสผ่านเดิม)
   /// - new_password: String (รหัสผ่านใหม่)
   Future<RepoResult<bool>> changePassword(ChangePasswordRequest data);
+
+  /// ฟังก์ชันตรวจสอบความถูกต้องของ Token
+  /// คืนค่า [CheckTokenResponse] ที่มี client version และ status
+  /// - 200: Token ถูกต้อง
+  /// - 401: Token ไม่ถูกต้องหรือหมดอายุ
+  Future<RepoResult<CheckTokenResponse>> checkToken();
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
@@ -525,6 +532,26 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
       // ใช้รหัสผ่านซ้ำกับปัจจุบัน
       if (dioEx.response!.isUnprocessable) {
         return RepoResult.empty(error: ChangePasswordReused());
+      }
+      return RepoResult.error(error: dioEx);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CheckTokenResponse>> checkToken() async {
+    try {
+      final response = await requireRemote.checkToken();
+
+      if (!response.isSuccessful) {
+        return RepoResult.empty();
+      }
+
+      return RepoResult.success(data: response.data);
+    } on DioException catch (dioEx) {
+      if (dioEx.response?.isUnauthorized == true) {
+        return RepoResult.empty(error: UserUnauthorized());
       }
       return RepoResult.error(error: dioEx);
     } on Exception catch (e) {
