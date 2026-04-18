@@ -40,6 +40,7 @@ MachineOrderReceiptResponse _$MachineOrderReceiptResponseFromJson(
   luckyImage: json['lucky_image'] as String?,
   qrImage: json['qr_image'] as String?,
   reviewScore: json['review_score'] as String?,
+  bonus: json['bonus'] as String?,
 );
 
 Map<String, dynamic> _$MachineOrderReceiptResponseToJson(
@@ -62,6 +63,7 @@ Map<String, dynamic> _$MachineOrderReceiptResponseToJson(
   'lucky_image': instance.luckyImage,
   'qr_image': instance.qrImage,
   'review_score': instance.reviewScore,
+  'bonus': instance.bonus,
 };
 
 MachineOrderReceiptSummary _$MachineOrderReceiptSummaryFromJson(

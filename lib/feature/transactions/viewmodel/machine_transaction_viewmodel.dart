@@ -400,10 +400,29 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   /// จะค้นหา AvailableCouponData ที่ id ตรงกับ customerCouponId
   /// ถ้ากดที่ coupon เดิมที่กำลัง selected อยู่ จะยกเลิกการเลือก
   /// ถ้าส่ง null เข้ามา จะยกเลิกการเลือก
-  void onCustomerCouponSelected(CustomerCouponModel? customerCoupon) {
+  Future<void> onCustomerCouponSelected(
+    CustomerCouponModel? customerCoupon,
+  ) async {
     if (!_machineProgramsNotifier.value.isSuccess) return;
 
-    final currentModel = _machineProgramsNotifier.value.data!;
+    // DONG 2026-04-18
+    // เพิ่มการ fetch machine program ทุกครั้งที่มีการเลือก Coupon เพื่อรองรับการ collect
+    // Coupon, E-Voucher ในจังหวะที่กำลังเลือก Coupon, E-Voucher มาใช้งาน
+    // เก็บ availableCoupons ที่ fetch มาใหม่
+    List<AvailableCouponData>? availableCouponsUpdate;
+    if (customerCoupon != null) {
+      final machineProgramResult = await machineRepo.fetchMachinePrograms(
+        machineId,
+        currentCustomerProvider.current.id.orEmpty,
+      );
+      if (machineProgramResult.isSuccess) {
+        availableCouponsUpdate = machineProgramResult.data.availableCoupons;
+      }
+    }
+    // update availableCoupons ให้ใหม่
+    final currentModel = _machineProgramsNotifier.value.data!.copyWith(
+      availableCoupons: availableCouponsUpdate,
+    );
 
     // ถ้าส่ง null มา ให้ clear selection
     if (customerCoupon == null) {
@@ -419,12 +438,28 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     );
 
     // ถ้าไม่เจอ coupon ที่ตรงกัน ให้ return
-    if (couponIndex == -1) return;
+    if (couponIndex == -1) {
+      if (!context.mounted) return;
+      AppOverlays.showBrownyDialog(
+        context,
+        // ไม่สามารถใช้งาน $couponType ได้
+        title: context.wording.cannotUseCouponType(
+          customerCoupon.getSelectedTypeNoDetailWordingDisplay(context),
+        ),
+        // ${getSelectedTypeNoDetailWordingDisplay} ${packageNameDisplay}
+        // ไม่ร่วมรายการ
+        message:
+            '''
+${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupon.packageNameDisplay(context)} ${context.wording.couponNotEligible}
+      ''',
+      );
+      return;
+    }
 
     // ตรวจสอบว่า coupon ที่เลือกเป็นตัวที่ selected อยู่หรือไม่
     final isCurrentlySelected = currentModel.isCouponSelected(couponIndex);
 
-    final updatedModel = isCurrentlySelected
+    MachineProgramModel updatedModel = isCurrentlySelected
         ? currentModel
               .clearSelectedCoupon() // ถ้ากดตัวเดิม ให้ยกเลิกการเลือก
         : currentModel.selectCoupon(
@@ -524,13 +559,23 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       return UiResult.empty();
     }
 
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-
     try {
+      String fcmToken;
+      try {
+        fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
+      } catch (_) {
+        fcmToken = '';
+      }
+      if (!context.mounted) return UiResult.empty();
+
       // add_time_value ใช้ค่า net จาก API machine/{id}/programs
       final addTimeValue = double.tryParse(
         programData.selectedAddTime?.net ?? '',
       )?.toInt();
+      int? couponCustomerId;
+      if (programData.validSelectedCouponAndMessageError(context) == null) {
+        couponCustomerId = programData.selectedCoupon?.id;
+      }
 
       // สร้าง request object
       final request = MachineOrderRequest(
@@ -540,7 +585,7 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
         programCode: programCode,
         addTimeValue: addTimeValue,
         paymentMethod: _paymentSelected!.method,
-        couponCustomerId: programData.selectedCoupon?.id,
+        couponCustomerId: couponCustomerId,
         discountId: programData.selectedProgram?.discount?.id,
         notificationToken: fcmToken,
       );
@@ -558,14 +603,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
       await fetchCustomerCredit();
       // Update ข้อมูลเครื่องเก็บเอาไว้ด้วย
-      final resultMachineDetail = await machineRepo.fetchMachineDetail(
-        machineId,
-      );
-      currentCustomerProvider.userTransactions.addNewMachineTracsactions(
-        _machineProgramsNotifier.value.data!.copyWith(
-          machineDetail: resultMachineDetail.data,
-        ),
-      );
+      // final resultMachineDetail = await machineRepo.fetchMachineDetail(
+      //   machineId,
+      // );
+      // currentCustomerProvider.userTransactions.addNewMachineTracsactions(
+      //   _machineProgramsNotifier.value.data!.copyWith(
+      //     machineDetail: resultMachineDetail.data,
+      //   ),
+      // );
       return UiResult.success(data: result.data);
     } catch (e) {
       return UiResult.error(

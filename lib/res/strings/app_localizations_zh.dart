@@ -1531,4 +1531,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forceUpdateButton => '立即更新';
+
+  @override
+  String couponMinimumAmountRequired(String minAmount) {
+    return '订单最低金额须达 $minAmount。';
+  }
+
+  @override
+  String get noCouponEligible => '未找到符合条件的优惠券';
+
+  @override
+  String get couponNotEligible => '不参与此活动';
+
+  @override
+  String cannotUseCouponType(String couponType) {
+    return '无法使用 $couponType';
+  }
 }

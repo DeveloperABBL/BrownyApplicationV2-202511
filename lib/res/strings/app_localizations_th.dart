@@ -1567,4 +1567,20 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get forceUpdateButton => 'อัปเดตเดี๋ยวนี้';
+
+  @override
+  String couponMinimumAmountRequired(String minAmount) {
+    return 'ต้องมียอดรวมขั้นต่ำ $minAmount';
+  }
+
+  @override
+  String get noCouponEligible => 'ไม่พบคูปองที่ร่วมรายการ';
+
+  @override
+  String get couponNotEligible => 'ไม่ร่วมรายการ';
+
+  @override
+  String cannotUseCouponType(String couponType) {
+    return 'ไม่สามารถใช้งาน $couponType ได้';
+  }
 }

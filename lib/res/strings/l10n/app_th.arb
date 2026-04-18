@@ -519,5 +519,23 @@
       }
     }
   },
-  "forceUpdateButton": "อัปเดตเดี๋ยวนี้"
+  "forceUpdateButton": "อัปเดตเดี๋ยวนี้",
+  "couponMinimumAmountRequired": "ต้องมียอดรวมขั้นต่ำ {minAmount}",
+  "@couponMinimumAmountRequired": {
+    "placeholders": {
+      "minAmount": {
+        "type": "String"
+      }
+    }
+  },
+  "noCouponEligible": "ไม่พบคูปองที่ร่วมรายการ",
+  "couponNotEligible": "ไม่ร่วมรายการ",
+  "cannotUseCouponType": "ไม่สามารถใช้งาน {couponType} ได้",
+  "@cannotUseCouponType": {
+    "placeholders": {
+      "couponType": {
+        "type": "String"
+      }
+    }
+  }
 }

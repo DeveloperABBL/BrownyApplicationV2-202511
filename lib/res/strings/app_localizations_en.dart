@@ -1576,4 +1576,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forceUpdateButton => 'Update Now';
+
+  @override
+  String couponMinimumAmountRequired(String minAmount) {
+    return 'Minimum order amount of $minAmount is required.';
+  }
+
+  @override
+  String get noCouponEligible => 'No eligible coupon found';
+
+  @override
+  String get couponNotEligible => 'Not eligible for this promotion';
+
+  @override
+  String cannotUseCouponType(String couponType) {
+    return 'Cannot use $couponType';
+  }
 }

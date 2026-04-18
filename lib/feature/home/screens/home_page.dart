@@ -41,6 +41,14 @@ class HomePage extends StatelessWidget {
     return await context.pushNamed(HomePage.pageName);
   }
 
+  static void goReplacementPage(
+    BuildContext context,
+  ) {
+    context.pushReplacementNamed(
+      HomePage.pageName,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

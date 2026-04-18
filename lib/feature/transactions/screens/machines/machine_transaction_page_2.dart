@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
@@ -21,12 +22,17 @@ class MachineTransactionPage2 extends StatelessWidget {
   const MachineTransactionPage2({
     super.key,
     required this.machineId,
+    this.customerCouponModel,
   });
 
   static final pagePath = '/machine_page';
   static final pageName = 'machine_page';
 
+  /// machineId ที่ scan ได้จาก QRCode
   final String machineId;
+
+  /// เก็บ Coupon, E-Voucher ที่เลือกใช้งาน
+  final CustomerCouponModel? customerCouponModel;
 
   /// util function route to pageName
   static Future<T?> goToPage<T>(
@@ -43,10 +49,14 @@ class MachineTransactionPage2 extends StatelessWidget {
   static void goReplacementPage(
     BuildContext context, {
     required String machineId,
+    CustomerCouponModel? customerCouponModel,
   }) async {
     context.pushReplacementNamed(
       MachineTransactionPage2.pageName,
-      extra: machineId,
+      extra: [
+        machineId,
+        customerCouponModel,
+      ],
     );
   }
 
@@ -61,6 +71,7 @@ class MachineTransactionPage2 extends StatelessWidget {
       ),
       child: _MachineContent(
         machineId: machineId,
+        customerCouponModel: customerCouponModel,
       ),
     );
   }
@@ -69,8 +80,14 @@ class MachineTransactionPage2 extends StatelessWidget {
 class _MachineContent extends StatefulWidget {
   const _MachineContent({
     required this.machineId,
+    this.customerCouponModel,
   });
+
+  /// machineId ที่ scan ได้จาก QRCode
   final String machineId;
+
+  /// เก็บ Coupon, E-Voucher ที่เลือกใช้งาน
+  final CustomerCouponModel? customerCouponModel;
 
   @override
   State<_MachineContent> createState() => __MachineContentState();
@@ -147,6 +164,15 @@ class __MachineContentState extends State<_MachineContent>
 
       if (!mounted) return;
       await _viewmodel.fetchMachinePrograms(widget.machineId);
+      if (widget.customerCouponModel != null) {
+        if (!mounted) return;
+        AppOverlays.showLoading(context);
+
+        await _viewmodel.onCustomerCouponSelected(
+          widget.customerCouponModel,
+        );
+        AppOverlays.hideLoading();
+      }
     });
   }
 
@@ -305,13 +331,13 @@ class __MachineContentState extends State<_MachineContent>
           );
 
           if (!mounted) return;
-          AppOverlays.hideLoading();
 
           if (orderResult.isSuccess) {
             final orderResponse = orderResult.data!;
             final orderData = orderResponse.data;
 
             if (orderData == null) {
+              AppOverlays.hideLoading();
               AppOverlays.showBrownyDialog(
                 context,
                 // เดิม: ไม่สามารถสร้างคำสั่งซื้อได้
@@ -323,6 +349,7 @@ class __MachineContentState extends State<_MachineContent>
             // Check payment_ref
             final paymentRef = orderData.paymentRef;
             if (paymentRef == null || paymentRef.isEmpty) {
+              AppOverlays.hideLoading();
               AppOverlays.showBrownyDialog(
                 context,
                 // เดิม: ไม่พบข้อมูล Payment Reference
@@ -340,9 +367,11 @@ class __MachineContentState extends State<_MachineContent>
               // เก็บ paymentRef ก่อนที่จะ call payment check
               _currentPaymentRef = paymentRef;
               _checkPaymentStatus();
+              AppOverlays.hideLoading();
               return;
             }
-
+            // ปิด Dialog Loading ถ้าผ่าน condition ข้างบนทั้งหมด
+            AppOverlays.hideLoading();
             // รอเก็บข้อมูล QRCode ที่ได้จาก payload
             String? qrData = '';
             // เช็ค flag ว่าต้องเปิด In-app QR หรือไม่
@@ -720,6 +749,11 @@ class __MachineContentState extends State<_MachineContent>
   /// คูปอง / E-Voucher
   /// แสดง Coupon / E-Voucher ที่เลือกมาใช้งาน
   Widget _couponEVoucherWidget() {
+    // เก็บ Error ก่อนว่า Counpon ที่เลือกมาสามารถใช้งานได้หรือไม่
+    String? validCouponMessage = _machineProgram!
+        .validSelectedCouponAndMessageError(
+          context,
+        );
     return Column(
       children: [
         AppDims.vericalPadding_24,
@@ -792,7 +826,10 @@ class __MachineContentState extends State<_MachineContent>
                           expired: couponSelected.getExpireDisplay(
                             context.languageCode,
                           ),
-                          borderColor: AppColors.primary,
+                          isDisabled: validCouponMessage != null,
+                          borderColor: validCouponMessage == null
+                              ? AppColors.primary
+                              : AppColors.error,
                         )
                       : null,
                 );
@@ -800,6 +837,25 @@ class __MachineContentState extends State<_MachineContent>
             ),
           ),
         ),
+        if (validCouponMessage != null) ...[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+            child: Row(
+              spacing: AppDims.size_4.w,
+              children: [
+                Assets.svg.icInfoRad.svg(),
+                // แจ้งเตือน error ถ้ามี
+                AppText(
+                  validCouponMessage,
+                  style: context.textTheme.labelSmall!.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else
+          SizedBox(),
       ],
     );
   }
@@ -808,23 +864,25 @@ class __MachineContentState extends State<_MachineContent>
     CouponVoucherPage.goToPage(
       context,
       state: CouponVoucherState.using,
-      customerCouponAvailables: (_machineProgram!.totalSelectedPrice == 0.0)
-          // ถ้าราคาเป็น 0.0 จะส่ง list เปล่า
-          ? []
-          : _machineProgram!.availableCoupons.orEmpty
-                // ตัดเอาเฉพาะ Coupon ที่มียอดรวมถึงยอด min
-                .where(
-                  (a) {
-                    return double.parse(a.min.ifNullOrEmpty('0.0')) <=
-                        _machineProgram!.totalSelectedPrice;
-                  },
-                )
-                .map((e) => e.id!)
-                .toList(),
-    ).then((customerCouponModelSelected) {
-      _viewmodel.onCustomerCouponSelected(
-        customerCouponModelSelected,
-      );
+      // filter เฉพาะที่ร่วมรายการ
+      // customerCouponAvailables: _machineProgram!.availableCoupons.orEmpty
+      //     .map((e) => e.id!)
+      //     .toList(),
+      // ส่ง couponid ที่เคยเลือกเอาไว้ไปด้วย
+      selectedCustomerCouponId: _machineProgram!.selectedCoupon?.id,
+    ).then((result) async {
+      if (!mounted) return;
+      // ถ้า result เป็น bool แสดงว่ามาจากการกดกลับเฉยๆ ไม่ต้องทำอะไร
+      if (result != null && result is bool) return;
+
+      try {
+        final customerCouponModelSelected = result as CustomerCouponModel;
+        AppOverlays.showLoading(context);
+        await _viewmodel.onCustomerCouponSelected(
+          customerCouponModelSelected,
+        );
+        AppOverlays.hideLoading();
+      } catch (_) {}
     });
   }
 
@@ -974,6 +1032,7 @@ class __MachineContentState extends State<_MachineContent>
             textPriceColor: _machineProgram!.getTotalDiscountStore() > 0
                 ? AppColors.error
                 : null,
+            discount: _machineProgram!.getTotalDiscountStore() > 0,
           ),
           AppDims.vericalPadding_16,
           // สรุปยอด คูปองส่วนลด
@@ -984,6 +1043,7 @@ class __MachineContentState extends State<_MachineContent>
             textPriceColor: _machineProgram!.getTotalCouponOnlyDiscount() > 0
                 ? AppColors.error
                 : null,
+            discount: _machineProgram!.getTotalCouponOnlyDiscount() > 0,
           ),
           AppDims.vericalPadding_16,
           // สรุปยอด E-Voucher
@@ -993,6 +1053,7 @@ class __MachineContentState extends State<_MachineContent>
             textPriceColor: _machineProgram!.getTotalEVoucherDiscount() > 0
                 ? AppColors.error
                 : null,
+            discount: _machineProgram!.getTotalEVoucherDiscount() > 0,
           ),
           AppDims.vericalPadding_16,
           _lineSummay(
@@ -1011,6 +1072,7 @@ class __MachineContentState extends State<_MachineContent>
     required String title,
     required String price,
     Color? textPriceColor,
+    bool discount = false,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1024,7 +1086,7 @@ class __MachineContentState extends State<_MachineContent>
           formatCurrency(
             string: price,
             decimal: true,
-            leadingSign: '฿',
+            leadingSign: discount ? '-฿' : '฿',
           ),
           style: _textPrice.copyWith(color: textPriceColor),
         ),

@@ -17,6 +17,7 @@ import 'package:browny_applications_new/feature/home/screens/app_notifications_p
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_mockup.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/update/screen/force_update_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
@@ -233,12 +234,16 @@ class AppRouter {
           CouponVoucherState couponState = CouponVoucherState.purshasing;
           List<int>? customerCouponAvailables;
           String? autoCollectQRData;
+          int? selectedCustomerCouponId;
           try {
             List<Object?> list = state.extra as List<Object?>;
             couponState = list[0] as CouponVoucherState;
             customerCouponAvailables = list[1] as List<int>?;
             if (list.length > 2) {
               autoCollectQRData = list[2] as String?;
+            }
+            if (list.length > 3) {
+              selectedCustomerCouponId = list[3] as int?;
             }
           } catch (_) {
             rethrow;
@@ -247,6 +252,7 @@ class AppRouter {
             state: couponState,
             customerCouponAvailables: customerCouponAvailables,
             autoCollectQRData: autoCollectQRData,
+            selectedCustomerCouponId: selectedCustomerCouponId,
           );
         },
       ),
@@ -383,11 +389,17 @@ class AppRouter {
         name: MachineTransactionPage2.pageName,
         builder: (context, state) {
           String machineId = '';
+          CustomerCouponModel? customerCouponModel;
           try {
-            machineId = state.extra as String;
+            final objs = state.extra as List<Object?>;
+            machineId = objs[0] as String;
+            if (objs[1] != null) {
+              customerCouponModel = objs[1] as CustomerCouponModel;
+            }
           } catch (_) {}
           return MachineTransactionPage2(
             machineId: machineId,
+            customerCouponModel: customerCouponModel,
           );
         },
       ),

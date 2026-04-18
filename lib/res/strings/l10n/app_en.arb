@@ -568,5 +568,23 @@
       }
     }
   },
-  "forceUpdateButton": "Update Now"
+  "forceUpdateButton": "Update Now",
+  "couponMinimumAmountRequired": "Minimum order amount of {minAmount} is required.",
+  "@couponMinimumAmountRequired": {
+    "placeholders": {
+      "minAmount": {
+        "type": "String"
+      }
+    }
+  },
+  "noCouponEligible": "No eligible coupon found",
+  "couponNotEligible": "Not eligible for this promotion",
+  "cannotUseCouponType": "Cannot use {couponType}",
+  "@cannotUseCouponType": {
+    "placeholders": {
+      "couponType": {
+        "type": "String"
+      }
+    }
+  }
 }

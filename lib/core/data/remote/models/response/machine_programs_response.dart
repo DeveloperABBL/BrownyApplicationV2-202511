@@ -271,8 +271,21 @@ class AvailableCouponData {
   @JsonKey(name: 'remaining')
   final int? remaining;
 
+  double get minValue =>
+      double.tryParse(min.orEmpty.replaceAll(',', ',').ifEmpty('0.0')) ?? 0.0;
+
   /// ดึงประเภทคูปองตาม locale
   String getCouponTypeDisplay(String locale) {
+    if (type?.en == 'E-Voucher') {
+      return 'E-Voucher';
+    }
+    if (type?.en == 'Discount') {
+      return ContentLocalizeData(
+        zh: '折扣优惠券',
+        en: 'Discount Coupons',
+        th: 'คูปองส่วนลด',
+      ).getTextByLocale(locale);
+    }
     return type?.getByLocaleCode(locale) ?? '';
   }
 

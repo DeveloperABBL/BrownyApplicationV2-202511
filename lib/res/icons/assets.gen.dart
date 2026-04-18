@@ -448,6 +448,10 @@ class $AssetsPngGen {
   AssetGenImage get brownyError3 =>
       const AssetGenImage('assets/png/browny_error_3.png');
 
+  /// File path: assets/png/browny_error_4.png
+  AssetGenImage get brownyError4 =>
+      const AssetGenImage('assets/png/browny_error_4.png');
+
   /// File path: assets/png/browny_horizaontal.png
   AssetGenImage get brownyHorizaontal =>
       const AssetGenImage('assets/png/browny_horizaontal.png');
@@ -616,6 +620,7 @@ class $AssetsPngGen {
     brownyError1,
     brownyError2,
     brownyError3,
+    brownyError4,
     brownyHorizaontal,
     brownyHorizaontal2,
     brownyLogo,

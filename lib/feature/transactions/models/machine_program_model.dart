@@ -1,9 +1,8 @@
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/coupon_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/payment_method_response.dart';
-import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 
 class MachineProgramModel extends MachineProgramsResponse {
@@ -64,6 +63,27 @@ class MachineProgramModel extends MachineProgramsResponse {
       paymentMethods: data.paymentMethods,
       selectedCoupon: null,
     );
+  }
+
+  String? validSelectedCouponAndMessageError(BuildContext context) {
+    if (selectedCoupon == null) {
+      return null;
+    }
+
+    // ตรวจสอบเงื่อนไขว่าร่วมรายการกับสาขาหรือไม่
+    final couponIndex = availableCoupons?.indexWhere(
+      (coupon) => coupon.id == selectedCoupon!.id,
+    );
+    if (couponIndex == -1) {
+      return '${selectedCoupon!.getCouponTypeDisplay(context.languageCode)} ${context.wording.couponNotEligible}';
+    }
+    // ตรวจสอบเงื่อนไขว่ายอดรวมถึงขั้นต่ำหรือไม่
+    if (totalSelectedPrice < selectedCoupon!.minValue) {
+      return context.wording.couponMinimumAmountRequired(
+        formatCurrency(leadingSign: '฿', value: selectedCoupon!.minValue),
+      );
+    }
+    return null;
   }
 
   /// เช็คว่าเป็นเครื่องซักหรือไม่

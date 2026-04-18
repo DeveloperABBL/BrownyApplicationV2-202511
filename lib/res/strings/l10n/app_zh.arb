@@ -517,5 +517,23 @@
       }
     }
   },
-  "forceUpdateButton": "立即更新"
+  "forceUpdateButton": "立即更新",
+  "couponMinimumAmountRequired": "订单最低金额须达 {minAmount}。",
+  "@couponMinimumAmountRequired": {
+    "placeholders": {
+      "minAmount": {
+        "type": "String"
+      }
+    }
+  },
+  "noCouponEligible": "未找到符合条件的优惠券",
+  "couponNotEligible": "不参与此活动",
+  "cannotUseCouponType": "无法使用 {couponType}",
+  "@cannotUseCouponType": {
+    "placeholders": {
+      "couponType": {
+        "type": "String"
+      }
+    }
+  }
 }

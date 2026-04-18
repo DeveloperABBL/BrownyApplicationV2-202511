@@ -789,8 +789,10 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           return UiResult.empty(error: UserNotFound());
         }
 
-        if (checkUserExists.error is! UserDuplicated) {
-          return UiResult.empty(error: checkUserExists.error);
+        if (checkUserExists.hasError) {
+          if (checkUserExists.error is! UserDuplicated) {
+            return UiResult.empty(error: checkUserExists.error);
+          }
         }
 
         return UiResult.success(data: null);

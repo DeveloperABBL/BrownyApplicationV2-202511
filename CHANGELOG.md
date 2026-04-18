@@ -1,4 +1,18 @@
 # CHANGELOG
+### DONG 2026-04-18
+* แก้ไข Crash "GoError: There is nothing to pop" บน Android และ iOS ในหน้า ShowQRPromptpayPage
+ - เพิ่มการตรวจสอบ context.canPop() ก่อนเรียก context.pop() และ fallback ไปยังหน้า Wallet แทน
+* เพิ่มเงื่อนไขการตรวจสอบ Coupon, E-Voucher ที่เลือกมาว่าตรงเงื่อนไขการร่วมรายการหรือไม่
+* เพิ่มการทำงาน หากสแกนใช้งาน Coupon, E-Voucher จากปุ่ม เริ่มการทำงาน จะใช้ Coupon, E-Voucher ให้ทันทีถ้าเข้าเงื่อนไข
+* แก้ไขการเลือก Coupon/E-Voucher ในหน้า CouponVoucherPage ไม่แสดง Highlight รายการที่เคยเลือกไว้
+ - เพิ่ม preSelectedCustomerCouponId ใน TransactionsViewmodel เพื่อ restore สถานะที่เลือกไว้
+ - ปรับ MachineTransactionPage2 ส่ง selectedCouponId ไปยัง CouponVoucherPage
+* เพิ่ม Localize wording ที่ยังเป็น Hardcoded
+ - couponMinimumAmountRequired: "ต้องมียอดรวมขั้นต่ำ {minAmount}"
+ - couponNotEligible: "ไม่ร่วมรายการ"
+ - cannotUseCouponType: "ไม่สามารถใช้งาน {couponType} ได้"
+* เก็บ Design Wallet Reciept
+
 ### DONG 2026-04-12
 * แก้ไขการแจ้งเตือน Exception ที่ไม่ถูก Handle UI ให้แสดง wording `ขออภัย เกิดข้อผิดพลาดขึ้น โปรดลองอีกครั้ง`
 * เพิ่ม function ตรวจสอบ API Key และการ ​Force Update App

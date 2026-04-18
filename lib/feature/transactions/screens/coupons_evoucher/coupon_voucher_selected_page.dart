@@ -1,5 +1,8 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/machine_status_response.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
+import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
+import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/coupon_voucher_selected_viewmodel_delegate.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -67,7 +70,7 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
         ],
       ),
       persistentFooterButtons: [
-        // ปุ่มยืนยันซื้อคูปอง
+        // ปุ่มเริ่มต้นใช้บริการ
         Container(
           padding: EdgeInsets.only(
             left: AppDims.size_24.w,
@@ -82,8 +85,32 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
               ),
             ), //
             iconAlignment: IconAlignment.end,
-            onPressed: () {
-              ScannerPage.goToPage(context);
+            onPressed: () async {
+              await ScannerPage.goToPage(
+                context,
+                process: ScannerProcess.machineButNeedResult,
+              ).then((data) {
+                if (!context.mounted) return;
+
+                try {
+                  final couponData =
+                      widget._viewmodel.customerCouponModelDelegate;
+                  final machine = data as MachineStatusResponse;
+                  MachineTransactionPage2.goReplacementPage(
+                    context,
+                    machineId: machine.storeMachineId!.toString(),
+                    customerCouponModel: couponData,
+                  );
+                } on Exception catch (_) {
+                  if (!context.mounted) return;
+
+                  AppOverlays.showBrownyDialog(
+                    context,
+                    title: context.wording.errorOccurred,
+                    message: context.wording.errorUi,
+                  );
+                }
+              });
             },
             // เริ่มต้นใช้บริการ
             label: AppText(context.wording.startService),

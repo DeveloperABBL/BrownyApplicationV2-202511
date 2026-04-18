@@ -54,6 +54,9 @@ class WalletReceiptData {
   @JsonKey(name: 'bonus')
   final String? bonus;
 
+  @JsonKey(name: 'qr_image')
+  final String? qrImage;
+
   WalletReceiptData({
     this.dateTime,
     this.gateway,
@@ -63,6 +66,7 @@ class WalletReceiptData {
     this.transactionId,
     this.amount,
     this.bonus,
+    this.qrImage,
   });
 
   factory WalletReceiptData.fromJson(Map<String, dynamic> json) =>

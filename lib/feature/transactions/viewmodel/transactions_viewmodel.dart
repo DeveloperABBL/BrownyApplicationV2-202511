@@ -59,6 +59,7 @@ class TransactionsViewmodel extends AppViewModel
     _discountNotifier.dispose();
     _transactionStateNotifier.dispose();
     _inputCollectCouponNotifier.dispose();
+    _inputCollectCouponControler.dispose();
     super.dispose();
   }
 
@@ -108,6 +109,10 @@ class TransactionsViewmodel extends AppViewModel
   /// เก็บ List customer_coupon_id ไว้สำหรับ filter แสดง
   List<int>? customerCouponAvailablesFilter;
 
+  /// customer_coupon_id ที่เคยเลือกไว้ก่อนเข้าหน้า coupon
+  /// ใช้สำหรับ restore การแสดง selected state เมื่อ user กลับมาที่หน้า coupon อีกครั้ง
+  int? preSelectedCustomerCouponId;
+
   /// เก็บประเภทชำระที่เลือก
   PaymentMethodModel? _paymentSelected;
   PaymentMethodModel? get paymentSelected => _paymentSelected;
@@ -138,6 +143,19 @@ class TransactionsViewmodel extends AppViewModel
       _inputCollectCouponControler;
 
   // ========== function, Logic ==========
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'using' (กำลังใช้งาน)
+  bool get isUsing => couponState == CouponVoucherState.using;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'purshasing' (กำลังซื้อ)
+  bool get isPurshasing => couponState == CouponVoucherState.purshasing;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'redeeming' (กำลังแลกของ)
+  bool get isRedeeming => couponState == CouponVoucherState.redeeming;
+
+  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'brownyShop' (ร้านค้า Browny)
+  bool get isBrownyShop => couponState == CouponVoucherState.brownyShop;
+
   late CouponPackageItem _selectedCoupon;
   @override
   CouponPackageItem get selectedCoupon => _selectedCoupon;
@@ -397,10 +415,13 @@ class TransactionsViewmodel extends AppViewModel
       final latLng = LatLng(position.latitude, position.longitude);
       await fetchCouponPackageListDependsOn(currentLocation: latLng);
     } catch (e) {
+      if (!context.mounted) return;
       // print('Error getting location: $e');
       // Fallback to fetch without location
-      _showNearbyStoresNotifier.value = false;
-      await fetchCouponPackageListDependsOn(currentLocation: null);
+      try {
+        _showNearbyStoresNotifier.value = false;
+        await fetchCouponPackageListDependsOn(currentLocation: null);
+      } catch (_) {}
     }
   }
 
@@ -475,12 +496,28 @@ class TransactionsViewmodel extends AppViewModel
         .map(
           (e) => CustomerCouponModel.fromCouponData(
             e,
-            customerCouponModelSelected != null &&
-                customerCouponModelSelected!.customerCouponId ==
-                    e.customerCouponId,
+            // ถ้ามีการเลือกไว้ในรอบนี้แล้ว ให้ตรวจสอบจาก customerCouponModelSelected ก่อน
+            // ถ้ายังไม่มี ให้ตรวจสอบจาก preSelectedCustomerCouponId (coupon ที่เคยเลือกไว้ก่อนหน้า)
+            customerCouponModelSelected != null
+                ? customerCouponModelSelected!.customerCouponId ==
+                      e.customerCouponId
+                : preSelectedCustomerCouponId != null &&
+                      preSelectedCustomerCouponId == e.customerCouponId,
           ),
         )
         .toList();
+
+    // Restore customerCouponModelSelected จาก preSelectedCustomerCouponId
+    // เพื่อให้เมื่อ user กด back โดยไม่เลือกใหม่ ยังคืนค่าที่เคยเลือกไว้ได้ถูกต้อง
+    if (customerCouponModelSelected == null &&
+        preSelectedCustomerCouponId != null) {
+      final matched = filteredCoupons.where(
+        (e) => e.customerCouponId == preSelectedCustomerCouponId,
+      );
+      if (matched.isNotEmpty) {
+        customerCouponModelSelected = matched.first;
+      }
+    }
 
     // Group by typeLabel.en
     final groupedMap = <String, List<CustomerCouponModel>>{};
@@ -548,19 +585,35 @@ class TransactionsViewmodel extends AppViewModel
         // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
         // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
         .where(
-          (e) =>
-              customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
-              true,
+          (e) => customerCouponAvailablesFilter.orEmpty.isEmpty
+              ? true
+              : customerCouponAvailablesFilter!.contains(e.customerCouponId),
         )
         .map(
           (e) => CustomerCouponModel.fromCouponData(
             e,
-            customerCouponModelSelected != null &&
-                customerCouponModelSelected!.customerCouponId ==
-                    e.customerCouponId,
+            // ถ้ามีการเลือกไว้ในรอบนี้แล้ว ให้ตรวจสอบจาก customerCouponModelSelected ก่อน
+            // ถ้ายังไม่มี ให้ตรวจสอบจาก preSelectedCustomerCouponId (coupon ที่เคยเลือกไว้ก่อนหน้า)
+            customerCouponModelSelected != null
+                ? customerCouponModelSelected!.customerCouponId ==
+                      e.customerCouponId
+                : preSelectedCustomerCouponId != null &&
+                      preSelectedCustomerCouponId == e.customerCouponId,
           ),
         )
         .toList();
+
+    // Restore customerCouponModelSelected จาก preSelectedCustomerCouponId
+    // เพื่อให้เมื่อ user กด back โดยไม่เลือกใหม่ ยังคืนค่าที่เคยเลือกไว้ได้ถูกต้อง
+    if (customerCouponModelSelected == null &&
+        preSelectedCustomerCouponId != null) {
+      final matched = filteredCoupons.where(
+        (e) => e.customerCouponId == preSelectedCustomerCouponId,
+      );
+      if (matched.isNotEmpty) {
+        customerCouponModelSelected = matched.first;
+      }
+    }
 
     // Group by appliesTo (washer, dryer, both)
     final groupedMap = <String, List<CustomerCouponModel>>{};
@@ -924,7 +977,9 @@ class TransactionsViewmodel extends AppViewModel
       customerId,
     );
 
-    if (context.mounted && result.hasError) {
+    if (!context.mounted) return;
+
+    if (result.hasError) {
       AppOverlays.hideLoading();
       // return UiResult.error(error: result.error);
       if (result.error is AuthenExceptions) {
@@ -938,7 +993,7 @@ class TransactionsViewmodel extends AppViewModel
       return;
     }
 
-    if (context.mounted && result.isEmpty) {
+    if (result.isEmpty) {
       AppOverlays.hideLoading();
       AppOverlays.showBrownyDialog(
         context,
@@ -947,10 +1002,19 @@ class TransactionsViewmodel extends AppViewModel
       );
     }
 
+    try {
+      // fetch coupon ที่เพิ่ม collect ได้เก็บเอาไว้ด้วย
+      if (isUsing && result.data.couponCustomer != null) {
+        customerCouponAvailablesFilter?.add(result.data.couponCustomer!.id);
+      }
+    } catch (_) {}
+
     // รีเฟรชรายการคูปองหลังจากรับสำเร็จ
     await fetchCustomerEVoucher();
     await fetchCustomerDiscount();
 
+    // clear text
+    _inputCollectCouponControler.text = '';
     if (context.mounted) {
       await AppOverlays.showBrownyDialog(
         context,

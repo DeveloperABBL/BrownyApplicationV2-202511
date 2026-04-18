@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/topup_re
 import 'package:browny_applications_new/core/data/remote/models/response/contact_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/wallet_history_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/wallet_receipt_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -186,6 +187,10 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   /// เริ่มตรวจสอบสถานะการชำระเงินทุก 30 วินาที
   void startPaymentStatusCheck(VoidCallback onSuccess) {
+    if (kDebugMode) {
+      onSuccess.call();
+      return;
+    }
     final paymentRef = topupResponse!.paymentRef!;
     _statusCheckTimer?.cancel();
 
@@ -254,21 +259,27 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   Future<void> fetchReceiptData(BuildContext context) async {
     // ======= mock =======
-    // final locale = Localizations.localeOf(context);
-    // _recieptDataNotifier.value = UiResult.success(
-    //   data: ReceiptDataModel.fromWalletReceiptData(
-    //     locale.languageCode.orEmpty.ifEmpty('th'),
-    //     WalletReceiptData(
-    //       amount: '100',
-    //       dateTime: DateTime.now(),
-    //       paymentRef: topupResponse?.paymentRef,
-    //       gateway: 'promptpay',
-    //       receiptNo: 'RCPT202506101430',
-    //       transactionId: 'TXN123456789',
-    //     ),
-    //   ),
-    // );
-    // return;
+    if (kDebugMode) {
+      final locale = Localizations.localeOf(context);
+      _recieptDataNotifier.value = UiResult.success(
+        data: ReceiptDataModel.fromWalletReceiptData(
+          locale.languageCode.orEmpty.ifEmpty('th'),
+          WalletReceiptData(
+            amount: '100',
+            dateTime: DateTime.now(),
+            paymentRef: topupResponse?.paymentRef,
+            gateway: 'promptpay',
+            receiptNo: 'RCPT202506101430',
+            transactionId: 'TXN123456789',
+            bonus: '100',
+            qrImage:
+                // 'https://dev.abgroup.co.th/storage/qrcodes/019ccd2e-6c2d-7043-b53a-1a0eb16bf59a.png',
+                'customer_id:019ccd2e-6c2d-7043-b53a-1a0eb16bf59a',
+          ),
+        ),
+      );
+      return;
+    }
 
     // ======= real =======
     if (!_recieptDataNotifier.value.isLoading) {
@@ -284,12 +295,16 @@ class WalletViewModel extends AppViewModelObscureHandler {
     }
 
     if (result.isSuccess && context.mounted) {
+      final qrImage =
+          result.data.data!.qrImage ??
+          'customer_id:${currentCustomerProvider.current.id}';
+
       final locale = Localizations.localeOf(context);
       _recieptDataNotifier.value = UiResult.success(
         data: ReceiptDataModel.fromWalletReceiptData(
           locale.countryCode.orEmpty.ifEmpty('th'),
           result.data.data!,
-        ),
+        ).copyWith(qrImage: qrImage),
       );
     }
   }

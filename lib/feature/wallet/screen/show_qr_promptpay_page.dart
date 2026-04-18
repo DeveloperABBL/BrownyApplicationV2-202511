@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_page.dart';
+import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
@@ -255,7 +256,11 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage>
           confirmText: context.wording.confirm,
           cancelText: context.wording.cancel,
           onConfirm: () {
-            context.pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.goNamed(WalletPage.pageName);
+            }
           },
         );
       },
@@ -294,7 +299,11 @@ class _ShowQRPromptpayPageState extends State<ShowQRPromptpayPage>
                       confirmText: context.wording.confirm,
                       cancelText: context.wording.cancel,
                       onConfirm: () {
-                        context.pop();
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.goNamed(WalletPage.pageName);
+                        }
                       },
                     );
                   },

@@ -214,6 +214,32 @@ class CustomerCouponModel extends CouponData {
     return typeLabelDisplay(context);
   }
 
+  String getSelectedTypeNoDetailWordingDisplay(BuildContext context) {
+    final typeText = typeLabel?.en ?? '';
+    final locales = context.languageCode;
+    if (typeText == 'E-Voucher') {
+      return 'E-Voucher';
+    }
+
+    context.wording.details;
+
+    if (typeText == 'Discount') {
+      if (appliesTo.orEmpty.toLowerCase() == 'both') {
+        if (locales == 'en' || locales == 'zh') {
+          return context.wording.washerDryerCoupon;
+        }
+        return context.wording.washerDryerCoupon;
+      }
+      if (appliesTo.orEmpty.toLowerCase() == 'dryer') {
+        return context.wording.dryerCoupon;
+      }
+      if (appliesTo.orEmpty.toLowerCase() == 'washer') {
+        return context.wording.washerCoupon;
+      }
+    }
+    return typeLabelDisplay(context);
+  }
+
   /// ดึง localized package name ตาม locale ปัจจุบัน
   String nameDisplay(BuildContext context) {
     final locale = context.languageCode;

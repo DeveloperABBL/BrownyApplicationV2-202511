@@ -12,6 +12,8 @@ class ReceiptDataModel extends WalletReceiptData {
     required super.receiptNo,
     required super.transactionId,
     required super.amount,
+    required super.bonus,
+    required super.qrImage,
     required this.locale,
   });
 
@@ -25,6 +27,8 @@ class ReceiptDataModel extends WalletReceiptData {
     receiptNo: null,
     transactionId: null,
     amount: null,
+    bonus: null,
+    qrImage: null,
     locale: '',
   );
 
@@ -40,7 +44,35 @@ class ReceiptDataModel extends WalletReceiptData {
       receiptNo: data.receiptNo,
       transactionId: data.transactionId,
       amount: data.amount,
+      bonus: data.bonus,
+      qrImage: data.qrImage,
       locale: locale,
+    );
+  }
+
+  ReceiptDataModel copyWith({
+    DateTime? dateTime,
+    String? gateway,
+    String? paymentRef,
+    String? wallet,
+    String? receiptNo,
+    String? transactionId,
+    String? amount,
+    String? bonus,
+    String? qrImage,
+    String? locale,
+  }) {
+    return ReceiptDataModel(
+      dateTime: dateTime ?? super.dateTime,
+      gateway: gateway ?? super.gateway,
+      paymentRef: paymentRef ?? super.paymentRef,
+      wallet: wallet ?? super.wallet,
+      receiptNo: receiptNo ?? super.receiptNo,
+      transactionId: transactionId ?? super.transactionId,
+      amount: amount ?? super.amount,
+      bonus: bonus ?? super.bonus,
+      qrImage: qrImage ?? super.qrImage,
+      locale: locale ?? this.locale,
     );
   }
 

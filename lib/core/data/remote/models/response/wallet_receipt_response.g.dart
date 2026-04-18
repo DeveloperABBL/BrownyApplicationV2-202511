@@ -36,6 +36,7 @@ WalletReceiptData _$WalletReceiptDataFromJson(Map<String, dynamic> json) =>
       transactionId: json['transaction_id'] as String?,
       amount: json['amount'] as String?,
       bonus: json['bonus'] as String?,
+      qrImage: json['qr_image'] as String?,
     );
 
 Map<String, dynamic> _$WalletReceiptDataToJson(WalletReceiptData instance) =>
@@ -48,4 +49,5 @@ Map<String, dynamic> _$WalletReceiptDataToJson(WalletReceiptData instance) =>
       'transaction_id': instance.transactionId,
       'amount': instance.amount,
       'bonus': instance.bonus,
+      'qr_image': instance.qrImage,
     };

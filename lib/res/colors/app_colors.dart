@@ -12,6 +12,17 @@ class AppColors {
   static const Color gradientMiddle = Color(0xFF50B748); // #50B748
   static const Color gradientEnd = Color(0xFF26A14C); // #26A14C
 
+  /// linear-gradient(91.77deg, #FFEFAD -17.01%, #FFD3B3 118.4%)
+  static const LinearGradient walletCoinBonusGradient = LinearGradient(
+    begin: Alignment(-1, -0.031),
+    end: Alignment(1, 0.031),
+    colors: [
+      Color(0xFFFFEFAD),
+      Color(0xFFFFD3B3),
+    ],
+    stops: [-0.1701, 1.184],
+  );
+
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

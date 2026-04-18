@@ -16,6 +16,8 @@ import 'package:permission_handler/permission_handler.dart' as handler;
 enum ScannerProcess {
   // Scan เพื่อสั่งทำงานเครื่อง
   machine,
+  // Scan เพื่อสั่งทำงานเครื่อง แต่ต้องการ result ถ้าเครื่องพร้อมใช้บริการ
+  machineButNeedResult,
   // ต้องการแค่ Result จากการ Detect
   needResult,
 }
@@ -175,6 +177,7 @@ class ScannerViewModel extends AppViewModel {
           try {
             switch (process) {
               case ScannerProcess.machine:
+              case ScannerProcess.machineButNeedResult:
                 {
                   // จะได้เป็น URL มา เอามา parse เป็น URI ไว้เช็คเงื่อนไข
                   final uri = Uri.parse(barcode.rawValue!);
@@ -262,6 +265,13 @@ class ScannerViewModel extends AppViewModel {
                           _resumeFlagScanning();
                         },
                       );
+                      return;
+                    }
+                    if (process == ScannerProcess.machineButNeedResult) {
+                      // DONG 2026-04-18
+                      // ถ้าเข้า process นี้ จะ pop result machine
+                      // กลับไปเพื่อตัดสินใจจากต้นทาง
+                      context.pop(machine);
                       return;
                     }
                     // DONG 2026-04-12

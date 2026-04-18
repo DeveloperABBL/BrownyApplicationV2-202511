@@ -16,6 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class PaymentSuccessPage extends StatelessWidget {
   const PaymentSuccessPage({
@@ -62,7 +63,9 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
         if (widget.viewmodel.recieptDataNotifier.value.hasError) {
           AppOverlays.showWalletDialog(
             context,
+            // เติมเงินไม่สำเร็จ
             title: context.wording.topUpFailed,
+            // เนื่องจากธนาคารปลายทางมีปัญหา หรือเงินในบัญชีอาจไม่พอ กรุณาตรวจสอบรายการใหม่อีกครั้ง
             message: context.wording.topUpFailedMessage,
             confirmText: context.wording.tryAgain,
             onConfirm: () async {
@@ -401,144 +404,177 @@ class _PaymentSuccessWidgetState extends State<PaymentSuccessWidget> {
                             AppDims.vericalPadding_4,
                             // Browny Coin Bonus
                             if (result.data!.bonus.orEmpty.isNotEmpty)
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Assets.png.brownyCoin.image(
-                                    width: 20.w,
-                                    height: 20.w,
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  AppText(
-                                    context.wording.youReceivedBonus,
-                                    style: context.textTheme.labelMedium!
-                                        .copyWith(
-                                          color: AppColors.cocoaBrown,
-                                        ),
-                                  ),
-                                  AppText(
-                                    'Browny Coin ${formatCurrency(string: result.data!.bonus, leadingSign: '+ ')}',
-                                    style: context.textTheme.labelMedium!
-                                        .copyWith(
-                                          color: AppColors.cocoaBrown,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            AppDims.vericalPadding_12,
-
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // ข้อมูลการโอน - จาก
-                                Row(
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: AppDims.size_2.h,
+                                  horizontal: AppDims.size_8.w,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: AppColors.walletCoinBonusGradient,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // ข้อมูลการโอน - จาก
-                                    Assets.png.promptpayBadge.image(
-                                      width: 150.w,
+                                    Assets.png.brownyCoin.image(
+                                      width: 20.w,
+                                      height: 20.w,
                                     ),
-                                    Expanded(child: SizedBox()),
-                                    Container(
-                                      width: 60.w,
-                                      height: 60.h,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: AppColors.textSecondary
-                                              .withValues(
-                                                alpha: 0.3,
-                                              ),
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          8.r,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.qr_code,
-                                          size: 60.w,
-                                          color: AppColors.textBlack,
-                                        ),
-                                      ),
+                                    SizedBox(width: 8.w),
+                                    AppText(
+                                      context.wording.youReceivedBonus,
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.cocoaBrown,
+                                          ),
+                                    ),
+                                    AppText(
+                                      ' Browny Coin ${formatCurrency(string: result.data!.bonus, leadingSign: '+ ')}',
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.cocoaBrown,
+                                          ),
                                     ),
                                   ],
                                 ),
-                                AppDims.vericalPadding_8,
-                                // ลูกศรลง
-                                Icon(
-                                  Icons.arrow_downward,
-                                  size: 24.w,
-                                  color: AppColors.gray500,
-                                ),
-                                AppDims.vericalPadding_8,
+                              ),
+                            AppDims.vericalPadding_12,
 
-                                // ข้อมูลการโอน - ถึง
-                                Row(
+                            Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      width: 36.w,
-                                      height: 36.h,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: AppColors.border,
-                                          width: 1,
+                                    // ข้อมูลการโอน - จาก
+                                    Row(
+                                      children: [
+                                        // ข้อมูลการโอน - จาก
+                                        Assets.png.promptpayBadge.image(
+                                          width: 150.w,
                                         ),
-                                        borderRadius: BorderRadius.circular(
-                                          100.r,
-                                        ),
-                                      ),
-                                      child: Assets.svg.icTpWallet.svg(
-                                        width: 22.w,
-                                        height: 20.h,
-                                        fit: BoxFit.none,
-                                      ),
+                                      ],
                                     ),
-                                    AppDims.horizonPadding_8,
+                                    AppDims.vericalPadding_8,
+                                    // ลูกศรลง
+                                    Icon(
+                                      Icons.arrow_downward,
+                                      size: 24.w,
+                                      color: AppColors.gray500,
+                                    ),
+                                    AppDims.vericalPadding_8,
 
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    // ข้อมูลการโอน - ถึง
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 36.w,
+                                          height: 36.h,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: AppColors.border,
+                                              width: 1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              100.r,
+                                            ),
+                                          ),
+                                          child: Assets.svg.icTpWallet.svg(
+                                            width: 22.w,
+                                            height: 20.h,
+                                            fit: BoxFit.none,
+                                          ),
+                                        ),
+                                        AppDims.horizonPadding_8,
+
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            AppText(
+                                              'TP+ Wallet',
+                                              style: context
+                                                  .textTheme
+                                                  .labelMedium!
+                                                  .copyWith(
+                                                    color: AppColors.textBlack,
+                                                  ),
+                                            ),
+                                            AppText(
+                                              result.data!.walletShow,
+                                              style: context
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                    fontSize:
+                                                        AppDims.size_10.sp,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    AppDims.vericalPadding_16,
+                                    // เลขที่รายการ
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         AppText(
-                                          'TP+ Wallet',
+                                          context.wording.transactionNumber,
                                           style: context.textTheme.labelMedium!
                                               .copyWith(
-                                                color: AppColors.textBlack,
+                                                color: AppColors.textSecondary,
                                               ),
                                         ),
                                         AppText(
-                                          result.data!.walletShow,
-                                          style: context.textTheme.bodySmall!
+                                          receiptData.receiptNo.orEmpty,
+                                          style: context.textTheme.labelMedium!
                                               .copyWith(
                                                 color: AppColors.textSecondary,
-                                                fontSize: AppDims.size_10.sp,
                                               ),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                                AppDims.vericalPadding_16,
-                                // เลขที่รายการ
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      context.wording.transactionNumber,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(
-                                            color: AppColors.textSecondary,
-                                          ),
-                                    ),
-                                    AppText(
-                                      receiptData.receiptNo.orEmpty,
-                                      style: context.textTheme.labelMedium!
-                                          .copyWith(
-                                            color: AppColors.textSecondary,
-                                          ),
-                                    ),
-                                  ],
+
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.network(
+                                        receiptData.qrImage.orEmpty,
+                                        width: 58.w,
+                                        height: 58.w,
+                                        fit: BoxFit.fill,
+                                        errorBuilder:
+                                            (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) => QrImageView(
+                                              data: receiptData.qrImage.orEmpty,
+                                              version: QrVersions.auto,
+                                              size: 58.w,
+                                              backgroundColor: Colors.white,
+                                              errorCorrectionLevel:
+                                                  QrErrorCorrectLevel.M,
+                                            ),
+                                      ),
+                                      AppText(
+                                        context
+                                            .wording
+                                            .qrCodeForSupportOnly, // QR Code สำหรับฝ่าย Browny Support เท่านั้น
+                                        style: context.textTheme.labelSmall!
+                                            .copyWith(
+                                              fontSize: AppDims.size_7.sp,
+                                            ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

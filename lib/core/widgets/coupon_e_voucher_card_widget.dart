@@ -92,6 +92,10 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
         foregroundDecoration: widget.isDisabled
             ? BoxDecoration(
                 color: Colors.grey,
+                borderRadius: BorderRadius.circular(8.r),
+                border: widget.borderColor != null
+                    ? BoxBorder.all(color: widget.borderColor!)
+                    : null,
                 backgroundBlendMode: BlendMode.saturation,
               )
             : null,

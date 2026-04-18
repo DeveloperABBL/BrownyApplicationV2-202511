@@ -3111,6 +3111,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update Now'**
   String get forceUpdateButton;
+
+  /// No description provided for @couponMinimumAmountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum order amount of {minAmount} is required.'**
+  String couponMinimumAmountRequired(String minAmount);
+
+  /// No description provided for @noCouponEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'No eligible coupon found'**
+  String get noCouponEligible;
+
+  /// No description provided for @couponNotEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'Not eligible for this promotion'**
+  String get couponNotEligible;
+
+  /// No description provided for @cannotUseCouponType.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot use {couponType}'**
+  String cannotUseCouponType(String couponType);
 }
 
 class _AppLocalizationsDelegate

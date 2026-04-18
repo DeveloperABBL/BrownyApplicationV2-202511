@@ -23,6 +23,7 @@ class CouponVoucherPage extends StatelessWidget {
     required this.state,
     this.customerCouponAvailables,
     this.autoCollectQRData,
+    this.selectedCustomerCouponId,
   });
 
   static final pagePath = '/coupon_voucher';
@@ -33,12 +34,17 @@ class CouponVoucherPage extends StatelessWidget {
   /// QR data สำหรับ auto-collect เมื่อ scan จากหน้า Home
   final String? autoCollectQRData;
 
+  /// customer_coupon_id ที่เคยเลือกไว้ก่อนหน้า
+  /// ใช้สำหรับ restore การแสดง selected state เมื่อ user กลับมาที่หน้านี้อีกครั้ง
+  final int? selectedCustomerCouponId;
+
   /// util function route to pageName
   static Future<T?> goToPage<T>(
     BuildContext context, {
     CouponVoucherState state = CouponVoucherState.purshasing,
     List<int>? customerCouponAvailables,
     String? autoCollectQRData,
+    int? selectedCustomerCouponId,
   }) async {
     if (context.read<CustomerProvider>().current.isGuest) {
       return await AuthenticationPage.goToPage(
@@ -52,6 +58,7 @@ class CouponVoucherPage extends StatelessWidget {
         state,
         customerCouponAvailables,
         autoCollectQRData,
+        selectedCustomerCouponId,
       ],
     );
   }
@@ -68,6 +75,7 @@ class CouponVoucherPage extends StatelessWidget {
         state: state,
         customerCouponAvailables: customerCouponAvailables,
         autoCollectQRData: autoCollectQRData,
+        selectedCustomerCouponId: selectedCustomerCouponId,
       ),
     );
   }
@@ -78,11 +86,13 @@ class _CouponVoucherWidget extends StatefulWidget {
     required this.state,
     this.customerCouponAvailables,
     this.autoCollectQRData,
+    this.selectedCustomerCouponId,
   });
 
   final CouponVoucherState state;
   final List<int>? customerCouponAvailables;
   final String? autoCollectQRData;
+  final int? selectedCustomerCouponId;
 
   @override
   State<_CouponVoucherWidget> createState() => _CouponVoucherWidgetState();
@@ -92,18 +102,6 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late final TransactionsViewmodel _viewmodel;
-
-  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'using' (กำลังใช้งาน)
-  bool get isUsing => widget.state == CouponVoucherState.using;
-
-  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'purshasing' (กำลังซื้อ)
-  bool get isPurshasing => widget.state == CouponVoucherState.purshasing;
-
-  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'redeeming' (กำลังแลกของ)
-  bool get isRedeeming => widget.state == CouponVoucherState.redeeming;
-
-  /// ใช้สำหรับตรวจสอบว่าสถานะปัจจุบันเป็น 'brownyShop' (ร้านค้า Browny)
-  bool get isBrownyShop => widget.state == CouponVoucherState.brownyShop;
 
   /// คืนค่าดัชนีเริ่มต้นของ TabBar ตามสถานะปัจจุบันของ widget
   /// - สำหรับ 'using' หรือ 'purshasing' จะคืนค่า 1
@@ -129,6 +127,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     // assign เก็บไว้สำหรับ fileter coupon ที่สามารถเลือกกดได้
     // จะเป็นการมาจากหน้า MachineTransactionProgram
     _viewmodel.customerCouponAvailablesFilter = widget.customerCouponAvailables;
+    // restore coupon ที่เคยเลือกไว้ก่อนหน้า เพื่อให้แสดง selected state ถูกต้อง
+    _viewmodel.preSelectedCustomerCouponId = widget.selectedCustomerCouponId;
     // เก็บ State ปัจจุบันที่เปิดหน้า coupon
     _viewmodel.couponState = widget.state;
     _tabController = TabController(
@@ -227,7 +227,8 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               leading: BackButton(
                 onPressed: () {
                   context.pop(
-                    _viewmodel.customerCouponModelSelected?.customerCouponId,
+                    // _viewmodel.customerCouponModelSelected,
+                    true,
                   );
                 },
               ),
@@ -337,11 +338,6 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
             controller: _tabController,
             children: [
               // ซักอบ
-              // _buildTabContent(
-              //   context: context,
-              //   icon: Assets.svg.icCouponWashRoundedGreen.svg(),
-              //   title: 'ซักอบ',
-              // ),
               _CustomerWashDryCouponWidget(
                 viewModel: _viewmodel,
               ),
@@ -350,11 +346,6 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               _CustomerEVoucherWidget(
                 viewModel: _viewmodel,
               ),
-              // _buildTabContent(
-              //   context: context,
-              //   icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
-              //   title: 'E-Voucher ของฉัน',
-              // ),
 
               // Browny Shop
               _buildTabContent(
@@ -855,7 +846,6 @@ class _CustomerWashDryCouponWidgetState
           valueListenable: widget._viewModel.discountNotifier,
           builder: (context, discountResult, child) {
             if (discountResult.isLoading) {
-              Future.microtask(widget._viewModel.fetchCustomerDiscount);
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -969,21 +959,39 @@ class _CustomerWashDryCouponWidgetState
       if (coupons.isEmpty)
         Column(
           children: [
-            Center(
-              child: Assets.png.brownyError1.image(
-                width: 145.w,
-                height: 100.h,
+            if (widget._viewModel.isUsing) ...[
+              Center(
+                child: Assets.png.brownyError4.image(
+                  width: 145.w,
+                  height: 100.h,
+                ),
               ),
-            ),
-            AppDims.vericalPadding_16,
+              AppDims.vericalPadding_16,
 
-            AppText(
-              // ไม่พบ$title
-              context.wording.couponNotFoundOf(title),
-              style: context.textTheme.labelLarge!.copyWith(
-                fontSize: AppDims.size_16.sp,
+              AppText(
+                // ไม่พบคูปองที่ร่วมรายการ
+                context.wording.noCouponEligible,
+                style: context.textTheme.labelLarge!.copyWith(
+                  fontSize: AppDims.size_16.sp,
+                ),
               ),
-            ),
+            ] else ...[
+              Center(
+                child: Assets.png.brownyError1.image(
+                  width: 145.w,
+                  height: 100.h,
+                ),
+              ),
+              AppDims.vericalPadding_16,
+
+              AppText(
+                // ไม่พบ$title
+                context.wording.couponNotFoundOf(title),
+                style: context.textTheme.labelLarge!.copyWith(
+                  fontSize: AppDims.size_16.sp,
+                ),
+              ),
+            ],
           ],
         ),
 
@@ -1033,7 +1041,9 @@ class _CustomerWashDryCouponWidgetState
       onTap: onTap,
       // Counpon ส่วนลดใน Tab ซักอบ
       child: CouponEVoucherCardWidget(
-        initialChecked: customerDiscount.isSelected,
+        initialChecked:
+            customerDiscount.customerCouponId ==
+            widget._viewModel.preSelectedCustomerCouponId,
         icon: Image.network(
           customerDiscount.imageUrlDisplay(context),
           errorBuilder: (_, _, _) => _onImageError(),
@@ -1468,7 +1478,9 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
     return GestureDetector(
       onTap: onTap,
       child: CouponEVoucherCardWidget(
-        initialChecked: customerEVoucher.isSelected,
+        initialChecked:
+            customerEVoucher.customerCouponId ==
+            widget._viewModel.preSelectedCustomerCouponId,
         icon: Image.network(
           customerEVoucher.imageUrlDisplay(context),
           errorBuilder: (_, _, _) => _onImageError(),
@@ -1530,21 +1542,39 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
   Widget _buidlNotFoundData(BuildContext context) {
     return Column(
       children: [
-        Center(
-          child: Assets.png.brownyError1.image(
-            width: 145.w,
-            height: 100.h,
+        if (widget._viewModel.isUsing) ...[
+          Center(
+            child: Assets.png.brownyError4.image(
+              width: 145.w,
+              height: 100.h,
+            ),
           ),
-        ),
-        AppDims.vericalPadding_16,
+          AppDims.vericalPadding_16,
 
-        AppText(
-          // 'ไม่พบคูปอง E-Voucher'
-          context.wording.evoucherNotFound,
-          style: context.textTheme.labelLarge!.copyWith(
-            fontSize: AppDims.size_16.sp,
+          AppText(
+            // ไม่พบคูปองที่ร่วมรายการ
+            'ไม่พบ E-Voucher ที่ร่วมรายการ',
+            style: context.textTheme.labelLarge!.copyWith(
+              fontSize: AppDims.size_16.sp,
+            ),
           ),
-        ),
+        ] else ...[
+          Center(
+            child: Assets.png.brownyError1.image(
+              width: 145.w,
+              height: 100.h,
+            ),
+          ),
+          AppDims.vericalPadding_16,
+
+          AppText(
+            // 'ไม่พบคูปอง E-Voucher'
+            context.wording.evoucherNotFound,
+            style: context.textTheme.labelLarge!.copyWith(
+              fontSize: AppDims.size_16.sp,
+            ),
+          ),
+        ],
       ],
     );
   }
