@@ -1686,7 +1686,7 @@ class _ForgotPasswordWidget extends _SignUpWidget {
                 );
                 return;
               }
-
+              FocusManager.instance.primaryFocus?.unfocus();
               goToProcess(context, AuthenProcess.forgotPasswordOTP);
             },
             child: AppText(context.wording.next),

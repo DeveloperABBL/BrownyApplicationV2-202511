@@ -377,6 +377,45 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                                 fontSize: AppDims.size_36.sp,
                               ),
                             ),
+                            // Browny Coin Bonus
+                            if (receiptData.bonus.orEmpty.isNotEmpty) ...[
+                              AppDims.vericalPadding_4,
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: AppDims.size_2.h,
+                                  horizontal: AppDims.size_8.w,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: AppColors.walletCoinBonusGradient,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Assets.png.brownyCoin.image(
+                                      width: 20.w,
+                                      height: 20.w,
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    AppText(
+                                      // คุณได้รับโบนัส
+                                      context.wording.youReceivedBonus,
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.cocoaBrown,
+                                          ),
+                                    ),
+                                    AppText(
+                                      ' Browny Coin ${formatCurrency(string: receiptData.bonus, leadingSign: '+ ')}',
+                                      style: context.textTheme.labelMedium!
+                                          .copyWith(
+                                            color: AppColors.cocoaBrown,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                             AppDims.vericalPadding_16,
 
                             _listTile(

@@ -17,6 +17,7 @@ class CouponReceiptModel extends CouponReceiptData {
     super.luckyNo,
     super.luckyImage,
     super.qrImage,
+    super.bonus,
   });
 
   /// Factory constructor สำหรับแปลง CouponReceiptData เป็น CouponReceiptModel
@@ -33,6 +34,7 @@ class CouponReceiptModel extends CouponReceiptData {
       luckyNo: data.luckyNo,
       luckyImage: data.luckyImage,
       qrImage: data.qrImage,
+      bonus: data.bonus,
     );
   }
 
@@ -49,6 +51,7 @@ class CouponReceiptModel extends CouponReceiptData {
     String? luckyNo,
     String? luckyImage,
     String? qrImage,
+    String? bonus,
   }) {
     return CouponReceiptModel(
       receiptAt: receiptAt ?? this.receiptAt,
@@ -62,6 +65,7 @@ class CouponReceiptModel extends CouponReceiptData {
       luckyNo: luckyNo ?? this.luckyNo,
       luckyImage: luckyImage ?? this.luckyImage,
       qrImage: qrImage ?? this.qrImage,
+      bonus: bonus ?? this.bonus,
     );
   }
 }

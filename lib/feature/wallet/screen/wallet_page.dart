@@ -375,7 +375,8 @@ class _WalletWidgetState extends State<WalletWidget> {
       padding: EdgeInsets.only(
         left: AppDims.size_24.w,
         right: AppDims.size_24.w,
-        bottom: AppDims.size_24.w,
+        // bottom: AppDims.size_24.w,
+        bottom: MediaQuery.of(context).viewPadding.bottom,
         top: AppDims.size_8.w,
       ),
       child: ElevatedButton(

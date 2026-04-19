@@ -199,10 +199,10 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     String orderId,
   ) async {
     try {
-      //       if (kDebugMode) {
-      //         return RepoResult.success(
-      //           data: MachineOrderReceiptResponse.fromJson(
-      //             jsonDecode('''
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: MachineOrderReceiptResponse.fromJson(
+      //       jsonDecode('''
       // {
       //     "lucky_number": null,
       //     "total": "60.00",
@@ -266,12 +266,13 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
       //     "lucky_no": "96",
       //     "lucky_image": "https://dev.abgroup.co.th/images/lucky_no/96.png",
       //     "review_score": null,
+      //     "bonus": "10",
       //     "qr_image": "https://dev.abgroup.co.th/storage/qrcodes/21.png"
       // }
       // '''),
-      //           ),
-      //         );
-      //       }
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.fetchMachineOrderReceipt(orderId);
 
       if (response.isSuccessful) {
@@ -303,19 +304,19 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     PaymentCheck paymentCheck,
   ) async {
     try {
-      //       if (kDebugMode) {
-      //         return RepoResult.success(
-      //           data: PaymentStatusCheckResponse.fromJson(
-      //             jsonDecode('''
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: PaymentStatusCheckResponse.fromJson(
+      //       jsonDecode('''
       // {
       //     "status": "paid",
       //     "order_id": "019cc70a-eef8-7285-8dc9-5bf006b6ca48",
       //     "redirect": "https://dev.abgroup.co.th/receipt/019cc70a-eef8-7285-8dc9-5bf006b6ca48"
       // }
       // '''),
-      //           ),
-      //         );
-      //       }
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.checkMachineOrderPaymentStatus(
         paymentCheck,
       );

@@ -41,6 +41,7 @@ CouponReceiptData _$CouponReceiptDataFromJson(Map<String, dynamic> json) =>
       luckyNo: json['lucky_no'] as String?,
       luckyImage: json['lucky_image'] as String?,
       qrImage: json['qr_image'] as String?,
+      bonus: json['bonus'] as String?,
     );
 
 Map<String, dynamic> _$CouponReceiptDataToJson(CouponReceiptData instance) =>
@@ -56,4 +57,5 @@ Map<String, dynamic> _$CouponReceiptDataToJson(CouponReceiptData instance) =>
       'lucky_no': instance.luckyNo,
       'lucky_image': instance.luckyImage,
       'qr_image': instance.qrImage,
+      'bonus': instance.bonus,
     };

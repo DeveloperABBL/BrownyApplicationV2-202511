@@ -307,8 +307,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       onTap: () async {
                         if (kDebugMode) {
                           final data = Uri.parse(
-                            'http://brownypay.com/wash/dry/82',
-                            // 'http://brownypay.com/wash/dry/2',
+                            // 'http://brownypay.com/wash/dry/82',
+                            'http://brownypay.com/wash/dry/2',
                           );
                           if (data.pathSegments.isNotEmpty) {
                             await MachineTransactionPage2.goToPage(
@@ -374,7 +374,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               ),
             ),
             SliverToBoxAdapter(
-              child: AppDims.vericalPadding_46,
+              child: AppDims.vericalPadding_24,
             ),
           ],
         ),
@@ -987,19 +987,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 return CircleAvatar(
                   backgroundColor: AppColors.background,
                   child: IconButton(
-                    onPressed: () {
-                      // if (_viewmodel.isProfileGuest()) {
-                      //   context.pushNamed(
-                      //     AuthenticationPage.pageName,
-                      //     extra: {
-                      //       AuthenProcess: AuthenProcess.login,
-                      //     },
-                      //   );
-                      // } else {
-                      // context.pushNamed(ProfilePage.pageName);
-                      context.pushNamed(MyProfileAndPreferencesPage.pageName);
-                      // }
-                    },
+                    onPressed: () => context.pushNamed(
+                      MyProfileAndPreferencesPage.pageName,
+                    ),
                     icon: customer.current.image.orEmpty.isEmpty
                         // ถ้าไม่มีรูป Profile ใช้รูป Default
                         ? Assets.svg.icPerson.svg(

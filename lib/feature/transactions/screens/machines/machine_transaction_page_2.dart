@@ -41,7 +41,7 @@ class MachineTransactionPage2 extends StatelessWidget {
   }) async {
     return await context.pushNamed(
       MachineTransactionPage2.pageName,
-      extra: machineId,
+      extra: [machineId],
     );
   }
 
@@ -596,10 +596,17 @@ class __MachineContentState extends State<_MachineContent>
           }
 
           if (result.hasError || result.isEmpty) {
-            return Center(
-              child: AppText(
-                // เดิม: ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง
-                context.wording.machineDataLoadError,
+            return Scaffold(
+              appBar: AppBar(
+                leading: BackButton(
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              body: Center(
+                child: AppText(
+                  // เดิม: ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง
+                  context.wording.machineDataLoadError,
+                ),
               ),
             );
           }

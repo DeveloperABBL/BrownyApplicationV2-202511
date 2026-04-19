@@ -1,4 +1,9 @@
 # CHANGELOG
+### DONG 2026-04-19
+* แก้ไข ลืมรหัส ระบบไม่ focus Field PIN ทำให้เก็บค่าผิด
+* เพิ่มการแสดง Field Bonus Browny coin จากการชำระใช้งานเครื่อง
+ - เพิ่มรองรับ field bonus ใน api machine-orders/{order_id}/receipt
+
 ### DONG 2026-04-18
 * แก้ไข Crash "GoError: There is nothing to pop" บน Android และ iOS ในหน้า ShowQRPromptpayPage
  - เพิ่มการตรวจสอบ context.canPop() ก่อนเรียก context.pop() และ fallback ไปยังหน้า Wallet แทน

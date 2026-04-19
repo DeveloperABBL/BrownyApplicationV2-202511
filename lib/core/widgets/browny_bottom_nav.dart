@@ -34,7 +34,8 @@ class BrownyBottomNav extends StatefulWidget {
     this.showLabels = true,
     this.backgroundRadius = 32.0,
     this.centerSize = 64.0,
-    this.margin = const EdgeInsets.fromLTRB(16, 0, 16, 16),
+    // this.margin = const EdgeInsets.fromLTRB(16, 0, 16, 16),
+    this.margin = const EdgeInsets.fromLTRB(14, 16, 14, 0),
   });
 
   final int currentIndex; // ตำแหน่งปุ่มที่เลือกอยู่

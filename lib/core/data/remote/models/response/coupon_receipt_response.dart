@@ -63,6 +63,9 @@ class CouponReceiptData {
   @JsonKey(name: 'qr_image')
   final String? qrImage;
 
+  @JsonKey(name: 'bonus')
+  final String? bonus;
+
   CouponReceiptData({
     this.receiptAt,
     this.totalPrice,
@@ -75,6 +78,7 @@ class CouponReceiptData {
     this.luckyNo,
     this.luckyImage,
     this.qrImage,
+    this.bonus,
   });
 
   factory CouponReceiptData.fromJson(Map<String, dynamic> json) =>

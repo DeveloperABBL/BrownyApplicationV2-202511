@@ -187,10 +187,10 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   /// เริ่มตรวจสอบสถานะการชำระเงินทุก 30 วินาที
   void startPaymentStatusCheck(VoidCallback onSuccess) {
-    if (kDebugMode) {
-      onSuccess.call();
-      return;
-    }
+    // if (kDebugMode) {
+    //   onSuccess.call();
+    //   return;
+    // }
     final paymentRef = topupResponse!.paymentRef!;
     _statusCheckTimer?.cancel();
 
@@ -259,27 +259,27 @@ class WalletViewModel extends AppViewModelObscureHandler {
 
   Future<void> fetchReceiptData(BuildContext context) async {
     // ======= mock =======
-    if (kDebugMode) {
-      final locale = Localizations.localeOf(context);
-      _recieptDataNotifier.value = UiResult.success(
-        data: ReceiptDataModel.fromWalletReceiptData(
-          locale.languageCode.orEmpty.ifEmpty('th'),
-          WalletReceiptData(
-            amount: '100',
-            dateTime: DateTime.now(),
-            paymentRef: topupResponse?.paymentRef,
-            gateway: 'promptpay',
-            receiptNo: 'RCPT202506101430',
-            transactionId: 'TXN123456789',
-            bonus: '100',
-            qrImage:
-                // 'https://dev.abgroup.co.th/storage/qrcodes/019ccd2e-6c2d-7043-b53a-1a0eb16bf59a.png',
-                'customer_id:019ccd2e-6c2d-7043-b53a-1a0eb16bf59a',
-          ),
-        ),
-      );
-      return;
-    }
+    // if (kDebugMode) {
+    //   final locale = Localizations.localeOf(context);
+    //   _recieptDataNotifier.value = UiResult.success(
+    //     data: ReceiptDataModel.fromWalletReceiptData(
+    //       locale.languageCode.orEmpty.ifEmpty('th'),
+    //       WalletReceiptData(
+    //         amount: '100',
+    //         dateTime: DateTime.now(),
+    //         paymentRef: topupResponse?.paymentRef,
+    //         gateway: 'promptpay',
+    //         receiptNo: 'RCPT202506101430',
+    //         transactionId: 'TXN123456789',
+    //         bonus: '100',
+    //         qrImage:
+    //             // 'https://dev.abgroup.co.th/storage/qrcodes/019ccd2e-6c2d-7043-b53a-1a0eb16bf59a.png',
+    //             'customer_id:019ccd2e-6c2d-7043-b53a-1a0eb16bf59a',
+    //       ),
+    //     ),
+    //   );
+    //   return;
+    // }
 
     // ======= real =======
     if (!_recieptDataNotifier.value.isLoading) {

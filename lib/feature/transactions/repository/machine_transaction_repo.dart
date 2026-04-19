@@ -51,10 +51,10 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
     String machineId,
   ) async {
     try {
-      //       if (kDebugMode) {
-      //         return RepoResult.success(
-      //           data: MachineDetailResponse.fromJson(
-      //             jsonDecode('''
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: MachineDetailResponse.fromJson(
+      //       jsonDecode('''
       //       {
       //     "id": 626,
       //     "store_name": {
@@ -89,9 +89,9 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
       //     }
       // }
       //       '''),
-      //           ),
-      //         );
-      //       }
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.fetchMachineDetail(machineId);
       if (!response.isSuccessful) {
         return RepoResult.empty();
