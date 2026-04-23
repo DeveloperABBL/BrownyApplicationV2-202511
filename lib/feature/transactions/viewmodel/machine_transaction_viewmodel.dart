@@ -5,11 +5,10 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     required super.context,
     required super.couponRepo,
     required super.transactionRepo,
-    required this.machineRepo,
+    required super.machineRepo,
   });
 
   // ========== Repo ==========
-  final MachineTransactionDataSourceMixin machineRepo;
 
   // ========== Dispose ==========
   @override
@@ -216,7 +215,12 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   Future<void> fetchMachinePrograms(
     String machineId,
   ) async {
-    _machineProgramsNotifier.value = UiResult.loading();
+    final currentProgram = _machineProgramsNotifier.value.data;
+    if (currentProgram == null) {
+      _machineProgramsNotifier.value = UiResult.loading();
+    }
+
+    if (!context.mounted) return;
 
     final result = await machineRepo.fetchMachinePrograms(
       machineId,
@@ -232,9 +236,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       _machineProgramsNotifier.value = UiResult.empty();
       return;
     }
+    if (!context.mounted) return;
 
     _machineProgramsNotifier.value = UiResult.success(
-      data: MachineProgramModel.fromResponse(result.data),
+      data: MachineProgramModel.fromResponse(result.data).copyWith(
+        selectedProgram: currentProgram?.selectedProgram,
+        selectedAddTime: currentProgram?.selectedAddTime,
+        selectedCoupon: currentProgram?.selectedCoupon,
+      ),
     );
     if (context.mounted) {
       await fetchPaymentMethod(context);

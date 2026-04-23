@@ -6,7 +6,9 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/scaner/viewmodel/scanner_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
+import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 
@@ -21,30 +23,28 @@ class CouponVoucherPage extends StatelessWidget {
   const CouponVoucherPage({
     super.key,
     required this.state,
-    this.customerCouponAvailables,
     this.autoCollectQRData,
-    this.selectedCustomerCouponId,
+    this.machineProgram,
   });
 
   static final pagePath = '/coupon_voucher';
   static final pageName = 'CouponVoucherPage';
   final CouponVoucherState state;
-  final List<int>? customerCouponAvailables;
 
   /// QR data สำหรับ auto-collect เมื่อ scan จากหน้า Home
   final String? autoCollectQRData;
 
-  /// customer_coupon_id ที่เคยเลือกไว้ก่อนหน้า
-  /// ใช้สำหรับ restore การแสดง selected state เมื่อ user กลับมาที่หน้านี้อีกครั้ง
-  final int? selectedCustomerCouponId;
+  /// MachineProgramModel จาก MachineTransactionPage
+  /// ใช้สำหรับ derive availableCoupons filter, selectedCoupon
+  /// และ re-fetch หลัง collectCoupon สำเร็จ
+  final MachineProgramModel? machineProgram;
 
   /// util function route to pageName
   static Future<T?> goToPage<T>(
     BuildContext context, {
     CouponVoucherState state = CouponVoucherState.purshasing,
-    List<int>? customerCouponAvailables,
     String? autoCollectQRData,
-    int? selectedCustomerCouponId,
+    MachineProgramModel? machineUsing,
   }) async {
     if (context.read<CustomerProvider>().current.isGuest) {
       return await AuthenticationPage.goToPage(
@@ -54,12 +54,7 @@ class CouponVoucherPage extends StatelessWidget {
     }
     return await context.pushNamed(
       CouponVoucherPage.pageName,
-      extra: [
-        state,
-        customerCouponAvailables,
-        autoCollectQRData,
-        selectedCustomerCouponId,
-      ],
+      extra: [state, autoCollectQRData, machineUsing],
     );
   }
 
@@ -70,12 +65,12 @@ class CouponVoucherPage extends StatelessWidget {
         context: context,
         couponRepo: CouponVoucherRepo(),
         transactionRepo: TransactionRepo(),
+        machineRepo: MachineRepo(),
       ),
       child: _CouponVoucherWidget(
         state: state,
-        customerCouponAvailables: customerCouponAvailables,
         autoCollectQRData: autoCollectQRData,
-        selectedCustomerCouponId: selectedCustomerCouponId,
+        machineProgram: machineProgram,
       ),
     );
   }
@@ -84,15 +79,13 @@ class CouponVoucherPage extends StatelessWidget {
 class _CouponVoucherWidget extends StatefulWidget {
   const _CouponVoucherWidget({
     required this.state,
-    this.customerCouponAvailables,
     this.autoCollectQRData,
-    this.selectedCustomerCouponId,
+    this.machineProgram,
   });
 
   final CouponVoucherState state;
-  final List<int>? customerCouponAvailables;
   final String? autoCollectQRData;
-  final int? selectedCustomerCouponId;
+  final MachineProgramModel? machineProgram;
 
   @override
   State<_CouponVoucherWidget> createState() => _CouponVoucherWidgetState();
@@ -124,11 +117,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     super.initState();
     _viewmodel = context.read();
     _viewmodel.attachContext(context);
-    // assign เก็บไว้สำหรับ fileter coupon ที่สามารถเลือกกดได้
-    // จะเป็นการมาจากหน้า MachineTransactionProgram
-    _viewmodel.customerCouponAvailablesFilter = widget.customerCouponAvailables;
-    // restore coupon ที่เคยเลือกไว้ก่อนหน้า เพื่อให้แสดง selected state ถูกต้อง
-    _viewmodel.preSelectedCustomerCouponId = widget.selectedCustomerCouponId;
+    _viewmodel.machineProgram = widget.machineProgram;
     // เก็บ State ปัจจุบันที่เปิดหน้า coupon
     _viewmodel.couponState = widget.state;
     _tabController = TabController(
@@ -857,9 +846,9 @@ class _CustomerWashDryCouponWidgetState
 
             final discountMap = discountResult.data ?? {};
 
-            if (discountMap.isEmpty) {
-              return _buildNotFoundData(context);
-            }
+            // if (discountMap.isEmpty) {
+            //   return _buildNotFoundData(context);
+            // }
 
             // Build sections for washer, dryer, and both
             final sections = <Widget>[];
@@ -1043,7 +1032,7 @@ class _CustomerWashDryCouponWidgetState
       child: CouponEVoucherCardWidget(
         initialChecked:
             customerDiscount.customerCouponId ==
-            widget._viewModel.preSelectedCustomerCouponId,
+            widget._viewModel.machineProgram?.selectedCoupon?.id,
         icon: Image.network(
           customerDiscount.imageUrlDisplay(context),
           errorBuilder: (_, _, _) => _onImageError(),
@@ -1480,7 +1469,7 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
       child: CouponEVoucherCardWidget(
         initialChecked:
             customerEVoucher.customerCouponId ==
-            widget._viewModel.preSelectedCustomerCouponId,
+            widget._viewModel.machineProgram?.selectedCoupon?.id,
         icon: Image.network(
           customerEVoucher.imageUrlDisplay(context),
           errorBuilder: (_, _, _) => _onImageError(),

@@ -349,6 +349,7 @@ class __MachineContentState extends State<_MachineContent> {
                 CouponVoucherPage.goToPage(
                   context,
                   state: CouponVoucherState.using,
+                  machineUsing: _machineProgram,
                 );
               },
               child: Row(

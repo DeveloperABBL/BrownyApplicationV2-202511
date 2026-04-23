@@ -106,9 +106,9 @@ PODS:
   - flutter_facebook_auth (7.1.5):
     - FBSDKLoginKit (= 18.0.2)
     - Flutter
-  - flutter_line_sdk (2.7.0):
+  - flutter_line_sdk (2.7.2):
     - Flutter
-    - LineSDKSwift (~> 5.13)
+    - LineSDKSwift (~> 5.16)
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_native_splash (2.4.3):
@@ -176,9 +176,9 @@ PODS:
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
-  - LineSDKSwift (5.14.0):
-    - LineSDKSwift/Core (= 5.14.0)
-  - LineSDKSwift/Core (5.14.0)
+  - LineSDKSwift (5.16.0):
+    - LineSDKSwift/Core (= 5.16.0)
+  - LineSDKSwift/Core (5.16.0)
   - live_activities (0.0.1):
     - Flutter
   - local_auth_darwin (0.0.1):
@@ -381,7 +381,7 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_app_group_directory: 55b5362007d1c0cb45dc1dd1e94f67d615f45a6b
   flutter_facebook_auth: fa3b69b1df0831d2178fe87a05ee2d7d0156db70
-  flutter_line_sdk: 04eef5c68b14dc268672534385fab57fea7baf55
+  flutter_line_sdk: b79e73a268c35420f28e05d4f059a797964eb707
   flutter_local_notifications: 643a3eda1ce1c0599413ca31672536d423dee214
   flutter_native_splash: c32d145d68aeda5502d5f543ee38c192065986cf
   flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
@@ -397,7 +397,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   image_gallery_saver_plus: e597bf65a7846979417a3eae0763b71b6dfec6c3
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
-  LineSDKSwift: 43296c380d01d22cbe58b012a1e0f27597fb205f
+  LineSDKSwift: ebb8d713640ff33e7353d3c82e129cddfc8f527c
   live_activities: 4dfa736d0736e1c77866a2f9c056a76513cc9e7b
   local_auth_darwin: c3ee6cce0a8d56be34c8ccb66ba31f7f180aaebb
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
@@ -416,6 +416,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d
 
-PODFILE CHECKSUM: 08164584798bfdf929c374ec93f6e92a5e475b98
+PODFILE CHECKSUM: fb87eabd27bcbc810baf15fc6ac4fb9e11648468
 
 COCOAPODS: 1.16.2

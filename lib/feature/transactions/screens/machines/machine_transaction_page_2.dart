@@ -871,16 +871,20 @@ class __MachineContentState extends State<_MachineContent>
     CouponVoucherPage.goToPage(
       context,
       state: CouponVoucherState.using,
-      // filter เฉพาะที่ร่วมรายการ
-      // customerCouponAvailables: _machineProgram!.availableCoupons.orEmpty
-      //     .map((e) => e.id!)
-      //     .toList(),
-      // ส่ง couponid ที่เคยเลือกเอาไว้ไปด้วย
-      selectedCustomerCouponId: _machineProgram!.selectedCoupon?.id,
+      // ส่ง machineProgram เพื่อให้ CouponVoucherPage derive availableCoupons
+      // และ selectedCoupon จาก model โดยตรง รวมถึง re-fetch หลัง collectCoupon
+      machineUsing: _machineProgram!,
     ).then((result) async {
       if (!mounted) return;
       // ถ้า result เป็น bool แสดงว่ามาจากการกดกลับเฉยๆ ไม่ต้องทำอะไร
-      if (result != null && result is bool) return;
+      if (result != null && result is bool) {
+        AppOverlays.showLoading(context);
+        // ถ้ากดกลับมาเฉยๆ จะ fetch program ใหม่ด้วย เผื่อกรณีมีการรับ Coupon แต่ไม่เลือกใช้
+        // ถ้าไม่ fetch ใหม่ availableCoupons จะไม่ถูกอัพเดทในหน้านี้
+        await _viewmodel.fetchMachinePrograms(_viewmodel.machineId);
+        AppOverlays.hideLoading();
+        return;
+      }
 
       try {
         final customerCouponModelSelected = result as CustomerCouponModel;

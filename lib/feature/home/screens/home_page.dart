@@ -307,8 +307,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
                       onTap: () async {
                         if (kDebugMode) {
                           final data = Uri.parse(
-                            // 'http://brownypay.com/wash/dry/82',
-                            'http://brownypay.com/wash/dry/2',
+                            'http://brownypay.com/wash/dry/82',
+                            // 'http://brownypay.com/wash/dry/1379',
                           );
                           if (data.pathSegments.isNotEmpty) {
                             await MachineTransactionPage2.goToPage(

@@ -38,12 +38,15 @@ class TransactionsViewmodel extends AppViewModel
     required super.context,
     required CouponVoucherDataSourceMixin couponRepo,
     required TransactionDataSourceMixin transactionRepo,
+    required this.machineRepo,
   }) : _couponRepo = couponRepo,
        _transactionRepo = transactionRepo;
 
   // ========== Repository ==========
   final CouponVoucherDataSourceMixin _couponRepo;
   final TransactionDataSourceMixin _transactionRepo;
+  final MachineTransactionDataSourceMixin machineRepo;
+
   @override
   CouponVoucherDataSourceMixin get repoDelegate => _couponRepo;
 
@@ -104,14 +107,12 @@ class TransactionsViewmodel extends AppViewModel
   CouponVoucherState? couponState;
   CustomerCouponModel? customerCouponModelSelected;
 
-  /// DONG 2026-02-23
-  ///
-  /// เก็บ List customer_coupon_id ไว้สำหรับ filter แสดง
-  List<int>? customerCouponAvailablesFilter;
-
-  /// customer_coupon_id ที่เคยเลือกไว้ก่อนเข้าหน้า coupon
-  /// ใช้สำหรับ restore การแสดง selected state เมื่อ user กลับมาที่หน้า coupon อีกครั้ง
-  int? preSelectedCustomerCouponId;
+  /// MachineProgramModel จาก MachineTransactionPage
+  /// เป็น single source of truth สำหรับ:
+  /// - filter coupon ที่ร่วมรายการ (availableCoupons)
+  /// - restore selected state (selectedCoupon)
+  /// - re-fetch หลัง collectCoupon สำเร็จ
+  MachineProgramModel? machineProgram;
 
   /// เก็บประเภทชำระที่เลือก
   PaymentMethodModel? _paymentSelected;
@@ -484,35 +485,32 @@ class TransactionsViewmodel extends AppViewModel
       return;
     }
 
+    final availableIds = machineProgram?.availableCoupons;
+    final selectedId = machineProgram?.selectedCoupon?.id;
+
     // Filter และ map เป็น CustomerCouponModel ก่อน
     final filteredCoupons = result.data.data!
-        // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
-        // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
         .where(
-          (e) =>
-              customerCouponAvailablesFilter?.contains(e.customerCouponId) ??
-              true,
+          (e) => availableIds?.isNotEmpty == true
+              ? availableIds!.any((a) => a.id == e.customerCouponId)
+              // ถ้ามาจากหน้าใช้งานเครื่อง และ availableIds ว่าง จะต้องไม่แสดง
+              : (isUsing ? false : true),
         )
         .map(
           (e) => CustomerCouponModel.fromCouponData(
             e,
-            // ถ้ามีการเลือกไว้ในรอบนี้แล้ว ให้ตรวจสอบจาก customerCouponModelSelected ก่อน
-            // ถ้ายังไม่มี ให้ตรวจสอบจาก preSelectedCustomerCouponId (coupon ที่เคยเลือกไว้ก่อนหน้า)
             customerCouponModelSelected != null
                 ? customerCouponModelSelected!.customerCouponId ==
                       e.customerCouponId
-                : preSelectedCustomerCouponId != null &&
-                      preSelectedCustomerCouponId == e.customerCouponId,
+                : selectedId != null && selectedId == e.customerCouponId,
           ),
         )
         .toList();
 
-    // Restore customerCouponModelSelected จาก preSelectedCustomerCouponId
-    // เพื่อให้เมื่อ user กด back โดยไม่เลือกใหม่ ยังคืนค่าที่เคยเลือกไว้ได้ถูกต้อง
-    if (customerCouponModelSelected == null &&
-        preSelectedCustomerCouponId != null) {
+    // Restore customerCouponModelSelected จาก machineProgram.selectedCoupon
+    if (customerCouponModelSelected == null && selectedId != null) {
       final matched = filteredCoupons.where(
-        (e) => e.customerCouponId == preSelectedCustomerCouponId,
+        (e) => e.customerCouponId == selectedId,
       );
       if (matched.isNotEmpty) {
         customerCouponModelSelected = matched.first;
@@ -580,35 +578,32 @@ class TransactionsViewmodel extends AppViewModel
       return;
     }
 
+    final availableIds = machineProgram?.availableCoupons;
+    final selectedId = machineProgram?.selectedCoupon?.id;
+
     // Filter และ map เป็น CustomerCouponModel ก่อน
     final filteredCoupons = result.data.data!
-        // ถ้ามีการ assign customerCouponAvailablesFilter เข้ามา
-        // จะต้อง filter เอาเฉพาะที่ available มาแสดงเท่านั้น
         .where(
-          (e) => customerCouponAvailablesFilter.orEmpty.isEmpty
-              ? true
-              : customerCouponAvailablesFilter!.contains(e.customerCouponId),
+          (e) => availableIds?.isNotEmpty == true
+              ? availableIds!.any((a) => a.id == e.customerCouponId)
+              // ถ้ามาจากหน้าใช้งานเครื่อง และ availableIds ว่าง จะต้องไม่แสดง
+              : (isUsing ? false : true),
         )
         .map(
           (e) => CustomerCouponModel.fromCouponData(
             e,
-            // ถ้ามีการเลือกไว้ในรอบนี้แล้ว ให้ตรวจสอบจาก customerCouponModelSelected ก่อน
-            // ถ้ายังไม่มี ให้ตรวจสอบจาก preSelectedCustomerCouponId (coupon ที่เคยเลือกไว้ก่อนหน้า)
             customerCouponModelSelected != null
                 ? customerCouponModelSelected!.customerCouponId ==
                       e.customerCouponId
-                : preSelectedCustomerCouponId != null &&
-                      preSelectedCustomerCouponId == e.customerCouponId,
+                : selectedId != null && selectedId == e.customerCouponId,
           ),
         )
         .toList();
 
-    // Restore customerCouponModelSelected จาก preSelectedCustomerCouponId
-    // เพื่อให้เมื่อ user กด back โดยไม่เลือกใหม่ ยังคืนค่าที่เคยเลือกไว้ได้ถูกต้อง
-    if (customerCouponModelSelected == null &&
-        preSelectedCustomerCouponId != null) {
+    // Restore customerCouponModelSelected จาก machineProgram.selectedCoupon
+    if (customerCouponModelSelected == null && selectedId != null) {
       final matched = filteredCoupons.where(
-        (e) => e.customerCouponId == preSelectedCustomerCouponId,
+        (e) => e.customerCouponId == selectedId,
       );
       if (matched.isNotEmpty) {
         customerCouponModelSelected = matched.first;
@@ -851,6 +846,8 @@ class TransactionsViewmodel extends AppViewModel
           result.data.data!,
         );
 
+        // refresh machine program ด้วย ถ้ามาจากหน้าการใช้งานเครื่อง
+        await refreshMachineProgram();
         // รีเฟรชรายการคูปองหลังจากรับสำเร็จ
         await fetchCustomerEVoucher();
         await fetchCustomerDiscount();
@@ -1003,9 +1000,9 @@ class TransactionsViewmodel extends AppViewModel
     }
 
     try {
-      // fetch coupon ที่เพิ่ม collect ได้เก็บเอาไว้ด้วย
       if (isUsing && result.data.couponCustomer != null) {
-        customerCouponAvailablesFilter?.add(result.data.couponCustomer!.id);
+        // refresh machine program ด้วย ถ้ามาจากหน้าการใช้งานเครื่อง
+        await refreshMachineProgram();
       }
     } catch (_) {}
 
@@ -1040,5 +1037,22 @@ class TransactionsViewmodel extends AppViewModel
 
   void onInputCouponChange(String value) {
     _inputCollectCouponNotifier.value = value.isNotEmpty;
+  }
+
+  Future<void> refreshMachineProgram() async {
+    if (machineProgram != null) {
+      // re-fetch machine programs เพื่ออัพเดท availableCoupons ให้ตรงกับสถานะล่าสุด
+      // หลังจาก collect coupon หรือ ซื้อ E-Vocher สำเร็จ
+      // coupon, E-Vocher ใหม่อาจถูกเพิ่มใน availableCoupons
+      final refreshResult = await machineRepo.fetchMachinePrograms(
+        machineProgram!.machineId.toString(),
+        currentCustomerProvider.current.id.orEmpty,
+      );
+      if (refreshResult.isSuccess) {
+        machineProgram = MachineProgramModel.fromResponse(
+          refreshResult.data,
+        );
+      }
+    }
   }
 }

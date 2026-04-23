@@ -44,6 +44,7 @@ import 'package:browny_applications_new/feature/transactions/viewmodel/transacti
 import 'package:browny_applications_new/feature/wallet/screen/payment_sucess_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/show_qr_promptpay_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
+import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/wallet/viewmodel/wallet_viewmodel.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -232,27 +233,24 @@ class AppRouter {
         name: CouponVoucherPage.pageName,
         builder: (context, state) {
           CouponVoucherState couponState = CouponVoucherState.purshasing;
-          List<int>? customerCouponAvailables;
           String? autoCollectQRData;
-          int? selectedCustomerCouponId;
+          MachineProgramModel? machineProgram;
           try {
             List<Object?> list = state.extra as List<Object?>;
             couponState = list[0] as CouponVoucherState;
-            customerCouponAvailables = list[1] as List<int>?;
-            if (list.length > 2) {
-              autoCollectQRData = list[2] as String?;
+            if (list.length > 1) {
+              autoCollectQRData = list[1] as String?;
             }
-            if (list.length > 3) {
-              selectedCustomerCouponId = list[3] as int?;
+            if (list.length > 2) {
+              machineProgram = list[2] as MachineProgramModel?;
             }
           } catch (_) {
             rethrow;
           }
           return CouponVoucherPage(
             state: couponState,
-            customerCouponAvailables: customerCouponAvailables,
             autoCollectQRData: autoCollectQRData,
-            selectedCustomerCouponId: selectedCustomerCouponId,
+            machineProgram: machineProgram,
           );
         },
       ),

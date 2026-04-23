@@ -1,4 +1,9 @@
 # CHANGELOG
+### DONG 2026-04-23
+* ปรับปรุงการทำงานหน้าแสดง Coupon, E-Voucher จากการใช้งานเครื่อง
+* Change prd token to v3.0.2
+* bump LINE SDK version v2.7.2
+
 ### DONG 2026-04-19
 * แก้ไข ลืมรหัส ระบบไม่ focus Field PIN ทำให้เก็บค่าผิด
 * เพิ่มการแสดง Field Bonus Browny coin จากการชำระใช้งานเครื่อง

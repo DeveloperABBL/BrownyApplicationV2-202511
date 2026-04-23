@@ -13,6 +13,9 @@ class DateTimeConverter implements JsonConverter<DateTime?, String?> {
     }
 
     try {
+      if (json.contains('+')) {
+        return DateTime.parse(json.split('+')[0]);
+      }
       return DateTime.parse(json);
     } catch (_) {
       // ถ้า parse ไม่ได้ ให้ลอง parse ด้วย format ข้างล่างต่อก่อน
