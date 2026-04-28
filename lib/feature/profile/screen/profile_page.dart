@@ -151,10 +151,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 return SizedBox();
               }
               if (profile.hasError) {
-                AppOverlays.showBrownyDialog(
+                AppOverlays.showBrownyErrorDialog(
                   context,
                   title: context.wording.somethingWrong,
-                  message: profile.error.toString(),
+                  error: profile.error,
                   onConfirm: () {
                     context.pop();
                   },
@@ -409,10 +409,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         },
                       );
                     } else if (result.isError) {
-                      await AppOverlays.showBrownyDialog(
+                      await AppOverlays.showBrownyErrorDialog(
                         context,
                         title: context.wording.somethingWrong,
-                        message: result.error.toString(),
+                        error: result.error,
                         imageAsset: Assets.png.brownyError1.path,
                       );
                     }

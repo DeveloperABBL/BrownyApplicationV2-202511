@@ -518,6 +518,11 @@
     }
   },
   "forceUpdateButton": "立即更新",
+  "pinRequiredTitle": "请设置 PIN 码",
+  "pinRequiredMessage": "您必须先设置 PIN 码，才能启用生物识别认证。",
+  "pinRequiredConfirm": "去设置 PIN",
+  "biometricNotAvailableTitle": "不支持生物识别",
+  "biometricNotAvailableMessage": "您的设备不支持生物识别认证。",
   "couponMinimumAmountRequired": "订单最低金额须达 {minAmount}。",
   "@couponMinimumAmountRequired": {
     "placeholders": {

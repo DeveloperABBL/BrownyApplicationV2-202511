@@ -200,7 +200,17 @@ class _MapContentState extends State<MapContent> {
     AppOverlays.hideLoading();
     if (!mounted) return;
 
-    if (storeResult.isEmpty || storeResult.hasError) {
+    if (storeResult.hasError) {
+      AppOverlays.showBrownyErrorDialog(
+        context,
+        // ไม่พบข้อมูล,
+        title: context.wording.dataNotFound,
+        error: storeResult.error,
+      );
+      return;
+    }
+
+    if (storeResult.isEmpty) {
       AppOverlays.showBrownyDialog(
         context,
         // ไม่พบข้อมูล,

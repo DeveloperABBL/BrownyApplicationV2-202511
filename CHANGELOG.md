@@ -1,4 +1,10 @@
 # CHANGELOG
+### DONG 2026-04-27
+* change token dev to v3.0.3
+* ปรับปรุง Wording Alert กรณีเกิด Exception ที่ไม่ได้ถูก Handle ไว้ ให้รองรับ Localize ครบทุกภาษา
+* ปรับ Sizing Banner เพราะมีปัญหา Content ใน Banner แสดงไม่ครบ (รอ Review)
+* แก้ไขให้ปุ่ม บริการ สามารถกดเพื่อเปิดกล้องได้
+
 ### DONG 2026-04-23
 * ปรับปรุงการทำงานหน้าแสดง Coupon, E-Voucher จากการใช้งานเครื่อง
 * Change prd token to v3.0.2

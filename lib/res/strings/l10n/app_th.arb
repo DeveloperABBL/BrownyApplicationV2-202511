@@ -520,6 +520,11 @@
     }
   },
   "forceUpdateButton": "อัปเดตเดี๋ยวนี้",
+  "pinRequiredTitle": "กรุณาตั้งค่า PIN",
+  "pinRequiredMessage": "คุณต้องตั้งค่ารหัส PIN ก่อนจึงจะสามารถเปิดใช้งาน Biometric ได้",
+  "pinRequiredConfirm": "ไปตั้งค่า PIN",
+  "biometricNotAvailableTitle": "ไม่รองรับ Biometric",
+  "biometricNotAvailableMessage": "อุปกรณ์ของคุณไม่รองรับการยืนยันตัวตนด้วย Biometric",
   "couponMinimumAmountRequired": "ต้องมียอดรวมขั้นต่ำ {minAmount}",
   "@couponMinimumAmountRequired": {
     "placeholders": {

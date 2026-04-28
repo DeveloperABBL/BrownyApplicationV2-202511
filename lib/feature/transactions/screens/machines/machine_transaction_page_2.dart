@@ -480,9 +480,9 @@ class __MachineContentState extends State<_MachineContent>
             return;
           }
 
-          AppOverlays.showBrownyDialog(
+          AppOverlays.showBrownyErrorDialog(
             context,
-            message: orderResult.error.toString(),
+            error: orderResult.error,
           );
           return;
         }

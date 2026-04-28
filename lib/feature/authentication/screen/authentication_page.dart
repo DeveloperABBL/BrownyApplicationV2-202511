@@ -681,14 +681,14 @@ class _SignUpWidget extends StatelessWidget {
   /// - ถ้าไม่ใช่ → แสดงข้อความ error ทั่วไป
   void _showErrorDialog(BuildContext context, dynamic error) {
     AppOverlays.hideLoading();
-    final message = error is AuthenExceptions
-        ? error.toUiMessage(context)
-        : context.wording.errorUi;
+    // final message = error is AuthenExceptions
+    //     ? error.toUiMessage(context)
+    //     : context.wording.errorUi;
 
-    AppOverlays.showBrownyDialog(
+    AppOverlays.showBrownyErrorDialog(
       context,
       title: context.wording.somethingWrong,
-      message: message,
+      error: error,
       confirmText: context.wording.tryAgain,
     );
   }
@@ -1476,11 +1476,12 @@ class _ReferralWidget extends _SignUpWidget {
                         if (context.mounted && result.isSuccess) {
                           FocusManager.instance.primaryFocus?.unfocus();
                           if (result.hasError) {
-                            AppOverlays.showBrownyDialog(
-                              context,
-                              title: context.wording.errorOccurred,
-                              message: result.error.toString(),
-                            );
+                            // AppOverlays.showBrownyDialog(
+                            //   context,
+                            //   title: context.wording.errorOccurred,
+                            //   message: result.error.toString(),
+                            // );
+                            _showErrorDialog(context, result.error);
                             return;
                           }
 
@@ -1518,11 +1519,12 @@ class _ReferralWidget extends _SignUpWidget {
                           // );
                         } else {
                           if (context.mounted) {
-                            AppOverlays.showBrownyDialog(
-                              context,
-                              title: context.wording.errorOccurred,
-                              message: result.error.toString(),
-                            );
+                            // AppOverlays.showBrownyDialog(
+                            //   context,
+                            //   title: context.wording.errorOccurred,
+                            //   message: result.error.toString(),
+                            // );
+                            _showErrorDialog(context, result.error);
                           }
                         }
                       }

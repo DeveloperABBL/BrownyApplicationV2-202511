@@ -781,10 +781,10 @@ class _LuckyScanContentState extends State<LuckyScanContent>
         return;
       }
 
-      AppOverlays.showBrownyDialog(
+      AppOverlays.showBrownyErrorDialog(
         context,
         title: context.wording.errorOccurred,
-        message: result.error.toString(),
+        error: result.error,
       );
       return;
     }

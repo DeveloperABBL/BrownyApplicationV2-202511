@@ -1569,6 +1569,23 @@ class AppLocalizationsTh extends AppLocalizations {
   String get forceUpdateButton => 'อัปเดตเดี๋ยวนี้';
 
   @override
+  String get pinRequiredTitle => 'กรุณาตั้งค่า PIN';
+
+  @override
+  String get pinRequiredMessage =>
+      'คุณต้องตั้งค่ารหัส PIN ก่อนจึงจะสามารถเปิดใช้งาน Biometric ได้';
+
+  @override
+  String get pinRequiredConfirm => 'ไปตั้งค่า PIN';
+
+  @override
+  String get biometricNotAvailableTitle => 'ไม่รองรับ Biometric';
+
+  @override
+  String get biometricNotAvailableMessage =>
+      'อุปกรณ์ของคุณไม่รองรับการยืนยันตัวตนด้วย Biometric';
+
+  @override
   String couponMinimumAmountRequired(String minAmount) {
     return 'ต้องมียอดรวมขั้นต่ำ $minAmount';
   }

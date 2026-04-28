@@ -290,10 +290,10 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
 
       if (context.mounted && result.hasError) {
         // แสดง error แต่ไม่ต้อง update UI (เก็บค่าเดิมไว้)
-        AppOverlays.showBrownyDialog(
+        AppOverlays.showBrownyErrorDialog(
           context,
           title: context.wording.errorOccurred,
-          message: context.wording.errorUi,
+          error: result.error,
         );
         return;
       }
@@ -379,10 +379,10 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
 
           if (!context.mounted) return;
           if (result.hasError) {
-            AppOverlays.showBrownyDialog(
+            AppOverlays.showBrownyErrorDialog(
               context,
               title: context.wording.errorOccurred,
-              message: result.error.toString(),
+              error: result.error,
             );
             return;
           }
@@ -448,9 +448,12 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
 
     await AppOverlays.showBrownyDialog(
       context,
-      title: 'กรุณาตั้งค่า PIN',
-      message: 'คุณต้องตั้งค่ารหัส PIN ก่อนจึงจะสามารถเปิดใช้งาน Biometric ได้',
-      confirmText: 'ไปตั้งค่า PIN',
+      // กรุณาตั้งค่า PIN
+      title: context.wording.pinRequiredTitle,
+      // คุณต้องตั้งค่ารหัส PIN ก่อนจึงจะสามารถเปิดใช้งาน Biometric ได้
+      message: context.wording.pinRequiredMessage,
+      // ไปตั้งค่า PIN
+      confirmText: context.wording.pinRequiredConfirm,
       onConfirm: () async {
         if (context.mounted) {
           await CreateAppPinPage.goToPage(
@@ -477,8 +480,10 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
 
     await AppOverlays.showBrownyDialog(
       context,
-      title: 'ไม่รองรับ Biometric',
-      message: 'อุปกรณ์ของคุณไม่รองรับการยืนยันตัวตนด้วย Biometric',
+      // ไม่รองรับ Biometric
+      title: context.wording.biometricNotAvailableTitle,
+      // อุปกรณ์ของคุณไม่รองรับการยืนยันตัวตนด้วย Biometric
+      message: context.wording.biometricNotAvailableMessage,
       confirmText: context.wording.confirm,
       onConfirm: () {
         // User acknowledged

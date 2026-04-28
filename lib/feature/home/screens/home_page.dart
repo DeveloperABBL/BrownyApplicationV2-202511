@@ -302,71 +302,76 @@ class _HomePageWidgetState extends State<HomePageWidget>
                         ),
                       ),
                     ),
-                    // TODO ต้องเอาออก
-                    GestureDetector(
-                      onTap: () async {
-                        if (kDebugMode) {
-                          final data = Uri.parse(
-                            'http://brownypay.com/wash/dry/82',
-                            // 'http://brownypay.com/wash/dry/1379',
-                          );
-                          if (data.pathSegments.isNotEmpty) {
-                            await MachineTransactionPage2.goToPage(
-                              context,
-                              machineId: data.pathSegments.last,
-                            );
-                            // if (mounted) {
-                            //   await _viewmodel.fetchWorkingMachines();
-                            // }
+                    SizedBox(
+                      height: AppDims.size_106.h,
+                      child: Builder(
+                        builder: (context) {
+                          List<AssetGenImage> services = [];
+                          switch (context.languageCode) {
+                            case 'zh':
+                              {
+                                services.addAll([
+                                  Assets.services.aWasherZh,
+                                  Assets.services.bDryerZh,
+                                ]);
+                                break;
+                              }
+                            case 'en':
+                              {
+                                services.addAll([
+                                  Assets.services.aWasherEn,
+                                  Assets.services.bDryerEn,
+                                ]);
+                                break;
+                              }
+                            default:
+                              {
+                                services.addAll([
+                                  Assets.services.aWasher,
+                                  Assets.services.bDryer,
+                                ]);
+                                break;
+                              }
                           }
+                          return ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) => GestureDetector(
+                              onTap: () async {
+                                if (kDebugMode) {
+                                  final data = Uri.parse(
+                                    'http://brownypay.com/wash/dry/82',
+                                    // 'http://brownypay.com/wash/dry/1379',
+                                  );
+                                  if (data.pathSegments.isNotEmpty) {
+                                    await MachineTransactionPage2.goToPage(
+                                      context,
+                                      machineId: data.pathSegments.last,
+                                    );
+                                    // if (mounted) {
+                                    //   await _viewmodel.fetchWorkingMachines();
+                                    // }
+                                  }
 
-                          // MachineStatusPage.goToPage(context, machineId: '13');
-                        }
-                      },
-                      child: SizedBox(
-                        height: AppDims.size_106.h,
-                        child: Builder(
-                          builder: (context) {
-                            List<AssetGenImage> services = [];
-                            switch (context.languageCode) {
-                              case 'zh':
-                                {
-                                  services.addAll([
-                                    Assets.services.aWasherZh,
-                                    Assets.services.bDryerZh,
-                                  ]);
-                                  break;
+                                  // MachineStatusPage.goToPage(context, machineId: '13');
+                                  return;
                                 }
-                              case 'en':
-                                {
-                                  services.addAll([
-                                    Assets.services.aWasherEn,
-                                    Assets.services.bDryerEn,
-                                  ]);
-                                  break;
-                                }
-                              default:
-                                {
-                                  services.addAll([
-                                    Assets.services.aWasher,
-                                    Assets.services.bDryer,
-                                  ]);
-                                  break;
-                                }
-                            }
-                            return ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) =>
-                                  services[index].image(
-                                    width: AppDims.size_109.w,
-                                    height: AppDims.size_106.h,
-                                  ),
-                              separatorBuilder: (context, index) =>
-                                  AppDims.horizonPadding_8,
-                              itemCount: 2,
-                            );
-                          },
-                        ),
+
+                                // Default ไปหน้า Scan
+                                await ScannerPage.goToPage(
+                                  context,
+                                  initialIndex: 0,
+                                );
+                              },
+                              child: services[index].image(
+                                width: AppDims.size_109.w,
+                                height: AppDims.size_106.h,
+                              ),
+                            ),
+                            separatorBuilder: (context, index) =>
+                                AppDims.horizonPadding_8,
+                            itemCount: 2,
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -843,7 +848,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       floating: false,
       surfaceTintColor: AppColors.transparent,
       stretch: true,
-      expandedHeight: 200.h,
+      expandedHeight: (MediaQuery.of(context).size.width < 600) ? 150.h : 200.h,
       elevation: 0.0,
       flexibleSpace: FlexibleSpaceBar(
         // FlexibleSpaceBar: ส่วนที่ยืด-หดได้ของ AppBar=
@@ -879,7 +884,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     key: ValueKey(imageUrl),
                     cacheKey: imageUrl,
                     imageUrl: imageUrl,
-                    fit: BoxFit.cover,
+                    // fit: BoxFit.cover,
+                    fit: (MediaQuery.of(context).size.width < 600)
+                        ? BoxFit.fitWidth
+                        : BoxFit.cover,
                     // ตั้งเป็น Duration.zero เพื่อปิด fade animation
                     // แสดงรูปจาก cache ได้ทันทีโดยไม่มี delay
                     fadeInDuration: Duration.zero,

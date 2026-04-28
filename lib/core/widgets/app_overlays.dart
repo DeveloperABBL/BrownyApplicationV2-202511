@@ -1,3 +1,5 @@
+import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
 import 'package:browny_applications_new/res/icons/assets.gen.dart';
@@ -265,6 +267,45 @@ class AppOverlays {
     }
 
     return result;
+  }
+
+  static Future<bool?> showBrownyErrorDialog(
+    BuildContext context, {
+    String? title,
+    required Exception error,
+    String? confirmText,
+    String? cancelText,
+    VoidCallback? onConfirm,
+    VoidCallback? onCancel,
+    bool barrierDismissible = true,
+    Widget? image,
+    String? imageAsset,
+  }) async {
+    String message;
+    if (error is AuthenExceptions) {
+      message = error.toUiMessage(context);
+    } else {
+      message =
+          ContentLocalizeData(
+            en: 'Oops, something went wrong.\nPlease try again.',
+            zh: '哎呀，出错了。\n请稍后重试。',
+            th: 'ขออภัย เกิดข้อผิดพลาดขึ้น\nโปรดลองอีกครั้ง',
+          ).getTextByLocale(
+            context.languageCode,
+          );
+    }
+    return await showBrownyDialog(
+      context,
+      title: title,
+      message: message,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      onConfirm: onConfirm,
+      onCancel: onCancel,
+      barrierDismissible: barrierDismissible,
+      image: image,
+      imageAsset: imageAsset,
+    );
   }
 }
 

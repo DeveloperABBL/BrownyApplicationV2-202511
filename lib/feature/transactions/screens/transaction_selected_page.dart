@@ -206,6 +206,19 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
               );
               return;
             }
+
+            // เช็ค Status ว่าชำระเงินแล้ว
+            if (orderResponse.data!.isPaid) {
+              // ถ้าน้อยกว่าหรือ 0.0 บาท จะแสดง popup ไปหน้า receipt เลย
+              _paymentProcessing = false;
+              _currentOrderData = orderData;
+
+              if (!mounted) return;
+              _checkPaymentStatus();
+              AppOverlays.hideLoading();
+              return;
+            }
+
             // รอเก็บข้อมูล QRCode ที่ได้จาก payload
             String? qrData = '';
             // เช็ค flag ว่าต้องเปิด In-app QR หรือไม่
@@ -316,9 +329,9 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
             return;
           }
 
-          AppOverlays.showBrownyDialog(
+          AppOverlays.showBrownyErrorDialog(
             context,
-            message: orderResult.error.toString(),
+            error: orderResult.error,
           );
           return;
         }

@@ -73,12 +73,13 @@ class UiResult<T> {
 
   /// ตรวจสอบว่า UiResult มีข้อผิดพลาดหรือไม่
   bool get hasError => _error != null;
-  Exception get error {
-    if (_error is AuthenExceptions) {
-      return _error;
-    }
-    return Unprocessable('ขออภัย เกิดข้อผิดพลาดขึ้น\nโปรดลองอีกครั้ง');
-  }
+  // Exception get error {
+  //   if (_error is AuthenExceptions) {
+  //     return _error;
+  //   }
+  //   return Unprocessable('ขออภัย เกิดข้อผิดพลาดขึ้น\nโปรดลองอีกครั้ง');
+  // }
+  Exception get error => _error!;
 
   /// ดึง Data ไปใช้
   T? get data => _data;

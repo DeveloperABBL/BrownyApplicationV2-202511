@@ -398,10 +398,10 @@ class _LuckyMockupContentState extends State<LuckyMockupContent>
                     AppOverlays.hideLoading();
 
                     if (result.hasError) {
-                      AppOverlays.showBrownyDialog(
+                      AppOverlays.showBrownyErrorDialog(
                         context,
                         title: context.wording.errorOccurred,
-                        message: result.error.toString(),
+                        error: result.error,
                       );
                       return;
                     }

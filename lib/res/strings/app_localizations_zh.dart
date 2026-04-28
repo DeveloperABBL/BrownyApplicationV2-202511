@@ -1533,6 +1533,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get forceUpdateButton => '立即更新';
 
   @override
+  String get pinRequiredTitle => '请设置 PIN 码';
+
+  @override
+  String get pinRequiredMessage => '您必须先设置 PIN 码，才能启用生物识别认证。';
+
+  @override
+  String get pinRequiredConfirm => '去设置 PIN';
+
+  @override
+  String get biometricNotAvailableTitle => '不支持生物识别';
+
+  @override
+  String get biometricNotAvailableMessage => '您的设备不支持生物识别认证。';
+
+  @override
   String couponMinimumAmountRequired(String minAmount) {
     return '订单最低金额须达 $minAmount。';
   }

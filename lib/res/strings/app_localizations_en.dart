@@ -1578,6 +1578,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdateButton => 'Update Now';
 
   @override
+  String get pinRequiredTitle => 'Please Set Up PIN';
+
+  @override
+  String get pinRequiredMessage =>
+      'You must set up a PIN before enabling Biometric authentication.';
+
+  @override
+  String get pinRequiredConfirm => 'Set Up PIN';
+
+  @override
+  String get biometricNotAvailableTitle => 'Biometric Not Supported';
+
+  @override
+  String get biometricNotAvailableMessage =>
+      'Your device does not support Biometric authentication.';
+
+  @override
   String couponMinimumAmountRequired(String minAmount) {
     return 'Minimum order amount of $minAmount is required.';
   }

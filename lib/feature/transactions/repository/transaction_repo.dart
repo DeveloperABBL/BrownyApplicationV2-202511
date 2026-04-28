@@ -104,6 +104,39 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     CouponOrderRequest request,
   ) async {
     try {
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: CouponOrderResponse.fromJson(
+            jsonDecode('''
+{
+    "message": "สร้างคำสั่งซื้อคูปองสำเร็จ",
+    "data": {
+        "customer_id": "019b683f-9ea2-7242-82e1-6b27d2cf721d",
+        "coupon_package_id": 1,
+        "order_no": "CPO-20260119-CGYETY",
+        "quantity": 1,
+        "total_price": 0,
+        "payment_method": "tp_wallet",
+        "payment_status": "paid",
+        "payment_ref": "20260119203154",
+        "gateway_transaction_id": null,
+        "response_payload": null,
+        "responded_at": null,
+        "receipt_no": null,
+        "receipt_at": null,
+        "updated_at": "2026-01-19T13:31:54.000000Z",
+        "created_at": "2026-01-19T13:31:54.000000Z",
+        "id": 5
+    },
+    "wallet_balance": 0,
+    "redirect_url": "https://dev.abgroup.co.th/pay/coupon/20260119203154",
+    "paid": true
+}
+ '''),
+          ),
+        );
+      }
+
       final response = await requireRemote.createCouponOrder(request);
 
       if (response.isSuccessful) {
@@ -135,6 +168,19 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
     PaymentCheck paymentCheck,
   ) async {
     try {
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: PaymentStatusCheckResponse.fromJson(
+            jsonDecode('''
+{
+    "status": "paid",
+    "redirect": "https://dev.abgroup.co.th/receipt/coupon/21",
+    "order_id": 21
+}
+'''),
+          ),
+        );
+      }
       final response = await requireRemote.checkPaymentStatusByRef(
         paymentCheck,
       );

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/popup_cache_manager.dart';
 // ignore: unused_import for debug mode
@@ -260,35 +262,55 @@ class HomeRepo extends CustomerDataRepo with HomeDataSourceMixin {
     try {
       // if (kDebugMode) {
       //   return RepoResult.success(
-      //     data: WorkingMachinesResponse(
-      //       count: 2,
-      //       data: [
-      //         WorkingMachineData(
-      //           id: 13,
-      //           machineImage:
-      //               'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
-      //           finishDatatime: '16:30',
-      //           remainingTime: '00:08:00',
-      //           name: ContentLocalizeData(
-      //             th: "เครื่องซัก 1 / Test",
-      //             en: "Washer 1 / Test",
-      //             zh: "洗衣机 1 / Test",
-      //           ),
-      //         ),
-      //         WorkingMachineData(
-      //           id: 18,
-      //           machineImage:
-      //               'https://dev.abgroup.co.th/storage/galleries/rmPkyT31v3Dl7ZpdoTSyEQX4RYLlqRJAyQZ6GxL0.png',
-      //           finishDatatime: '23:30',
-      //           remainingTime: '00:20:00',
-      //           name: ContentLocalizeData(
-      //             th: "เครื่องอบ 1 - 16.00 กก.",
-      //             en: "Dryer 1 - 16.00 kg",
-      //             zh: "烘干机 1 - 16.00 公斤",
-      //           ),
-      //         ),
-      //       ],
+      //     data: WorkingMachinesResponse.fromJson(
+      //       jsonDecode('''
+      // {
+      //   "count": 1,
+      //   "data": [
+      //     {
+      //         "id": 624,
+      //         "machine_image": "https:\/\/gateway2026.abgroup.co.th\/storage\/galleries\/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
+      //         "finish_datatime": "22:51",
+      //         "remaining_time": "00:00:00",
+      //         "name": {
+      //             "th": "เครื่องซัก 4 \/ จรัญฯ 40",
+      //             "en": "Washer 4 \/ Charan 40",
+      //             "zh": "洗衣机 4 \/ Charan 40"
+      //         }
+      //     }
+      // ]
+      // }
+      // '''),
       //     ),
+      //     // WorkingMachinesResponse(
+      //     //   count: 2,
+      //     //   data: [
+      //     //     WorkingMachineData(
+      //     //       id: 13,
+      //     //       machineImage:
+      //     //           'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+      //     //       finishDatatime: '16:30',
+      //     //       remainingTime: '00:08:00',
+      //     //       name: ContentLocalizeData(
+      //     //         th: "เครื่องซัก 1 / Test",
+      //     //         en: "Washer 1 / Test",
+      //     //         zh: "洗衣机 1 / Test",
+      //     //       ),
+      //     //     ),
+      //     //     WorkingMachineData(
+      //     //       id: 18,
+      //     //       machineImage:
+      //     //           'https://dev.abgroup.co.th/storage/galleries/rmPkyT31v3Dl7ZpdoTSyEQX4RYLlqRJAyQZ6GxL0.png',
+      //     //       finishDatatime: '23:30',
+      //     //       remainingTime: '00:20:00',
+      //     //       name: ContentLocalizeData(
+      //     //         th: "เครื่องอบ 1 - 16.00 กก.",
+      //     //         en: "Dryer 1 - 16.00 kg",
+      //     //         zh: "烘干机 1 - 16.00 公斤",
+      //     //       ),
+      //     //     ),
+      //     //   ],
+      //     // ),
       //   );
       // }
 

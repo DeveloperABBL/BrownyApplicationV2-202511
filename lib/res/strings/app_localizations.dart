@@ -3112,6 +3112,36 @@ abstract class AppLocalizations {
   /// **'Update Now'**
   String get forceUpdateButton;
 
+  /// No description provided for @pinRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please Set Up PIN'**
+  String get pinRequiredTitle;
+
+  /// No description provided for @pinRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You must set up a PIN before enabling Biometric authentication.'**
+  String get pinRequiredMessage;
+
+  /// No description provided for @pinRequiredConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Up PIN'**
+  String get pinRequiredConfirm;
+
+  /// No description provided for @biometricNotAvailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Not Supported'**
+  String get biometricNotAvailableTitle;
+
+  /// No description provided for @biometricNotAvailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device does not support Biometric authentication.'**
+  String get biometricNotAvailableMessage;
+
   /// No description provided for @couponMinimumAmountRequired.
   ///
   /// In en, this message translates to:

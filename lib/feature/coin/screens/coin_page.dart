@@ -532,10 +532,10 @@ class __CoinContentState extends State<_CoinContent> {
     AppOverlays.hideLoading();
     if (mounted) {
       if (result.hasError) {
-        AppOverlays.showBrownyDialog(
+        AppOverlays.showBrownyErrorDialog(
           context,
           title: context.wording.errorOccurred,
-          message: context.wording.errorUi,
+          error: result.error,
         );
         return;
       }

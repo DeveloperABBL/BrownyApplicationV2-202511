@@ -569,6 +569,11 @@
     }
   },
   "forceUpdateButton": "Update Now",
+  "pinRequiredTitle": "Please Set Up PIN",
+  "pinRequiredMessage": "You must set up a PIN before enabling Biometric authentication.",
+  "pinRequiredConfirm": "Set Up PIN",
+  "biometricNotAvailableTitle": "Biometric Not Supported",
+  "biometricNotAvailableMessage": "Your device does not support Biometric authentication.",
   "couponMinimumAmountRequired": "Minimum order amount of {minAmount} is required.",
   "@couponMinimumAmountRequired": {
     "placeholders": {
