@@ -542,5 +542,13 @@
         "type": "String"
       }
     }
-  }
+  },
+  "orderHistoryTitle": "ประวัติการใช้งาน",
+  "filterByDate": "กรองตามวันที่",
+  "noOrderHistory": "ไม่พบประวัติการใช้งาน",
+  "orderHistoryReceiptNo": "เลขที่ใบเสร็จ",
+  "orderHistoryStore": "สาขา",
+  "orderHistoryMachine": "เครื่อง",
+  "orderHistoryPayment": "การชำระเงิน",
+  "orderHistoryAmount": "ยอดชำระ"
 }

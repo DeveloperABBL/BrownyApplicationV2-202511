@@ -46,19 +46,21 @@ class AppOverlays {
     );
 
     Overlay.of(context).insert(_loadingOverlay!);
-
-    _delayTimeout = Future.delayed(
-      timeout ??
-          const Duration(
-            minutes: 1,
-            seconds: 30,
-          ),
-      () {
-        hideLoading();
-        if (!context.mounted) return;
-        onTimeout?.call();
-      },
-    );
+    // ถ้าสง
+    if (timeout == null || timeout != Duration.zero) {
+      _delayTimeout = Future.delayed(
+        timeout ??
+            const Duration(
+              minutes: 1,
+              seconds: 30,
+            ),
+        () {
+          hideLoading();
+          if (!context.mounted) return;
+          onTimeout?.call();
+        },
+      );
+    }
   }
 
   /// ซ่อน Loading overlay
@@ -296,7 +298,7 @@ class AppOverlays {
     }
     return await showBrownyDialog(
       context,
-      title: title,
+      title: title ?? context.wording.errorOccurred,
       message: message,
       confirmText: confirmText,
       cancelText: cancelText,

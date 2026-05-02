@@ -112,6 +112,11 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     }
   }
 
+  TextStyle get _defaultTextStyle => context.textTheme.labelLarge!.copyWith(
+    color: AppColors.textBare,
+    fontSize: AppDims.size_16.sp,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -312,9 +317,33 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                     color: AppColors.gray500,
                   ),
                   tabs: [
-                    Tab(child: AppText(context.wording.sakob)),
-                    Tab(child: AppText(context.wording.eVouchers)),
-                    Tab(child: AppText(context.wording.brownyShop)),
+                    Tab(
+                      child: AppText(
+                        context.wording.sakob,
+                        style: context.textTheme.labelLarge!.copyWith(
+                          color: AppColors.gray500,
+                          fontSize: AppDims.size_16.sp,
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: AppText(
+                        context.wording.eVouchers,
+                        style: context.textTheme.labelLarge!.copyWith(
+                          color: AppColors.gray500,
+                          fontSize: AppDims.size_16.sp,
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: AppText(
+                        context.wording.brownyShop,
+                        style: context.textTheme.labelLarge!.copyWith(
+                          color: AppColors.gray500,
+                          fontSize: AppDims.size_15.sp,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -389,6 +418,9 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
+                hintStyle: context.textTheme.titleSmall!.copyWith(
+                  color: AppColors.gray600,
+                ),
               ),
               onChanged: _viewmodel.onInputCouponChange,
             ),

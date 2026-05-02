@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/utils/share_helper.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_receipt_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/history_transaction_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
@@ -247,10 +248,12 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         automaticallyImplyLeading: false,
-        // leading: BackButton(
-        //   color: AppColors.textPrimary,
-        //   onPressed: () => context.pop(),
-        // ),
+        leading: widget.viewmodel.isFromHistory
+            ? BackButton(
+                color: AppColors.textPrimary,
+                onPressed: () => context.pop(),
+              )
+            : null,
         title: AppText(
           context.wording.receipt, // ใบเสร็จ
           style: context.textTheme.titleLarge!.copyWith(
@@ -269,14 +272,29 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
           ),
           child: ElevatedButton(
             onPressed: () {
-              context.popUntil(
-                predicate: (route) {
-                  return route.name.orEmpty == CouponVoucherPage.pageName;
-                },
-              );
+              if (widget.viewmodel.isFromHistory) {
+                context.popUntil(
+                  predicate: (route) {
+                    return route.name.orEmpty ==
+                        HistoryTransactionPage.pageName;
+                  },
+                );
+              } else {
+                context.popUntil(
+                  predicate: (route) {
+                    return route.name.orEmpty == CouponVoucherPage.pageName;
+                  },
+                );
+              }
             },
             child: AppText(
-              context.wording.backToEvoucher, // กลับสู่ E-Voucher
+              widget.viewmodel.isFromHistory
+                  ?
+                    // กลับ
+                    context.wording.back
+                  :
+                    // กลับสู่ E-Voucher
+                    context.wording.backToEvoucher,
             ),
           ),
         ),
@@ -626,27 +644,30 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
     required String trailing,
     Widget? trailingWidget,
   }) {
-    return ListTile(
-      horizontalTitleGap: 0,
-      minVerticalPadding: 0,
-      contentPadding: EdgeInsets.zero,
-      minTileHeight: AppDims.size_22.h,
-      leading:
-          leadingWidget ??
-          AppText(
-            leading,
-            style: context.textTheme.titleMedium!.copyWith(
-              color: AppColors.gray600,
-            ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppDims.size_2.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child:
+                leadingWidget ??
+                AppText(
+                  leading,
+                  style: context.textTheme.titleMedium!.copyWith(
+                    color: AppColors.gray600,
+                  ),
+                ),
           ),
-      trailing:
           trailingWidget ??
-          AppText(
-            trailing,
-            style: context.textTheme.titleMedium!.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
+              AppText(
+                trailing,
+                style: context.textTheme.titleMedium!.copyWith(
+                  color: AppColors.gray600,
+                ),
+              ),
+        ],
+      ),
     );
   }
 

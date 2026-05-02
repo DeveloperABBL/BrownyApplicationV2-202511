@@ -53,6 +53,16 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
   Timer? _pollingTimer;
   CouponOrderData? _currentOrderData;
   bool _isPolling = false;
+  // DONG 2026-05-01
+  // เพิ่ม flag ดัก event กดเบิ้ลๆ
+  bool _isPurchaseClicked = false;
+  void _purchaseClicked() {
+    _isPurchaseClicked = true;
+  }
+
+  void _clearPurchaseClicked() {
+    _isPurchaseClicked = false;
+  }
 
   @override
   void initState() {
@@ -150,6 +160,12 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
   }
 
   void onPurchaseClicked() async {
+    if (_isPurchaseClicked) {
+      return;
+    }
+    // flagกันคลิกเบิ้ล
+    _purchaseClicked();
+
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
@@ -176,8 +192,13 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
         title: title,
         message: message,
       );
+      // flagกันคลิกเบิ้ล
+      _clearPurchaseClicked();
       return;
     }
+
+    // flagกันคลิกเบิ้ล
+    _clearPurchaseClicked();
     TransactionAuthenPage.goToPage(context).then((
       result,
     ) async {

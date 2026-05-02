@@ -76,6 +76,7 @@ class BrownyApp extends StatelessWidget {
                 // From Team design screen sizing
                 designSize: const Size(375, 812),
                 // minTextAdapt: true,
+                enableScaleText: () => true,
                 splitScreenMode: true,
                 enableScaleWH: () => boxCons.maxWidth < 600,
                 // fontSizeResolver: FontSizeResolvers.radius,

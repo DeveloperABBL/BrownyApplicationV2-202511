@@ -3,6 +3,7 @@ import 'package:browny_applications_new/core/data/remote/models/content_localize
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
+import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/invit_friend/screen/invit_friend_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
@@ -12,6 +13,7 @@ import 'package:browny_applications_new/feature/profile/screen/profile_page.dart
 import 'package:browny_applications_new/feature/profile/viewmodel/profile_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/history_transaction_page.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class MyProfileAndPreferencesPage extends StatelessWidget {
@@ -168,6 +170,20 @@ class _MyProfileAndPreferencesContentState
                     // Top row with profile icon, name, and actions
                     Row(
                       children: [
+                        InkWell(
+                          onTap: () {
+                            if (context.canPop()) {
+                              context.pop();
+                              return;
+                            }
+                            HomePage.goReplacementPage(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: AppColors.background,
+                          ),
+                        ),
+                        AppDims.horizonPadding_12,
                         // Profile Icon
                         CircleAvatar(
                           radius: AppDims.size_24.w,
@@ -449,7 +465,8 @@ class _MyProfileAndPreferencesContentState
                         label: context.wording.history,
                         onTap: () async {
                           // TODO: Navigate to history page
-                          await _showDialogComingSoon(context.wording.history);
+                          // await _showDialogComingSoon(context.wording.history);
+                          HistoryTransactionPage.goToPage(context);
                         },
                       ),
                     ],

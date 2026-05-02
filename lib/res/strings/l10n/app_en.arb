@@ -591,5 +591,13 @@
         "type": "String"
       }
     }
-  }
+  },
+  "orderHistoryTitle": "Order History",
+  "filterByDate": "Filter by Date",
+  "noOrderHistory": "No order history found",
+  "orderHistoryReceiptNo": "Receipt No.",
+  "orderHistoryStore": "Store",
+  "orderHistoryMachine": "Machine",
+  "orderHistoryPayment": "Payment",
+  "orderHistoryAmount": "Amount"
 }

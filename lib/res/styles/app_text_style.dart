@@ -10,95 +10,95 @@ class AppTextStyles {
 
   // Display styles
   static TextStyle displayLarge = GoogleFonts.mitr(
-    fontSize: 32.sp,
+    fontSize: 34.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   static TextStyle displayMedium = GoogleFonts.mitr(
-    fontSize: 28.sp,
+    fontSize: 30.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   static TextStyle displaySmall = GoogleFonts.mitr(
-    fontSize: 24.sp,
+    fontSize: 26.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   // Headline styles
   static TextStyle headlineLarge = GoogleFonts.mitr(
-    fontSize: 22.sp,
+    fontSize: 24.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
 
   static TextStyle headlineMedium = GoogleFonts.mitr(
-    fontSize: 20.sp,
+    fontSize: 22.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
 
   static TextStyle headlineSmall = GoogleFonts.mitr(
-    fontSize: 18.sp,
+    fontSize: 20.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
 
   // Title styles
   static TextStyle titleLarge = GoogleFonts.mitr(
-    fontSize: 18.sp,
+    fontSize: 20.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle titleMedium = GoogleFonts.mitr(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle titleSmall = GoogleFonts.mitr(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   // Body styles
   static TextStyle bodyLarge = GoogleFonts.mitr(
-    fontSize: 16.sp,
+    fontSize: 18.sp,
     fontWeight: FontWeight.w300,
     color: AppColors.textPrimary,
   );
 
   static TextStyle bodyMedium = GoogleFonts.mitr(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w300,
     color: AppColors.textPrimary,
   );
 
   static TextStyle bodySmall = GoogleFonts.mitr(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w300,
     color: AppColors.textSecondary,
   );
 
   // Label styles
   static TextStyle labelLarge = GoogleFonts.mitr(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle labelMedium = GoogleFonts.mitr(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle labelSmall = GoogleFonts.mitr(
-    fontSize: 10.sp,
+    fontSize: 12.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
   );
@@ -111,95 +111,95 @@ class AppTextNumberStyles {
 
   // Display styles
   static TextStyle displayLarge = GoogleFonts.prompt(
-    fontSize: 32.sp,
+    fontSize: 34.sp,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
   );
 
   static TextStyle displayMedium = GoogleFonts.prompt(
-    fontSize: 28.sp,
+    fontSize: 30.sp,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
   );
 
   static TextStyle displaySmall = GoogleFonts.prompt(
-    fontSize: 24.sp,
+    fontSize: 26.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   // Headline styles
   static TextStyle headlineLarge = GoogleFonts.prompt(
-    fontSize: 22.sp,
+    fontSize: 24.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   static TextStyle headlineMedium = GoogleFonts.prompt(
-    fontSize: 20.sp,
+    fontSize: 22.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   static TextStyle headlineSmall = GoogleFonts.prompt(
-    fontSize: 18.sp,
+    fontSize: 20.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
 
   // Title styles
   static TextStyle titleLarge = GoogleFonts.prompt(
-    fontSize: 24.sp,
+    fontSize: 26.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle titleMedium = GoogleFonts.prompt(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle titleSmall = GoogleFonts.prompt(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   // Body styles
   static TextStyle bodyLarge = GoogleFonts.prompt(
-    fontSize: 16.sp,
+    fontSize: 18.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
   );
 
   static TextStyle bodyMedium = GoogleFonts.prompt(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w300,
     color: AppColors.textPrimary,
   );
 
   static TextStyle bodySmall = GoogleFonts.prompt(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
   );
 
   // Label styles
   static TextStyle labelLarge = GoogleFonts.prompt(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
 
   static TextStyle labelMedium = GoogleFonts.prompt(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
 
   static TextStyle labelSmall = GoogleFonts.prompt(
-    fontSize: 10.sp,
+    fontSize: 12.sp,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
   );

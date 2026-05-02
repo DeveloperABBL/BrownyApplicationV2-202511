@@ -782,6 +782,49 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
     }
   }
 
+  /// Fetch ใบเสร็จเครื่องซัก/อบ โดยตรงจาก orderId (ใช้สำหรับดูจากประวัติ)
+  Future<UiResult<MachineOrderReceiptResponse>> fetchMachineReceiptByOrderId(
+    String orderId,
+  ) async {
+    _machineTransactionStateNotifier.value = UiResult.success(
+      data: MachinePaymentTransactionState(
+        step: TransactionStep.loadingReceipt,
+      ),
+    );
+    try {
+      final result = await _transactionRepo.fetchMachineOrderReceipt(orderId);
+      if (result.isSuccess) {
+        final receiptResponse = result.data;
+        _isFirstReviewScore = receiptResponse.reviewScore == null;
+        _machineTransactionStateNotifier.value = UiResult.success(
+          data: MachinePaymentTransactionState(
+            receipt: receiptResponse,
+            step: TransactionStep.receiptLoaded,
+          ),
+        );
+        return UiResult.success(data: receiptResponse);
+      } else if (result.isEmpty) {
+        _machineTransactionStateNotifier.value = UiResult.success(
+          data: MachinePaymentTransactionState.error(result.error),
+        );
+        return UiResult.empty(error: result.error);
+      } else {
+        _machineTransactionStateNotifier.value = UiResult.success(
+          data: MachinePaymentTransactionState.error(result.error),
+        );
+        return UiResult.error(error: result.error);
+      }
+    } catch (e) {
+      final error = Exception(
+        'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ: ${e.toString()}',
+      );
+      _machineTransactionStateNotifier.value = UiResult.success(
+        data: MachinePaymentTransactionState.error(error),
+      );
+      return UiResult.error(error: error);
+    }
+  }
+
   void onScoreTap(int scored) {
     // ถ้าเคย Review แล้ว จะไม่ให้แก้ไข
     if (!_isFirstReviewScore) return;

@@ -1609,4 +1609,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String cannotUseCouponType(String couponType) {
     return 'Cannot use $couponType';
   }
+
+  @override
+  String get orderHistoryTitle => 'Order History';
+
+  @override
+  String get filterByDate => 'Filter by Date';
+
+  @override
+  String get noOrderHistory => 'No order history found';
+
+  @override
+  String get orderHistoryReceiptNo => 'Receipt No.';
+
+  @override
+  String get orderHistoryStore => 'Store';
+
+  @override
+  String get orderHistoryMachine => 'Machine';
+
+  @override
+  String get orderHistoryPayment => 'Payment';
+
+  @override
+  String get orderHistoryAmount => 'Amount';
 }

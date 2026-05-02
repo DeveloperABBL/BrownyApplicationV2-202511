@@ -18,6 +18,7 @@ import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmod
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_mockup.dart';
 import 'package:browny_applications_new/feature/lucky_scan/screens/lucky_scan_page.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
+import 'package:browny_applications_new/feature/transactions/screens/history_transaction_page.dart';
 import 'package:browny_applications_new/feature/update/screen/force_update_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/map/screens/store_detail_page.dart';
@@ -421,6 +422,11 @@ class AppRouter {
         path: ForceUpdatePage.pagePath,
         name: ForceUpdatePage.pageName,
         builder: (context, state) => const ForceUpdatePage(),
+      ),
+      GoRoute(
+        path: HistoryTransactionPage.pagePath,
+        name: HistoryTransactionPage.pageName,
+        builder: (context, state) => const HistoryTransactionPage(),
       ),
     ],
   );

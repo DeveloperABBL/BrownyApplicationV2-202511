@@ -759,4 +759,24 @@ abstract class AppClient {
   /// - 401: Token ไม่ถูกต้องหรือหมดอายุ
   @GET('/check-token')
   Future<HttpResponse<CheckTokenResponse>> checkToken();
+
+  /// DONG 2026-05-02
+  ///
+  /// API fetch ประวัติการสั่งซื้อของลูกค้า
+  ///
+  /// Path Parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Query Parameters:
+  /// - page: int (หน้าที่ต้องการดึง)
+  ///
+  /// Response:
+  /// - OrderHistoryResponse with list of orders (machine_order / coupon_package_order) and pagination meta
+  @GET('/customer/{customerId}/order-history')
+  Future<HttpResponse<OrderHistoryResponse>> fetchOrderHistory(
+    @Path('customerId') String customerId,
+    @Query('page') int page,
+    @Query('start_date') String? startDate,
+    @Query('end_date') String? endDate,
+  );
 }

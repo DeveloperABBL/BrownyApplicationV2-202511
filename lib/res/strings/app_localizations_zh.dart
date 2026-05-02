@@ -1562,4 +1562,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String cannotUseCouponType(String couponType) {
     return '无法使用 $couponType';
   }
+
+  @override
+  String get orderHistoryTitle => '使用记录';
+
+  @override
+  String get filterByDate => '按日期筛选';
+
+  @override
+  String get noOrderHistory => '暂无使用记录';
+
+  @override
+  String get orderHistoryReceiptNo => '收据编号';
+
+  @override
+  String get orderHistoryStore => '门店';
+
+  @override
+  String get orderHistoryMachine => '机器';
+
+  @override
+  String get orderHistoryPayment => '支付方式';
+
+  @override
+  String get orderHistoryAmount => '金额';
 }

@@ -19,6 +19,7 @@ import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/profile/screen/my_profile_and_preferences_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/screens/history_transaction_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_status_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
@@ -199,70 +200,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
             // เก็บ Coupon
             SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                  // top: AppDims.size_8.h,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      child: ElevatedButton.icon(
-                        onPressed: null,
-                        icon: Assets.svg.icCouponRoundGreen.svg(),
-                        label: Column(
-                          children: [
-                            AppText(
-                              // เก็บคูปอง
-                              context.wording.collectCoupon,
-                              style: context.textTheme.labelLarge,
-                            ),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.transparent,
-                          foregroundColor: AppColors.primary,
-                          alignment: AlignmentDirectional.centerStart,
-                          padding: EdgeInsets.zero,
-                          disabledBackgroundColor: AppColors.transparent,
-                          overlayColor: AppColors.transparent,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // context.pushNamed(CouponVoucherPage.pageName);
-                        CouponVoucherPage.goToPage(
-                          context,
-                        );
-                        // _showInvitBottomSheet();
-                      },
-                      // banner เก็บคูปอง
-                      child: Stack(
-                        children: [
-                          Opacity(
-                            opacity: 0.1,
-                            child: Assets.png.cardCouponEvoucher.image(
-                              color: AppColors.black,
-                            ),
-                          ),
-                          ClipRect(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 0.1,
-                                sigmaY: 0.1,
-                              ),
-                              child: Assets.png.cardCouponEvoucher.image(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildCollectCoupon(context),
             ),
 
             // สถานะบริการ ที่กำลังใช้งาน
@@ -270,113 +208,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
             // สถานะบริการ
             SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: AppDims.size_16.w,
-                  right: AppDims.size_16.w,
-                  // top: AppDims.size_8.h,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      child: ElevatedButton.icon(
-                        onPressed: null,
-                        icon: Assets.svg.icPawRoundedGreen.svg(),
-                        label: Column(
-                          children: [
-                            AppText(
-                              // บริการ
-                              context.wording.services,
-                              style: context.textTheme.labelLarge,
-                            ),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.transparent,
-                          foregroundColor: AppColors.primary,
-                          alignment: AlignmentDirectional.centerStart,
-                          padding: EdgeInsets.zero,
-                          disabledBackgroundColor: AppColors.transparent,
-                          overlayColor: AppColors.transparent,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: AppDims.size_106.h,
-                      child: Builder(
-                        builder: (context) {
-                          List<AssetGenImage> services = [];
-                          switch (context.languageCode) {
-                            case 'zh':
-                              {
-                                services.addAll([
-                                  Assets.services.aWasherZh,
-                                  Assets.services.bDryerZh,
-                                ]);
-                                break;
-                              }
-                            case 'en':
-                              {
-                                services.addAll([
-                                  Assets.services.aWasherEn,
-                                  Assets.services.bDryerEn,
-                                ]);
-                                break;
-                              }
-                            default:
-                              {
-                                services.addAll([
-                                  Assets.services.aWasher,
-                                  Assets.services.bDryer,
-                                ]);
-                                break;
-                              }
-                          }
-                          return ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) => GestureDetector(
-                              onTap: () async {
-                                if (kDebugMode) {
-                                  final data = Uri.parse(
-                                    'http://brownypay.com/wash/dry/82',
-                                    // 'http://brownypay.com/wash/dry/1379',
-                                  );
-                                  if (data.pathSegments.isNotEmpty) {
-                                    await MachineTransactionPage2.goToPage(
-                                      context,
-                                      machineId: data.pathSegments.last,
-                                    );
-                                    // if (mounted) {
-                                    //   await _viewmodel.fetchWorkingMachines();
-                                    // }
-                                  }
-
-                                  // MachineStatusPage.goToPage(context, machineId: '13');
-                                  return;
-                                }
-
-                                // Default ไปหน้า Scan
-                                await ScannerPage.goToPage(
-                                  context,
-                                  initialIndex: 0,
-                                );
-                              },
-                              child: services[index].image(
-                                width: AppDims.size_109.w,
-                                height: AppDims.size_106.h,
-                              ),
-                            ),
-                            separatorBuilder: (context, index) =>
-                                AppDims.horizonPadding_8,
-                            itemCount: 2,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildServices(context),
             ),
             SliverToBoxAdapter(
               child: AppDims.vericalPadding_24,
@@ -421,6 +253,187 @@ class _HomePageWidgetState extends State<HomePageWidget>
     );
   }
 
+  Widget _buildServices(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppDims.size_16.w,
+        right: AppDims.size_16.w,
+        // top: AppDims.size_8.h,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: ElevatedButton.icon(
+              onPressed: null,
+              icon: Assets.svg.icPawRoundedGreen.svg(),
+              label: Column(
+                children: [
+                  AppText(
+                    // บริการ
+                    context.wording.services,
+                    style: _defaultTextTitleStyle,
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.transparent,
+                foregroundColor: AppColors.primary,
+                alignment: AlignmentDirectional.centerStart,
+                padding: EdgeInsets.zero,
+                disabledBackgroundColor: AppColors.transparent,
+                overlayColor: AppColors.transparent,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: AppDims.size_106.h,
+            child: Builder(
+              builder: (context) {
+                List<AssetGenImage> services = [];
+                switch (context.languageCode) {
+                  case 'zh':
+                    {
+                      services.addAll([
+                        Assets.services.aWasherZh,
+                        Assets.services.bDryerZh,
+                      ]);
+                      break;
+                    }
+                  case 'en':
+                    {
+                      services.addAll([
+                        Assets.services.aWasherEn,
+                        Assets.services.bDryerEn,
+                      ]);
+                      break;
+                    }
+                  default:
+                    {
+                      services.addAll([
+                        Assets.services.aWasher,
+                        Assets.services.bDryer,
+                      ]);
+                      break;
+                    }
+                }
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () async {
+                      if (kDebugMode) {
+                        final data = Uri.parse(
+                          'http://brownypay.com/wash/dry/82',
+                          // 'http://brownypay.com/wash/dry/1379',
+                        );
+                        if (data.pathSegments.isNotEmpty) {
+                          await MachineTransactionPage2.goToPage(
+                            context,
+                            machineId: data.pathSegments.last,
+                          );
+                          // if (mounted) {
+                          //   await _viewmodel.fetchWorkingMachines();
+                          // }
+                        }
+
+                        // MachineStatusPage.goToPage(context, machineId: '13');
+                        return;
+                      }
+
+                      // Default ไปหน้า Scan
+                      await ScannerPage.goToPage(
+                        context,
+                        initialIndex: 0,
+                      );
+                    },
+                    child: services[index].image(
+                      width: AppDims.size_109.w,
+                      height: AppDims.size_106.h,
+                    ),
+                  ),
+                  separatorBuilder: (context, index) =>
+                      AppDims.horizonPadding_8,
+                  itemCount: 2,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  TextStyle get _defaultTextTitleStyle => context.textTheme.labelLarge!;
+  // context.textTheme.labelLarge!.copyWith(
+  //   fontSize: AppDims.size_16.sp,
+  // );
+  Padding _buildCollectCoupon(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppDims.size_16.w,
+        right: AppDims.size_16.w,
+        // top: AppDims.size_8.h,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: ElevatedButton.icon(
+              onPressed: null,
+              icon: Assets.svg.icCouponRoundGreen.svg(),
+              label: Column(
+                children: [
+                  AppText(
+                    // เก็บคูปอง
+                    context.wording.collectCoupon,
+                    style: _defaultTextTitleStyle,
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.transparent,
+                foregroundColor: AppColors.primary,
+                alignment: AlignmentDirectional.centerStart,
+                padding: EdgeInsets.zero,
+                disabledBackgroundColor: AppColors.transparent,
+                overlayColor: AppColors.transparent,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              // context.pushNamed(CouponVoucherPage.pageName);
+              CouponVoucherPage.goToPage(
+                context,
+              );
+              // _showInvitBottomSheet();
+            },
+            // banner เก็บคูปอง
+            child: Stack(
+              children: [
+                Opacity(
+                  opacity: 0.1,
+                  child: Assets.png.cardCouponEvoucher.image(
+                    color: AppColors.black,
+                  ),
+                ),
+                ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 0.1,
+                      sigmaY: 0.1,
+                    ),
+                    child: Assets.png.cardCouponEvoucher.image(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   SliverToBoxAdapter _buildServicesWorking(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
@@ -441,7 +454,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     AppText(
                       // สถานะการทำงาน
                       context.wording.usageStatus,
-                      style: context.textTheme.labelLarge,
+                      style: _defaultTextTitleStyle,
                     ),
                   ],
                 ),
@@ -719,27 +732,32 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 ),
               ),
 
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDims.size_2.w,
-                  // vertical: AppDims.size_8.h,
-                ),
-                child: _buldIconShortCut(
-                  icon: Assets.iconShortcut.iscTransactionHistory,
-                  // ประวัติ\nการใช้งาน
-                  title: context.wording.usageHistory,
-                  // children: [
-                  //   Assets.iconShortcut.iscTransactionHistory.image(
-                  //     width: AppDims.size_74.w,
-                  //     height: AppDims.size_42.h,
-                  //   ),
-                  //   AppText(
-                  //     // ประวัติ\nการใช้งาน
-                  //     context.wording.usageHistory,
-                  //     textAlign: TextAlign.center,
-                  //     style: context.textTheme.titleSmall,
-                  //   ),
-                  // ],
+              GestureDetector(
+                onTap: () {
+                  HistoryTransactionPage.goToPage(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDims.size_2.w,
+                    // vertical: AppDims.size_8.h,
+                  ),
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscTransactionHistory,
+                    // ประวัติ\nการใช้งาน
+                    title: context.wording.usageHistory,
+                    // children: [
+                    //   Assets.iconShortcut.iscTransactionHistory.image(
+                    //     width: AppDims.size_74.w,
+                    //     height: AppDims.size_42.h,
+                    //   ),
+                    //   AppText(
+                    //     // ประวัติ\nการใช้งาน
+                    //     context.wording.usageHistory,
+                    //     textAlign: TextAlign.center,
+                    //     style: context.textTheme.titleSmall,
+                    //   ),
+                    // ],
+                  ),
                 ),
               ),
 

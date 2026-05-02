@@ -53,6 +53,9 @@ class TransactionsViewmodel extends AppViewModel
   @override
   UserModel get currentUserDelegate => currentCustomerProvider.current;
 
+  /// Flag สำหรับตรวจสอบว่ามาจากหน้าประวัติหรือไม่ (เพื่อเปลี่ยน nav บนหน้าใบเสร็จ)
+  bool get isFromHistory => false;
+
   @override
   void dispose() {
     _paymentMethodNotifier.dispose();
@@ -889,6 +892,48 @@ class TransactionsViewmodel extends AppViewModel
         ),
       );
       return UiResult.error(error: exception);
+    }
+  }
+
+  /// Fetch ใบเสร็จคูปอง/e-voucher โดยตรงจาก orderId (ใช้สำหรับดูจากประวัติ)
+  Future<UiResult<CouponReceiptModel>> fetchCouponReceiptByOrderId(
+    String orderId,
+  ) async {
+    _transactionStateNotifier.value = UiResult.success(
+      data: PaymentTransactionState(step: TransactionStep.loadingReceipt),
+    );
+    try {
+      final result = await _transactionRepo.fetchCouponReceipt(orderId);
+      if (result.isSuccess) {
+        final receiptModel = CouponReceiptModel.fromCouponReceiptData(
+          result.data.data!,
+        );
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState(
+            receipt: receiptModel,
+            step: TransactionStep.receiptLoaded,
+          ),
+        );
+        return UiResult.success(data: receiptModel);
+      } else if (result.isEmpty) {
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(result.error),
+        );
+        return UiResult.empty(error: result.error);
+      } else {
+        _transactionStateNotifier.value = UiResult.success(
+          data: PaymentTransactionState.error(result.error),
+        );
+        return UiResult.error(error: result.error);
+      }
+    } catch (e) {
+      final error = Exception(
+        'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ: ${e.toString()}',
+      );
+      _transactionStateNotifier.value = UiResult.success(
+        data: PaymentTransactionState.error(error),
+      );
+      return UiResult.error(error: error);
     }
   }
 

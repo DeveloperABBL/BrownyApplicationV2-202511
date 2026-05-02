@@ -1,5 +1,3 @@
-import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
-
 /// สถานะต่างๆ ของ UI ที่สามารถเกิดขึ้นได้
 /// - loading: กำลังโหลดข้อมูล
 /// - success: โหลดข้อมูลสำเร็จ

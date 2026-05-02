@@ -16,6 +16,7 @@ import 'package:browny_applications_new/feature/transactions/screens/coupons_evo
 import 'package:browny_applications_new/feature/transactions/screens/receipt_machine_page.dart';
 import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class MachineTransactionPage2 extends StatelessWidget {
@@ -103,6 +104,16 @@ class __MachineContentState extends State<_MachineContent>
   Timer? _pollingTimer;
   String? _currentPaymentRef;
   bool _isPolling = false;
+  // DONG 2026-05-01
+  // เพิ่ม flag ดัก event กดเบิ้ลๆ
+  bool _isPurchaseClicked = false;
+  void _purchaseClicked() {
+    _isPurchaseClicked = true;
+  }
+
+  void _clearPurchaseClicked() {
+    _isPurchaseClicked = false;
+  }
 
   @override
   void initState() {
@@ -289,6 +300,11 @@ class __MachineContentState extends State<_MachineContent>
     //   viewmodel: _viewmodel,
     // );
     // return;
+    if (_isPurchaseClicked) {
+      return;
+    }
+    // flagกันคลิกเบิ้ล
+    _purchaseClicked();
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
@@ -317,15 +333,23 @@ class __MachineContentState extends State<_MachineContent>
         // เดิม: กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
         message: message,
       );
+
+      // flagกันคลิกเบิ้ล
+      _clearPurchaseClicked();
       return;
     }
+    // flagกันคลิกเบิ้ล
+    _clearPurchaseClicked();
     // ไปหน้า PIN/Biometric เพื่อยืนยันการทำรายการ
     TransactionAuthenPage.goToPage(context).then(
       (result) async {
         if (!mounted) return;
 
         if (result is bool && result) {
-          AppOverlays.showLoading(context);
+          AppOverlays.showLoading(
+            context,
+            timeout: Duration.zero,
+          );
           final orderResult = await _viewmodel.createMachineOrder(
             widget.machineId,
           );

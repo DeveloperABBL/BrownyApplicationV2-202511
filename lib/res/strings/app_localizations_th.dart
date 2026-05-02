@@ -1600,4 +1600,28 @@ class AppLocalizationsTh extends AppLocalizations {
   String cannotUseCouponType(String couponType) {
     return 'ไม่สามารถใช้งาน $couponType ได้';
   }
+
+  @override
+  String get orderHistoryTitle => 'ประวัติการใช้งาน';
+
+  @override
+  String get filterByDate => 'กรองตามวันที่';
+
+  @override
+  String get noOrderHistory => 'ไม่พบประวัติการใช้งาน';
+
+  @override
+  String get orderHistoryReceiptNo => 'เลขที่ใบเสร็จ';
+
+  @override
+  String get orderHistoryStore => 'สาขา';
+
+  @override
+  String get orderHistoryMachine => 'เครื่อง';
+
+  @override
+  String get orderHistoryPayment => 'การชำระเงิน';
+
+  @override
+  String get orderHistoryAmount => 'ยอดชำระ';
 }

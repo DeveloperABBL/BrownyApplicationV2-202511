@@ -540,5 +540,13 @@
         "type": "String"
       }
     }
-  }
+  },
+  "orderHistoryTitle": "使用记录",
+  "filterByDate": "按日期筛选",
+  "noOrderHistory": "暂无使用记录",
+  "orderHistoryReceiptNo": "收据编号",
+  "orderHistoryStore": "门店",
+  "orderHistoryMachine": "机器",
+  "orderHistoryPayment": "支付方式",
+  "orderHistoryAmount": "金额"
 }

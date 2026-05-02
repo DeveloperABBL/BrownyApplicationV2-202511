@@ -3165,6 +3165,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot use {couponType}'**
   String cannotUseCouponType(String couponType);
+
+  /// No description provided for @orderHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order History'**
+  String get orderHistoryTitle;
+
+  /// No description provided for @filterByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by Date'**
+  String get filterByDate;
+
+  /// No description provided for @noOrderHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No order history found'**
+  String get noOrderHistory;
+
+  /// No description provided for @orderHistoryReceiptNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt No.'**
+  String get orderHistoryReceiptNo;
+
+  /// No description provided for @orderHistoryStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Store'**
+  String get orderHistoryStore;
+
+  /// No description provided for @orderHistoryMachine.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine'**
+  String get orderHistoryMachine;
+
+  /// No description provided for @orderHistoryPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get orderHistoryPayment;
+
+  /// No description provided for @orderHistoryAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get orderHistoryAmount;
 }
 
 class _AppLocalizationsDelegate

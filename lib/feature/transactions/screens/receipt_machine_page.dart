@@ -246,6 +246,20 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
     }
   }
 
+  void _popPage() {
+    if (_viewmodel.isFromHistory) {
+      if (context.canPop()) {
+        context.pop();
+        return;
+      }
+    }
+    context.popUntil(
+      predicate: (route) {
+        return route.name.orEmpty == HomePage.pageName;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,9 +270,7 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
         leading: BackButton(
           color: AppColors.textPrimary,
           onPressed: () {
-            context.popUntil(
-              predicate: (route) => route.name.orEmpty == HomePage.pageName,
-            );
+            _popPage();
           },
         ),
         title: AppText(
@@ -283,50 +295,50 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
                 await _viewmodel.submitMachineOrderReview();
               }
               if (!context.mounted) return;
-              context.popUntil(
-                predicate: (route) {
-                  return route.name.orEmpty == HomePage.pageName;
-                },
-              );
+              if (_viewmodel.isFromHistory) {}
+              _popPage();
             },
             child: AppText(
-              context.wording.backToHome, // กลับสู่หน้าหลัก
+              _viewmodel.isFromHistory
+                  ?
+                    // ย้อนกลับ
+                    context.wording.back
+                  :
+                    // กลับสู่หน้าหลัก
+                    context.wording.backToHome,
             ),
           ),
         ),
-        Container(
-          padding: EdgeInsets.only(
-            left: AppDims.size_24.w,
-            right: AppDims.size_24.w,
-            top: AppDims.size_8.h,
-            bottom: AppDims.size_26.w,
-          ),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              backgroundColor: AppColors.ci3,
+        if (!_viewmodel.isFromHistory)
+          Container(
+            padding: EdgeInsets.only(
+              left: AppDims.size_24.w,
+              right: AppDims.size_24.w,
+              top: AppDims.size_8.h,
+              bottom: AppDims.size_26.w,
             ),
-            onPressed: () async {
-              if (_viewmodel.isFirstReviewed) {
-                await _viewmodel.submitMachineOrderReview();
-              }
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                backgroundColor: AppColors.ci3,
+              ),
+              onPressed: () async {
+                if (_viewmodel.isFirstReviewed) {
+                  await _viewmodel.submitMachineOrderReview();
+                }
 
-              if (!context.mounted) return;
-              context.popUntil(
-                predicate: (route) {
-                  return route.name.orEmpty == HomePage.pageName;
-                },
-              );
-              MachineStatusPage.goToPage(
-                context,
-                machineId: _viewmodel.machineId,
-              );
-            },
-            child: AppText(
-              context.wording.checkStatus, // ตรวจสอบสถานะ
+                if (!context.mounted) return;
+                _popPage();
+                MachineStatusPage.goToPage(
+                  context,
+                  machineId: _viewmodel.machineId,
+                );
+              },
+              child: AppText(
+                context.wording.checkStatus, // ตรวจสอบสถานะ
+              ),
             ),
           ),
-        ),
       ],
       body: SingleChildScrollView(
         child: Column(
@@ -901,12 +913,14 @@ Data Error : ${result.data!.error.toString()}
                                 children: [
                                   AppText(
                                     'Browny Care',
-                                    style: context.textTheme.labelLarge,
+                                    style: context.textTheme.labelLarge!
+                                        .copyWith(fontSize: AppDims.size_14.sp),
                                   ),
                                   AppText(
                                     result.data!.receipt!.callCenter.orEmpty,
                                     style: context.textTheme.labelMedium!
                                         .copyWith(
+                                          fontSize: AppDims.size_12.sp,
                                           color: AppColors.gray500,
                                         ),
                                   ),
@@ -945,12 +959,16 @@ Data Error : ${result.data!.error.toString()}
                                 children: [
                                   AppText(
                                     'LINE',
-                                    style: context.textTheme.labelLarge,
+                                    style: context.textTheme.labelLarge!
+                                        .copyWith(
+                                          fontSize: AppDims.size_14.sp,
+                                        ),
                                   ),
                                   AppText(
                                     'Browny Official',
                                     style: context.textTheme.labelMedium!
                                         .copyWith(
+                                          fontSize: AppDims.size_12.sp,
                                           color: AppColors.gray500,
                                         ),
                                   ),
@@ -1030,27 +1048,32 @@ Data Error : ${result.data!.error.toString()}
     required String trailing,
     Widget? trailingWidget,
   }) {
-    return ListTile(
-      horizontalTitleGap: 0,
-      minVerticalPadding: 0,
-      contentPadding: EdgeInsets.zero,
-      minTileHeight: AppDims.size_22.h,
-      leading:
-          leadingWidget ??
-          AppText(
-            leading,
-            style: context.textTheme.titleMedium!.copyWith(
-              color: AppColors.gray600,
-            ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppDims.size_2.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child:
+                leadingWidget ??
+                AppText(
+                  leading,
+                  style: context.textTheme.titleMedium!.copyWith(
+                    color: AppColors.gray600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
           ),
-      trailing:
           trailingWidget ??
-          AppText(
-            trailing,
-            style: context.textTheme.titleMedium!.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
+              AppText(
+                trailing,
+                style: context.textTheme.titleMedium!.copyWith(
+                  color: AppColors.gray600,
+                ),
+              ),
+        ],
+      ),
     );
   }
 
