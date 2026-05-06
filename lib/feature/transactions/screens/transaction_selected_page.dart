@@ -196,9 +196,6 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
       _clearPurchaseClicked();
       return;
     }
-
-    // flagกันคลิกเบิ้ล
-    _clearPurchaseClicked();
     TransactionAuthenPage.goToPage(context).then((
       result,
     ) async {
@@ -209,22 +206,27 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           // _startPolling(CouponOrderData(paymentRef: '20260208150706'));
           // return;
 
-          AppOverlays.showLoading(context);
+          AppOverlays.showLoading(
+            context,
+            timeout: Duration.zero,
+          );
           final orderResult = await _viewmodel.createCouponOrder();
 
           if (!context.mounted) return;
-          AppOverlays.hideLoading();
 
           if (orderResult.isSuccess) {
             final orderResponse = orderResult.data!;
             final orderData = orderResponse.data;
 
             if (orderData == null) {
+              AppOverlays.hideLoading();
               AppOverlays.showBrownyDialog(
                 context,
                 // ไม่สามารถสร้างคำสั่งซื้อได้
                 message: context.wording.cannotCreateOrder,
               );
+              // flagกันคลิกเบิ้ล
+              _clearPurchaseClicked();
               return;
             }
 
@@ -235,11 +237,12 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
               _currentOrderData = orderData;
 
               if (!mounted) return;
-              _checkPaymentStatus();
+              await _checkPaymentStatus();
               AppOverlays.hideLoading();
               return;
             }
-
+            // ปิด Dialog Loading ถ้าผ่าน condition ข้างบนทั้งหมด
+            AppOverlays.hideLoading();
             // รอเก็บข้อมูล QRCode ที่ได้จาก payload
             String? qrData = '';
             // เช็ค flag ว่าต้องเปิด In-app QR หรือไม่
@@ -259,13 +262,14 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                 // ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง
                 message: context.wording.incompletePaymentData,
               );
+              // flagกันคลิกเบิ้ล
+              _clearPurchaseClicked();
               return;
             }
 
-            _paymentProcessing = true;
-
             // Start polling for payment status
             _startPolling(orderData);
+            _paymentProcessing = true;
 
             // DONG 2026-02-28
             // เพิ่มการเช็คว่าถ้ามีค่า qrAndWechat จะทำการเปิดหน้า QR ในแอพแทน
@@ -296,14 +300,6 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                 isScrollControlled: true,
                 isDismissible: false,
                 builder: (dialogContext) {
-                  // controller = WebViewController()
-                  //   ..setJavaScriptMode(
-                  //     JavaScriptMode.unrestricted,
-                  //   )
-                  //   ..setBackgroundColor(AppColors.background)
-                  //   ..loadRequest(
-                  //     Uri.parse(orderResponse.redirectUrl!),
-                  //   );
                   return SizedBox(
                     height: 812.h * 0.85,
                     child: Scaffold(
@@ -349,7 +345,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
             await _checkPaymentStatus();
             return;
           }
-
+          // flagกันคลิกเบิ้ล
+          _clearPurchaseClicked();
           AppOverlays.showBrownyErrorDialog(
             context,
             error: orderResult.error,
@@ -357,6 +354,9 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           return;
         }
         return;
+      } else {
+        // flagกันคลิกเบิ้ล
+        _clearPurchaseClicked();
       }
       // Handler develop
       // ถ้าส่ง type มาผิดจะ throw ให้ App Error
@@ -366,360 +366,383 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      persistentFooterDecoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.5), // Shadow color
-            spreadRadius: 1, // How much the shadow should spread
-            blurRadius: 10, // How soft the shadow should be
-            offset: Offset(0, -2), // Negative dy value moves the shadow upwards
-          ),
-        ],
-      ),
-      persistentFooterButtons: [
-        // ปุ่มยืนยันซื้อคูปอง
-        ValueListenableBuilder(
-          valueListenable: _viewmodel.paymentMethodNotifier,
-          builder: (context, value, child) {
-            return Container(
-              padding: EdgeInsets.only(
-                left: AppDims.size_24.w,
-                right: AppDims.size_24.w,
-                top: AppDims.size_8.h,
-              ),
-              child: ElevatedButton(
-                onPressed: value.isSuccess ? onPurchaseClicked : null,
-                child: AppText(context.wording.makePayment),
-              ),
-            );
-          },
+    return PopScope(
+      canPop: false,
+      // เพิ่มป้องกัน User กดกลับออกจากหน้าจาก Navigator ของระบบ
+      // ถ้ากดในจังหวะที่กำลังสร้่างออร์เดอร์ จะทำให้ route กลับไป HomePage แต่
+      // Process การชำระยังทำงานอยู่ จะทำให้เปิด Receipt ขึ้นมา replace หน้า HomePage แทน
+      onPopInvokedWithResult: (didPop, result) {
+        // ถ้า didpop เป็น true แสดงว่า context.pop ทำงาน จะ return ออกไม่ต้องทำอะไร
+        if (didPop) return;
+        // ถ้า didpop เป็น false แสดงว่ามีการกด Back จาก Navigtor ของระบบ จะต้องเช็ค flag
+        // _isPurchaseClicked == true แสดงว่ากำลัง process ไม่จะให้ออกจากหน้าจนกว่าจะ process เสร็จ
+        if (_isPurchaseClicked) {
+          return;
+        }
+        // ไม่เข้าทุกเงื่อนไข จะอนุญาตให้ pop ได้
+        context.pop();
+      },
+      child: Scaffold(
+        persistentFooterDecoration: BoxDecoration(
+          color: AppColors.background,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.5), // Shadow color
+              spreadRadius: 1, // How much the shadow should spread
+              blurRadius: 10, // How soft the shadow should be
+              offset: Offset(
+                0,
+                -2,
+              ), // Negative dy value moves the shadow upwards
+            ),
+          ],
         ),
-      ],
-      appBar: AppBar(
-        title: AppText(
-          // ทำการสั่งซื้อ
-          context.wording.makeOrder,
-          style: context.appBarTextThemeWhite,
-        ),
-        actions: [
-          // แจ้งปัญหา
-          IconButton(
-            onPressed: () {
-              ContactPage.goToPage(context, ContactProvider.helpAndProblemNoti);
-            },
-            icon: Assets.svg.icHeadset.svg(),
-          ),
-        ],
-        flexibleSpace: FlexibleSpaceBar(
-          background: Assets.png.bgAppBar.image(
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-      backgroundColor: AppColors.bareBackground,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(
-            left: AppDims.size_14.w,
-            right: AppDims.size_14.w,
-            top: AppDims.size_16.h,
-          ),
-          child: ValueListenableBuilder(
-            valueListenable: _viewmodel.selectedPackageNotifier!,
-            builder: (context, package, child) {
-              return Column(
-                children: [
-                  // สาขา
-                  _card(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Assets.svg.icLocationRoundedGreen.svg(),
-                        AppDims.horizonPadding_8,
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppText(
-                              context.wording.stores,
-                              style: _textPrimary,
-                            ),
-                            AppText(
-                              package!.storeNameDisplay(context),
-                              style: context.textTheme.labelLarge!.copyWith(
-                                color: AppColors.gray600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // คูปองและรหัสคูปองที่จะใช้ ปิดไปก่อน ยังใช้ไม่ได้
-                  // Visibility(
-                  //   visible: false,
-                  //   child: _card(
-                  //     child: Column(
-                  //       children: [
-                  //         AppDims.vericalPadding_14,
-
-                  //         // Title
-                  //         Row(
-                  //           crossAxisAlignment: CrossAxisAlignment.start,
-                  //           children: [
-                  //             Assets.svg.icCouponRoundGreen.svg(),
-                  //             AppDims.horizonPadding_8,
-
-                  //             Expanded(
-                  //               child: Row(
-                  //                 mainAxisAlignment:
-                  //                     MainAxisAlignment.spaceBetween,
-                  //                 children: [
-                  //                   SizedBox(
-                  //                     child: AppText(
-                  //                       'คูปองและรหัสคูปอง',
-                  //                       style: _textPrimary,
-                  //                     ),
-                  //                   ),
-                  //                   GestureDetector(
-                  //                     onTap: () {},
-                  //                     child: Assets.svg.icArrowForward.svg(),
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //         AppDims.vericalPadding_8,
-
-                  //         CouponEVoucherCardWidget(
-                  //           title: 'title',
-                  //           description: 'description',
-                  //           detailUsing: 'detailUsing',
-                  //           expired: 'expired',
-                  //           borderColor: AppColors.checkboxSelectedBg,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  AppDims.vericalPadding_14,
-
-                  // สินค้าที่กำลังจะซื้อ
-                  ValueListenableBuilder(
-                    valueListenable: _viewmodel.couponDetailNotifier!,
-                    builder: (context, couponDetailResult, child) {
-                      // Success state - get data
-                      final couponDetail = couponDetailResult.data!;
-                      final couponData = couponDetail.coupon!;
-
-                      // Use selected package or fallback to first package
-                      final packageData = package;
-                      return _card(
-                        child: Column(
-                          children: [
-                            // Title
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Assets.svg.icLikeBadgeRoundedGreen.svg(),
-                                AppDims.horizonPadding_8,
-
-                                SizedBox(
-                                  child: AppText(
-                                    context.wording.products,
-                                    style: _textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            AppDims.vericalPadding_8,
-
-                            _buildItemCard(
-                              context,
-                              couponData,
-                              packageData,
-                              couponDetail,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  AppDims.vericalPadding_14,
-
-                  // ประเภทชำระ
-                  ValueListenableBuilder(
-                    valueListenable: _viewmodel.paymentMethodNotifier,
-                    builder: (context, value, child) {
-                      if (value.isLoading) {
-                        return _card(
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-
-                      if (value.hasError) {
-                        return _card(
-                          child: AppText(context.wording.errorUi),
-                        );
-                      }
-
-                      return _card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Title
-                            Row(
-                              children: [
-                                Assets.svg.icWalletRoundedGreen.svg(),
-                                AppDims.horizonPadding_8,
-
-                                Expanded(
-                                  child: AppText(
-                                    // เลือกวิธีชำระเงิน
-                                    context.wording.selectPaymentMethod,
-                                    style: _textPrimary,
-                                  ),
-                                ),
-
-                                // ดูประเภทชำระทั้งหมด
-                                GestureDetector(
-                                  onTap: () {
-                                    context.pushNamed(
-                                      AvailablePaymentMethodPage.pageName,
-                                      extra: _viewmodel,
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      AppText(
-                                        // ดูทั้งหมด
-                                        context.wording.seeAll,
-                                        style: _textPrimary,
-                                      ),
-                                      AppDims.horizonPadding_8,
-                                      Assets.svg.icArrowForward.svg(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            AppDims.vericalPadding_8,
-
-                            // ประเภทชำระแต่ละละแบบ ตามที่ API ส่งมา
-                            ...value.data!
-                                .take(3)
-                                .map(
-                                  (payment) => _cardPaymentDependOnState(
-                                    payment,
-                                    // isTPWallet:
-                                    //     payment.isSelected &&
-                                    //     payment.method == 'tp_wallet',
-                                    // selected: payment.isSelected,
-                                    // child: ListTile(
-                                    //   minVerticalPadding: 0,
-                                    //   contentPadding: EdgeInsets.zero,
-                                    //   minTileHeight: 0,
-                                    //   horizontalTitleGap: AppDims.size_8.w,
-                                    //   leading: payment.imageUrl != null
-                                    //       ? CachedNetworkImage(
-                                    //           imageUrl: payment.imageUrl!,
-                                    //           width: 22.w,
-                                    //           height: 22.h,
-                                    //           fit: BoxFit.contain,
-                                    //           placeholder: (_, _) => SizedBox(
-                                    //             width: 22.w,
-                                    //             height: 22.h,
-                                    //           ),
-                                    //           errorWidget: (_, _, _) =>
-                                    //               SizedBox(
-                                    //                 width: 22.w,
-                                    //                 height: 22.h,
-                                    //               ),
-                                    //         )
-                                    //       : null,
-                                    //   title: AppText(
-                                    //     payment.name,
-                                    //     style: payment.isSelected
-                                    //         ? _textPrimarySelected
-                                    //         : _textPrimary,
-                                    //   ),
-                                    //   onTap: () {
-                                    //     _viewmodel.onPaymentChanged(
-                                    //       payment,
-                                    //     );
-                                    //   },
-                                    //   trailing: payment.isSelected
-                                    //       ? Padding(
-                                    //           padding: EdgeInsets.only(
-                                    //             right: 6.0.w,
-                                    //           ),
-                                    //           child: Assets.svg.icChecked.svg(),
-                                    //         )
-                                    //       : null,
-                                    // ),
-                                  ),
-                                ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  AppDims.vericalPadding_14,
-
-                  // สรุปยอดเงิน
-                  _card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title
-                        Row(
-                          children: [
-                            Assets.svg.icListRoundedGreen.svg(),
-                            AppDims.horizonPadding_8,
-
-                            AppText(
-                              // สรุปการสั่งซื้อ
-                              context.wording.orderSummary,
-                              style: _textPrimary,
-                            ),
-                          ],
-                        ),
-                        AppDims.vericalPadding_16,
-
-                        // detail
-                        // Title
-                        _lineSummay(
-                          // สรุปการสั่งซื้อ
-                          title: context.wording.orderSummary,
-                          price: package.price.ifNullOrEmpty('0.0'),
-                        ),
-                        AppDims.vericalPadding_16,
-                        // ส่วนลดถ้ามี
-                        _lineSummay(
-                          // ส่วนลดสินค้า
-                          title: context.wording.productDiscount,
-                          price: '0',
-                        ),
-                        AppDims.vericalPadding_16,
-                        // สรุปยอด
-                        _lineSummay(
-                          // ยอดชำระทั้งหมด
-                          title: context.wording.totalPayment,
-                          price: package.price.ifNullOrEmpty('0.0'),
-                          textPriceColor: AppColors.primary,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  AppDims.vericalPadding_14,
-                ],
+        persistentFooterButtons: [
+          // ปุ่มยืนยันซื้อคูปอง
+          ValueListenableBuilder(
+            valueListenable: _viewmodel.paymentMethodNotifier,
+            builder: (context, value, child) {
+              return Container(
+                padding: EdgeInsets.only(
+                  left: AppDims.size_24.w,
+                  right: AppDims.size_24.w,
+                  top: AppDims.size_8.h,
+                ),
+                child: ElevatedButton(
+                  onPressed: value.isSuccess ? onPurchaseClicked : null,
+                  child: AppText(context.wording.makePayment),
+                ),
               );
             },
+          ),
+        ],
+        appBar: AppBar(
+          title: AppText(
+            // ทำการสั่งซื้อ
+            context.wording.makeOrder,
+            style: context.appBarTextThemeWhite,
+          ),
+          actions: [
+            // แจ้งปัญหา
+            IconButton(
+              onPressed: () {
+                ContactPage.goToPage(
+                  context,
+                  ContactProvider.helpAndProblemNoti,
+                );
+              },
+              icon: Assets.svg.icHeadset.svg(),
+            ),
+          ],
+          flexibleSpace: FlexibleSpaceBar(
+            background: Assets.png.bgAppBar.image(
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        backgroundColor: AppColors.bareBackground,
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(
+              left: AppDims.size_14.w,
+              right: AppDims.size_14.w,
+              top: AppDims.size_16.h,
+            ),
+            child: ValueListenableBuilder(
+              valueListenable: _viewmodel.selectedPackageNotifier!,
+              builder: (context, package, child) {
+                return Column(
+                  children: [
+                    // สาขา
+                    _card(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Assets.svg.icLocationRoundedGreen.svg(),
+                          AppDims.horizonPadding_8,
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppText(
+                                context.wording.stores,
+                                style: _textPrimary,
+                              ),
+                              AppText(
+                                package!.storeNameDisplay(context),
+                                style: context.textTheme.labelLarge!.copyWith(
+                                  color: AppColors.gray600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // คูปองและรหัสคูปองที่จะใช้ ปิดไปก่อน ยังใช้ไม่ได้
+                    // Visibility(
+                    //   visible: false,
+                    //   child: _card(
+                    //     child: Column(
+                    //       children: [
+                    //         AppDims.vericalPadding_14,
+
+                    //         // Title
+                    //         Row(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             Assets.svg.icCouponRoundGreen.svg(),
+                    //             AppDims.horizonPadding_8,
+
+                    //             Expanded(
+                    //               child: Row(
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 children: [
+                    //                   SizedBox(
+                    //                     child: AppText(
+                    //                       'คูปองและรหัสคูปอง',
+                    //                       style: _textPrimary,
+                    //                     ),
+                    //                   ),
+                    //                   GestureDetector(
+                    //                     onTap: () {},
+                    //                     child: Assets.svg.icArrowForward.svg(),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         AppDims.vericalPadding_8,
+
+                    //         CouponEVoucherCardWidget(
+                    //           title: 'title',
+                    //           description: 'description',
+                    //           detailUsing: 'detailUsing',
+                    //           expired: 'expired',
+                    //           borderColor: AppColors.checkboxSelectedBg,
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    AppDims.vericalPadding_14,
+
+                    // สินค้าที่กำลังจะซื้อ
+                    ValueListenableBuilder(
+                      valueListenable: _viewmodel.couponDetailNotifier!,
+                      builder: (context, couponDetailResult, child) {
+                        // Success state - get data
+                        final couponDetail = couponDetailResult.data!;
+                        final couponData = couponDetail.coupon!;
+
+                        // Use selected package or fallback to first package
+                        final packageData = package;
+                        return _card(
+                          child: Column(
+                            children: [
+                              // Title
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Assets.svg.icLikeBadgeRoundedGreen.svg(),
+                                  AppDims.horizonPadding_8,
+
+                                  SizedBox(
+                                    child: AppText(
+                                      context.wording.products,
+                                      style: _textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              AppDims.vericalPadding_8,
+
+                              _buildItemCard(
+                                context,
+                                couponData,
+                                packageData,
+                                couponDetail,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    AppDims.vericalPadding_14,
+
+                    // ประเภทชำระ
+                    ValueListenableBuilder(
+                      valueListenable: _viewmodel.paymentMethodNotifier,
+                      builder: (context, value, child) {
+                        if (value.isLoading) {
+                          return _card(
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        if (value.hasError) {
+                          return _card(
+                            child: AppText(context.wording.errorUi),
+                          );
+                        }
+
+                        return _card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Title
+                              Row(
+                                children: [
+                                  Assets.svg.icWalletRoundedGreen.svg(),
+                                  AppDims.horizonPadding_8,
+
+                                  Expanded(
+                                    child: AppText(
+                                      // เลือกวิธีชำระเงิน
+                                      context.wording.selectPaymentMethod,
+                                      style: _textPrimary,
+                                    ),
+                                  ),
+
+                                  // ดูประเภทชำระทั้งหมด
+                                  GestureDetector(
+                                    onTap: () {
+                                      context.pushNamed(
+                                        AvailablePaymentMethodPage.pageName,
+                                        extra: _viewmodel,
+                                      );
+                                    },
+                                    child: Row(
+                                      children: [
+                                        AppText(
+                                          // ดูทั้งหมด
+                                          context.wording.seeAll,
+                                          style: _textPrimary,
+                                        ),
+                                        AppDims.horizonPadding_8,
+                                        Assets.svg.icArrowForward.svg(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              AppDims.vericalPadding_8,
+
+                              // ประเภทชำระแต่ละละแบบ ตามที่ API ส่งมา
+                              ...value.data!
+                                  .take(3)
+                                  .map(
+                                    (payment) => _cardPaymentDependOnState(
+                                      payment,
+                                      // isTPWallet:
+                                      //     payment.isSelected &&
+                                      //     payment.method == 'tp_wallet',
+                                      // selected: payment.isSelected,
+                                      // child: ListTile(
+                                      //   minVerticalPadding: 0,
+                                      //   contentPadding: EdgeInsets.zero,
+                                      //   minTileHeight: 0,
+                                      //   horizontalTitleGap: AppDims.size_8.w,
+                                      //   leading: payment.imageUrl != null
+                                      //       ? CachedNetworkImage(
+                                      //           imageUrl: payment.imageUrl!,
+                                      //           width: 22.w,
+                                      //           height: 22.h,
+                                      //           fit: BoxFit.contain,
+                                      //           placeholder: (_, _) => SizedBox(
+                                      //             width: 22.w,
+                                      //             height: 22.h,
+                                      //           ),
+                                      //           errorWidget: (_, _, _) =>
+                                      //               SizedBox(
+                                      //                 width: 22.w,
+                                      //                 height: 22.h,
+                                      //               ),
+                                      //         )
+                                      //       : null,
+                                      //   title: AppText(
+                                      //     payment.name,
+                                      //     style: payment.isSelected
+                                      //         ? _textPrimarySelected
+                                      //         : _textPrimary,
+                                      //   ),
+                                      //   onTap: () {
+                                      //     _viewmodel.onPaymentChanged(
+                                      //       payment,
+                                      //     );
+                                      //   },
+                                      //   trailing: payment.isSelected
+                                      //       ? Padding(
+                                      //           padding: EdgeInsets.only(
+                                      //             right: 6.0.w,
+                                      //           ),
+                                      //           child: Assets.svg.icChecked.svg(),
+                                      //         )
+                                      //       : null,
+                                      // ),
+                                    ),
+                                  ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    AppDims.vericalPadding_14,
+
+                    // สรุปยอดเงิน
+                    _card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Row(
+                            children: [
+                              Assets.svg.icListRoundedGreen.svg(),
+                              AppDims.horizonPadding_8,
+
+                              AppText(
+                                // สรุปการสั่งซื้อ
+                                context.wording.orderSummary,
+                                style: _textPrimary,
+                              ),
+                            ],
+                          ),
+                          AppDims.vericalPadding_16,
+
+                          // detail
+                          // Title
+                          _lineSummay(
+                            // สรุปการสั่งซื้อ
+                            title: context.wording.orderSummary,
+                            price: package.price.ifNullOrEmpty('0.0'),
+                          ),
+                          AppDims.vericalPadding_16,
+                          // ส่วนลดถ้ามี
+                          _lineSummay(
+                            // ส่วนลดสินค้า
+                            title: context.wording.productDiscount,
+                            price: '0',
+                          ),
+                          AppDims.vericalPadding_16,
+                          // สรุปยอด
+                          _lineSummay(
+                            // ยอดชำระทั้งหมด
+                            title: context.wording.totalPayment,
+                            price: package.price.ifNullOrEmpty('0.0'),
+                            textPriceColor: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    AppDims.vericalPadding_14,
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

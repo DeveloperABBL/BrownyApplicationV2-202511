@@ -69,6 +69,7 @@ class OrderHistoryItem {
     this.store,
     this.machineNo,
     this.machineType,
+    this.image,
     this.luckNo,
     this.program,
     this.paymentMethod,
@@ -93,6 +94,9 @@ class OrderHistoryItem {
 
   @JsonKey(name: 'machine_no')
   final int? machineNo;
+
+  @JsonKey(name: 'image')
+  final String? image;
 
   @JsonKey(name: 'machine_type')
   final ContentLocalizeData? machineType;

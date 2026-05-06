@@ -286,7 +286,7 @@ class __MachineContentState extends State<_MachineContent>
 
         if (!mounted) return;
         AppOverlays.hideLoading();
-        ReceiptMachinePage.goToPage(
+        ReceiptMachinePage.goReplacementPage(
           context,
           viewmodel: _viewmodel,
         );
@@ -338,8 +338,6 @@ class __MachineContentState extends State<_MachineContent>
       _clearPurchaseClicked();
       return;
     }
-    // flagกันคลิกเบิ้ล
-    _clearPurchaseClicked();
     // ไปหน้า PIN/Biometric เพื่อยืนยันการทำรายการ
     TransactionAuthenPage.goToPage(context).then(
       (result) async {
@@ -367,6 +365,9 @@ class __MachineContentState extends State<_MachineContent>
                 // เดิม: ไม่สามารถสร้างคำสั่งซื้อได้
                 message: context.wording.cannotCreateOrder,
               );
+
+              // flagกันคลิกเบิ้ล
+              _clearPurchaseClicked();
               return;
             }
 
@@ -379,6 +380,9 @@ class __MachineContentState extends State<_MachineContent>
                 // เดิม: ไม่พบข้อมูล Payment Reference
                 message: context.wording.paymentReferenceNotFound,
               );
+
+              // flagกันคลิกเบิ้ล
+              _clearPurchaseClicked();
               return;
             }
 
@@ -390,7 +394,7 @@ class __MachineContentState extends State<_MachineContent>
               if (!mounted) return;
               // เก็บ paymentRef ก่อนที่จะ call payment check
               _currentPaymentRef = paymentRef;
-              _checkPaymentStatus();
+              await _checkPaymentStatus();
               AppOverlays.hideLoading();
               return;
             }
@@ -415,6 +419,9 @@ class __MachineContentState extends State<_MachineContent>
                 // ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง
                 message: context.wording.incompletePaymentData,
               );
+
+              // flagกันคลิกเบิ้ล
+              _clearPurchaseClicked();
               return;
             }
 
@@ -450,14 +457,6 @@ class __MachineContentState extends State<_MachineContent>
                 isScrollControlled: true,
                 isDismissible: false,
                 builder: (dialogContext) {
-                  // controller = WebViewController()
-                  //   ..setJavaScriptMode(
-                  //     JavaScriptMode.unrestricted,
-                  //   )
-                  //   ..setBackgroundColor(AppColors.background)
-                  //   ..loadRequest(
-                  //     Uri.parse(orderResponse.redirectUrl!),
-                  //   );
                   return SizedBox(
                     height: 812.h * 0.85,
                     child: Scaffold(
@@ -504,11 +503,16 @@ class __MachineContentState extends State<_MachineContent>
             return;
           }
 
+          // flagกันคลิกเบิ้ล
+          _clearPurchaseClicked();
           AppOverlays.showBrownyErrorDialog(
             context,
             error: orderResult.error,
           );
           return;
+        } else {
+          // flagกันคลิกเบิ้ล
+          _clearPurchaseClicked();
         }
       },
     );
@@ -527,81 +531,181 @@ class __MachineContentState extends State<_MachineContent>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      persistentFooterDecoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: AppColors.defatultShadow,
-      ),
-      persistentFooterButtons: [
-        // ปุ่มยืนยันสั่งเครื่องทำงาน
-        ValueListenableBuilder(
-          valueListenable: _viewmodel.machineProgramsNotifier,
-          builder: (context, result, child) {
-            if (!result.isSuccess) {
-              return SizedBox();
-            }
+    return PopScope(
+      canPop: false,
+      // เพิ่มป้องกัน User กดกลับออกจากหน้าจาก Navigator ของระบบ
+      // ถ้ากดในจังหวะที่กำลังสร้่างออร์เดอร์ จะทำให้ route กลับไป HomePage แต่
+      // Process การชำระยังทำงานอยู่ จะทำให้เปิด Receipt ขึ้นมา replace หน้า HomePage แทน
+      onPopInvokedWithResult: (didPop, result) {
+        // ถ้า didpop เป็น true แสดงว่า context.pop ทำงาน จะ return ออกไม่ต้องทำอะไร
+        if (didPop) return;
+        // ถ้า didpop เป็น false แสดงว่ามีการกด Back จาก Navigtor ของระบบ จะต้องเช็ค flag
+        // _isPurchaseClicked == true แสดงว่ากำลัง process ไม่จะให้ออกจากหน้าจนกว่าจะ process เสร็จ
+        if (_isPurchaseClicked) {
+          return;
+        }
+        // ไม่เข้าทุกเงื่อนไข จะอนุญาตให้ pop ได้
+        context.pop();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        persistentFooterDecoration: BoxDecoration(
+          color: AppColors.background,
+          boxShadow: AppColors.defatultShadow,
+        ),
+        persistentFooterButtons: [
+          // ปุ่มยืนยันสั่งเครื่องทำงาน
+          ValueListenableBuilder(
+            valueListenable: _viewmodel.machineProgramsNotifier,
+            builder: (context, result, child) {
+              if (!result.isSuccess) {
+                return SizedBox();
+              }
 
-            final enable = result.isSuccess && result.data!.hasSelectedProgram;
-            return Column(
-              children: [
-                Builder(
-                  builder: (context) {
-                    final totalDiscount =
-                        result.data!.getTotalDiscountStore() +
-                        result.data!.getTotalCouponOnlyDiscount() +
-                        result.data!.getTotalEVoucherDiscount();
-                    final discountText = formatCurrency(
-                      value: totalDiscount,
-                    );
+              final enable =
+                  result.isSuccess && result.data!.hasSelectedProgram;
+              return Column(
+                children: [
+                  Builder(
+                    builder: (context) {
+                      final totalDiscount =
+                          result.data!.getTotalDiscountStore() +
+                          result.data!.getTotalCouponOnlyDiscount() +
+                          result.data!.getTotalEVoucherDiscount();
+                      final discountText = formatCurrency(
+                        value: totalDiscount,
+                      );
 
-                    if (totalDiscount == 0) {
-                      return SizedBox();
-                    }
+                      if (totalDiscount == 0) {
+                        return SizedBox();
+                      }
 
-                    return Padding(
-                      padding: EdgeInsets.only(top: AppDims.size_8.h),
-                      child: RichText(
-                        text: TextSpan(
-                          style: context.textTheme.bodyMedium!,
-                          children: [
-                            TextSpan(text: '${context.wording.totalDiscount} '),
-                            TextSpan(
-                              text: '฿',
-                              style: AppTextNumberStyles.labelLarge.copyWith(
-                                color: AppColors.error,
+                      return Padding(
+                        padding: EdgeInsets.only(top: AppDims.size_8.h),
+                        child: RichText(
+                          text: TextSpan(
+                            style: context.textTheme.bodyMedium!,
+                            children: [
+                              TextSpan(
+                                text: '${context.wording.totalDiscount} ',
                               ),
-                            ),
-                            TextSpan(
-                              text: discountText,
-                              style: AppTextNumberStyles.labelLarge.copyWith(
-                                color: AppColors.error,
+                              TextSpan(
+                                text: '฿',
+                                style: AppTextNumberStyles.labelLarge.copyWith(
+                                  color: AppColors.error,
+                                ),
                               ),
-                            ),
-                            TextSpan(text: ' ${context.wording.thb}'),
-                          ],
+                              TextSpan(
+                                text: discountText,
+                                style: AppTextNumberStyles.labelLarge.copyWith(
+                                  color: AppColors.error,
+                                ),
+                              ),
+                              TextSpan(text: ' ${context.wording.thb}'),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                      left: AppDims.size_16.w,
+                      right: AppDims.size_16.w,
+                      top: AppDims.size_8.h,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: enable ? _onPurchaseClicked : null,
+                      child: AppText(
+                        '${context.wording.makePayment} ${formatCurrency(
+                          leadingSign: '฿',
+                          value: result.data!.getNetPrice(),
+                        )}',
+                        style: context.textTheme.headlineSmall!.copyWith(
+                          fontSize: AppDims.size_14.sp,
+                          color: AppColors.textWhite,
                         ),
                       ),
-                    );
-                  },
-                ),
-                Container(
-                  padding: EdgeInsets.only(
-                    left: AppDims.size_16.w,
-                    right: AppDims.size_16.w,
-                    top: AppDims.size_8.h,
+                    ),
                   ),
-                  child: ElevatedButton(
-                    onPressed: enable ? _onPurchaseClicked : null,
-                    child: AppText(
-                      '${context.wording.makePayment} ${formatCurrency(
-                        leadingSign: '฿',
-                        value: result.data!.getNetPrice(),
-                      )}',
-                      style: context.textTheme.headlineSmall!.copyWith(
-                        fontSize: AppDims.size_14.sp,
-                        color: AppColors.textWhite,
-                      ),
+                ],
+              );
+            },
+          ),
+        ],
+        body: ValueListenableBuilder(
+          valueListenable: _viewmodel.machineProgramsNotifier,
+          builder: (context, result, child) {
+            if (result.isLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (result.hasError || result.isEmpty) {
+              return Scaffold(
+                appBar: AppBar(
+                  leading: BackButton(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                body: Center(
+                  child: AppText(
+                    // เดิม: ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง
+                    context.wording.machineDataLoadError,
+                  ),
+                ),
+              );
+            }
+            // assign value
+            _machineProgram = result.data!;
+            return Column(
+              children: [
+                // Scrollable Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        // Fixed Header with Machine Image
+                        _buildFixedHeader(),
+
+                        // Title เครื่องซัก, สาขา
+                        _mainTitle(),
+
+                        // Program ของเครื่องซักที่มี
+                        _programWidget(),
+
+                        // Program เพิ่มเวลา ของเครื่องอบที่มี
+                        if (_machineProgram!.hasAddTime)
+                          _programAddTimeWidget(),
+
+                        // คูปอง / E-Voucher
+                        _couponEVoucherWidget(),
+
+                        // ประเภทชำระ
+                        _paymentMethods(),
+
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_16.w,
+                          ),
+                          child: AppDims.vericalPadding_24,
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppDims.size_16.w,
+                          ),
+                          child: Divider(),
+                        ),
+
+                        // Summary Transaction
+                        _summary(),
+
+                        // Extra padding เพื่อให้ scroll พ้น footer button
+                        // SizedBox(height: 42.h),
+                      ],
                     ),
                   ),
                 ),
@@ -609,85 +713,6 @@ class __MachineContentState extends State<_MachineContent>
             );
           },
         ),
-      ],
-      body: ValueListenableBuilder(
-        valueListenable: _viewmodel.machineProgramsNotifier,
-        builder: (context, result, child) {
-          if (result.isLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (result.hasError || result.isEmpty) {
-            return Scaffold(
-              appBar: AppBar(
-                leading: BackButton(
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              body: Center(
-                child: AppText(
-                  // เดิม: ไม่พบข้อมูลเครื่องหรือเกิดข้อผิดพลาด\nกรุณาตรวจสอบและลองใหม่อีกครั้ง
-                  context.wording.machineDataLoadError,
-                ),
-              ),
-            );
-          }
-          // assign value
-          _machineProgram = result.data!;
-          return Column(
-            children: [
-              // Scrollable Content
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      // Fixed Header with Machine Image
-                      _buildFixedHeader(),
-
-                      // Title เครื่องซัก, สาขา
-                      _mainTitle(),
-
-                      // Program ของเครื่องซักที่มี
-                      _programWidget(),
-
-                      // Program เพิ่มเวลา ของเครื่องอบที่มี
-                      if (_machineProgram!.hasAddTime) _programAddTimeWidget(),
-
-                      // คูปอง / E-Voucher
-                      _couponEVoucherWidget(),
-
-                      // ประเภทชำระ
-                      _paymentMethods(),
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_16.w,
-                        ),
-                        child: AppDims.vericalPadding_24,
-                      ),
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDims.size_16.w,
-                        ),
-                        child: Divider(),
-                      ),
-
-                      // Summary Transaction
-                      _summary(),
-
-                      // Extra padding เพื่อให้ scroll พ้น footer button
-                      // SizedBox(height: 42.h),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
       ),
     );
   }

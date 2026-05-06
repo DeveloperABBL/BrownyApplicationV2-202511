@@ -86,8 +86,8 @@ class CrashlyticsHelper {
   /// [reason] - เหตุผลหรือบริบทของ error (optional)
   /// [fatal] - เป็น fatal error หรือไม่ (default: false)
   static Future<void> recordError(
-    dynamic exception,
-    StackTrace? stackTrace, {
+    dynamic exception, {
+    StackTrace? stackTrace,
     String? reason,
     bool fatal = false,
     Map<String, dynamic>? customKeys,
@@ -239,7 +239,6 @@ class CrashlyticsHelper {
     if (kDebugMode) {
       await recordError(
         Exception('This is a test exception from Crashlytics'),
-        StackTrace.current,
         reason: 'Testing Crashlytics integration',
         fatal: false,
       );

@@ -622,6 +622,15 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
       // );
       return UiResult.success(data: result.data);
     } catch (e) {
+      unawaited(
+        CrashlyticsHelper.recordError(
+          e,
+          fatal: true,
+          customKeys: {
+            'customer_id': customerId,
+          },
+        ),
+      );
       return UiResult.error(
         error: Exception('Failed to create machine order: ${e.toString()}'),
       );
@@ -674,6 +683,9 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
         return UiResult.error(error: result.error);
       }
     } catch (e) {
+      unawaited(
+        CrashlyticsHelper.recordError(e),
+      );
       final exception = Exception(
         'เกิดข้อผิดพลาดในการตรวจสอบสถานะ: ${e.toString()}',
       );
@@ -769,6 +781,9 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
         return UiResult.error(error: result.error);
       }
     } catch (e) {
+      unawaited(
+        CrashlyticsHelper.recordError(e),
+      );
       final exception = Exception(
         'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ: ${e.toString()}',
       );

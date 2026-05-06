@@ -106,6 +106,7 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
   ) async {
     try {
       if (kDebugMode) {
+        // await Future.delayed(const Duration(seconds: 30));
         return RepoResult.success(
           data: CouponOrderResponse.fromJson(
             jsonDecode('''
@@ -170,6 +171,7 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
   ) async {
     try {
       if (kDebugMode) {
+        await Future.delayed(const Duration(seconds: 30));
         return RepoResult.success(
           data: PaymentStatusCheckResponse.fromJson(
             jsonDecode('''
@@ -408,6 +410,7 @@ class TransactionRepo extends AppRepository with TransactionDataSourceMixin {
   ) async {
     try {
       if (kDebugMode) {
+        // await Future.delayed(const Duration(seconds: 30));
         return RepoResult.success(
           data: PaymentStatusCheckResponse.fromJson(
             jsonDecode('''

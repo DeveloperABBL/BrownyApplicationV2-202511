@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/payment_check.dart';
+import 'package:browny_applications_new/core/utils/crashlytics_helper.dart';
 import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/transactions/models/machine_program_model.dart';
 import 'package:browny_applications_new/feature/transactions/models/payment_transaction_state.dart';
@@ -731,6 +732,15 @@ class TransactionsViewmodel extends AppViewModel
         return UiResult.error(error: result.error);
       }
     } catch (e) {
+      unawaited(
+        CrashlyticsHelper.recordError(
+          e,
+          fatal: true,
+          customKeys: {
+            'customer_id': customerId,
+          },
+        ),
+      );
       return UiResult.error(
         error: Exception('เกิดข้อผิดพลาดในการสร้างคำสั่งซื้อ: ${e.toString()}'),
       );

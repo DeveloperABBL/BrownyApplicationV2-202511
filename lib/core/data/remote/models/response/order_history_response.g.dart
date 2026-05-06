@@ -52,6 +52,7 @@ OrderHistoryItem _$OrderHistoryItemFromJson(Map<String, dynamic> json) =>
           : ContentLocalizeData.fromJson(
               json['machine_type'] as Map<String, dynamic>,
             ),
+      image: json['image'] as String?,
       luckNo: json['luck_no'] as String?,
       program: json['program'] == null
           ? null
@@ -79,6 +80,7 @@ Map<String, dynamic> _$OrderHistoryItemToJson(OrderHistoryItem instance) =>
       'receipt_at': instance.receiptAt,
       'store': instance.store,
       'machine_no': instance.machineNo,
+      'image': instance.image,
       'machine_type': instance.machineType,
       'luck_no': instance.luckNo,
       'program': instance.program,

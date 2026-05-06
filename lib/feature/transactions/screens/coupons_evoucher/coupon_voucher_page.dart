@@ -324,6 +324,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                           color: AppColors.gray500,
                           fontSize: AppDims.size_16.sp,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Tab(
@@ -333,6 +334,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                           color: AppColors.gray500,
                           fontSize: AppDims.size_16.sp,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Tab(
@@ -342,6 +344,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
                           color: AppColors.gray500,
                           fontSize: AppDims.size_15.sp,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],

@@ -382,7 +382,9 @@ class __TransactionAuthenContentState extends _CreateAppPinContentState {
 
     if (success && mounted && context.mounted) {
       // PIN ถูกต้อง - pop กลับพร้อม result
-      context.pop(true);
+      if (context.canPop()) {
+        context.pop(true);
+      }
     }
     // ถ้าไม่ถูกต้อง error message จะแสดงโดย viewModel
   }

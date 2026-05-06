@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:browny_applications_new/core/data/cache/biometric_helper.dart';
 import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
+import 'package:browny_applications_new/core/utils/crashlytics_helper.dart';
 import 'package:browny_applications_new/core/utils/pin_decryption_util.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 enum PinBiometricPross {
@@ -270,17 +273,23 @@ class PinBiometricViewModel extends AppViewModel {
           ciphertextB64: ciphertext,
           appKey: appKey,
         );
+        if (kDebugMode) {
+          throw Exception('test throw');
+        }
       } catch (e) {
         // Decrypt failed - อาจเป็นเพราะ APP_KEY ไม่ถูกต้อง
         // ⚠️ ควร log error และแจ้ง admin แทนที่จะให้ user สร้าง PIN ใหม่
         // เพราะถ้าให้สร้างใหม่จะทำให้ PIN local กับ server ไม่ตรงกัน
+        unawaited(
+          CrashlyticsHelper.recordError(
+            e,
+            customKeys: {'event': 'getPinFromServer'},
+          ),
+        );
         _isLoading = false;
         _errorMessage =
             'Cannot sync PIN from server. Please contact support or try again later.';
         notifyListeners();
-
-        // TODO: Log error to analytics/monitoring service
-        // Analytics.logError('PIN_DECRYPT_FAILED', error: e.toString());
 
         return false;
       }

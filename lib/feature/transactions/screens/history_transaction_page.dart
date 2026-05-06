@@ -145,6 +145,7 @@ class __HistoryTransactionContentState
       ),
       backgroundColor: AppColors.bareBackground,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Date range filter header
           _DateFilterHeader(
@@ -193,7 +194,7 @@ class __HistoryTransactionContentState
                     // separatorBuilder: (_, _) => Divider(),
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
-                      vertical: 16.h,
+                      vertical: 8.h,
                     ),
                     itemCount: items.length + 1,
                     itemBuilder: (context, index) {
@@ -249,15 +250,25 @@ class _DateFilterHeader extends StatelessWidget {
         final startLabel = _formatDateLabel(range.start, locale);
         final endLabel = _formatDateLabel(range.end, locale);
 
-        return InkWell(
-          onTap: onTap,
+        return Container(
+          // width: double.infinity,
+          padding: EdgeInsets.only(
+            left: AppDims.size_16.w,
+            right: AppDims.size_16.w,
+            top: AppDims.size_16.h,
+            bottom: AppDims.size_8.h,
+          ),
           child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-            // decoration: BoxDecoration(
-            //   color: AppColors.white,
-            // ),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDims.size_12.w,
+              vertical: AppDims.size_8.h,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(AppDims.smallRadius),
+            ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Assets.svg.icCalendarToday.svg(
@@ -268,14 +279,17 @@ class _DateFilterHeader extends StatelessWidget {
                 ),
                 AppDims.horizonPadding_8,
 
-                AppText(
-                  '$startLabel – $endLabel',
-                  style: context.textTheme.labelMedium?.copyWith(
-                    color: AppColors.darkBrown,
+                GestureDetector(
+                  onTap: onTap,
+                  child: AppText(
+                    '$startLabel – $endLabel',
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: AppColors.darkBrown,
+                    ),
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 AppDims.horizonPadding_4,
               ],
@@ -328,113 +342,193 @@ class _OrderHistoryItem extends StatelessWidget {
       subtitle = item.getPackageNameDisplay(locale);
     }
 
-    // final paymentName = item.paymentMethod?.getNameDisplay(locale) ?? '';
-    // final paymentImage = item.paymentMethod?.image;
-    Widget icon;
-    if (item.isMachineOrder) {
-      icon = Assets.svg.icChecked.svg();
-    } else {
-      icon = Assets.icMenu.icTicket.image();
-    }
+    final paymentName = item.paymentMethod?.getNameDisplay(locale) ?? '';
+    final paymentImage = item.paymentMethod?.image;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: AppDims.size_8.h),
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Expanded(
-              child: Column(
-                spacing: AppDims.size_2.h,
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      margin: EdgeInsets.only(bottom: AppDims.size_8.h),
+      padding: EdgeInsets.all(AppDims.size_12.w),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: BoxBorder.fromLTRB(
+                bottom: BorderSide(
+                  color: AppColors.border,
+                ),
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: AppDims.size_8.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppText(
-                    item.receiptNo ?? '-',
-                    style: context.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                    'Order ID',
+                    style: context.textTheme.labelMedium!.copyWith(
+                      color: AppColors.gray600,
                     ),
                     // maxLines: 2,
                     // overflow: TextOverflow.ellipsis,
                   ),
-                  // store
-                  if (storeName.isNotEmpty) ...[
-                    AppText(
-                      storeName,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2.h),
-                  ],
-                  // Machine/Package subtitle
-                  if (subtitle.isNotEmpty) ...[
-                    AppText(
-                      subtitle,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      // maxLines: 2,
-                      // overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2.h),
-                  ],
-                  // Amount (machine_order only)
-                  // if (item.isMachineOrder && item.amount != null)
-                  //   Row(
-                  //     spacing: AppDims.size_8.w,
-                  //     children: [
-                  //       // ยอดชำระ
-                  //       AppText(
-                  //         formatCurrency(
-                  //           string: item.amount!,
-                  //           leadingSign: '฿',
-                  //         ),
-                  //         style: context.textTheme.labelMedium?.copyWith(
-                  //           color: AppColors.textSecondary,
-                  //         ),
-                  //       ),
-                  //       // payment method name
-                  //       if (paymentName.isNotEmpty) ...[
-                  //         AppText(
-                  //           paymentName,
-                  //           style: context.textTheme.labelMedium?.copyWith(
-                  //             color: AppColors.textSecondary,
-                  //           ),
-                  //           maxLines: 1,
-                  //           overflow: TextOverflow.ellipsis,
-                  //         ),
-                  //         Image.network(
-                  //           width: 30.w,
-                  //           paymentImage.orEmpty,
-                  //           fit: BoxFit.contain,
-                  //           errorBuilder: (_, _, _) => SizedBox(),
-                  //         ),
-                  //       ],
-                  //     ],
-                  //   ),
-                  // Receipt date
                   AppText(
-                    receiptDate,
-                    style: context.textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                    item.receiptNo ?? '-',
+                    style: context.textTheme.labelMedium!.copyWith(
+                      // color: AppColors.gray600,
+                    ),
+                    // maxLines: 2,
+                    // overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AppDims.vericalPadding_8,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              // Image Service ที่ใช้
+              Container(
+                width: AppDims.size_75.w,
+                height: AppDims.size_75.h,
+                padding: EdgeInsets.symmetric(
+                  vertical: AppDims.size_5.h,
+                  horizontal: AppDims.size_12.w,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.r),
+                  color: AppColors.border,
+                  // image: DecorationImage(
+                  //   image: NetworkImage(
+                  //     'https://dev.abgroup.co.th/storage/galleries/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png',
+                  //     // notification.icon!,
+                  //   ),
+                  // ),
+                ),
+                child: Image.network(
+                  item.image.orEmpty,
+                  width: AppDims.size_50.w,
+                  errorBuilder: (_, _, _) => SizedBox(),
+                ),
+              ),
+              AppDims.horizonPadding_8,
+              Expanded(
+                child: Column(
+                  spacing: AppDims.size_2.h,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // store
+                    if (storeName.isNotEmpty) ...[
+                      AppText(
+                        storeName,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          // color: AppColors.darkBrown,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      AppDims.vericalPadding_2,
+                    ],
+                    // package ใช้งานเครื่อง
+                    if (item.program != null) ...[
+                      AppText(
+                        item.program!.getNameDisplay(locale),
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                    ],
+                    // Machine/Package subtitle
+                    if (subtitle.isNotEmpty) ...[
+                      AppText(
+                        subtitle,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                      AppDims.vericalPadding_2,
+                    ],
+                    if (paymentName.orEmpty.isNotEmpty) ...[
+                      Row(
+                        spacing: AppDims.size_2.w,
+                        children: [
+                          Spacer(),
+                          Image.network(
+                            width: AppDims.size_24.w,
+                            paymentImage.orEmpty,
+                            errorBuilder: (_, _, _) => SizedBox(),
+                          ),
+                          AppText(
+                            paymentName,
+                            style: context.textTheme.labelMedium?.copyWith(
+                              color: AppColors.gray600,
+                            ),
+                          ),
+                          AppDims.horizonPadding_4,
+                          if (item.amount.orEmpty.isNotEmpty)
+                            AppText(
+                              formatCurrency(
+                                string: item.amount.ifNullOrEmpty('0.00'),
+                                leadingSign: '฿',
+                              ),
+                              style: context.textTheme.labelMedium?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          AppDims.vericalPadding_8,
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDims.size_12.w,
+                vertical: AppDims.size_8.h,
+              ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.ci3,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                spacing: AppDims.size_10.w,
+                children: [
+                  Assets.svg.icChecked.svg(width: AppDims.size_24.w),
+                  Expanded(
+                    child: AppText(
+                      receiptDate,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: AppColors.gray500,
+                      ),
+                    ),
+                  ),
+                  Assets.svg.icArrowForward.svg(
+                    width: AppDims.size_24.w,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.primary,
+                      BlendMode.srcIn,
                     ),
                   ),
                 ],
               ),
             ),
-            Assets.svg.arrowRight.svg(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

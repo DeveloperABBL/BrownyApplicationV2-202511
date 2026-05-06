@@ -174,4 +174,8 @@ class AppDims {
   );
 
   static final double primaryRadius = 32.0.r;
+
+  static final double mediumRadius = 16.0.r;
+
+  static final double smallRadius = 8.0.r;
 }

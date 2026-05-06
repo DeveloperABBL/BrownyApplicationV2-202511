@@ -127,7 +127,7 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
   ) async {
     // ========== Mock Data for Debug Mode (priceFinal = 0.0) ==========
     if (kDebugMode) {
-      await Future.delayed(const Duration(minutes: 2));
+      // await Future.delayed(const Duration(seconds: 30));
       // Mock response สำหรับทดสอบกรณีลด 100% (priceFinal = 0.0)
       final mockTimestamp = DateTime.now().millisecondsSinceEpoch;
       final mockResponse = MachineOrderResponse(

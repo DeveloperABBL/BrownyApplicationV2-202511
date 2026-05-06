@@ -647,7 +647,8 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: AppDims.size_2.h),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
         children: [
           Expanded(
             child:
