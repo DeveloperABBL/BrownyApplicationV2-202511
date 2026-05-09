@@ -548,5 +548,9 @@
   "orderHistoryStore": "门店",
   "orderHistoryMachine": "机器",
   "orderHistoryPayment": "支付方式",
-  "orderHistoryAmount": "金额"
+  "orderHistoryAmount": "金额",
+  "unavailableCoupons": "无法使用的优惠券",
+  "unavailableEVouchers": "无法使用的电子券",
+  "couponExpired": "已过期",
+  "couponFullyRedeemed": "已满额"
 }

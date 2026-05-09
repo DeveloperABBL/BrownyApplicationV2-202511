@@ -3213,6 +3213,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amount'**
   String get orderHistoryAmount;
+
+  /// No description provided for @unavailableCoupons.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable Coupons'**
+  String get unavailableCoupons;
+
+  /// No description provided for @unavailableEVouchers.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable E-Vouchers'**
+  String get unavailableEVouchers;
+
+  /// No description provided for @couponExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get couponExpired;
+
+  /// No description provided for @couponFullyRedeemed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully Redeemed'**
+  String get couponFullyRedeemed;
 }
 
 class _AppLocalizationsDelegate

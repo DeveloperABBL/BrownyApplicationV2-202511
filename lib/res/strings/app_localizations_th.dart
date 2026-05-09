@@ -1624,4 +1624,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get orderHistoryAmount => 'ยอดชำระ';
+
+  @override
+  String get unavailableCoupons => 'คูปองที่ใช้ไม่ได้';
+
+  @override
+  String get unavailableEVouchers => 'E-Voucher ที่ใช้ไม่ได้';
+
+  @override
+  String get couponExpired => 'หมดอายุ';
+
+  @override
+  String get couponFullyRedeemed => 'สิทธิ์เต็ม';
 }

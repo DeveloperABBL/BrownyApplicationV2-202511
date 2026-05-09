@@ -112,11 +112,6 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
     }
   }
 
-  TextStyle get _defaultTextStyle => context.textTheme.labelLarge!.copyWith(
-    color: AppColors.textBare,
-    fontSize: AppDims.size_16.sp,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -885,11 +880,34 @@ class _CustomerWashDryCouponWidgetState
             //   return _buildNotFoundData(context);
             // }
 
+            bool isUnavailable(CustomerCouponModel c) =>
+                (c.isAvailable != true) || (c.isExpired == true);
+
+            // Filter ออกในแต่ละ group เก็บเฉพาะคูปองที่ใช้ได้
+            final washerAvailable =
+                (discountMap['washer'] ?? [])
+                    .where((c) => !isUnavailable(c))
+                    .toList();
+            final dryerAvailable =
+                (discountMap['dryer'] ?? [])
+                    .where((c) => !isUnavailable(c))
+                    .toList();
+            final bothAvailable =
+                (discountMap['both'] ?? [])
+                    .where((c) => !isUnavailable(c))
+                    .toList();
+
+            // รวมคูปองที่ใช้ไม่ได้จากทุก group
+            final unavailableCoupons = <CustomerCouponModel>[
+              ...(discountMap['washer'] ?? []).where(isUnavailable),
+              ...(discountMap['dryer'] ?? []).where(isUnavailable),
+              ...(discountMap['both'] ?? []).where(isUnavailable),
+            ];
+
             // Build sections for washer, dryer, and both
             final sections = <Widget>[];
 
             // Section: คูปองซัก (washer)
-            final washerCoupons = discountMap['washer'] ?? [];
             sections.addAll(
               _buildSection(
                 context: context,
@@ -897,12 +915,11 @@ class _CustomerWashDryCouponWidgetState
                 icon: Assets.svg.icCouponWashRoundedGreen.svg(),
                 // คูปองซัก
                 title: context.wording.washerCoupon,
-                coupons: washerCoupons,
+                coupons: washerAvailable,
               ),
             );
 
             // Section: คูปองอบ (dryer)
-            final dryerCoupons = discountMap['dryer'] ?? [];
             sections.addAll(
               _buildSection(
                 context: context,
@@ -910,12 +927,11 @@ class _CustomerWashDryCouponWidgetState
                 icon: Assets.svg.icCouponDryRoundedGreen.svg(),
                 // คูปองอบ
                 title: context.wording.dryerCoupon,
-                coupons: dryerCoupons,
+                coupons: dryerAvailable,
               ),
             );
 
             // Section: คูปองซักอบ (both)
-            final bothCoupons = discountMap['both'] ?? [];
             sections.addAll(
               _buildSection(
                 context: context,
@@ -923,9 +939,19 @@ class _CustomerWashDryCouponWidgetState
                 icon: Assets.svg.icCouponWashRoundedGreen.svg(),
                 // คูปองซักอบ
                 title: context.wording.washerDryerCoupon,
-                coupons: bothCoupons,
+                coupons: bothAvailable,
               ),
             );
+
+            // Section: คูปองที่ใช้ไม่ได้ (unavailable / expired)
+            if (unavailableCoupons.isNotEmpty) {
+              sections.addAll(
+                _buildUnavailableSection(
+                  context: context,
+                  coupons: unavailableCoupons,
+                ),
+              );
+            }
 
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -1020,6 +1046,71 @@ class _CustomerWashDryCouponWidgetState
         ),
 
       // Expand/Collapse button
+      if (needButtonExpanding)
+        _buildButtonExpandable(
+          () {
+            setState(() {
+              _sectionExpandedStates[key] = !isExpanded;
+            });
+          },
+          isExpanded,
+        ),
+
+      AppDims.vericalPadding_14,
+    ];
+  }
+
+  /// Section "คูปองที่ใช้ไม่ได้" — รวมคูปองที่ isAvailable != true || isExpired == true
+  /// แสดง Card แบบ disabled และ flag isExpired ตาม model
+  List<Widget> _buildUnavailableSection({
+    required BuildContext context,
+    required List<CustomerCouponModel> coupons,
+  }) {
+    const key = 'unavailable';
+    final lengthList = coupons.length;
+    final needButtonExpanding = lengthList > 2;
+    final isExpanded = _sectionExpandedStates[key] ?? false;
+
+    return [
+      ElevatedButton.icon(
+        onPressed: null,
+        icon: Assets.svg.icCrossRoundGreen.svg(),
+        label: AppText(
+          // คูปองที่ใช้ไม่ได้
+          context.wording.unavailableCoupons,
+          style: context.textTheme.labelLarge!.copyWith(
+            fontSize: AppDims.size_16.sp,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.transparent,
+          foregroundColor: AppColors.primary,
+          alignment: AlignmentDirectional.centerStart,
+          padding: EdgeInsets.zero,
+          disabledBackgroundColor: AppColors.transparent,
+          overlayColor: AppColors.transparent,
+        ),
+      ),
+      AppDims.vericalPadding_8,
+
+      ...coupons
+          .take(isExpanded ? lengthList : 2)
+          .map(
+            (c) => CouponEVoucherCardWidget(
+              isExpired: c.isExpired ?? false,
+              isFullyRedeemed:
+                  (c.isAvailable != true) && c.remainingCount == 0,
+              icon: Image.network(
+                c.imageUrlDisplay(context),
+                errorBuilder: (_, _, _) => _onImageError(),
+              ),
+              title: c.packageNameDisplay(context),
+              description: c.storeNameDisplay(context),
+              detailUsing: c.usageLabelDisplay(context),
+              expired: c.expireDateDisplay(context),
+            ),
+          ),
+
       if (needButtonExpanding)
         _buildButtonExpandable(
           () {
@@ -1255,10 +1346,16 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                   return _buidlNotFoundData(context);
                 }
 
-                // Build sections for each coupon type
+                bool isUnavailable(CustomerCouponModel c) =>
+                    (c.isAvailable != true) || (c.isExpired == true);
+
+                // Build sections for each coupon type (filter ออก unavailable)
                 final sections = <Widget>[];
 
-                evoucherMap.forEach((typeKey, coupons) {
+                evoucherMap.forEach((typeKey, allCoupons) {
+                  final coupons = allCoupons
+                      .where((c) => !isUnavailable(c))
+                      .toList();
                   if (coupons.isEmpty) return;
 
                   // Get the first coupon to access typeLabel
@@ -1463,10 +1560,100 @@ class _CustomerEVoucherWidgetState extends State<_CustomerEVoucherWidget> {
                 );
               },
             ),
+
+            // Section: E-Voucher ที่ใช้ไม่ได้ (วางไว้ใต้ List E-Voucher ที่จะให้เลือกซื้อ)
+            ValueListenableBuilder(
+              valueListenable: widget._viewModel.evoucherNotifier,
+              builder: (context, evoucherResult, child) {
+                final evoucherMap = evoucherResult.data ?? {};
+                final unavailableCoupons = <CustomerCouponModel>[
+                  for (final entry in evoucherMap.entries)
+                    ...entry.value.where(
+                      (c) => (c.isAvailable != true) || (c.isExpired == true),
+                    ),
+                ];
+
+                if (unavailableCoupons.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  children: _buildUnavailableEVoucherSection(
+                    context: context,
+                    coupons: unavailableCoupons,
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  /// Section "E-Voucher ที่ใช้ไม่ได้" — รวม E-Voucher ที่ isAvailable != true || isExpired == true
+  /// แสดง Card แบบ disabled และ flag isExpired ตาม model
+  List<Widget> _buildUnavailableEVoucherSection({
+    required BuildContext context,
+    required List<CustomerCouponModel> coupons,
+  }) {
+    const key = 'unavailable_evoucher';
+    final lengthList = coupons.length;
+    final needButtonExpanding = lengthList > 2;
+    final isExpanded = _sectionExpandedStates[key] ?? false;
+
+    return [
+      ElevatedButton.icon(
+        onPressed: null,
+        icon: Assets.svg.icCrossRoundGreen.svg(),
+        label: AppText(
+          // E-Voucher ที่ใช้ไม่ได้
+          context.wording.unavailableEVouchers,
+          style: context.textTheme.labelLarge!.copyWith(
+            fontSize: AppDims.size_16.sp,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.transparent,
+          foregroundColor: AppColors.primary,
+          alignment: AlignmentDirectional.centerStart,
+          padding: EdgeInsets.zero,
+          disabledBackgroundColor: AppColors.transparent,
+          overlayColor: AppColors.transparent,
+        ),
+      ),
+      AppDims.vericalPadding_16,
+
+      ...coupons
+          .take(isExpanded ? lengthList : 2)
+          .map(
+            (c) => CouponEVoucherCardWidget(
+              isExpired: c.isExpired ?? false,
+              isFullyRedeemed:
+                  (c.isAvailable != true) && c.remainingCount == 0,
+              icon: Image.network(
+                c.imageUrlDisplay(context),
+                errorBuilder: (_, _, _) => _onImageError(),
+              ),
+              title: c.packageNameDisplay(context),
+              description: c.storeNameDisplay(context),
+              detailUsing: c.usageLabelDisplay(context),
+              expired: c.expireDateDisplay(context),
+            ),
+          ),
+
+      if (needButtonExpanding)
+        _buildButtonExpandable(
+          () {
+            setState(() {
+              _sectionExpandedStates[key] = !isExpanded;
+            });
+          },
+          isExpanded,
+        ),
+
+      AppDims.vericalPadding_14,
+    ];
   }
 
   GestureDetector _buildCustomerEVoucher(

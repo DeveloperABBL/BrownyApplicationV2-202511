@@ -27,7 +27,7 @@ class HistoryTransactionsViewmodel extends MachineTransactionViewmodel {
   bool _isLoadingMore = false;
 
   // ========== Date filter state ==========
-  late DateTime _startDate = DateTime.now();
+  late DateTime _startDate = DateTime.now().subtract(const Duration(days: 6));
   late DateTime _endDate = DateTime.now();
 
   // ========== ValueNotifiers ==========
@@ -37,7 +37,10 @@ class HistoryTransactionsViewmodel extends MachineTransactionViewmodel {
       _orderHistoryNotifier;
 
   final ValueNotifier<DateTimeRange> _dateRangeNotifier = ValueNotifier(
-    DateTimeRange(start: DateTime.now(), end: DateTime.now()),
+    DateTimeRange(
+      start: DateTime.now().subtract(const Duration(days: 6)),
+      end: DateTime.now(),
+    ),
   );
   ValueListenable<DateTimeRange> get dateRangeNotifier => _dateRangeNotifier;
 

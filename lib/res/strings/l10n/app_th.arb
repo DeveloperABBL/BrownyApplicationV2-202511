@@ -550,5 +550,9 @@
   "orderHistoryStore": "สาขา",
   "orderHistoryMachine": "เครื่อง",
   "orderHistoryPayment": "การชำระเงิน",
-  "orderHistoryAmount": "ยอดชำระ"
+  "orderHistoryAmount": "ยอดชำระ",
+  "unavailableCoupons": "คูปองที่ใช้ไม่ได้",
+  "unavailableEVouchers": "E-Voucher ที่ใช้ไม่ได้",
+  "couponExpired": "หมดอายุ",
+  "couponFullyRedeemed": "สิทธิ์เต็ม"
 }

@@ -1586,4 +1586,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get orderHistoryAmount => '金额';
+
+  @override
+  String get unavailableCoupons => '无法使用的优惠券';
+
+  @override
+  String get unavailableEVouchers => '无法使用的电子券';
+
+  @override
+  String get couponExpired => '已过期';
+
+  @override
+  String get couponFullyRedeemed => '已满额';
 }

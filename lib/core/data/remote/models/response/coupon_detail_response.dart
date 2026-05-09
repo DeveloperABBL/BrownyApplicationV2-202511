@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -94,6 +95,22 @@ class CouponData {
       _$CouponDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$CouponDataToJson(this);
+
+  String dateLeftDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    if (usageDurationDays != null) {
+      switch (locale) {
+        case 'en':
+          return '$usageDurationDays days';
+        case 'zh':
+          return '$usageDurationDays 天';
+        default:
+          return '$usageDurationDays วัน';
+      }
+    } else {
+      return '';
+    }
+  }
 }
 
 @JsonSerializable()

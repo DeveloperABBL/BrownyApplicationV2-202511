@@ -350,7 +350,7 @@ class _PurchaseCouponVoucherPageState extends State<PurchaseCouponVoucherPage> {
                 children: [
                   _buildConditionItem(
                     wording: context.wording.useWithin(
-                      couponData.usageDurationDays ?? '0',
+                      couponData.dateLeftDisplay(context),
                     ),
                     icon: Assets.svg.icCalendarRoundedGreen.svg(
                       width: 28.w,

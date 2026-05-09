@@ -1633,4 +1633,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orderHistoryAmount => 'Amount';
+
+  @override
+  String get unavailableCoupons => 'Unavailable Coupons';
+
+  @override
+  String get unavailableEVouchers => 'Unavailable E-Vouchers';
+
+  @override
+  String get couponExpired => 'Expired';
+
+  @override
+  String get couponFullyRedeemed => 'Fully Redeemed';
 }

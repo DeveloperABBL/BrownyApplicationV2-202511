@@ -2,6 +2,8 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/dims/app_dims.dart';
+import 'package:browny_applications_new/res/icons/assets.gen.dart';
+import 'package:browny_applications_new/res/strings/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -46,6 +48,28 @@ class CouponEVoucherCardWidget extends StatefulWidget {
 
   final bool? initialChecked;
 
+  /// แสดงสถานะหมดอายุ (true → แทนที่ description ด้วย Row icon + ข้อความ "หมดอายุ" สี error)
+  final bool isExpired;
+
+  /// แสดงสถานะสิทธิ์เต็ม (true → แทนที่ description ด้วย Row icon + ข้อความ "สิทธิ์เต็ม" สี error)
+  /// ลำดับความสำคัญ: isExpired > isFullyRedeemed
+  final bool isFullyRedeemed;
+
+  /// custom สีของ AppText title
+  final Color? titleColor;
+
+  /// custom สีของ AppText description
+  final Color? descriptionColor;
+
+  /// custom สีของ AppText detailUsing
+  final Color? detailUsingColor;
+
+  /// custom สีของ AppText expired
+  final Color? expiredColor;
+
+  /// custom สีของ AppText conditionText
+  final Color? conditionTextColor;
+
   const CouponEVoucherCardWidget({
     super.key,
     this.isDisabled = false,
@@ -62,6 +86,13 @@ class CouponEVoucherCardWidget extends StatefulWidget {
     this.onTap,
     this.borderColor,
     this.initialChecked,
+    this.isExpired = false,
+    this.isFullyRedeemed = false,
+    this.titleColor,
+    this.descriptionColor,
+    this.detailUsingColor,
+    this.expiredColor,
+    this.conditionTextColor,
   });
 
   @override
@@ -136,7 +167,9 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
                   children: [
                     AppText(
                       widget.title,
-                      style: context.textTheme.titleSmall,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        color: widget.titleColor,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -148,7 +181,7 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
                         AppText(
                           widget.description,
                           style: context.textTheme.titleSmall!.copyWith(
-                            color: AppColors.primary,
+                            color: widget.descriptionColor ?? AppColors.primary,
                             fontSize: AppDims.size_10.sp,
                           ),
                           maxLines: 1,
@@ -184,39 +217,87 @@ class _CouponEVoucherCardWidgetState extends State<CouponEVoucherCardWidget> {
                       widget.detailUsing,
                       style: context.textTheme.bodySmall?.copyWith(
                         fontSize: AppDims.size_10.sp,
-                        color: AppColors.textSecondary,
+                        color:
+                            widget.detailUsingColor ?? AppColors.textSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Spacer(),
 
-                    Row(
-                      children: [
-                        AppText(
-                          widget.expired,
-                          style: context.textTheme.bodySmall?.copyWith(
-                            fontSize: AppDims.size_10.sp,
-                            color: AppColors.textSecondary,
+                    if (widget.isExpired)
+                      Row(
+                        children: [
+                          Assets.svg.icInfoRad.svg(
+                            width: 14.w,
+                            height: 14.w,
+                            colorFilter: ColorFilter.mode(
+                              AppColors.error,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        ),
-
-                        if (widget.conditionText != null &&
-                            widget.conditionText!.isNotEmpty) ...[
-                          AppText(' '),
-                          GestureDetector(
-                            onTap: widget.onConditionTap,
-                            child: AppText(
-                              widget.conditionText.orEmpty,
-                              style: context.textTheme.labelSmall?.copyWith(
-                                color: AppColors.primary,
-                                fontSize: AppDims.size_10.sp,
-                              ),
+                          AppDims.horizonPadding_4,
+                          AppText(
+                            context.wording.couponExpired,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              fontSize: AppDims.size_10.sp,
+                              color: AppColors.error,
                             ),
                           ),
                         ],
-                      ],
-                    ),
+                      )
+                    else if (widget.isFullyRedeemed)
+                      Row(
+                        children: [
+                          Assets.svg.icInfoRad.svg(
+                            width: 14.w,
+                            height: 14.w,
+                            colorFilter: ColorFilter.mode(
+                              AppColors.error,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          AppDims.horizonPadding_4,
+                          AppText(
+                            context.wording.couponFullyRedeemed,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              fontSize: AppDims.size_10.sp,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Row(
+                        children: [
+                          AppText(
+                            widget.expired,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              fontSize: AppDims.size_10.sp,
+                              color:
+                                  widget.expiredColor ??
+                                  AppColors.textSecondary,
+                            ),
+                          ),
+
+                          if (widget.conditionText != null &&
+                              widget.conditionText!.isNotEmpty) ...[
+                            AppText(' '),
+                            GestureDetector(
+                              onTap: widget.onConditionTap,
+                              child: AppText(
+                                widget.conditionText.orEmpty,
+                                style: context.textTheme.labelSmall?.copyWith(
+                                  color:
+                                      widget.conditionTextColor ??
+                                      AppColors.primary,
+                                  fontSize: AppDims.size_10.sp,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
 
                     // RichText(
                     //   maxLines: 2,

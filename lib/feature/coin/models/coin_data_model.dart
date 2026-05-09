@@ -124,9 +124,10 @@ class CoinDataModel extends CoinClaimData {
     StreakModelItem itemBuild(StreakItem item, int index) {
       final fallbackDate = DateTime.now().add(Duration(days: index));
       final streakDate = parseDate(item.calendarDate) ?? parseDate(item.day);
-      final displayDate = (streakDate ?? fallbackDate)
-          .formatDateLocale(locale, pattern: 'dd MMM')
-          .replaceAll('.', '');
+      final displayDate = (streakDate ?? fallbackDate).formatDateLocale(
+        locale,
+        pattern: 'dd MMM',
+      );
 
       // API ใหม่ส่ง today_calendar_date มาให้ จึงใช้ค่านี้เป็นหลัก
       final todayDateString = data.todayCalendarDate.orEmpty;
