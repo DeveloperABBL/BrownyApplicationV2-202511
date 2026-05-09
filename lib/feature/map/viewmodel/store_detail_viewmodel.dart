@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
+import 'package:browny_applications_new/core/utils/location_helper.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/map/repository/map_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class StoreDetailViewModel extends AppViewModel {
@@ -12,7 +14,7 @@ class StoreDetailViewModel extends AppViewModel {
     required StoreDataDetail initialStore,
   }) {
     storeNotifier = ValueNotifier(initialStore);
-    _startRefreshTimer();
+    _resolveCurrentLocation().then((_) => _startRefreshTimer());
   }
 
   final MapDataSourceMixin repo;
@@ -21,6 +23,21 @@ class StoreDetailViewModel extends AppViewModel {
   StoreDataDetail get store => storeNotifier.value;
 
   Timer? _refreshTimer;
+
+  /// Cache ตำแหน่งปัจจุบันของผู้ใช้ ใช้ส่งให้ fetchStoreDetail
+  /// เพื่อให้ backend คำนวณระยะห่างจากร้านได้ถูกต้อง
+  String? _currentLat;
+  String? _currentLng;
+
+  Future<void> _resolveCurrentLocation() async {
+    try {
+      final position = await LocationHelper.getCurrentPosition();
+      _currentLat = position.latitude.toString();
+      _currentLng = position.longitude.toString();
+    } catch (e) {
+      debugPrint('StoreDetailViewModel: cannot get current position: $e');
+    }
+  }
 
   void pauseRefresh() {
     _refreshTimer?.cancel();
@@ -39,8 +56,8 @@ class StoreDetailViewModel extends AppViewModel {
 
       final result = await repo.fetchStoreDetail(
         storeId: storeId,
-        latitude: store.latitude,
-        longitude: store.longitude,
+        latitude: _currentLat,
+        longitude: _currentLng,
       );
 
       if (result.isSuccess) {

@@ -5,6 +5,7 @@
 - ปรับ default ช่วงวันที่หน้า HistoryTransactionPage เป็น 7 วันย้อนหลัง
 - ปรับ flow สมัครสมาชิก เช็ค referral status ก่อนเข้าหน้า referral (ถ้าปิดอยู่ ข้ามไปสร้าง PIN เลย)
 - แก้ไข wording วัน ในหน้าแสดง E-Voucher, Coupon
+- แก้บัค StoreDetailPage refresh ใช้พิกัดร้านแทนพิกัดผู้ใช้ ทำให้คำนวณระยะห่างผิด
 - แก้ไข format วันที่ในหน้า claim coin ให้มี จุด ในตัวย่อเดือน
 - upgrade version v3.0.4
 - Change token_dev to v3.0.4
