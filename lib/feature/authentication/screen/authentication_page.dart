@@ -451,7 +451,17 @@ class _SignUpWidget extends StatelessWidget {
     AppOverlays.hideLoading();
     // ถ้าเป็นการ Logic ครั้งแรก ต้องเข้าหน้ากรอกเพื่อนชวนเพื่อน
     if (loginResult.data!.firstLogin == true) {
-      viewmodel(context).goToProcess(AuthenProcess.referral, animate: false);
+      final referralEnabled = await viewmodel(context).isReferralEnabled();
+      if (!context.mounted) return;
+      if (referralEnabled) {
+        viewmodel(context).goToProcess(AuthenProcess.referral, animate: false);
+      } else {
+        CreateAppPinPage.goReplacementPage(
+          context,
+          isFirstSingup: true,
+          process: PinBiometricPross.create,
+        );
+      }
     } else {
       CreateAppPinPage.goReplacementPage(
         context,
@@ -971,27 +981,28 @@ class _OTPContent extends _SignUpWidget {
 
   Future<void> _summitOtp(BuildContext context) async {
     AppOverlays.showLoading(context);
-    // OTP Request
-    viewmodel(context).onSummitForm().then((
-      result,
-    ) {
-      if (!context.mounted) return;
-      AppOverlays.hideLoading();
+    final result = await viewmodel(context).onSummitForm();
+    if (!context.mounted) return;
+    AppOverlays.hideLoading();
 
-      if (result.hasError) {
-        _showErrorDialog(context, result.error);
-        return;
-      }
+    if (result.hasError) {
+      _showErrorDialog(context, result.error);
+      return;
+    }
+    if (result.isEmpty) return;
 
-      if (result.isEmpty) {
-        return;
-      }
-      // สำเร็จ → ไปหน้ากรอกอ้างอิง
-      goToProcess(
+    final referralEnabled = await viewmodel(context).isReferralEnabled();
+    if (!context.mounted) return;
+
+    if (referralEnabled) {
+      goToProcess(context, AuthenProcess.referral);
+    } else {
+      CreateAppPinPage.goReplacementPage(
         context,
-        AuthenProcess.referral,
+        isFirstSingup: true,
+        process: PinBiometricPross.create,
       );
-    });
+    }
   }
 
   /// ปุ่มขอ OTP ใหม่ / แสดง Timer นับถอยหลัง

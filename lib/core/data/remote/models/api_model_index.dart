@@ -7,6 +7,7 @@ export 'package:browny_applications_new/core/data/remote/models/request/device_l
 export 'package:browny_applications_new/core/data/remote/models/request/machine_order_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/machine_order_review_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/pin_request.dart';
+export 'package:browny_applications_new/core/data/remote/models/request/referral_status_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/request_otp.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/store_location_request.dart';
@@ -55,6 +56,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/payment
 export 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/referral_reward_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/referral_status_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/request_otp_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/topup_request_response.dart';

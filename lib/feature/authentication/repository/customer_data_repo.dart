@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/change_password_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/referral_status_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/social_login_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/customer_credential.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/referral_status_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/check_token_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_available_count_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
@@ -79,6 +81,9 @@ mixin CustomerDataSourceMixin {
   /// - 200: Token ถูกต้อง
   /// - 401: Token ไม่ถูกต้องหรือหมดอายุ
   Future<RepoResult<CheckTokenResponse>> checkToken();
+
+  /// ตรวจสอบสถานะระบบแนะนำเพื่อน
+  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({String? phone});
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
@@ -554,6 +559,21 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
         return RepoResult.empty(error: UserUnauthorized());
       }
       return RepoResult.error(error: dioEx);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({String? phone}) async {
+    try {
+      final response = await requireRemote.fetchReferralStatus(
+        ReferralStatusRequest(phone: phone),
+      );
+      if (!response.isSuccessful) {
+        return RepoResult.empty();
+      }
+      return RepoResult.success(data: response.data);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }

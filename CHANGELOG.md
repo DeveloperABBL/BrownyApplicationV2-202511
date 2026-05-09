@@ -3,6 +3,7 @@
 - upgrade version v3.0.4
 - Change token_dev to v3.0.4
 - Change token_prd to v3.0.4
+- ปรับ Process การ save referral ใช้เช็ค status การเปิดใช้งานด้วย
 - ปรับปรุง UX หน้าสถานะเครื่อง (MachineStatusPage) กรณีเครื่องยังไม่เริ่มทำงาน
  - ย้าย Dialog ที่ Block หน้าจอ ไปแสดงเป็น Inline Panel ใน Scaffold แทน
  - ผู้ใช้สามารถกดปุ่ม Back จาก AppBar ออกจากหน้าได้ แม้เครื่องส่ง status ไม่ได้

@@ -906,6 +906,22 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
     return UiResult.empty();
   }
 
+  /// ตรวจสอบว่าระบบแนะนำเพื่อนเปิดใช้งานอยู่หรือไม่
+  /// ถ้า API ล้มเหลว จะ fallback เป็น true (แสดง referral ตามปกติ)
+  Future<bool> isReferralEnabled() async {
+    try {
+      final result = await customerDataRepo.fetchReferralStatus(
+        phone: usernameController.text.trim(),
+      );
+      if (result.isSuccess) {
+        return result.data.isEnabled;
+      }
+      return true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   Future<UiResult<LoginCustomerData>> socialLogin(
     SocialLoginType provider,
   ) async {

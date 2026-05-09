@@ -524,6 +524,20 @@ abstract class AppClient {
     @Body() Map<String, dynamic> body,
   );
 
+  /// DONG 2026-05-09
+  ///
+  /// API ตรวจสอบสถานะการแนะนำเพื่อน (referral status)
+  ///
+  /// Body parameters:
+  /// - phone: String (เบอร์โทรศัพท์)
+  ///
+  /// Response:
+  /// - ReferralStatusResponse with enabled flag and terms content
+  @GET('/referral/status')
+  Future<HttpResponse<ReferralStatusResponse>> fetchReferralStatus(
+    @Body() ReferralStatusRequest body,
+  );
+
   /// DONG 2026-01-11
   ///
   /// API fetch QRCode ของ customer ตาม [uuid]
