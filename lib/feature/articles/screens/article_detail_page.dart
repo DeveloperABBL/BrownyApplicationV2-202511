@@ -184,6 +184,12 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       fontFamily: GoogleFonts.prompt().fontFamily,
                     ),
                   },
+                  onLinkTap: (url, attributes, element) async {
+                    if (url != null) {
+                      // เปิด URL ในเบราว์เซอร์
+                      LaunchHelper.openUrl(url);
+                    }
+                  },
                 ),
               ],
             ),

@@ -51,47 +51,47 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
     String machineId,
   ) async {
     try {
-      // if (kDebugMode) {
-      //   return RepoResult.success(
-      //     data: MachineDetailResponse.fromJson(
-      //       jsonDecode('''
-      //       {
-      //     "id": 626,
-      //     "store_name": {
-      //         "th": "จรัญฯ 40",
-      //         "en": "Charan 40",
-      //         "zh": "-"
-      //     },
-      //     "status": "Busy",
-      //     "finish_datatime": "00:11",
-      //     "remaining_time": "00:21:50",
-      //     "machine_no": "6",
-      //     "machine_image": "https:\/\/dev.abgroup.co.th\/storage\/galleries\/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
-      //     "machine_type": {
-      //         "th": "เครื่องซัก",
-      //         "en": "Washer",
-      //         "zh": "洗衣机"
-      //     },
-      //     "name": {
-      //         "th": "เครื่องซัก 6 - 22.00 กก.",
-      //         "en": "Washer 6 - 22.00 kg",
-      //         "zh": "洗衣机 6 - 22.00 公斤"
-      //     },
-      //     "order_id": "",
-      //     "receipt_no": "",
-      //     "startTime": "",
-      //     "addTime": [],
-      //     "program_image": "",
-      //     "program_name": {
-      //         "th": "",
-      //         "en": "",
-      //         "zh": ""
-      //     }
-      // }
-      //       '''),
-      //     ),
-      //   );
-      // }
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: MachineDetailResponse.fromJson(
+            jsonDecode('''
+            {
+          "id": 626,
+          "store_name": {
+              "th": "จรัญฯ 40",
+              "en": "Charan 40",
+              "zh": "-"
+          },
+          "status": "Busy",
+          "finish_datatime": "00:11",
+          "remaining_time": "00:21:50",
+          "machine_no": "6",
+          "machine_image": "https:\/\/dev.abgroup.co.th\/storage\/galleries\/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
+          "machine_type": {
+              "th": "เครื่องซัก",
+              "en": "Washer",
+              "zh": "洗衣机"
+          },
+          "name": {
+              "th": "เครื่องซัก 6 - 22.00 กก.",
+              "en": "Washer 6 - 22.00 kg",
+              "zh": "洗衣机 6 - 22.00 公斤"
+          },
+          "order_id": "",
+          "receipt_no": "",
+          "startTime": "",
+          "addTime": [],
+          "program_image": "",
+          "program_name": {
+              "th": "",
+              "en": "",
+              "zh": ""
+          }
+      }
+            '''),
+          ),
+        );
+      }
       final response = await requireRemote.fetchMachineDetail(machineId);
       if (!response.isSuccessful) {
         return RepoResult.empty();
@@ -192,6 +192,9 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
     MachineOrderReviewRequest request,
   ) async {
     try {
+      if (kDebugMode) {
+        return RepoResult.success(data: BaseResponse());
+      }
       final response = await requireRemote.submitMachineOrderReview(
         orderId,
         request,

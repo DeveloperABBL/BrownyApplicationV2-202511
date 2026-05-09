@@ -1,4 +1,13 @@
 # CHANGELOG
+### DONG 2026-05-9
+- ปรับปรุง UX หน้าสถานะเครื่อง (MachineStatusPage) กรณีเครื่องยังไม่เริ่มทำงาน
+ - ย้าย Dialog ที่ Block หน้าจอ ไปแสดงเป็น Inline Panel ใน Scaffold แทน
+ - ผู้ใช้สามารถกดปุ่ม Back จาก AppBar ออกจากหน้าได้ แม้เครื่องส่ง status ไม่ได้
+ - คงการทำงาน Auto-check timer (poll ทุก 3 วิ) และปุ่ม ตรวจสอบสถานะ / แจ้งปัญหาการใช้งาน ไว้ใน Panel
+- เพิ่มการ Refresh ข้อมูลสถานะเครื่องซัก/อบ หน้ารายละเอียดสาขา (StoreDetailPage) แบบ Real-time
+ - Poll API `fetchStoreDetail` ทุก 5 วินาที อัพเดท UI เครื่องซักและเครื่องอบอัตโนมัติ
+ - เพิ่ม StoreDetailViewModel แยกออกมาตาม Clean Architecture (ย้าย Timer + Repo ออกจาก Widget)
+
 ### DONG 2026-05-2
 - Change env.prd API key to v3.0.3
 - ปรัับปรุง Process การทำงานจังหวะสร้าง Order ป้องกันการกดกลับจาก User ที่อาจจะส่งผลให้การทำงานผิด Process

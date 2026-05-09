@@ -93,9 +93,9 @@ class _MachineStatusContentState extends State<MachineStatusContent>
       await _loadThumbImage();
       // Fetch machine detail ครั้งแรก
       await _viewmodel.fetchMachineDetail(widget.machineId);
-      // เช็คสถานะหลังจาก fetch เสร็จ
+      // เริ่ม/หยุด timer ตามสถานะหลัง fetch เสร็จ
       if (mounted) {
-        _checkMachineStatusAndShowDialog();
+        _syncAutoCheckTimer();
       }
     });
   }
@@ -151,64 +151,40 @@ class _MachineStatusContentState extends State<MachineStatusContent>
     }
   }
 
-  /// เช็คสถานะเครื่องและแสดง Dialog ถ้าเครื่องยังไม่เริ่มทำงาน
-  void _checkMachineStatusAndShowDialog() {
+  /// Sync auto-check timer ตามสถานะเครื่อง
+  /// - ยังไม่เริ่มทำงาน (isBusy == false): start timer poll ทุก 3 วิ
+  /// - ทำงานแล้ว: stop timer
+  void _syncAutoCheckTimer() {
     final machineDetail = _viewmodel.machineDetailNotifier.value;
-
     if (machineDetail == null) return;
 
-    // ถ้าเครื่องไม่ได้ทำงาน (isBusy == false) ให้แสดง Dialog
     if (!machineDetail.isBusy) {
-      _showMachineNotStartedDialog();
       _startAutoCheckTimer();
     } else {
-      // ถ้าเครื่องทำงานแล้ว ให้หยุด Timer
       _stopAutoCheckTimer();
     }
   }
 
-  /// แสดง Dialog แจ้งให้กดเริ่มที่หน้าเครื่อง
-  void _showMachineNotStartedDialog() {
+  /// กด "ตรวจสอบสถานะ" จาก inline not-started panel
+  Future<void> _onCheckStatusPressed() async {
+    AppOverlays.showLoading(context);
+    await Future.delayed(const Duration(seconds: 1, milliseconds: 5));
+    await _viewmodel.fetchMachineDetail(widget.machineId);
+    AppOverlays.hideLoading();
     if (!mounted) return;
+    _syncAutoCheckTimer();
+  }
 
-    AppOverlays.showBrownyDialog(
+  /// กด "แจ้งปัญหาการใช้งาน" จาก inline not-started panel
+  Future<void> _onReportProblemPressed() async {
+    await ContactPage.goToPage(
       context,
-      imageAsset: Assets.png.brownyWashy.path,
-      // เริ่มการทำงานเครื่อง
-      title: context.wording.startMachineOperation,
-      // กรุณากดปุ่มที่หน้าเครื่องเพื่อเริ่มการทำงาน
-      message: context.wording.pleasePressMachineButton,
-      // ตรวจสอบสถานะ
-      confirmText: context.wording.checkStatus,
-      // แจ้งปัญหาการใช้งาน
-      cancelText: context.wording.reportProblem,
-      barrierDismissible: false,
-      onCancel: () async {
-        await ContactPage.goToPage(
-          context,
-          ContactProvider.helpAndProblemNoti,
-        );
-
-        // ถ้า back กลับมา เช็คสถานะอีกครั้ง
-        await _viewmodel.fetchMachineDetail(widget.machineId);
-        _checkMachineStatusAndShowDialog();
-      },
-      onConfirm: () async {
-        // แสดง loading
-        AppOverlays.showLoading(context);
-        await Future.delayed(
-          const Duration(seconds: 1, milliseconds: 5),
-          () async {
-            // เช็คสถานะอีกครั้ง
-            await _viewmodel.fetchMachineDetail(widget.machineId);
-          },
-        );
-        AppOverlays.hideLoading();
-
-        // เช็คอีกครั้ง
-        _checkMachineStatusAndShowDialog();
-      },
+      ContactProvider.helpAndProblemNoti,
     );
+    if (!mounted) return;
+    await _viewmodel.fetchMachineDetail(widget.machineId);
+    if (!mounted) return;
+    _syncAutoCheckTimer();
   }
 
   /// เริ่ม Timer เพื่อ auto-check สถานะเครื่องทุกๆ 3 วินาที
@@ -248,25 +224,37 @@ class _MachineStatusContentState extends State<MachineStatusContent>
         boxShadow: AppColors.defatultShadow,
       ),
       persistentFooterButtons: [
-        // ปุ่มยืนยันสั่งเครื่องทำงาน
-        Container(
-          padding: EdgeInsets.only(
-            left: AppDims.size_16.w,
-            right: AppDims.size_16.w,
-            top: AppDims.size_8.h,
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              context.pop();
-            },
-            child: AppText(
-              context.wording.backToMainPage,
-              style: context.textTheme.headlineSmall!.copyWith(
-                fontSize: AppDims.size_14.sp,
-                color: AppColors.textWhite,
+        // ปุ่มกลับสู่หน้าหลัก
+        ValueListenableBuilder<MachineDetailResponse?>(
+          valueListenable: _viewmodel.machineDetailNotifier,
+          builder: (context, machineDetail, child) {
+            final notStarted = machineDetail == null || !machineDetail.isBusy;
+            return Container(
+              padding: EdgeInsets.only(
+                left: AppDims.size_16.w,
+                right: AppDims.size_16.w,
+                top: AppDims.size_8.h,
               ),
-            ),
-          ),
+              child: ElevatedButton(
+                onPressed: notStarted
+                    ? _onCheckStatusPressed
+                    : () {
+                        context.pop();
+                      },
+                child: AppText(
+                  notStarted
+                      ? // ตรวจสอบสถานะ
+                        context.wording.checkStatus
+                      // กลับสู่หน้าหลัก
+                      : context.wording.backToMainPage,
+                  style: context.textTheme.headlineSmall!.copyWith(
+                    fontSize: AppDims.size_14.sp,
+                    color: AppColors.textWhite,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ],
       body: ValueListenableBuilder<MachineDetailResponse?>(
@@ -281,12 +269,14 @@ class _MachineStatusContentState extends State<MachineStatusContent>
 
           // เช็คสถานะเครื่องครั้งแรก (เฉพาะครั้งเดียว)
           // ย้ายมาทำใน initState แล้ว ไม่ต้องทำที่นี่
+          final notStarted = !machineDetail.isBusy;
 
           // แสดง UI ปกติ
           return RefreshIndicator(
             onRefresh: () async {
               // Refresh โดยเรียก API ใหม่
               await _viewmodel.fetchMachineDetail(widget.machineId);
+              if (mounted) _syncAutoCheckTimer();
             },
             child: Column(
               children: [
@@ -303,22 +293,27 @@ class _MachineStatusContentState extends State<MachineStatusContent>
                         // Title เครื่องซัก, สาขา
                         _mainTitle(machineDetail),
 
-                        if (machineDetail.isDryer) ...[
-                          machineDetail
-                              .getDryerExtendingTimeDisplay(
-                                context.languageCode,
-                              )
-                              .image(),
+                        if (notStarted) ...[
+                          // Inline panel แทน dialog เดิม -- ผู้ใช้กด back จาก AppBar ได้
+                          _buildNotStartedPanel(),
+                        ] else ...[
+                          if (machineDetail.isDryer) ...[
+                            machineDetail
+                                .getDryerExtendingTimeDisplay(
+                                  context.languageCode,
+                                )
+                                .image(),
+                          ],
+                          AppDims.vericalPadding_32,
+
+                          // Progress Timeline
+                          ..._buildTimelineProgress(context, machineDetail),
+
+                          _divider(),
+
+                          // Summary Transaction
+                          _summary(machineDetail),
                         ],
-                        AppDims.vericalPadding_32,
-
-                        // Progress Timeline
-                        ..._buildTimelineProgress(context, machineDetail),
-
-                        _divider(),
-
-                        // Summary Transaction
-                        _summary(machineDetail),
                       ],
                     ),
                   ),
@@ -695,6 +690,54 @@ class _MachineStatusContentState extends State<MachineStatusContent>
             },
           ),
           AppDims.vericalPadding_16,
+        ],
+      ),
+    );
+  }
+
+  /// Inline panel แสดงเมื่อเครื่องยังไม่เริ่มทำงาน (แทน dialog ที่ block ทั้งหน้า)
+  /// ผู้ใช้สามารถกด back จาก AppBar ได้ปกติ ป้องกันกรณีเครื่องส่ง status ไม่ได้
+  Widget _buildNotStartedPanel() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_24.w,
+        vertical: AppDims.size_8.h,
+      ),
+      child: Column(
+        children: [
+          Assets.png.brownyWashy.image(
+            height: 95.h,
+            fit: BoxFit.contain,
+          ),
+          AppDims.vericalPadding_16,
+          AppText(
+            // เริ่มการทำงานเครื่อง
+            context.wording.startMachineOperation,
+            style: context.textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          AppDims.vericalPadding_8,
+          AppText(
+            // กรุณากดปุ่มที่หน้าเครื่องเพื่อเริ่มการทำงาน
+            context.wording.pleasePressMachineButton,
+            style: context.textTheme.bodyMedium!.copyWith(
+              color: AppColors.gray500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          AppDims.vericalPadding_16,
+          OutlinedButton(
+            onPressed: _onReportProblemPressed,
+            child: AppText(
+              // แจ้งปัญหาการใช้งาน
+              context.wording.reportProblem,
+              textAlign: TextAlign.center,
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontSize: AppDims.size_14.sp,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
         ],
       ),
     );

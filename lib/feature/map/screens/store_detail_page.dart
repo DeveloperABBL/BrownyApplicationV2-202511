@@ -1,5 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/store_detail_response.dart';
+import 'package:browny_applications_new/feature/map/repository/map_repo.dart';
+import 'package:browny_applications_new/feature/map/viewmodel/store_detail_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
 
 class StoreDetailPage extends StatelessWidget {
@@ -16,25 +18,57 @@ class StoreDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreDetailContent(
-      storeDetail: storeDetail,
+    return ChangeNotifierProvider(
+      create: (_) => StoreDetailViewModel(
+        context: context,
+        repo: MapRepo(),
+        initialStore: storeDetail,
+      ),
+      child: StoreDetailContent(),
     );
   }
 }
 
 class StoreDetailContent extends StatefulWidget {
-  const StoreDetailContent({
-    super.key,
-    required this.storeDetail,
-  });
-  final StoreDataDetail storeDetail;
+  const StoreDetailContent({super.key});
 
   @override
   State<StoreDetailContent> createState() => _StoreDetailContentState();
 }
 
-class _StoreDetailContentState extends State<StoreDetailContent> {
-  StoreDataDetail get store => widget.storeDetail;
+class _StoreDetailContentState extends State<StoreDetailContent>
+    with WidgetsBindingObserver {
+  late final StoreDetailViewModel _viewmodel;
+
+  StoreDataDetail get store => _viewmodel.store;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _viewmodel = context.read<StoreDetailViewModel>();
+    _viewmodel.attachContext(context);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        _viewmodel.pauseRefresh();
+      case AppLifecycleState.resumed:
+        _viewmodel.resumeRefresh();
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,28 +95,29 @@ class _StoreDetailContentState extends State<StoreDetailContent> {
           ),
         ),
       ],
-      body: CustomScrollView(
-        slivers: [
-          // AppBar
-          _buildMyAppBar(),
+      body: ValueListenableBuilder<StoreDataDetail>(
+        valueListenable: _viewmodel.storeNotifier,
+        builder: (context, _, _) => CustomScrollView(
+          slivers: [
+            // AppBar
+            _buildMyAppBar(),
 
-          // Store Info
-          _buildStoreInfo(
-            context,
-          ),
+            // Store Info
+            _buildStoreInfo(context),
 
-          // Store Service available
-          ..._buildStoreServiceAvailable(context),
+            // Store Service available
+            ..._buildStoreServiceAvailable(context),
 
-          // Facilities
-          ..._buildFacilities(context),
+            // Facilities
+            ..._buildFacilities(context),
 
-          // เครื่องซัก
-          ..._buildMachineWasher(context),
+            // เครื่องซัก
+            ..._buildMachineWasher(context),
 
-          // เครื่องอบ
-          ..._buildMachineDryer(context),
-        ],
+            // เครื่องอบ
+            ..._buildMachineDryer(context),
+          ],
+        ),
       ),
     );
   }

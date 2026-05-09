@@ -6,6 +6,7 @@ import 'package:browny_applications_new/feature/invit_friend/viewmodel/invit_fri
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InvitFriendPage extends StatelessWidget {
   const InvitFriendPage({super.key});
@@ -119,6 +120,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppText(
+                        // ชวนเพื่อนแลกคูปอง
                         context.wording.inviteFriendsForCoupons,
                         style: context.textTheme.titleMedium,
                       ),
@@ -358,6 +360,7 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
           ),
         ),
         AppText(
+          // ไม่พบรายการรางวัล
           context.wording.noRewardsFound,
           style: context.textTheme.labelMedium,
         ),
@@ -424,10 +427,14 @@ class __InvitFriendWidgetState extends State<_InvitFriendWidget> {
                         rewardData.typeDisplay,
                         style: context.textTheme.titleSmall,
                       ),
-                      AppText(
-                        rewardData.descriptionDisplay,
-                        style: context.textTheme.labelSmall!.copyWith(
-                          color: AppColors.primary,
+                      Expanded(
+                        child: AppText(
+                          rewardData.descriptionDisplay,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.labelSmall!.copyWith(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                       Spacer(),

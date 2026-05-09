@@ -246,7 +246,13 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
     }
   }
 
-  void _popPage() {
+  Future<void> _popPage() async {
+    if (_viewmodel.isFirstReviewed) {
+      AppOverlays.showLoading(context);
+      await _viewmodel.submitMachineOrderReview();
+      if (!mounted) return;
+      AppOverlays.hideLoading();
+    }
     if (_viewmodel.isFromHistory) {
       if (context.canPop()) {
         context.pop();
@@ -291,11 +297,10 @@ class _ReceiptWidgetState extends State<ReceiptWidget> {
           ),
           child: ElevatedButton(
             onPressed: () async {
-              if (_viewmodel.isFirstReviewed) {
-                await _viewmodel.submitMachineOrderReview();
-              }
+              // if (_viewmodel.isFirstReviewed) {
+              //   await _viewmodel.submitMachineOrderReview();
+              // }
               if (!context.mounted) return;
-              if (_viewmodel.isFromHistory) {}
               _popPage();
             },
             child: AppText(
