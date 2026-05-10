@@ -793,4 +793,38 @@ abstract class AppClient {
     @Query('start_date') String? startDate,
     @Query('end_date') String? endDate,
   );
+
+  /// DONG 2026-05-09
+  ///
+  /// API fetch รายการสินค้า Browny Shop
+  ///
+  /// Query parameters:
+  /// - product_type: String (เช่น "all")
+  /// - customer_id: String (uuid)
+  ///
+  /// Response:
+  /// - ProductsResponse with list of products (แต่ละชิ้นมี translations, product_subs)
+  @GET('/products')
+  Future<HttpResponse<ProductsResponse>> fetchProducts(
+    @Query('product_type') String productType,
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-05-09
+  ///
+  /// API fetch รายละเอียดสินค้า Browny Shop
+  ///
+  /// Path parameters:
+  /// - id: String (product UUID)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid)
+  ///
+  /// Response:
+  /// - ProductDetailResponse with single product (product_subs จะมี field stock เพิ่ม)
+  @GET('/products/{id}')
+  Future<HttpResponse<ProductDetailResponse>> fetchProductDetail(
+    @Path('id') String productId,
+    @Query('customer_id') String customerId,
+  );
 }

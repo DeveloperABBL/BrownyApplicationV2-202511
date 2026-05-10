@@ -1598,4 +1598,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couponFullyRedeemed => '已满额';
+
+  @override
+  String get freeShipping => '免运费';
+
+  @override
+  String get onSale => '促销';
+
+  @override
+  String get baht => '泰铢';
+
+  @override
+  String get categories => '分类';
+
+  @override
+  String get searchProductPlaceholder => '搜索商品';
+
+  @override
+  String get popular => '热门';
+
+  @override
+  String get brownySale => 'Browny Sale';
+
+  @override
+  String get brownyDoll => '布朗尼公仔';
+
+  @override
+  String get housework => '家务';
+
+  @override
+  String get brownyShopTitle => 'Shop';
+
+  @override
+  String get flashDeals => '限时特卖';
+
+  @override
+  String get forYou => '为你推荐';
 }

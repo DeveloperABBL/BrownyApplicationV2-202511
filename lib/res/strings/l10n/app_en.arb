@@ -603,5 +603,17 @@
   "unavailableCoupons": "Unavailable Coupons",
   "unavailableEVouchers": "Unavailable E-Vouchers",
   "couponExpired": "Expired",
-  "couponFullyRedeemed": "Fully Redeemed"
+  "couponFullyRedeemed": "Fully Redeemed",
+  "freeShipping": "Free Shipping",
+  "onSale": "On Sale",
+  "baht": "Baht",
+  "categories": "Categories",
+  "searchProductPlaceholder": "Search products",
+  "popular": "Popular",
+  "brownySale": "Browny Sale",
+  "brownyDoll": "Browny Doll",
+  "housework": "Housework",
+  "brownyShopTitle": "Shop",
+  "flashDeals": "Flash Deals",
+  "forYou": "For You"
 }

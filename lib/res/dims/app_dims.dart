@@ -6,6 +6,7 @@ class AppDims {
 
   static final double size_1 = 1.0;
   static final double size_2 = 2.0;
+  static final double size_3 = 3.0;
   static final double size_4 = 4.0;
   static final double size_5 = 5.0;
   static final double size_6 = 6.0;

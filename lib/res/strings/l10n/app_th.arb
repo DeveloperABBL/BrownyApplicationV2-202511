@@ -554,5 +554,17 @@
   "unavailableCoupons": "คูปองที่ใช้ไม่ได้",
   "unavailableEVouchers": "E-Voucher ที่ใช้ไม่ได้",
   "couponExpired": "หมดอายุ",
-  "couponFullyRedeemed": "สิทธิ์เต็ม"
+  "couponFullyRedeemed": "สิทธิ์เต็ม",
+  "freeShipping": "ส่งฟรี",
+  "onSale": "ลดราคา",
+  "baht": "บาท",
+  "categories": "หมวดหมู่",
+  "searchProductPlaceholder": "ค้นหาสินค้า",
+  "popular": "ยอดนิยม",
+  "brownySale": "Browny Sale",
+  "brownyDoll": "น้องบราวนี่",
+  "housework": "งานบ้าน",
+  "brownyShopTitle": "Shop",
+  "flashDeals": "Flash Deals",
+  "forYou": "สำหรับคุณ"
 }

@@ -148,6 +148,35 @@ class AppColors {
     ],
   );
 
+  /// Browny Shop section background — outer wrapper ครอบทั้ง section
+  /// Figma: ไล่จากเขียวเข้ม (α0.6) ลงสู่ขาว แบบ 5 stops
+  static final LinearGradient brownyShopSectionGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: const [0.0, 0.1464, 0.3261, 0.4879, 1.0],
+    colors: [
+      const Color(0xFF3EA639).withValues(alpha: 0.6),
+      const Color(0xFF7DC34D).withValues(alpha: 0.6),
+      const Color(0xFFB1EF83).withValues(alpha: 0.6),
+      const Color(0xFFEBEF83).withValues(alpha: 0.6),
+      AppColors.white,
+    ],
+  );
+
+  /// Browny Shop categories wrapper background
+  /// Figma: linear-gradient(180deg, #CAFFA2 -2.99%, #FFFFFF 4.15%)
+  /// เขียวอ่อนที่ขอบบน fade เป็นขาวอย่างรวดเร็ว (~4% แรก) ที่เหลือเป็นขาว
+  static const LinearGradient brownyShopCategoryWrapperGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: [0.0, 0.0415, 1.0],
+    colors: [
+      Color(0xFFCAFFA2),
+      AppColors.white,
+      AppColors.white,
+    ],
+  );
+
   static LinearGradient popupFestiveFailedGradient = LinearGradient(
     begin: Alignment.bottomCenter,
     end: Alignment.topCenter,
@@ -352,6 +381,9 @@ class AppColors {
 
   /// Gray 400
   static const Color gray400 = Color(0xFFCDCDCD); // #CDCDCD
+
+  /// Gray 50 — สีพื้นหลังอ่อนมาก (เกือบขาว) ใช้กับ search box เป็นต้น
+  static const Color gray50 = Color(0xFFF9FAFB); // #F9FAFB
 
   /// CI (Corporate Identity) - สีเขียวหลัก
   static const Color ci = Color(0xFF2FBA38); // #2FBA38

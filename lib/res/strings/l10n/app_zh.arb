@@ -552,5 +552,17 @@
   "unavailableCoupons": "无法使用的优惠券",
   "unavailableEVouchers": "无法使用的电子券",
   "couponExpired": "已过期",
-  "couponFullyRedeemed": "已满额"
+  "couponFullyRedeemed": "已满额",
+  "freeShipping": "免运费",
+  "onSale": "促销",
+  "baht": "泰铢",
+  "categories": "分类",
+  "searchProductPlaceholder": "搜索商品",
+  "popular": "热门",
+  "brownySale": "Browny Sale",
+  "brownyDoll": "布朗尼公仔",
+  "housework": "家务",
+  "brownyShopTitle": "Shop",
+  "flashDeals": "限时特卖",
+  "forYou": "为你推荐"
 }

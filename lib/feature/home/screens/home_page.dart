@@ -24,6 +24,9 @@ import 'package:browny_applications_new/feature/transactions/screens/machines/ma
 import 'package:browny_applications_new/feature/transactions/screens/machines/machine_transaction_page_2.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
@@ -56,6 +59,7 @@ class HomePage extends StatelessWidget {
       create: (_) => HomePageViewmodel(
         context: context,
         repo: HomeRepo(),
+        brownyShopRepo: BrownyShopRepo(),
       ),
       child: HomePageWidget(),
     );
@@ -94,6 +98,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
     await _viewmodel.fetchBannersHighlight();
     // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
     await _viewmodel.fetchWorkingMachines();
+    // ดึงสินค้า Browny Shop
+    unawaited(_viewmodel.fetchShopProducts());
 
     if (mounted) {
       // ดึงข้อมูลแสดง Popup เพื่อนเชิญเพื่อน ของวันนี้
@@ -210,6 +216,14 @@ class _HomePageWidgetState extends State<HomePageWidget>
             SliverToBoxAdapter(
               child: _buildServices(context),
             ),
+
+            SliverToBoxAdapter(
+              child: AppDims.vericalPadding_18,
+            ),
+            // POC: Browny Shop Section
+            SliverToBoxAdapter(
+              child: _buildBrownyShopSection(context),
+            ),
             SliverToBoxAdapter(
               child: AppDims.vericalPadding_24,
             ),
@@ -247,7 +261,198 @@ class _HomePageWidgetState extends State<HomePageWidget>
               // }
               return;
             }
+
+            if (index == 3) {
+              await BrownyShopPage.goToPage(context);
+              return;
+            }
           },
+        ),
+      ),
+    );
+  }
+
+  /// Browny Shop section — ตาม design BROWNY_SHOP_HOME_SECTION_PLAN.md
+  Widget _buildBrownyShopSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.brownyShopSectionGradient,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // [1] Top banner area + [2] header (วางที่ขอบล่างของ banner area)
+          _buildShopTopBanner(context),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildShopSearchBox(context),
+                AppDims.vericalPadding_24,
+                _buildShopMidBannerCarousel(context),
+                AppDims.vericalPadding_24,
+              ],
+            ),
+          ),
+          // [5] + [6] Categories + Featured Grid wrapper (gradient bg, rounded top 24)
+          _buildShopCategoriesGridWrapper(context),
+        ],
+      ),
+    );
+  }
+
+  /// Container ครอบ Categories + Grid + Show More — bg gradient + rounded top 24
+  Widget _buildShopCategoriesGridWrapper(BuildContext context) {
+    return BrownyShopCategoriesGridSection(
+      productsListenable: _viewmodel.shopProductsNotifier,
+      selectedCategoryListenable: _viewmodel.shopSelectedCategoryNotifier,
+      onCategorySelected: _viewmodel.onShopCategorySelected,
+      showShowMore: true,
+      onShowMoreTap: () => BrownyShopPage.goToPage(context),
+      onProductTap: (p) => debugPrint('tap product: ${p.id}'),
+      onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
+    );
+  }
+
+  /// [1] Top banner (200h) + [2] header row วางที่ขอบล่าง (ทับซ้อนกับ banner)
+  Widget _buildShopTopBanner(BuildContext context) {
+    // TODO mockup Banner อาจจะเป็น api ดึงมาแสดง
+    AssetGenImage brownyBanner;
+    switch (context.languageCode) {
+      case 'zh':
+        brownyBanner = Assets.icShop.brownyShopBannerZh;
+        break;
+      case 'en':
+        brownyBanner = Assets.icShop.brownyShopBannerEn;
+        break;
+      default:
+        brownyBanner = Assets.icShop.brownyShopBannerTh;
+        break;
+    }
+    return SizedBox(
+      height: 200.h,
+      child: Stack(
+        children: [
+          // [1] Content banner เต็มพื้นที่
+          Positioned.fill(
+            top: AppDims.size_10.h,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: AppDims.size_8.h,
+                left: AppDims.size_8.w,
+                right: AppDims.size_8.w,
+              ),
+              child: brownyBanner.image(fit: BoxFit.cover),
+            ),
+          ),
+          // [2] Header row ชิดขอบล่างซ้าย (ทับ banner)
+          Positioned(
+            left: AppDims.size_16.w,
+            right: AppDims.size_16.w,
+            bottom: AppDims.size_8.h,
+            child: _buildShopHeaderRow(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// [2] Header Row — Browny Shop logo + Bag (ห่างกัน 8px ชิดซ้าย)
+  Widget _buildShopHeaderRow(BuildContext context) {
+    return SizedBox(
+      height: AppDims.size_60.h,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Assets.icShop.icBrownyShop.image(),
+          SizedBox(width: AppDims.size_8.w),
+          GestureDetector(
+            onTap: () => debugPrint('tap shop bag → cart (TODO)'),
+            child: Container(
+              width: AppDims.size_39.w,
+              height: AppDims.size_39.w,
+              decoration: const BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Assets.icShop.icBag.image(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// [3] Search Box — Tap → BrownyShopSearchPage (TODO)
+  Widget _buildShopSearchBox(BuildContext context) {
+    return GestureDetector(
+      onTap: () => debugPrint('tap shop search → SearchPage (TODO)'),
+      child: Container(
+        height: AppDims.size_40.h,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDims.size_16.w,
+          vertical: AppDims.size_12.h,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.gray50,
+          border: Border.all(color: AppColors.productStroke),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search,
+              size: AppDims.size_16.w,
+              color: AppColors.gray500,
+            ),
+            SizedBox(width: AppDims.size_8.w),
+            Expanded(
+              child: AppText(
+                context.wording.searchProductPlaceholder,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: AppColors.gray500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// [4] Mid Banner — Figma: 343x78, rounded 8, รองรับหลายรูปด้วย CarouselSlider
+  /// TODO: รับ list จาก API/viewmodel ในอนาคต — ตอนนี้ mock ด้วย Assets.icShop.midBanner
+  Widget _buildShopMidBannerCarousel(BuildContext context) {
+    final banners = <AssetGenImage>[
+      Assets.icShop.midBanner,
+    ];
+
+    if (banners.isEmpty) return const SizedBox.shrink();
+
+    return SizedBox(
+      height: 78.h,
+      child: CarouselSlider.builder(
+        itemCount: banners.length,
+        itemBuilder: (context, index, _) {
+          return GestureDetector(
+            onTap: () => debugPrint('tap mid banner $index (TODO)'),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.r),
+              child: banners[index].image(
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+          );
+        },
+        options: CarouselOptions(
+          height: 78.h,
+          viewportFraction: 1,
+          autoPlay: banners.length > 1,
+          enableInfiniteScroll: banners.length > 1,
         ),
       ),
     );
@@ -633,18 +838,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   child: _buldIconShortCut(
                     icon: Assets.iconShortcut.iscCoupon,
                     title: context.wording.rewards,
-                    // children: [
-                    //   Assets.iconShortcut.iscCoupon.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     // คูปอง
-                    //     context.wording.rewards,
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),
@@ -659,45 +852,23 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   child: _buldIconShortCut(
                     icon: Assets.iconShortcut.iscBrownyClub,
                     title: 'Browny\nClub',
-                    //  Column(
-                    // children: [
-                    //   Assets.iconShortcut.iscBrownyClub.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     'Browny\nClub',
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),
 
               Container(
-                // foregroundDecoration: BoxDecoration(
-                //   color: Colors.grey,
-                //   backgroundBlendMode: BlendMode.saturation,
-                // ),
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDims.size_2.w,
                   // vertical: AppDims.size_8.h,
                 ),
-                child: _buldIconShortCut(
-                  icon: Assets.iconShortcut.iscBrownyShop,
-                  title: 'Browny\nShop',
-                  // children: [
-                  //   Assets.iconShortcut.iscBrownyShop.image(
-                  //     width: AppDims.size_74.w,
-                  //     height: AppDims.size_42.h,
-                  //   ),
-                  //   AppText(
-                  //     'Browny\nShop',
-                  //     textAlign: TextAlign.center,
-                  //     style: context.textTheme.titleSmall,
-                  //   ),
-                  // ],
+                child: GestureDetector(
+                  onTap: () async {
+                    await BrownyShopPage.goToPage(context);
+                  },
+                  child: _buldIconShortCut(
+                    icon: Assets.iconShortcut.iscBrownyShop,
+                    title: 'Browny\nShop',
+                  ),
                 ),
               ),
 
@@ -712,22 +883,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppDims.size_2.w,
-                    // vertical: AppDims.size_8.h,
                   ),
                   child: _buldIconShortCut(
                     icon: Assets.iconShortcut.iscLuckyScan,
                     title: 'Lucky\nScan',
-                    // children: [
-                    //   Assets.iconShortcut.iscLuckyScan.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     'Lucky\nScan',
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),
@@ -745,18 +904,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     icon: Assets.iconShortcut.iscTransactionHistory,
                     // ประวัติ\nการใช้งาน
                     title: context.wording.usageHistory,
-                    // children: [
-                    //   Assets.iconShortcut.iscTransactionHistory.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     // ประวัติ\nการใช้งาน
-                    //     context.wording.usageHistory,
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),
@@ -775,18 +922,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
                     icon: Assets.iconShortcut.iscContact,
                     // ติดต่อ\nสอบถาม
                     title: context.wording.contactInquiry,
-                    // children: [
-                    //   Assets.iconShortcut.iscContact.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     // ติดต่อ\nสอบถาม
-                    //     context.wording.contactInquiry,
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),
@@ -805,17 +940,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   child: _buldIconShortCut(
                     icon: Assets.iconShortcut.iscBrownyId,
                     title: 'Browny ID',
-                    // children: [
-                    //   Assets.iconShortcut.iscBrownyId.image(
-                    //     width: AppDims.size_74.w,
-                    //     height: AppDims.size_42.h,
-                    //   ),
-                    //   AppText(
-                    //     'Browny ID',
-                    //     textAlign: TextAlign.center,
-                    //     style: context.textTheme.titleSmall,
-                    //   ),
-                    // ],
                   ),
                 ),
               ),

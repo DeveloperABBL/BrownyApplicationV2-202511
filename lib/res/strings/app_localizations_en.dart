@@ -1645,4 +1645,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couponFullyRedeemed => 'Fully Redeemed';
+
+  @override
+  String get freeShipping => 'Free Shipping';
+
+  @override
+  String get onSale => 'On Sale';
+
+  @override
+  String get baht => 'Baht';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get searchProductPlaceholder => 'Search products';
+
+  @override
+  String get popular => 'Popular';
+
+  @override
+  String get brownySale => 'Browny Sale';
+
+  @override
+  String get brownyDoll => 'Browny Doll';
+
+  @override
+  String get housework => 'Housework';
+
+  @override
+  String get brownyShopTitle => 'Shop';
+
+  @override
+  String get flashDeals => 'Flash Deals';
+
+  @override
+  String get forYou => 'For You';
 }

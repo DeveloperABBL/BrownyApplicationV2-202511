@@ -3237,6 +3237,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fully Redeemed'**
   String get couponFullyRedeemed;
+
+  /// No description provided for @freeShipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Shipping'**
+  String get freeShipping;
+
+  /// No description provided for @onSale.
+  ///
+  /// In en, this message translates to:
+  /// **'On Sale'**
+  String get onSale;
+
+  /// No description provided for @baht.
+  ///
+  /// In en, this message translates to:
+  /// **'Baht'**
+  String get baht;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @searchProductPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search products'**
+  String get searchProductPlaceholder;
+
+  /// No description provided for @popular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get popular;
+
+  /// No description provided for @brownySale.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Sale'**
+  String get brownySale;
+
+  /// No description provided for @brownyDoll.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Doll'**
+  String get brownyDoll;
+
+  /// No description provided for @housework.
+  ///
+  /// In en, this message translates to:
+  /// **'Housework'**
+  String get housework;
+
+  /// No description provided for @brownyShopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get brownyShopTitle;
+
+  /// No description provided for @flashDeals.
+  ///
+  /// In en, this message translates to:
+  /// **'Flash Deals'**
+  String get flashDeals;
+
+  /// No description provided for @forYou.
+  ///
+  /// In en, this message translates to:
+  /// **'For You'**
+  String get forYou;
 }
 
 class _AppLocalizationsDelegate

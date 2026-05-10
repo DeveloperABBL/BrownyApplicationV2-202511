@@ -1636,4 +1636,40 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get couponFullyRedeemed => 'สิทธิ์เต็ม';
+
+  @override
+  String get freeShipping => 'ส่งฟรี';
+
+  @override
+  String get onSale => 'ลดราคา';
+
+  @override
+  String get baht => 'บาท';
+
+  @override
+  String get categories => 'หมวดหมู่';
+
+  @override
+  String get searchProductPlaceholder => 'ค้นหาสินค้า';
+
+  @override
+  String get popular => 'ยอดนิยม';
+
+  @override
+  String get brownySale => 'Browny Sale';
+
+  @override
+  String get brownyDoll => 'น้องบราวนี่';
+
+  @override
+  String get housework => 'งานบ้าน';
+
+  @override
+  String get brownyShopTitle => 'Shop';
+
+  @override
+  String get flashDeals => 'Flash Deals';
+
+  @override
+  String get forYou => 'สำหรับคุณ';
 }

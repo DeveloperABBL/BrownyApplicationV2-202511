@@ -8,6 +8,7 @@ class AppNotificationViewmodel extends HomePageViewmodel {
   AppNotificationViewmodel({
     required super.context,
     required super.repo,
+    required super.brownyShopRepo,
   });
 
   // ========== Dispose ==========

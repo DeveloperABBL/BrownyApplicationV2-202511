@@ -141,6 +141,67 @@ class $AssetsIcReviewsGen {
   ];
 }
 
+class $AssetsIcShopGen {
+  const $AssetsIcShopGen();
+
+  /// File path: assets/ic_shop/browny_shop_banner_en.png
+  AssetGenImage get brownyShopBannerEn =>
+      const AssetGenImage('assets/ic_shop/browny_shop_banner_en.png');
+
+  /// File path: assets/ic_shop/browny_shop_banner_th.png
+  AssetGenImage get brownyShopBannerTh =>
+      const AssetGenImage('assets/ic_shop/browny_shop_banner_th.png');
+
+  /// File path: assets/ic_shop/browny_shop_banner_zh.png
+  AssetGenImage get brownyShopBannerZh =>
+      const AssetGenImage('assets/ic_shop/browny_shop_banner_zh.png');
+
+  /// File path: assets/ic_shop/ic_bag.png
+  AssetGenImage get icBag => const AssetGenImage('assets/ic_shop/ic_bag.png');
+
+  /// File path: assets/ic_shop/ic_box.png
+  AssetGenImage get icBox => const AssetGenImage('assets/ic_shop/ic_box.png');
+
+  /// File path: assets/ic_shop/ic_browny_shop.png
+  AssetGenImage get icBrownyShop =>
+      const AssetGenImage('assets/ic_shop/ic_browny_shop.png');
+
+  /// File path: assets/ic_shop/ic_discount.png
+  AssetGenImage get icDiscount =>
+      const AssetGenImage('assets/ic_shop/ic_discount.png');
+
+  /// File path: assets/ic_shop/ic_fav_active.png
+  AssetGenImage get icFavActive =>
+      const AssetGenImage('assets/ic_shop/ic_fav_active.png');
+
+  /// File path: assets/ic_shop/ic_fav_inactive.png
+  AssetGenImage get icFavInactive =>
+      const AssetGenImage('assets/ic_shop/ic_fav_inactive.png');
+
+  /// File path: assets/ic_shop/ic_shopping_bag.svg
+  SvgGenImage get icShoppingBag =>
+      const SvgGenImage('assets/ic_shop/ic_shopping_bag.svg');
+
+  /// File path: assets/ic_shop/mid_banner.png
+  AssetGenImage get midBanner =>
+      const AssetGenImage('assets/ic_shop/mid_banner.png');
+
+  /// List of all assets
+  List<dynamic> get values => [
+    brownyShopBannerEn,
+    brownyShopBannerTh,
+    brownyShopBannerZh,
+    icBag,
+    icBox,
+    icBrownyShop,
+    icDiscount,
+    icFavActive,
+    icFavInactive,
+    icShoppingBag,
+    midBanner,
+  ];
+}
+
 class $AssetsIconProfilePreferencesGen {
   const $AssetsIconProfilePreferencesGen();
 
@@ -573,6 +634,10 @@ class $AssetsPngGen {
   AssetGenImage get launcherIcon =>
       const AssetGenImage('assets/png/launcher_icon.png');
 
+  /// File path: assets/png/launcher_icon_improve.png
+  AssetGenImage get launcherIconImprove =>
+      const AssetGenImage('assets/png/launcher_icon_improve.png');
+
   /// File path: assets/png/logo_referral.png
   AssetGenImage get logoReferral =>
       const AssetGenImage('assets/png/logo_referral.png');
@@ -652,6 +717,7 @@ class $AssetsPngGen {
     icLine,
     icPaw2RoundedGreen,
     launcherIcon,
+    launcherIconImprove,
     logoReferral,
     promptpayBadge,
     promptpayBadgeNoLine,
@@ -1271,6 +1337,7 @@ class Assets {
   static const $AssetsIcMenuGen icMenu = $AssetsIcMenuGen();
   static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
   static const $AssetsIcReviewsGen icReviews = $AssetsIcReviewsGen();
+  static const $AssetsIcShopGen icShop = $AssetsIcShopGen();
   static const $AssetsIconProfilePreferencesGen iconProfilePreferences =
       $AssetsIconProfilePreferencesGen();
   static const $AssetsIconShortcutGen iconShortcut = $AssetsIconShortcutGen();

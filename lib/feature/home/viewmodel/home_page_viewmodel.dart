@@ -4,10 +4,12 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -20,11 +22,16 @@ class HomePageViewmodel extends AppViewModel {
   HomePageViewmodel({
     required super.context,
     required HomeDataSourceMixin repo,
-  }) : _repo = repo;
+    required BrownyShopDataSourceMixin brownyShopRepo,
+  }) : _repo = repo,
+       _brownyShopRepo = brownyShopRepo;
 
   // ========== Repo ==========
   final HomeDataSourceMixin _repo;
   HomeDataSourceMixin get homeRepo => _repo;
+
+  final BrownyShopDataSourceMixin _brownyShopRepo;
+  BrownyShopDataSourceMixin get brownyShopRepo => _brownyShopRepo;
 
   // ========== Dispose ==========
   @override
@@ -35,6 +42,8 @@ class HomePageViewmodel extends AppViewModel {
     _categoriesNotifier.dispose();
     _workingMachinesNotifier.dispose();
     _customerNotificationsCountNotifier.dispose();
+    _shopProductsNotifier.dispose();
+    _shopSelectedCategoryNotifier.dispose();
     super.dispose();
   }
 
@@ -85,6 +94,20 @@ class HomePageViewmodel extends AppViewModel {
   );
   ValueListenable<UiResult<WorkingMachinesResponse>>
   get workingMachinesNotifier => _workingMachinesNotifier;
+
+  /// Notifier fetch รายการสินค้า Browny Shop
+  final ValueNotifier<UiResult<List<ProductData>>> _shopProductsNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<ProductData>>> get shopProductsNotifier =>
+      _shopProductsNotifier;
+
+  /// Notifier เก็บ category ที่ user เลือกอยู่ใน Shop section
+  /// ค่าเริ่มต้น = "all"
+  final ValueNotifier<String> _shopSelectedCategoryNotifier = ValueNotifier(
+    'all',
+  );
+  ValueListenable<String> get shopSelectedCategoryNotifier =>
+      _shopSelectedCategoryNotifier;
 
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
@@ -385,5 +408,51 @@ class HomePageViewmodel extends AppViewModel {
     _customerNotificationsCountNotifier.value = UiResult.success(
       data: result.data.data.orEmpty.length,
     );
+  }
+
+  /// เปลี่ยน category ที่เลือกใน Shop section แล้ว fetch ข้อมูลใหม่
+  Future<void> onShopCategorySelected(String category) async {
+    if (_shopSelectedCategoryNotifier.value == category) return;
+    _shopSelectedCategoryNotifier.value = category;
+    await fetchShopProducts(productType: category);
+  }
+
+  /// DONG 2026-05-10
+  ///
+  /// API fetch รายการสินค้า Browny Shop
+  ///
+  /// Parameters:
+  /// - productType: String (default "all")
+  Future<void> fetchShopProducts({String productType = 'all'}) async {
+    // 1. Set loading
+    _shopProductsNotifier.value = UiResult.loading();
+
+    final customerId = currentCustomerProvider.current.id.orEmpty;
+
+    // 2. Call repo
+    final result = await _brownyShopRepo.fetchProducts(
+      productType: productType,
+      customerId: customerId,
+    );
+
+    // 3. Handle error
+    if (result.hasError) {
+      _shopProductsNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    // 4. Handle empty
+    if (result.isEmpty) {
+      _shopProductsNotifier.value = UiResult.empty();
+      return;
+    }
+
+    // 5. Handle success
+    final products = result.data.product ?? <ProductData>[];
+    if (products.isEmpty) {
+      _shopProductsNotifier.value = UiResult.empty();
+      return;
+    }
+    _shopProductsNotifier.value = UiResult.success(data: products);
   }
 }

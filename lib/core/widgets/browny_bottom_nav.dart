@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/map/screens/map_page.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
@@ -58,7 +59,7 @@ class BrownyBottomNav extends StatefulWidget {
   @override
   State<BrownyBottomNav> createState() => _BrownyBottomNavState();
 
-  static onTapAppDefault(BuildContext context, int index) {
+  static void onTapAppDefault(BuildContext context, int index) {
     if (index == 0) {
       context.pushNamedAndClear(HomePage.pageName);
       return;
@@ -74,6 +75,11 @@ class BrownyBottomNav extends StatefulWidget {
 
     if (index == 2) {
       context.pushNamed(MapPage.pageName);
+      return;
+    }
+
+    if (index == 3) {
+      BrownyShopPage.goToPage(context);
       return;
     }
   }
@@ -102,8 +108,8 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
       ),
       BottomNavigationBarItem(
         icon: Assets.icMenu.icShop.image(
-          color: AppColors.gray500,
-          colorBlendMode: BlendMode.srcIn,
+          // color: AppColors.gray500,
+          // colorBlendMode: BlendMode.srcIn,
           width: 28.w,
         ),
         activeIcon: Assets.icMenu.icShopActive.image(width: 28.w),
@@ -131,14 +137,14 @@ class _BrownyBottomNavState extends State<BrownyBottomNav> {
       }
       final bool selected = i == widget.currentIndex;
       final item = items[i];
-      bool enable = item.label != context.wording.shop;
+      // bool enable = item.label != context.wording.shop;
       itemWidgets.add(
         _NavItem(
           icon: selected ? item.activeIcon : item.icon,
           label: item.label ?? '',
           selected: selected,
           showLabel: widget.showLabels,
-          enable: enable,
+          enable: true,
           onTap: () => widget.onTap(context, i),
         ),
       );

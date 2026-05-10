@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_notification_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/app_notification_viewmodel.dart';
 
@@ -20,6 +21,7 @@ class AppNotificationsPage extends StatelessWidget {
       create: (context) => AppNotificationViewmodel(
         context: context,
         repo: HomeRepo(),
+        brownyShopRepo: BrownyShopRepo(),
       ),
       child: _AppNotificationContent(),
     );
