@@ -144,6 +144,14 @@ class $AssetsIcReviewsGen {
 class $AssetsIcShopGen {
   const $AssetsIcShopGen();
 
+  /// File path: assets/ic_shop/bronwy_shop_flash_sales.png
+  AssetGenImage get bronwyShopFlashSales =>
+      const AssetGenImage('assets/ic_shop/bronwy_shop_flash_sales.png');
+
+  /// File path: assets/ic_shop/bronwy_shop_title.png
+  AssetGenImage get bronwyShopTitle =>
+      const AssetGenImage('assets/ic_shop/bronwy_shop_title.png');
+
   /// File path: assets/ic_shop/browny_shop_banner_en.png
   AssetGenImage get brownyShopBannerEn =>
       const AssetGenImage('assets/ic_shop/browny_shop_banner_en.png');
@@ -161,6 +169,10 @@ class $AssetsIcShopGen {
 
   /// File path: assets/ic_shop/ic_box.png
   AssetGenImage get icBox => const AssetGenImage('assets/ic_shop/ic_box.png');
+
+  /// File path: assets/ic_shop/ic_browny_paw_gradient.svg
+  SvgGenImage get icBrownyPawGradient =>
+      const SvgGenImage('assets/ic_shop/ic_browny_paw_gradient.svg');
 
   /// File path: assets/ic_shop/ic_browny_shop.png
   AssetGenImage get icBrownyShop =>
@@ -188,11 +200,14 @@ class $AssetsIcShopGen {
 
   /// List of all assets
   List<dynamic> get values => [
+    bronwyShopFlashSales,
+    bronwyShopTitle,
     brownyShopBannerEn,
     brownyShopBannerTh,
     brownyShopBannerZh,
     icBag,
     icBox,
+    icBrownyPawGradient,
     icBrownyShop,
     icDiscount,
     icFavActive,

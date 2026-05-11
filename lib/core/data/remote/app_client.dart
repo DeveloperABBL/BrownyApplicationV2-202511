@@ -827,4 +827,13 @@ abstract class AppClient {
     @Path('id') String productId,
     @Query('customer_id') String customerId,
   );
+
+  /// DONG 2026-05-11
+  ///
+  /// API fetch รายการ Flash Sale ที่ active อยู่ (Browny Shop)
+  ///
+  /// Response:
+  /// - FlashSalesResponse with list ของ flash sale campaign แต่ละชุดมี products
+  @GET('/flash-sales')
+  Future<HttpResponse<FlashSalesResponse>> fetchFlashSales();
 }

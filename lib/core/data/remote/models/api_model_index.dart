@@ -21,6 +21,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/check_t
 export 'package:browny_applications_new/core/data/remote/models/response/order_history_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/product_detail_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';

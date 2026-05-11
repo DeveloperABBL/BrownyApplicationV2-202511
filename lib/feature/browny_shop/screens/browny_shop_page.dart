@@ -3,6 +3,8 @@ import 'package:browny_applications_new/feature/browny_shop/repository/browny_sh
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
+import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
+import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 
 class BrownyShopPage extends StatelessWidget {
   const BrownyShopPage({super.key});
@@ -89,7 +91,6 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
   Widget _buildAppBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        // gradient: AppColors.primaryGradient,
         image: DecorationImage(
           fit: BoxFit.fill,
           image: Assets.png.bgAppBar.provider(),
@@ -124,8 +125,9 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Assets.icShop.icBrownyShop.image(
-                  height: AppDims.size_24.h,
+                Assets.icShop.bronwyShopTitle.image(
+                  height: 25.h,
+                  fit: BoxFit.contain,
                 ),
                 SizedBox(width: AppDims.size_4.w),
                 AppText(
@@ -176,7 +178,11 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
           _buildIconButton(
             context,
             svg: Assets.svg.icHeadset,
-            onTap: () => debugPrint('tap headset (TODO)'),
+            // ไปหน้าติดต่อช่วยเหลือ
+            onTap: () => ContactPage.goToPage(
+              context,
+              ContactProvider.helpAndProblemNoti,
+            ),
           ),
         ],
       ),
