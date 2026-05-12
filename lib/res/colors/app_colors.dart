@@ -177,6 +177,58 @@ class AppColors {
     ],
   );
 
+  /// Flash Sale section background
+  /// Figma: linear-gradient(172.48deg, rgba(255,120,1,0.4), rgba(126,226,120,0.45), rgba(75,190,34,0.45))
+  static final LinearGradient flashSaleSectionGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: const [0.022, 0.522, 1.0],
+    colors: [
+      const Color(0xFFFF7801).withValues(alpha: 0.4),
+      const Color(0xFF7EE278).withValues(alpha: 0.45),
+      const Color(0xFF4BBE22).withValues(alpha: 0.45),
+    ],
+  );
+
+  /// Flash Sale — paw icon square (25x25) bg
+  /// Figma: linear-gradient(126.07deg, rgba(153,212,70,0.8), rgba(135,206,69,0.8), rgba(36,181,45,0.8))
+  static final LinearGradient flashSalePawSquareGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    stops: const [0.174, 0.497, 0.894],
+    colors: [
+      const Color(0xFF99D446).withValues(alpha: 0.8),
+      const Color(0xFF87CE45).withValues(alpha: 0.8),
+      const Color(0xFF24B52D).withValues(alpha: 0.8),
+    ],
+  );
+
+  /// Flash Sale — countdown timer box bg
+  /// Figma: linear-gradient(181.22deg, rgba(212,207,70,0.8), rgba(135,206,69,0.6), rgba(36,181,45,0.4))
+  static final LinearGradient flashSaleTimerGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: const [0.052, 0.508, 1.0],
+    colors: [
+      const Color(0xFFD4CF46).withValues(alpha: 0.8),
+      const Color(0xFF87CE45).withValues(alpha: 0.6),
+      const Color(0xFF24B52D).withValues(alpha: 0.4),
+    ],
+  );
+
+  /// Flash Sale — price tag bg (sale price pill)
+  /// Figma: linear-gradient(to right, #E02A48 0%, #FF5F2F 50.48%, #FEB210 100%)
+  static const LinearGradient flashSalePriceGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    stops: [0.0, 0.5048, 1.0],
+    colors: [
+      Color(0xFFE02A48),
+      Color(0xFFFF5F2F),
+      Color(0xFFFEB210),
+    ],
+  );
+
   static LinearGradient popupFestiveFailedGradient = LinearGradient(
     begin: Alignment.bottomCenter,
     end: Alignment.topCenter,
@@ -384,6 +436,9 @@ class AppColors {
 
   /// Gray 50 — สีพื้นหลังอ่อนมาก (เกือบขาว) ใช้กับ search box เป็นต้น
   static const Color gray50 = Color(0xFFF9FAFB); // #F9FAFB
+
+  /// Mint Green — สีพื้นหลังปุ่ม "เพิ่มลงรถเข็น" ที่หน้าสินค้า
+  static const Color mintCartButton = Color(0xFFBFFAC3); // #BFFAC3
 
   /// CI (Corporate Identity) - สีเขียวหลัก
   static const Color ci = Color(0xFF2FBA38); // #2FBA38

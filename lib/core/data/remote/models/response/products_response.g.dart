@@ -20,6 +20,9 @@ ProductData _$ProductDataFromJson(Map<String, dynamic> json) => ProductData(
   id: json['id'] as String?,
   isFreeShipping: json['is_free_shipping'] as bool?,
   favoriteStatus: json['favorite_status'] as bool?,
+  hasFlashSale: json['has_flash_sale'] as bool?,
+  flashSaleStartsAt: json['flash_sale_starts_at'] as String?,
+  flashSaleEndsAt: json['flash_sale_ends_at'] as String?,
   unit: json['unit'] == null
       ? null
       : ContentLocalizeData.fromJson(json['unit'] as Map<String, dynamic>),
@@ -39,6 +42,9 @@ Map<String, dynamic> _$ProductDataToJson(ProductData instance) =>
       'id': instance.id,
       'is_free_shipping': instance.isFreeShipping,
       'favorite_status': instance.favoriteStatus,
+      'has_flash_sale': instance.hasFlashSale,
+      'flash_sale_starts_at': instance.flashSaleStartsAt,
+      'flash_sale_ends_at': instance.flashSaleEndsAt,
       'unit': instance.unit,
       'translations': instance.translations,
       'product_subs': instance.productSubs,
@@ -84,8 +90,16 @@ ProductSubData _$ProductSubDataFromJson(Map<String, dynamic> json) =>
       name: json['name'] == null
           ? null
           : ContentLocalizeData.fromJson(json['name'] as Map<String, dynamic>),
-      coinPrice: json['coin_price'] as String?,
-      moneyPrice: json['money_price'] as String?,
+      originalCoinPrice: json['original_coin_price'] as num?,
+      originalMoneyPrice: json['original_money_price'] as num?,
+      coinPrice: json['coin_price'] as num?,
+      moneyPrice: json['money_price'] as num?,
+      isFlashSale: json['is_flash_sale'] as bool?,
+      flashSale: json['flash_sale'] == null
+          ? null
+          : FlashSaleInfoData.fromJson(
+              json['flash_sale'] as Map<String, dynamic>,
+            ),
       imageUrl: json['image_url'] as String?,
       stock: json['stock'] as String?,
     );
@@ -95,8 +109,12 @@ Map<String, dynamic> _$ProductSubDataToJson(ProductSubData instance) =>
       'id': instance.id,
       'list_order': instance.listOrder,
       'name': instance.name,
+      'original_coin_price': instance.originalCoinPrice,
+      'original_money_price': instance.originalMoneyPrice,
       'coin_price': instance.coinPrice,
       'money_price': instance.moneyPrice,
+      'is_flash_sale': instance.isFlashSale,
+      'flash_sale': instance.flashSale,
       'image_url': instance.imageUrl,
       'stock': instance.stock,
     };

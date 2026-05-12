@@ -836,4 +836,22 @@ abstract class AppClient {
   /// - FlashSalesResponse with list ของ flash sale campaign แต่ละชุดมี products
   @GET('/flash-sales')
   Future<HttpResponse<FlashSalesResponse>> fetchFlashSales();
+
+  /// DONG 2026-05-12
+  ///
+  /// API เพิ่มสินค้าลงตะกร้าของลูกค้า
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Body:
+  /// - CartItemAddRequest (product_id, product_sub_id, quantity)
+  ///
+  /// Response:
+  /// - CartItemAddResponse with cart item data (id, totals, price_changed)
+  @POST('/customer/{customerId}/cart/items')
+  Future<HttpResponse<CartItemAddResponse>> addCartItem(
+    @Path('customerId') String customerId,
+    @Body() CartItemAddRequest body,
+  );
 }

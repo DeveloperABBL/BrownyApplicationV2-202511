@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
@@ -44,6 +45,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _vm.attachContext(context);
       _vm.fetchProducts();
+      _vm.fetchFlashSales();
     });
   }
 
@@ -61,11 +63,15 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppDims.vericalPadding_24,
-            // [1] Flash Deals — placeholder รอ API
+            // [1] Flash Deals — ดึงจาก API
             Padding(
               padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-              child: const FlashDealsSection(),
+              child: FlashDealsSection(
+                flashSalesListenable: _vm.flashSalesNotifier,
+                onSeeAllTap: () => debugPrint('tap flash sale see all (TODO)'),
+                onProductTap: (p) =>
+                    debugPrint('tap flash sale product: ${p.id}'),
+              ),
             ),
             // [2] หมวดหมู่ + chips + grid (shared widget กับ home)
             BrownyShopCategoriesGridSection(
@@ -73,7 +79,14 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
               productsListenable: _vm.productsNotifier,
               selectedCategoryListenable: _vm.selectedCategoryNotifier,
               onCategorySelected: _vm.onCategorySelected,
-              onProductTap: (p) => debugPrint('tap product: ${p.id}'),
+              onProductTap: (p) {
+                if (p.id != null) {
+                  BrownyShopProductDetailPage.goToPage(
+                    context,
+                    productId: p.id!,
+                  );
+                }
+              },
               onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
             ),
             AppDims.vericalPadding_24,
@@ -128,13 +141,6 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
                 Assets.icShop.bronwyShopTitle.image(
                   height: 25.h,
                   fit: BoxFit.contain,
-                ),
-                SizedBox(width: AppDims.size_4.w),
-                AppText(
-                  context.wording.brownyShopTitle,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    color: AppColors.white,
-                  ),
                 ),
               ],
             ),
@@ -202,16 +208,18 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.search,
-              size: AppDims.size_16.w,
-              color: AppColors.gray500,
+            Assets.svg.icMagnify.svg(
+              width: AppDims.size_16.w,
+              colorFilter: ColorFilter.mode(
+                AppColors.gray500,
+                BlendMode.srcIn,
+              ),
             ),
             SizedBox(width: AppDims.size_8.w),
             Expanded(
               child: AppText(
                 context.wording.searchProductPlaceholder,
-                style: context.textTheme.bodySmall?.copyWith(
+                style: context.textTheme.titleSmall?.copyWith(
                   color: AppColors.gray500,
                 ),
               ),

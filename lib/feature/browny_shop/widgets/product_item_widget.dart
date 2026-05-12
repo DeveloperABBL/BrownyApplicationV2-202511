@@ -112,7 +112,7 @@ class ProductItemWidget extends StatelessWidget {
                   ? Container(color: AppColors.ci3)
                   : CachedNetworkImage(
                       imageUrl: imageUrl!,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       placeholder: (_, _) => Container(color: AppColors.ci3),
                       errorWidget: (_, _, _) => Container(color: AppColors.ci3),
                     ),

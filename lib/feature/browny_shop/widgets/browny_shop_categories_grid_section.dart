@@ -156,10 +156,10 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
                     ? p.productSubs!.first
                     : null;
                 return ProductItemWidget(
-                  imageUrl: firstSub?.imageUrl ?? p.mainImageUrl,
+                  imageUrl: p.mainImageUrl ?? firstSub?.imageUrl,
                   name: p.getNameDisplay(locale),
-                  coinPrice: firstSub?.coinPrice,
-                  moneyPrice: firstSub?.moneyPrice,
+                  coinPrice: firstSub?.coinPrice?.toString(),
+                  moneyPrice: firstSub?.moneyPrice?.toString(),
                   isFreeShipping: p.isFreeShipping ?? false,
                   isFavorite: p.favoriteStatus ?? false,
                   onTap: () => onProductTap?.call(p),

@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
@@ -22,7 +23,36 @@ class BrownyShopPageViewmodel extends AppViewModel {
   void dispose() {
     _productsNotifier.dispose();
     _selectedCategoryNotifier.dispose();
+    _flashSalesNotifier.dispose();
     super.dispose();
+  }
+
+  /// รายการ Flash Sale ที่ active อยู่
+  final ValueNotifier<UiResult<List<FlashSaleData>>> _flashSalesNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<FlashSaleData>>> get flashSalesNotifier =>
+      _flashSalesNotifier;
+
+  /// ดึงรายการ Flash Sale จาก API
+  Future<void> fetchFlashSales() async {
+    _flashSalesNotifier.value = UiResult.loading();
+
+    final result = await _repo.fetchFlashSales();
+
+    if (result.hasError) {
+      _flashSalesNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _flashSalesNotifier.value = UiResult.empty();
+      return;
+    }
+    final sales = result.data.flashSales ?? <FlashSaleData>[];
+    if (sales.isEmpty) {
+      _flashSalesNotifier.value = UiResult.empty();
+      return;
+    }
+    _flashSalesNotifier.value = UiResult.success(data: sales);
   }
 
   /// รายการสินค้าใน Browny Shop

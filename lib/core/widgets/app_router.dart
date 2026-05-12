@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/articles/screens/article_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
@@ -79,6 +80,15 @@ class AppRouter {
         path: BrownyShopPage.pagePath,
         name: BrownyShopPage.pageName,
         builder: (context, state) => const BrownyShopPage(),
+      ),
+      GoRoute(
+        path: BrownyShopProductDetailPage.pagePath,
+        name: BrownyShopProductDetailPage.pageName,
+        builder: (context, state) => BrownyShopProductDetailPage(
+          productId:
+              state.pathParameters[BrownyShopProductDetailPage.kProductId] ??
+              '',
+        ),
       ),
       GoRoute(
         path: AppNotificationsPage.pagePath,

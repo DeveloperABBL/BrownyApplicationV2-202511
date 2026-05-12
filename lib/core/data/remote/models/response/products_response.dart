@@ -1,4 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
+import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'products_response.g.dart';
@@ -30,6 +32,9 @@ class ProductData {
     this.id,
     this.isFreeShipping,
     this.favoriteStatus,
+    this.hasFlashSale,
+    this.flashSaleStartsAt,
+    this.flashSaleEndsAt,
     this.unit,
     this.translations,
     this.productSubs,
@@ -44,6 +49,18 @@ class ProductData {
 
   @JsonKey(name: 'favorite_status')
   final bool? favoriteStatus;
+
+  /// เช็คว่าสินค้านี้อยู่ใน flash sale หรือไม่
+  @JsonKey(name: 'has_flash_sale')
+  final bool? hasFlashSale;
+
+  /// เวลาที่ flash sale เริ่ม (ISO datetime string) — มีค่าเมื่อ [hasFlashSale] = true
+  @JsonKey(name: 'flash_sale_starts_at')
+  final String? flashSaleStartsAt;
+
+  /// เวลาที่ flash sale จบ (ISO datetime string) — มีค่าเมื่อ [hasFlashSale] = true
+  @JsonKey(name: 'flash_sale_ends_at')
+  final String? flashSaleEndsAt;
 
   @JsonKey(name: 'unit')
   final ContentLocalizeData? unit;
@@ -137,8 +154,12 @@ class ProductSubData {
     this.id,
     this.listOrder,
     this.name,
+    this.originalCoinPrice,
+    this.originalMoneyPrice,
     this.coinPrice,
     this.moneyPrice,
+    this.isFlashSale,
+    this.flashSale,
     this.imageUrl,
     this.stock,
   });
@@ -152,11 +173,29 @@ class ProductSubData {
   @JsonKey(name: 'name')
   final ContentLocalizeData? name;
 
-  @JsonKey(name: 'coin_price')
-  final String? coinPrice;
+  /// ราคาเดิม (ก่อนลด) — coin
+  @JsonKey(name: 'original_coin_price')
+  final num? originalCoinPrice;
 
+  /// ราคาเดิม (ก่อนลด) — money
+  @JsonKey(name: 'original_money_price')
+  final num? originalMoneyPrice;
+
+  /// ราคาปัจจุบัน — coin
+  @JsonKey(name: 'coin_price')
+  final num? coinPrice;
+
+  /// ราคาปัจจุบัน — money
   @JsonKey(name: 'money_price')
-  final String? moneyPrice;
+  final num? moneyPrice;
+
+  /// อยู่ใน flash sale หรือไม่
+  @JsonKey(name: 'is_flash_sale')
+  final bool? isFlashSale;
+
+  /// ข้อมูล flash sale ที่ผูกกับ sub product (null ถ้าไม่ได้อยู่ใน flash sale)
+  @JsonKey(name: 'flash_sale')
+  final FlashSaleInfoData? flashSale;
 
   @JsonKey(name: 'image_url')
   final String? imageUrl;
@@ -171,13 +210,25 @@ class ProductSubData {
   }
 
   /// แปลง coin_price เป็น double (default 0)
-  double get coinPriceValue => double.tryParse(coinPrice ?? '0') ?? 0;
+  double get coinPriceValue => coinPrice?.toDouble() ?? 0;
 
   /// แปลง money_price เป็น double (default 0)
-  double get moneyPriceValue => double.tryParse(moneyPrice ?? '0') ?? 0;
+  double get moneyPriceValue => moneyPrice?.toDouble() ?? 0;
 
   /// แปลง stock เป็น double (default 0)
-  double get stockValue => double.tryParse(stock ?? '0') ?? 0;
+  double get stockValue => double.parse(stock.orEmpty.ifEmpty('0.0'));
+
+  /// เช็คว่ามีส่วนลด money หรือไม่
+  bool get hasMoneyDiscount =>
+      originalMoneyPrice != null &&
+      moneyPrice != null &&
+      moneyPrice! < originalMoneyPrice!;
+
+  /// เช็คว่ามีส่วนลด coin หรือไม่
+  bool get hasCoinDiscount =>
+      originalCoinPrice != null &&
+      coinPrice != null &&
+      coinPrice! < originalCoinPrice!;
 
   factory ProductSubData.fromJson(Map<String, dynamic> json) =>
       _$ProductSubDataFromJson(json);

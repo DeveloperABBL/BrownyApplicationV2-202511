@@ -26,6 +26,7 @@ import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -311,7 +312,11 @@ class _HomePageWidgetState extends State<HomePageWidget>
       onCategorySelected: _viewmodel.onShopCategorySelected,
       showShowMore: true,
       onShowMoreTap: () => BrownyShopPage.goToPage(context),
-      onProductTap: (p) => debugPrint('tap product: ${p.id}'),
+      onProductTap: (p) {
+        if (p.id != null) {
+          BrownyShopProductDetailPage.goToPage(context, productId: p.id!);
+        }
+      },
       onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
     );
   }

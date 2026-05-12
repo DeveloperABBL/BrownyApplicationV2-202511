@@ -148,6 +148,10 @@ class $AssetsIcShopGen {
   AssetGenImage get bronwyShopFlashSales =>
       const AssetGenImage('assets/ic_shop/bronwy_shop_flash_sales.png');
 
+  /// File path: assets/ic_shop/bronwy_shop_paw.png
+  AssetGenImage get bronwyShopPaw =>
+      const AssetGenImage('assets/ic_shop/bronwy_shop_paw.png');
+
   /// File path: assets/ic_shop/bronwy_shop_title.png
   AssetGenImage get bronwyShopTitle =>
       const AssetGenImage('assets/ic_shop/bronwy_shop_title.png');
@@ -167,6 +171,14 @@ class $AssetsIcShopGen {
   /// File path: assets/ic_shop/ic_bag.png
   AssetGenImage get icBag => const AssetGenImage('assets/ic_shop/ic_bag.png');
 
+  /// File path: assets/ic_shop/ic_bag_cart.svg
+  SvgGenImage get icBagCart =>
+      const SvgGenImage('assets/ic_shop/ic_bag_cart.svg');
+
+  /// File path: assets/ic_shop/ic_bag_outline.png
+  AssetGenImage get icBagOutline =>
+      const AssetGenImage('assets/ic_shop/ic_bag_outline.png');
+
   /// File path: assets/ic_shop/ic_box.png
   AssetGenImage get icBox => const AssetGenImage('assets/ic_shop/ic_box.png');
 
@@ -177,6 +189,14 @@ class $AssetsIcShopGen {
   /// File path: assets/ic_shop/ic_browny_shop.png
   AssetGenImage get icBrownyShop =>
       const AssetGenImage('assets/ic_shop/ic_browny_shop.png');
+
+  /// File path: assets/ic_shop/ic_chevron_right.svg
+  SvgGenImage get icChevronRight =>
+      const SvgGenImage('assets/ic_shop/ic_chevron_right.svg');
+
+  /// File path: assets/ic_shop/ic_coupon_rounded_green.png
+  AssetGenImage get icCouponRoundedGreen =>
+      const AssetGenImage('assets/ic_shop/ic_coupon_rounded_green.png');
 
   /// File path: assets/ic_shop/ic_discount.png
   AssetGenImage get icDiscount =>
@@ -190,9 +210,20 @@ class $AssetsIcShopGen {
   AssetGenImage get icFavInactive =>
       const AssetGenImage('assets/ic_shop/ic_fav_inactive.png');
 
+  /// File path: assets/ic_shop/ic_flash.svg
+  SvgGenImage get icFlash => const SvgGenImage('assets/ic_shop/ic_flash.svg');
+
+  /// File path: assets/ic_shop/ic_heart.png
+  AssetGenImage get icHeart =>
+      const AssetGenImage('assets/ic_shop/ic_heart.png');
+
   /// File path: assets/ic_shop/ic_shopping_bag.svg
   SvgGenImage get icShoppingBag =>
       const SvgGenImage('assets/ic_shop/ic_shopping_bag.svg');
+
+  /// File path: assets/ic_shop/ic_truck_tick.svg
+  SvgGenImage get icTruckTick =>
+      const SvgGenImage('assets/ic_shop/ic_truck_tick.svg');
 
   /// File path: assets/ic_shop/mid_banner.png
   AssetGenImage get midBanner =>
@@ -201,18 +232,26 @@ class $AssetsIcShopGen {
   /// List of all assets
   List<dynamic> get values => [
     bronwyShopFlashSales,
+    bronwyShopPaw,
     bronwyShopTitle,
     brownyShopBannerEn,
     brownyShopBannerTh,
     brownyShopBannerZh,
     icBag,
+    icBagCart,
+    icBagOutline,
     icBox,
     icBrownyPawGradient,
     icBrownyShop,
+    icChevronRight,
+    icCouponRoundedGreen,
     icDiscount,
     icFavActive,
     icFavInactive,
+    icFlash,
+    icHeart,
     icShoppingBag,
+    icTruckTick,
     midBanner,
   ];
 }
