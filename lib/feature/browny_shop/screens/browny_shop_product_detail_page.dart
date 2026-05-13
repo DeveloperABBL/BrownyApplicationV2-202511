@@ -2,6 +2,9 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_product_detail_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/models/product_data_selected.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/add_to_cart_bottom_sheet.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -182,7 +185,7 @@ class _BrownyShopProductDetailWidgetState
                       children: [
                         _RoundIconButton(
                           icon: Assets.icShop.icBagOutline,
-                          onTap: () => debugPrint('tap bag (TODO)'),
+                          onTap: () => BrownyShopSelected.goToPage(context),
                         ),
                         SizedBox(width: AppDims.size_8.w),
                         _RoundIconButton(
@@ -412,29 +415,22 @@ class _PriceSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (sub.moneyPrice != null)
-              RichText(
-                text: TextSpan(
-                  style: context.textTheme.titleLarge?.copyWith(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.ci,
-                  ),
-                  children: [
-                    TextSpan(text: '฿${_fmt(sub.moneyPrice)}'),
-                    TextSpan(
-                      text: ' ${context.wording.baht}',
-                      style: context.textTheme.titleLarge?.copyWith(
-                        fontSize: 22.sp,
-                        color: AppColors.ci,
-                      ),
-                    ),
-                  ],
+              AppText(
+                formatCurrency(
+                  value: sub.moneyPrice,
+                  leadingSign: '฿',
+                  trailingSign: ' ${context.wording.baht}',
+                ),
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.ci,
                 ),
               ),
             SizedBox(width: AppDims.size_8.w),
             if (sub.hasMoneyDiscount) ...[
               AppText(
-                '฿${_fmt(sub.originalMoneyPrice)}',
+                formatCurrency(value: sub.originalMoneyPrice, leadingSign: '฿'),
                 style: context.textTheme.labelMedium?.copyWith(
                   fontSize: 16.sp,
                   color: AppColors.error,
@@ -461,7 +457,7 @@ class _PriceSection extends StatelessWidget {
             if (sub.originalCoinPrice != null &&
                 sub.originalCoinPrice != sub.coinPrice)
               AppText(
-                _fmt(sub.originalCoinPrice),
+                formatCurrency(value: sub.originalCoinPrice),
                 style: context.textTheme.labelMedium?.copyWith(
                   fontSize: 16.sp,
                   color: AppColors.error,
@@ -490,28 +486,20 @@ class _PriceSection extends StatelessWidget {
         children: [
           Assets.png.brownyCoin.image(width: 18.w, height: 18.w),
           SizedBox(width: AppDims.size_8.w),
-          RichText(
-            text: TextSpan(
-              style: context.textTheme.labelMedium?.copyWith(
-                fontSize: 16.sp,
-                color: AppColors.ci,
-                fontWeight: FontWeight.w500,
-              ),
-              children: [
-                TextSpan(text: _fmt(sub.coinPrice)),
-                TextSpan(text: ' ${context.wording.coin}'),
-              ],
+          AppText(
+            formatCurrency(
+              value: sub.coinPrice,
+              trailingSign: ' ${context.wording.coin}',
+            ),
+            style: context.textTheme.labelMedium?.copyWith(
+              fontSize: 16.sp,
+              color: AppColors.ci,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
       ),
     );
-  }
-
-  String _fmt(num? n) {
-    if (n == null) return '';
-    if (n == n.truncate()) return n.toInt().toString();
-    return n.toStringAsFixed(2);
   }
 
   int _discountPercent(num original, num sale) {
@@ -529,10 +517,10 @@ class _TitleSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppText(
       product.getNameDisplay(context.languageCode),
-      style: context.textTheme.headlineSmall?.copyWith(
-        fontSize: 26.sp,
+      style: context.textTheme.headlineLarge?.copyWith(
+        // fontSize: 26.sp,
         color: AppColors.darkBrown,
-        height: 32 / 24,
+        // height: 32 / 24,
       ),
     );
   }
@@ -617,7 +605,7 @@ class _CouponCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    'คูปองส่งฟรี ไม่มีขั้นต่ำ',
+                    context.wording.freeShippingCouponNoMin,
                     style: context.textTheme.titleSmall?.copyWith(
                       fontSize: 14.sp,
                       color: AppColors.darkBrown,
@@ -625,7 +613,7 @@ class _CouponCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   AppText(
-                    'เฉพาะสินค้าที่ร่วมรายการ',
+                    context.wording.onlyParticipatingItems,
                     style: context.textTheme.labelSmall?.copyWith(
                       fontSize: 12.sp,
                       color: AppColors.ci,
@@ -633,7 +621,7 @@ class _CouponCard extends StatelessWidget {
                   ),
                   SizedBox(height: AppDims.size_8.h),
                   AppText(
-                    'คูปองหมดอายุ 12 พ.ย. 2025',
+                    '${context.wording.couponExpiresLabel} 12 พ.ย. 2025',
                     style: context.textTheme.labelSmall?.copyWith(
                       fontSize: 12.sp,
                       color: AppColors.gray500,
@@ -675,7 +663,7 @@ class _ShippingInfo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AppText(
-                'จะได้รับภายใน 30 วัน',
+                '${context.wording.willReceiveWithin} 30 ${context.wording.dayUnit}',
                 style: context.textTheme.titleSmall?.copyWith(
                   fontSize: 16.sp,
                   color: AppColors.ci,
@@ -683,29 +671,29 @@ class _ShippingInfo extends StatelessWidget {
                 ),
               ),
               AppText(
-                'ส่งไปที่ ยานนาวา',
+                '${context.wording.deliverToLabel} ยานนาวา',
                 style: context.textTheme.titleSmall?.copyWith(
                   fontSize: 16.sp,
                   color: AppColors.gray600,
                 ),
               ),
-              RichText(
-                text: TextSpan(
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 16.sp,
-                    color: AppColors.gray600,
-                  ),
-                  children: [
-                    TextSpan(text: 'ราคา '),
-                    TextSpan(
-                      text: '฿30',
-                      style: AppTextNumberStyles.bodySmall.copyWith(
-                        fontSize: 16.sp,
-                        color: AppColors.ci,
-                      ),
+              Row(
+                children: [
+                  AppText(
+                    '${context.wording.priceLabel} ',
+                    style: context.textTheme.titleSmall?.copyWith(
+                      fontSize: 16.sp,
+                      color: AppColors.gray600,
                     ),
-                  ],
-                ),
+                  ),
+                  AppText(
+                    formatCurrency(value: 30, leadingSign: '฿'),
+                    style: context.textTheme.titleSmall?.copyWith(
+                      fontSize: 16.sp,
+                      color: AppColors.ci,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -731,7 +719,7 @@ class _DescriptionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
-          'รายละเอียดสินค้า',
+          context.wording.productDetails,
           style: context.textTheme.bodyMedium?.copyWith(
             fontSize: 16.sp,
             color: AppColors.darkBrown,
@@ -821,20 +809,47 @@ class _BottomActionBar extends StatelessWidget {
           SizedBox(width: AppDims.size_8.w),
           Expanded(
             child: _CtaButton(
-              label: 'เพิ่มลงรถเข็น',
+              label: context.wording.addToCart,
               background: AppColors.mintCartButton,
               textColor: AppColors.ci,
               iconPng: Assets.icShop.icBagOutline,
-              onTap: () => debugPrint('tap add to cart (TODO)'),
+              onTap: () => showAddToCartBottomSheet(
+                context,
+                product: product,
+                actionLabel: context.wording.addToCart,
+                onConfirm: (subId, qty) {
+                  context.read<CustomerProvider>().addShopCartItem(
+                    ProductDataSelected.fromProduct(
+                      product,
+                      selectedSubId: subId,
+                      quantity: qty,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           SizedBox(width: AppDims.size_8.w),
           Expanded(
             child: _CtaButton(
-              label: 'ซื้อเลย',
+              label: context.wording.buyNow,
               background: AppColors.ci,
               textColor: AppColors.white,
-              onTap: () => debugPrint('tap buy now (TODO)'),
+              onTap: () => showAddToCartBottomSheet(
+                context,
+                product: product,
+                actionLabel: context.wording.buyNow,
+                onConfirm: (subId, qty) {
+                  context.read<CustomerProvider>().addShopCartItem(
+                    ProductDataSelected.fromProduct(
+                      product,
+                      selectedSubId: subId,
+                      quantity: qty,
+                    ),
+                  );
+                  BrownyShopSelected.goToPage(context);
+                },
+              ),
             ),
           ),
         ],
@@ -863,7 +878,7 @@ class _FavoriteButton extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             AppText(
-              'ถูกใจ',
+              context.wording.favoriteLike,
               style: context.textTheme.labelSmall?.copyWith(
                 fontSize: 12.sp,
                 color: AppColors.gray500,

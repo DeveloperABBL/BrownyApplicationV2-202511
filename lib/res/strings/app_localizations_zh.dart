@@ -1634,4 +1634,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forYou => '为你推荐';
+
+  @override
+  String get cart => '购物车';
+
+  @override
+  String get total => '总计';
+
+  @override
+  String get productOption => '选项';
+
+  @override
+  String get addToCart => '加入购物车';
+
+  @override
+  String get buyNow => '立即购买';
+
+  @override
+  String get favoriteLike => '喜欢';
+
+  @override
+  String get productDetails => '商品详情';
+
+  @override
+  String get goShoppingNow => '去购物吧';
+
+  @override
+  String get cartIsEmpty => '购物车是空的';
+
+  @override
+  String get freeShippingCouponNoMin => '免运费券（无门槛）';
+
+  @override
+  String get onlyParticipatingItems => '仅限参与商品';
+
+  @override
+  String get couponExpiresLabel => '优惠券到期';
+
+  @override
+  String get deliverToLabel => '送货至';
+
+  @override
+  String get priceLabel => '价格';
+
+  @override
+  String get dayUnit => '天';
+
+  @override
+  String get willReceiveWithin => '送达时间';
 }

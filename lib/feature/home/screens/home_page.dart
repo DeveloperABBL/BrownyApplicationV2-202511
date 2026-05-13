@@ -27,6 +27,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -374,7 +375,16 @@ class _HomePageWidgetState extends State<HomePageWidget>
           Assets.icShop.icBrownyShop.image(),
           SizedBox(width: AppDims.size_8.w),
           GestureDetector(
-            onTap: () => debugPrint('tap shop bag → cart (TODO)'),
+            // เปิด BrownyShopPage ก่อน แล้ว push BrownyShopSelected ต่อทันที
+            // เพื่อให้กด back จากตะกร้าแล้วเจอหน้า Shop (ไม่ใช่ Home)
+            onTap: () async {
+              // เปิดเข้าหน้า BrownyShop ปกติก่อน
+              BrownyShopPage.goToPage(context);
+              if (!context.mounted) return;
+              // และเปิดเข้าหน้าตะกร้าซ้อนขึ้นมาทันที
+              // เพื่อให้ถ้า User กดกลับ จะได้เจอหน้า BrownyShop
+              BrownyShopSelected.goToPage(context);
+            },
             child: Container(
               width: AppDims.size_39.w,
               height: AppDims.size_39.w,
@@ -443,7 +453,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         itemCount: banners.length,
         itemBuilder: (context, index, _) {
           return GestureDetector(
-            onTap: () => debugPrint('tap mid banner $index (TODO)'),
+            onTap: () => BrownyShopPage.goToPage(context),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
               child: banners[index].image(

@@ -1672,4 +1672,52 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get forYou => 'สำหรับคุณ';
+
+  @override
+  String get cart => 'ตะกร้า';
+
+  @override
+  String get total => 'รวม';
+
+  @override
+  String get productOption => 'ตัวเลือก';
+
+  @override
+  String get addToCart => 'เพิ่มลงรถเข็น';
+
+  @override
+  String get buyNow => 'ซื้อเลย';
+
+  @override
+  String get favoriteLike => 'ถูกใจ';
+
+  @override
+  String get productDetails => 'รายละเอียดสินค้า';
+
+  @override
+  String get goShoppingNow => 'ไปช็อปกันเลย';
+
+  @override
+  String get cartIsEmpty => 'ตะกร้าว่างเปล่า';
+
+  @override
+  String get freeShippingCouponNoMin => 'คูปองส่งฟรี ไม่มีขั้นต่ำ';
+
+  @override
+  String get onlyParticipatingItems => 'เฉพาะสินค้าที่ร่วมรายการ';
+
+  @override
+  String get couponExpiresLabel => 'คูปองหมดอายุ';
+
+  @override
+  String get deliverToLabel => 'ส่งไปที่';
+
+  @override
+  String get priceLabel => 'ราคา';
+
+  @override
+  String get dayUnit => 'วัน';
+
+  @override
+  String get willReceiveWithin => 'จะได้รับภายใน';
 }

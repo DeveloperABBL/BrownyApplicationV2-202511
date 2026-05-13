@@ -1681,4 +1681,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forYou => 'For You';
+
+  @override
+  String get cart => 'Cart';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get productOption => 'Option';
+
+  @override
+  String get addToCart => 'Add to cart';
+
+  @override
+  String get buyNow => 'Buy now';
+
+  @override
+  String get favoriteLike => 'Like';
+
+  @override
+  String get productDetails => 'Product details';
+
+  @override
+  String get goShoppingNow => 'Go shopping now';
+
+  @override
+  String get cartIsEmpty => 'Your cart is empty';
+
+  @override
+  String get freeShippingCouponNoMin => 'Free shipping coupon (no minimum)';
+
+  @override
+  String get onlyParticipatingItems => 'Participating products only';
+
+  @override
+  String get couponExpiresLabel => 'Coupon expires';
+
+  @override
+  String get deliverToLabel => 'Deliver to';
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get dayUnit => 'days';
+
+  @override
+  String get willReceiveWithin => 'Delivered within';
 }

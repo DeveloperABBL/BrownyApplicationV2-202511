@@ -3309,6 +3309,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'For You'**
   String get forYou;
+
+  /// No description provided for @cart.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart'**
+  String get cart;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @productOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Option'**
+  String get productOption;
+
+  /// No description provided for @addToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to cart'**
+  String get addToCart;
+
+  /// No description provided for @buyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy now'**
+  String get buyNow;
+
+  /// No description provided for @favoriteLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get favoriteLike;
+
+  /// No description provided for @productDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Product details'**
+  String get productDetails;
+
+  /// No description provided for @goShoppingNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Go shopping now'**
+  String get goShoppingNow;
+
+  /// No description provided for @cartIsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get cartIsEmpty;
+
+  /// No description provided for @freeShippingCouponNoMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Free shipping coupon (no minimum)'**
+  String get freeShippingCouponNoMin;
+
+  /// No description provided for @onlyParticipatingItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Participating products only'**
+  String get onlyParticipatingItems;
+
+  /// No description provided for @couponExpiresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon expires'**
+  String get couponExpiresLabel;
+
+  /// No description provided for @deliverToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliver to'**
+  String get deliverToLabel;
+
+  /// No description provided for @priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get priceLabel;
+
+  /// No description provided for @dayUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get dayUnit;
+
+  /// No description provided for @willReceiveWithin.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered within'**
+  String get willReceiveWithin;
 }
 
 class _AppLocalizationsDelegate

@@ -564,5 +564,21 @@
   "housework": "家务",
   "brownyShopTitle": "Shop",
   "flashDeals": "限时特卖",
-  "forYou": "为你推荐"
+  "forYou": "为你推荐",
+  "cart": "购物车",
+  "total": "总计",
+  "productOption": "选项",
+  "addToCart": "加入购物车",
+  "buyNow": "立即购买",
+  "favoriteLike": "喜欢",
+  "productDetails": "商品详情",
+  "goShoppingNow": "去购物吧",
+  "cartIsEmpty": "购物车是空的",
+  "freeShippingCouponNoMin": "免运费券（无门槛）",
+  "onlyParticipatingItems": "仅限参与商品",
+  "couponExpiresLabel": "优惠券到期",
+  "deliverToLabel": "送货至",
+  "priceLabel": "价格",
+  "dayUnit": "天",
+  "willReceiveWithin": "送达时间"
 }

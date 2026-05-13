@@ -566,5 +566,21 @@
   "housework": "งานบ้าน",
   "brownyShopTitle": "Shop",
   "flashDeals": "Flash Deals",
-  "forYou": "สำหรับคุณ"
+  "forYou": "สำหรับคุณ",
+  "cart": "ตะกร้า",
+  "total": "รวม",
+  "productOption": "ตัวเลือก",
+  "addToCart": "เพิ่มลงรถเข็น",
+  "buyNow": "ซื้อเลย",
+  "favoriteLike": "ถูกใจ",
+  "productDetails": "รายละเอียดสินค้า",
+  "goShoppingNow": "ไปช็อปกันเลย",
+  "cartIsEmpty": "ตะกร้าว่างเปล่า",
+  "freeShippingCouponNoMin": "คูปองส่งฟรี ไม่มีขั้นต่ำ",
+  "onlyParticipatingItems": "เฉพาะสินค้าที่ร่วมรายการ",
+  "couponExpiresLabel": "คูปองหมดอายุ",
+  "deliverToLabel": "ส่งไปที่",
+  "priceLabel": "ราคา",
+  "dayUnit": "วัน",
+  "willReceiveWithin": "จะได้รับภายใน"
 }

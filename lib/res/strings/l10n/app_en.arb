@@ -615,5 +615,21 @@
   "housework": "Housework",
   "brownyShopTitle": "Shop",
   "flashDeals": "Flash Deals",
-  "forYou": "For You"
+  "forYou": "For You",
+  "cart": "Cart",
+  "total": "Total",
+  "productOption": "Option",
+  "addToCart": "Add to cart",
+  "buyNow": "Buy now",
+  "favoriteLike": "Like",
+  "productDetails": "Product details",
+  "goShoppingNow": "Go shopping now",
+  "cartIsEmpty": "Your cart is empty",
+  "freeShippingCouponNoMin": "Free shipping coupon (no minimum)",
+  "onlyParticipatingItems": "Participating products only",
+  "couponExpiresLabel": "Coupon expires",
+  "deliverToLabel": "Deliver to",
+  "priceLabel": "Price",
+  "dayUnit": "days",
+  "willReceiveWithin": "Delivered within"
 }

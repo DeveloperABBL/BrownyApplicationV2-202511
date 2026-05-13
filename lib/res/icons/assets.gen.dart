@@ -148,6 +148,10 @@ class $AssetsIcShopGen {
   AssetGenImage get bronwyShopFlashSales =>
       const AssetGenImage('assets/ic_shop/bronwy_shop_flash_sales.png');
 
+  /// File path: assets/ic_shop/bronwy_shop_order_empty.png
+  AssetGenImage get bronwyShopOrderEmpty =>
+      const AssetGenImage('assets/ic_shop/bronwy_shop_order_empty.png');
+
   /// File path: assets/ic_shop/bronwy_shop_paw.png
   AssetGenImage get bronwyShopPaw =>
       const AssetGenImage('assets/ic_shop/bronwy_shop_paw.png');
@@ -178,6 +182,10 @@ class $AssetsIcShopGen {
   /// File path: assets/ic_shop/ic_bag_outline.png
   AssetGenImage get icBagOutline =>
       const AssetGenImage('assets/ic_shop/ic_bag_outline.png');
+
+  /// File path: assets/ic_shop/ic_bag_outline2.png
+  AssetGenImage get icBagOutline2 =>
+      const AssetGenImage('assets/ic_shop/ic_bag_outline2.png');
 
   /// File path: assets/ic_shop/ic_box.png
   AssetGenImage get icBox => const AssetGenImage('assets/ic_shop/ic_box.png');
@@ -232,6 +240,7 @@ class $AssetsIcShopGen {
   /// List of all assets
   List<dynamic> get values => [
     bronwyShopFlashSales,
+    bronwyShopOrderEmpty,
     bronwyShopPaw,
     bronwyShopTitle,
     brownyShopBannerEn,
@@ -240,6 +249,7 @@ class $AssetsIcShopGen {
     icBag,
     icBagCart,
     icBagOutline,
+    icBagOutline2,
     icBox,
     icBrownyPawGradient,
     icBrownyShop,
