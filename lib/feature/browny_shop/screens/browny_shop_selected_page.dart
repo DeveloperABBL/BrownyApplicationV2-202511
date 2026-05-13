@@ -295,9 +295,13 @@ class _CartItemCardState extends State<_CartItemCard> {
       child: url == null
           ? const SizedBox.shrink()
           : CachedNetworkImage(
-              imageUrl: url,
+              imageUrl: item.selectedSub!.imageUrl.orEmpty,
               fit: BoxFit.contain,
-              errorWidget: (_, _, _) => const SizedBox.shrink(),
+              errorWidget: (_, _, _) => CachedNetworkImage(
+                imageUrl: item.mainImageUrl!,
+                fit: BoxFit.contain,
+                errorWidget: (_, _, _) => const SizedBox.shrink(),
+              ),
             ),
     );
   }

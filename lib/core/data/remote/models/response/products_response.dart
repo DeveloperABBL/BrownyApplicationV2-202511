@@ -217,6 +217,7 @@ class ProductSubData {
 
   /// แปลง stock เป็น double (default 0)
   double get stockValue => double.parse(stock.orEmpty.ifEmpty('0.0'));
+  int get stockInt => num.parse(stock.orEmpty.ifEmpty('0.0')).toInt();
 
   /// เช็คว่ามีส่วนลด money หรือไม่
   bool get hasMoneyDiscount =>
