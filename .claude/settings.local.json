@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart pub *)",
+      "Bash(~/.pub-cache/bin/flutterfire --version)",
+      "Bash(flutter run *)",
+      "Bash(dart run *)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter gen-l10n *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(flutter build *)"
+    ]
+  }
+}

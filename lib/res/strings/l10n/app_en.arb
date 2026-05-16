@@ -631,5 +631,7 @@
   "deliverToLabel": "Deliver to",
   "priceLabel": "Price",
   "dayUnit": "days",
-  "willReceiveWithin": "Delivered within"
+  "willReceiveWithin": "Delivered within",
+  "addedToCartSuccess": "Added to cart",
+  "removeCartItemConfirm": "Remove this item from your cart?"
 }

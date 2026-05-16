@@ -1720,4 +1720,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get willReceiveWithin => 'จะได้รับภายใน';
+
+  @override
+  String get addedToCartSuccess => 'เพิ่มลงตะกร้าเรียบร้อย';
+
+  @override
+  String get removeCartItemConfirm => 'ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?';
 }

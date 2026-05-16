@@ -1682,4 +1682,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get willReceiveWithin => '送达时间';
+
+  @override
+  String get addedToCartSuccess => '已加入购物车';
+
+  @override
+  String get removeCartItemConfirm => '要将此商品从购物车中移除吗？';
 }

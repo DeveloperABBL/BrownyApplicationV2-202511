@@ -2,7 +2,6 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_product_detail_viewmodel.dart';
-import 'package:browny_applications_new/feature/browny_shop/models/product_data_selected.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/add_to_cart_bottom_sheet.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
@@ -790,6 +789,36 @@ class _BottomActionBar extends StatelessWidget {
 
   final ProductData product;
 
+  /// เพิ่มสินค้าลงตะกร้าออนไลน์ผ่าน ViewModel แล้วแสดงผลลัพธ์
+  ///
+  /// - [goToCart] = true (ปุ่มซื้อเลย) → เข้าหน้าตะกร้าเมื่อสำเร็จ
+  /// - [goToCart] = false (ปุ่มเพิ่มลงรถเข็น) → แสดง toast ยืนยัน
+  Future<void> _onConfirm(
+    BuildContext context, {
+    required int subId,
+    required int quantity,
+    required bool goToCart,
+  }) async {
+    final result = await context
+        .read<BrownyShopProductDetailViewmodel>()
+        .addToCart(subId: subId, quantity: quantity);
+    if (!context.mounted) return;
+
+    if (!result.isSuccess) {
+      AppOverlays.showBrownyDialog(context, message: context.wording.errorUi);
+      return;
+    }
+
+    if (goToCart) {
+      BrownyShopSelected.goToPage(context);
+    } else {
+      AppOverlays.showToast(
+        context,
+        message: context.wording.addedToCartSuccess,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -817,15 +846,12 @@ class _BottomActionBar extends StatelessWidget {
                 context,
                 product: product,
                 actionLabel: context.wording.addToCart,
-                onConfirm: (subId, qty) {
-                  context.read<CustomerProvider>().addShopCartItem(
-                    ProductDataSelected.fromProduct(
-                      product,
-                      selectedSubId: subId,
-                      quantity: qty,
-                    ),
-                  );
-                },
+                onConfirm: (subId, qty) => _onConfirm(
+                  context,
+                  subId: subId,
+                  quantity: qty,
+                  goToCart: false,
+                ),
               ),
             ),
           ),
@@ -839,16 +865,12 @@ class _BottomActionBar extends StatelessWidget {
                 context,
                 product: product,
                 actionLabel: context.wording.buyNow,
-                onConfirm: (subId, qty) {
-                  context.read<CustomerProvider>().addShopCartItem(
-                    ProductDataSelected.fromProduct(
-                      product,
-                      selectedSubId: subId,
-                      quantity: qty,
-                    ),
-                  );
-                  BrownyShopSelected.goToPage(context);
-                },
+                onConfirm: (subId, qty) => _onConfirm(
+                  context,
+                  subId: subId,
+                  quantity: qty,
+                  goToCart: true,
+                ),
               ),
             ),
           ),

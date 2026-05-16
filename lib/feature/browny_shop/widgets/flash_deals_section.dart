@@ -178,14 +178,28 @@ class _CountdownTimerState extends State<_CountdownTimer> {
     final hh = _pad2(_remaining.inHours);
     final mm = _pad2(_remaining.inMinutes.remainder(60));
     final ss = _pad2(_remaining.inSeconds.remainder(60));
-    return Row(
-      children: [
-        _timeBox(context, hh),
-        _separator(context),
-        _timeBox(context, mm),
-        _separator(context),
-        _timeBox(context, ss),
-      ],
+    // ครอบด้วย SizedBox (tight constraints) → FittedBox กลายเป็น relayout
+    // boundary กัน setState ทุก 1 วินาที ไป trigger relayout ทั้งหน้า
+    // (โดยเฉพาะ GridView สินค้าที่เป็น shrinkWrap — ทำให้ scroll สะดุด/ดีด)
+    // RepaintBoundary แยก layer การ repaint ของ countdown ออกจาก list
+    return RepaintBoundary(
+      child: SizedBox(
+        width: 78.w,
+        height: 20.h,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Row(
+            children: [
+              _timeBox(context, hh),
+              _separator(context),
+              _timeBox(context, mm),
+              _separator(context),
+              _timeBox(context, ss),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
@@ -105,5 +106,29 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
       );
     }
     _productNotifier.value = UiResult.success(data: product);
+  }
+
+  /// เพิ่มสินค้าลงตะกร้าออนไลน์ (ระบุ subId + จำนวน)
+  ///
+  /// คืน [UiResult] ให้ฝั่ง View แสดง toast/dialog ตามผลลัพธ์
+  Future<UiResult<CartItemData>> addToCart({
+    required int subId,
+    required int quantity,
+  }) async {
+    final customerId = currentCustomerProvider.current.id.orEmpty;
+    final result = await _repo.addCartItem(
+      customerId: customerId,
+      productId: productId,
+      subId: subId,
+      quantity: quantity,
+    );
+
+    if (result.hasError) {
+      return UiResult.error(error: result.error);
+    }
+    if (result.isEmpty) {
+      return UiResult.empty();
+    }
+    return UiResult.success(data: result.data);
   }
 }

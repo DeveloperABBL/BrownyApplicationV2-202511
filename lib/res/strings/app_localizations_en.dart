@@ -1729,4 +1729,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get willReceiveWithin => 'Delivered within';
+
+  @override
+  String get addedToCartSuccess => 'Added to cart';
+
+  @override
+  String get removeCartItemConfirm => 'Remove this item from your cart?';
 }

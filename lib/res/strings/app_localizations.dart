@@ -3405,6 +3405,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivered within'**
   String get willReceiveWithin;
+
+  /// No description provided for @addedToCartSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to cart'**
+  String get addedToCartSuccess;
+
+  /// No description provided for @removeCartItemConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this item from your cart?'**
+  String get removeCartItemConfirm;
 }
 
 class _AppLocalizationsDelegate

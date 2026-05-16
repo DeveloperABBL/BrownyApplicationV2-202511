@@ -854,4 +854,64 @@ abstract class AppClient {
     @Path('customerId') String customerId,
     @Body() CartItemAddRequest body,
   );
+
+  /// DONG 2026-05-16
+  ///
+  /// API fetch ตะกร้าสินค้าของลูกค้า (Browny Shop)
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Response:
+  /// - CartResponse with cart items + totals
+  @GET('/customer/{customerId}/cart')
+  Future<HttpResponse<CartResponse>> fetchCart(
+    @Path('customerId') String customerId,
+  );
+
+  /// DONG 2026-05-16
+  ///
+  /// API ลดจำนวนสินค้าในตะกร้าทีละ 1 (ไม่มี body)
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  /// - itemId: int (id ของ cart item)
+  ///
+  /// Response:
+  /// - CartItemAddResponse with updated cart item data
+  @PATCH('/customer/{customerId}/cart/items/{itemId}')
+  Future<HttpResponse<CartItemAddResponse>> decreaseCartItemQuantity(
+    @Path('customerId') String customerId,
+    @Path('itemId') int itemId,
+  );
+
+  /// DONG 2026-05-16
+  ///
+  /// API ลบสินค้า 1 รายการออกจากตะกร้า
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  /// - itemId: int (id ของ cart item)
+  ///
+  /// Response:
+  /// - CartItemRemoveResponse with removed flag + id
+  @DELETE('/customer/{customerId}/cart/items/{itemId}')
+  Future<HttpResponse<CartItemRemoveResponse>> removeCartItem(
+    @Path('customerId') String customerId,
+    @Path('itemId') int itemId,
+  );
+
+  /// DONG 2026-05-16
+  ///
+  /// API ล้างตะกร้าทั้งหมดของลูกค้า
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Response:
+  /// - CartClearResponse with deleted_count
+  @DELETE('/customer/{customerId}/cart')
+  Future<HttpResponse<CartClearResponse>> clearCart(
+    @Path('customerId') String customerId,
+  );
 }

@@ -580,5 +580,7 @@
   "deliverToLabel": "送货至",
   "priceLabel": "价格",
   "dayUnit": "天",
-  "willReceiveWithin": "送达时间"
+  "willReceiveWithin": "送达时间",
+  "addedToCartSuccess": "已加入购物车",
+  "removeCartItemConfirm": "要将此商品从购物车中移除吗？"
 }

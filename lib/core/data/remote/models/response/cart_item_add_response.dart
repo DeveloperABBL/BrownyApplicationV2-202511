@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cart_item_add_response.g.dart';
@@ -45,6 +46,13 @@ class CartItemData {
     this.lineCoinTotal,
     this.lineMoneyTotal,
     this.priceChanged,
+    this.productName,
+    this.variantName,
+    this.currentUnitCoinPrice,
+    this.currentUnitMoneyPrice,
+    this.currentIsFlashSale,
+    this.currentFlashSaleId,
+    this.product,
   });
 
   @JsonKey(name: 'id')
@@ -87,6 +95,53 @@ class CartItemData {
   /// true เมื่อราคาเปลี่ยนระหว่างที่ user กำลังหยิบใส่ตะกร้า
   @JsonKey(name: 'price_changed')
   final bool? priceChanged;
+
+  /// ชื่อสินค้า (มีเฉพาะใน endpoint GET /cart)
+  @JsonKey(name: 'product_name')
+  final String? productName;
+
+  /// ชื่อตัวเลือกย่อย (product_sub) — มีเฉพาะใน endpoint GET /cart
+  @JsonKey(name: 'variant_name')
+  final String? variantName;
+
+  /// ราคาต่อหน่วยปัจจุบัน (coin) — ราคาล่าสุด เทียบกับ snapshot ตอนหยิบใส่ตะกร้า
+  @JsonKey(name: 'current_unit_coin_price')
+  final num? currentUnitCoinPrice;
+
+  /// ราคาต่อหน่วยปัจจุบัน (money) — ราคาล่าสุด เทียบกับ snapshot ตอนหยิบใส่ตะกร้า
+  @JsonKey(name: 'current_unit_money_price')
+  final num? currentUnitMoneyPrice;
+
+  /// สถานะ flash sale ปัจจุบันของสินค้า
+  @JsonKey(name: 'current_is_flash_sale')
+  final bool? currentIsFlashSale;
+
+  /// id flash sale ปัจจุบันของสินค้า (null = ไม่อยู่ใน flash sale)
+  @JsonKey(name: 'current_flash_sale_id')
+  final int? currentFlashSaleId;
+
+  /// ข้อมูลสินค้าเต็ม (translations, รูป, product_subs)
+  ///
+  /// TODO(backend): รอ API nest object `product` มาในแต่ละ cart item
+  /// ระหว่างนี้จะเป็น null → UI fallback ไปใช้ [productName] / placeholder
+  @JsonKey(name: 'product')
+  final ProductData? product;
+
+  /// เช็คว่าราคาเปลี่ยนไปจากตอนหยิบใส่ตะกร้าหรือไม่
+  bool get hasPriceChanged => priceChanged == true;
+
+  /// product_sub ที่ตรงกับ [productSubId] (อาศัย [product] ที่ nest มา — null ถ้าไม่มี)
+  ProductSubData? get matchedSub {
+    final subs = product?.productSubs;
+    if (subs == null) return null;
+    for (final s in subs) {
+      if (s.id == productSubId) return s;
+    }
+    return null;
+  }
+
+  /// URL รูปของรายการนี้ — variant image ก่อน, fallback เป็นรูปหลักของสินค้า
+  String? get imageUrl => matchedSub?.imageUrl ?? product?.mainImageUrl;
 
   factory CartItemData.fromJson(Map<String, dynamic> json) =>
       _$CartItemDataFromJson(json);
