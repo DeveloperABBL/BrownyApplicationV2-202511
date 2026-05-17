@@ -633,5 +633,8 @@
   "dayUnit": "days",
   "willReceiveWithin": "Delivered within",
   "addedToCartSuccess": "Added to cart",
-  "removeCartItemConfirm": "Remove this item from your cart?"
+  "removeCartItemConfirm": "Remove this item from your cart?",
+  "shipping": "Shipping",
+  "productSubtotal": "Product subtotal",
+  "orderProduct": "Place order"
 }

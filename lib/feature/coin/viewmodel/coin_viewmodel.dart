@@ -1,8 +1,10 @@
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_history_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/coin/models/coin_data_model.dart';
 import 'package:browny_applications_new/feature/coin/repository/coin_claim_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -13,9 +15,11 @@ class CoinViewmModel extends AppViewModel {
   CoinViewmModel({
     required super.context,
     required CoinDataSourceMixin repo,
+    required this.brownyShopRepo,
   }) : _repo = repo;
 
   final CoinDataSourceMixin _repo;
+  final BrownyShopDataSourceMixin brownyShopRepo;
 
   // ========== dispose ==========
   @override
@@ -24,6 +28,8 @@ class CoinViewmModel extends AppViewModel {
     _coinClaimDataNotifier.dispose();
     _coinHistoryNotifier.dispose();
     _coinHistoryGroupsNotifier.dispose();
+    _shopProductsNotifier.dispose();
+    _shopSelectedCategoryNotifier.dispose();
     super.dispose();
   }
 
@@ -56,7 +62,66 @@ class CoinViewmModel extends AppViewModel {
   ValueListenable<UiResult<List<CoinHistoryGroup>>>
   get coinHistoryGroupsNotifier => _coinHistoryGroupsNotifier;
 
+  /// Notifier fetch รายการสินค้า Browny Shop
+  final ValueNotifier<UiResult<List<ProductData>>> _shopProductsNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<ProductData>>> get shopProductsNotifier =>
+      _shopProductsNotifier;
+
+  /// Notifier เก็บ category ที่ user เลือกอยู่ใน Shop section
+  /// ค่าเริ่มต้น = "all"
+  final ValueNotifier<String> _shopSelectedCategoryNotifier = ValueNotifier(
+    'all',
+  );
+  ValueListenable<String> get shopSelectedCategoryNotifier =>
+      _shopSelectedCategoryNotifier;
   // ========== Logic ==========
+  /// เปลี่ยน category ที่เลือกใน Shop section แล้ว fetch ข้อมูลใหม่
+  Future<void> onShopCategorySelected(String category) async {
+    if (_shopSelectedCategoryNotifier.value == category) return;
+    _shopSelectedCategoryNotifier.value = category;
+    await fetchShopProducts(productType: category);
+  }
+
+  /// DONG 2026-05-10
+  ///
+  /// API fetch รายการสินค้า Browny Shop
+  ///
+  /// Parameters:
+  /// - productType: String (default "all")
+  Future<void> fetchShopProducts({String productType = 'all'}) async {
+    // 1. Set loading
+    _shopProductsNotifier.value = UiResult.loading();
+
+    final customerId = currentCustomerProvider.current.id.orEmpty;
+
+    // 2. Call repo
+    final result = await brownyShopRepo.fetchProducts(
+      productType: productType,
+      customerId: customerId,
+    );
+
+    // 3. Handle error
+    if (result.hasError) {
+      _shopProductsNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    // 4. Handle empty
+    if (result.isEmpty) {
+      _shopProductsNotifier.value = UiResult.empty();
+      return;
+    }
+
+    // 5. Handle success
+    final products = result.data.product ?? <ProductData>[];
+    if (products.isEmpty) {
+      _shopProductsNotifier.value = UiResult.empty();
+      return;
+    }
+    _shopProductsNotifier.value = UiResult.success(data: products);
+  }
+
   Future<UiResult<CoinClaimedResponse>> coinClaiming() async {
     String id = currentCustomerProvider.current.id!;
     final result = await _repo.coinClaiming(id);

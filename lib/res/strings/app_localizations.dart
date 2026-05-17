@@ -3417,6 +3417,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove this item from your cart?'**
   String get removeCartItemConfirm;
+
+  /// No description provided for @shipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping'**
+  String get shipping;
+
+  /// No description provided for @productSubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Product subtotal'**
+  String get productSubtotal;
+
+  /// No description provided for @orderProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Place order'**
+  String get orderProduct;
 }
 
 class _AppLocalizationsDelegate

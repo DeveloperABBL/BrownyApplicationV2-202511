@@ -584,5 +584,8 @@
   "dayUnit": "วัน",
   "willReceiveWithin": "จะได้รับภายใน",
   "addedToCartSuccess": "เพิ่มลงตะกร้าเรียบร้อย",
-  "removeCartItemConfirm": "ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?"
+  "removeCartItemConfirm": "ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?",
+  "shipping": "การจัดส่ง",
+  "productSubtotal": "ยอดรวมสินค้า",
+  "orderProduct": "สั่งซื้อสินค้า"
 }

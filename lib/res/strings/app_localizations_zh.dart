@@ -1688,4 +1688,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get removeCartItemConfirm => '要将此商品从购物车中移除吗？';
+
+  @override
+  String get shipping => '配送';
+
+  @override
+  String get productSubtotal => '商品小计';
+
+  @override
+  String get orderProduct => '下单';
 }

@@ -1726,4 +1726,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get removeCartItemConfirm => 'ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?';
+
+  @override
+  String get shipping => 'การจัดส่ง';
+
+  @override
+  String get productSubtotal => 'ยอดรวมสินค้า';
+
+  @override
+  String get orderProduct => 'สั่งซื้อสินค้า';
 }

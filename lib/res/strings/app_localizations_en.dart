@@ -1735,4 +1735,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeCartItemConfirm => 'Remove this item from your cart?';
+
+  @override
+  String get shipping => 'Shipping';
+
+  @override
+  String get productSubtotal => 'Product subtotal';
+
+  @override
+  String get orderProduct => 'Place order';
 }

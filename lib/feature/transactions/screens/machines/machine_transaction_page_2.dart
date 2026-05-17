@@ -1010,47 +1010,6 @@ class __MachineContentState extends State<_MachineContent>
                       .map(
                         (payment) => _cardPaymentDependOnState(
                           payment,
-                          // isTPWallet:
-                          //     payment.isSelected &&
-                          //     payment.method == 'tp_wallet',
-                          // selected: payment.isSelected,
-                          // child: ListTile(
-                          //   minVerticalPadding: 0,
-                          //   contentPadding: EdgeInsets.zero,
-                          //   minTileHeight: 0,
-                          //   horizontalTitleGap: AppDims.size_8.w,
-                          //   leading: payment.imageUrl != null
-                          //       ? CachedNetworkImage(
-                          //           imageUrl: payment.imageUrl!,
-                          //           width: 22.w,
-                          //           height: 22.h,
-                          //           fit: BoxFit.contain,
-                          //           placeholder: (_, __) =>
-                          //               SizedBox(width: 22.w, height: 22.h),
-                          //           errorWidget: (_, __, ___) =>
-                          //               SizedBox(width: 22.w, height: 22.h),
-                          //         )
-                          //       : null,
-                          //   title: AppText(
-                          //     payment.name,
-                          //     style: payment.isSelected
-                          //         ? _textPrimarySelected
-                          //         : _textPrimary,
-                          //   ),
-                          //   onTap: () {
-                          //     _viewmodel.onPaymentChanged(
-                          //       payment,
-                          //     );
-                          //   },
-                          //   trailing: payment.isSelected
-                          //       ? Padding(
-                          //           padding: EdgeInsets.only(
-                          //             right: 6.0.w,
-                          //           ),
-                          //           child: Assets.svg.icChecked.svg(),
-                          //         )
-                          //       : null,
-                          // ),
                         ),
                       ),
                 ],

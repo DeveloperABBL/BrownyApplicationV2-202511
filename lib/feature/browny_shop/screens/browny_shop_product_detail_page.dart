@@ -2,7 +2,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_product_detail_viewmodel.dart';
-import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/add_to_cart_bottom_sheet.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
@@ -184,7 +184,7 @@ class _BrownyShopProductDetailWidgetState
                       children: [
                         _RoundIconButton(
                           icon: Assets.icShop.icBagOutline,
-                          onTap: () => BrownyShopSelected.goToPage(context),
+                          onTap: () => BrownyShopCartPage.goToPage(context),
                         ),
                         SizedBox(width: AppDims.size_8.w),
                         _RoundIconButton(
@@ -810,7 +810,12 @@ class _BottomActionBar extends StatelessWidget {
     }
 
     if (goToCart) {
-      BrownyShopSelected.goToPage(context);
+      // ซื้อเลย → ผ่านหน้าตะกร้า แล้วเด้งเข้าหน้าสรุปเฉพาะสินค้านี้
+      BrownyShopCartPage.goToPage(
+        context,
+        buyNowSubId: subId,
+        buyNowQuantity: quantity,
+      );
     } else {
       AppOverlays.showToast(
         context,

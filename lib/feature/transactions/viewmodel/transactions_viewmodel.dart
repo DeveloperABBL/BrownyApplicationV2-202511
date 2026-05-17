@@ -226,6 +226,22 @@ class TransactionsViewmodel extends AppViewModel
   /// - ดึง payment methods จาก couponDetail
   /// - ถ้ามีการเลือกไว้แล้ว (_paymentSelected != null) จะเอาตัวที่เลือกมาไว้ index 0
   /// - ถ้ายังไม่เคยเลือก จะเลือกตัวแรกเป็น default
+  /// DONG 2026-05-17
+  ///
+  /// แปลง payment methods จาก API /payment-methods เป็น [PaymentMethodModel]
+  /// ตรงๆ — ใช้กับ Browny Shop ที่ไม่มี couponDetail/machineProgram ให้ filter
+  List<PaymentMethodModel> _buildBrownyShopPaymentList() => _cachedPaymentMethods
+      .map(
+        (m) => PaymentMethodModel(
+          method: m.code ?? '',
+          name: m.name ?? '',
+          imageUrl: m.image,
+          isSelected: false,
+          isActive: true,
+        ),
+      )
+      .toList();
+
   Future<void> fetchPaymentMethod(
     BuildContext context, {
     bool fetchAll = false,
@@ -233,6 +249,38 @@ class TransactionsViewmodel extends AppViewModel
     // Set loading state ถ้ายังไม่ได้ loading อยู่
     if (!_paymentMethodNotifier.value.isLoading) {
       _paymentMethodNotifier.value = UiResult.loading();
+    }
+
+    // DONG 2026-05-17
+    // Browny Shop checkout — ไม่มี couponDetail ใช้ payment methods ทั้งหมดจาก API
+    if (isBrownyShop) {
+      final paymentMethodsResult = await repoDelegate.fetchPaymentMethods();
+      _cachedPaymentMethods = paymentMethodsResult.data.payments ?? [];
+      var shopList = _buildBrownyShopPaymentList();
+      if (shopList.isEmpty) {
+        _paymentMethodNotifier.value = UiResult.empty();
+        return;
+      }
+      if (_paymentSelected != null) {
+        final idx = shopList.indexWhere(
+          (e) => e.method == _paymentSelected!.method,
+        );
+        if (idx != -1) {
+          final selected = shopList.removeAt(idx);
+          shopList.insert(0, selected.copyWith(isSelected: true));
+        }
+      } else {
+        shopList = shopList
+            .asMap()
+            .entries
+            .map((e) => e.value.copyWith(isSelected: e.key == 0))
+            .toList();
+        _paymentSelected = shopList.first;
+      }
+      _paymentMethodNotifier.value = UiResult.success(
+        data: shopList.take(fetchAll ? shopList.length : 3).toList(),
+      );
+      return;
     }
 
     // ตรวจสอบว่า couponDetail พร้อมใช้งานหรือยัง
@@ -338,6 +386,22 @@ class TransactionsViewmodel extends AppViewModel
     PaymentMethodModel payment, {
     bool fetchAll = false,
   }) {
+    // DONG 2026-05-17
+    // Browny Shop checkout — ไม่มี couponDetail ใช้ payment methods ที่ cache ไว้
+    if (isBrownyShop) {
+      var shopList = _buildBrownyShopPaymentList();
+      final idx = shopList.indexWhere((e) => e.method == payment.method);
+      if (idx != -1) {
+        final selected = shopList.removeAt(idx);
+        shopList.insert(0, selected.copyWith(isSelected: true));
+        _paymentSelected = shopList.first;
+      }
+      _paymentMethodNotifier.value = UiResult.success(
+        data: shopList.take(fetchAll ? shopList.length : 3).toList(),
+      );
+      return;
+    }
+
     // ตรวจสอบว่า couponDetail พร้อมใช้งาน
     if (!couponDetailNotifier!.value.isSuccess) return;
 

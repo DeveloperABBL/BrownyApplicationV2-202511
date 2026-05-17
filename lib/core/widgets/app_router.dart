@@ -5,7 +5,9 @@ import 'package:browny_applications_new/core/widgets/app_text.dart';
 import 'package:browny_applications_new/feature/articles/screens/article_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
@@ -92,9 +94,23 @@ class AppRouter {
         ),
       ),
       GoRoute(
+        path: BrownyShopCartPage.pagePath,
+        name: BrownyShopCartPage.pageName,
+        builder: (context, state) {
+          // (subId, quantity) จาก flow "ซื้อเลย" — null = เข้าตะกร้าปกติ
+          final extra = state.extra;
+          return BrownyShopCartPage(
+            buyNowSubId: extra is (int, int) ? extra.$1 : null,
+            buyNowQuantity: extra is (int, int) ? extra.$2 : null,
+          );
+        },
+      ),
+      GoRoute(
         path: BrownyShopSelected.pagePath,
         name: BrownyShopSelected.pageName,
-        builder: (context, state) => const BrownyShopSelected(),
+        builder: (context, state) => BrownyShopSelected(
+          viewModel: state.extra as BrownyShopSelectedViewModel,
+        ),
       ),
       GoRoute(
         path: AppNotificationsPage.pagePath,

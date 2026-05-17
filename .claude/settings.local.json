@@ -8,7 +8,17 @@
       "Bash(flutter analyze *)",
       "Bash(flutter gen-l10n *)",
       "Bash(echo \"exit: $?\")",
-      "Bash(flutter build *)"
+      "Bash(flutter build *)",
+      "Skill(figma:figma-implement-design)",
+      "Skill(figma:figma-implement-design:*)",
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -o browny_checkout.png \"https://www.figma.com/api/mcp/asset/a9f7e531-511f-4e80-ac56-6c5ae6a82e03\")",
+      "mcp__plugin_figma_figma__get_design_context",
+      "Bash(grep -nE 'icTpWallet|class \\\\$Assets\\(IcShop|Png|Svg\\)Gen' lib/res/icons/assets.gen.dart)",
+      "Bash(grep -rnA8 \"enum CouponVoucherState\" lib --include=\"*.dart\")",
+      "Bash(grep -rnA40 \"class PaymentMethodModel\" lib --include=\"*.dart\")"
     ]
   }
 }

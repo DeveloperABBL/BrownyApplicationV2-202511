@@ -27,7 +27,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
-import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -383,7 +383,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               if (!context.mounted) return;
               // และเปิดเข้าหน้าตะกร้าซ้อนขึ้นมาทันที
               // เพื่อให้ถ้า User กดกลับ จะได้เจอหน้า BrownyShop
-              BrownyShopSelected.goToPage(context);
+              BrownyShopCartPage.goToPage(context);
             },
             child: Container(
               width: AppDims.size_39.w,

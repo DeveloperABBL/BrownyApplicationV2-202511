@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/providers/customer_provider.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -5,6 +7,10 @@ import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/widgets/app_container_radius.dart';
 import 'package:browny_applications_new/core/widgets/app_overlays.dart';
 import 'package:browny_applications_new/core/widgets/app_text.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/coin/models/coin_data_model.dart';
 import 'package:browny_applications_new/feature/coin/repository/coin_claim_repo.dart';
 import 'package:browny_applications_new/feature/coin/screens/coin_history_page.dart';
@@ -32,6 +38,7 @@ class CoinPage extends StatelessWidget {
       create: (context) => CoinViewmModel(
         context: context,
         repo: CoinClaimRepo(),
+        brownyShopRepo: BrownyShopRepo(),
       ),
       child: _CoinContent(),
     );
@@ -88,7 +95,7 @@ class __CoinContentState extends State<_CoinContent> {
       // โหลดข้อมูล CoinClaim
       await _viewModel.fetchCoinCliamData();
       if (!mounted) return;
-
+      unawaited(_viewModel.fetchShopProducts());
       _showCondition(context);
     });
   }
@@ -99,6 +106,7 @@ class __CoinContentState extends State<_CoinContent> {
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: Column(
+          spacing: AppDims.size_16.h,
           children: [
             Container(
               decoration: BoxDecoration(
@@ -250,6 +258,25 @@ class __CoinContentState extends State<_CoinContent> {
               ),
             ),
             // Expanded(child: Text('')),
+            BrownyShopCategoriesGridSection(
+              topBoxDecoration: BoxDecoration(),
+              productsListenable: _viewModel.shopProductsNotifier,
+              selectedCategoryListenable:
+                  _viewModel.shopSelectedCategoryNotifier,
+              onCategorySelected: _viewModel.onShopCategorySelected,
+              showShowMore: true,
+              onShowMoreTap: () => BrownyShopPage.goToPage(context),
+              onProductTap: (p) {
+                if (p.id != null) {
+                  BrownyShopProductDetailPage.goToPage(
+                    context,
+                    productId: p.id!,
+                  );
+                }
+              },
+              onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
+            ),
+            AppDims.vericalPadding_24
           ],
         ),
       ),

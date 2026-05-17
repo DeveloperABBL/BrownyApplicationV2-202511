@@ -1,7 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
-import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
@@ -185,7 +185,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
           _buildIconButton(
             context,
             svg: Assets.icShop.icShoppingBag,
-            onTap: () => BrownyShopSelected.goToPage(context),
+            onTap: () => BrownyShopCartPage.goToPage(context),
           ),
           SizedBox(width: AppDims.size_8.w),
           _buildIconButton(

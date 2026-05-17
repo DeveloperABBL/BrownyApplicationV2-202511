@@ -582,5 +582,8 @@
   "dayUnit": "天",
   "willReceiveWithin": "送达时间",
   "addedToCartSuccess": "已加入购物车",
-  "removeCartItemConfirm": "要将此商品从购物车中移除吗？"
+  "removeCartItemConfirm": "要将此商品从购物车中移除吗？",
+  "shipping": "配送",
+  "productSubtotal": "商品小计",
+  "orderProduct": "下单"
 }

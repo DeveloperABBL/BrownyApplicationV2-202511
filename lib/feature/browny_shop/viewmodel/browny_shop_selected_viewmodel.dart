@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
-import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
+import 'package:browny_applications_new/feature/transactions/repository/transaction_repo.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
+import 'package:browny_applications_new/feature/transactions/viewmodel/transactions_viewmodel.dart';
 
 /// 1 บรรทัดในตะกร้า — ห่อ [CartItemData] จาก server + state ฝั่ง client
 /// ([quantity] ที่แก้ได้ก่อน sync, [selected] สำหรับติ๊กชำระเงิน)
@@ -50,18 +54,34 @@ class CartLine {
   String get selectionKey => '${data.productId}:${data.productSubId}';
 }
 
-/// ViewModel หน้าตะกร้า Browny Shop ([BrownyShopSelected])
+/// ViewModel ของ Browny Shop ตะกร้า + checkout
 ///
-/// แนวคิด sync (debounced batch): ทุกการแก้จำนวน (+/−/พิมพ์) แก้ที่ฝั่ง app
-/// ก่อน (instant) แล้ว debounce — เมื่อ user หยุดแก้ครบ [_syncDelay] จึง batch
-/// sync ขึ้น server: ลบรายการที่เปลี่ยน → addCartItem จำนวนใหม่ → fetchCart ใหม่
+/// ใช้ร่วมกันทั้ง [BrownyShopCartPage] และ [BrownyShopSelected] (checkout) —
+/// flow ต้องผ่านหน้าตะกร้าก่อนเสมอ จึงสร้าง VM ที่หน้าตะกร้าแล้วส่ง instance
+/// ต่อให้หน้า checkout
 ///
-/// ระหว่าง debounce/sync ปุ่มชำระเงินจะถูก disable ([canCheckout])
-class BrownyShopSelectedViewModel extends AppViewModel {
+/// extends [TransactionsViewmodel] เพื่อ reuse ระบบ payment method / order ที่
+/// integrate API ไว้แล้ว — ตั้ง [couponState] = brownyShop ให้ logic ฝั่ง
+/// payment เลือก path ของ shop (ดู fetchPaymentMethod/onPaymentChanged)
+///
+/// แนวคิด sync ตะกร้า (debounced batch): ทุกการแก้จำนวน (+/−/พิมพ์) แก้ที่
+/// ฝั่ง app ก่อน (instant) แล้ว debounce — เมื่อ user หยุดแก้ครบ [_syncDelay]
+/// จึง batch sync ขึ้น server: ลบรายการที่เปลี่ยน → addCartItem จำนวนใหม่ →
+/// fetchCart ใหม่
+class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   BrownyShopSelectedViewModel({
-    required super.context,
+    required BuildContext context,
     required BrownyShopDataSourceMixin repo,
-  }) : _repo = repo;
+  }) : _repo = repo,
+       super(
+         context: context,
+         couponRepo: CouponVoucherRepo(),
+         transactionRepo: TransactionRepo(),
+         machineRepo: MachineRepo(),
+       ) {
+    // บอก logic ฝั่ง payment ว่าอยู่ใน context ของ Browny Shop
+    couponState = CouponVoucherState.brownyShop;
+  }
 
   final BrownyShopDataSourceMixin _repo;
 
