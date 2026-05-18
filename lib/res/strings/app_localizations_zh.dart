@@ -579,6 +579,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addNewAddress => '新增地址';
 
   @override
+  String get address => '地址';
+
+  @override
+  String get addAddress => '添加地址';
+
+  @override
+  String get mainAddress => '主要地址';
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get selectAddress => '选择地址';
+
+  @override
+  String get setAsMainAddress => '设为主要地址';
+
+  @override
+  String get deleteAddressConfirm => '确定删除此地址吗？';
+
+  @override
+  String get recipientName => '收件人姓名';
+
+  @override
+  String get recipientNameHint => '姓名';
+
+  @override
+  String get provinceDistrictZipSubdistrict => '省/区(县)/邮编/街道(乡)';
+
+  @override
+  String get deliveryAddressHint => '配送地址';
+
+  @override
+  String get roadBuilding => '道路/建筑名称';
+
+  @override
+  String get unitFloorHouseNo => '单元/楼层或门牌号';
+
+  @override
+  String get additionalAddressInfo => '附加地址信息（可选）';
+
+  @override
+  String get mobilePhone => '手机号码';
+
+  @override
+  String get saveAddress => '保存地址';
+
+  @override
   String get manageAddress => '管理地址';
 
   @override
@@ -688,9 +736,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deliveryDetails => '配送详情';
-
-  @override
-  String get recipientName => '收件人姓名';
 
   @override
   String get recipientTel => '收件人电话';

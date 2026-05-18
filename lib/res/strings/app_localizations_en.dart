@@ -590,6 +590,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNewAddress => 'Add new address';
 
   @override
+  String get address => 'Address';
+
+  @override
+  String get addAddress => 'Add address';
+
+  @override
+  String get mainAddress => 'Main address';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get selectAddress => 'Select address';
+
+  @override
+  String get setAsMainAddress => 'Set as main address';
+
+  @override
+  String get deleteAddressConfirm => 'Delete this address?';
+
+  @override
+  String get recipientName => 'Recipient name';
+
+  @override
+  String get recipientNameHint => 'Full name';
+
+  @override
+  String get provinceDistrictZipSubdistrict =>
+      'Province / District / Postal code / Subdistrict';
+
+  @override
+  String get deliveryAddressHint => 'Delivery address';
+
+  @override
+  String get roadBuilding => 'Road / Building name';
+
+  @override
+  String get unitFloorHouseNo => 'Unit / Floor or house no.';
+
+  @override
+  String get additionalAddressInfo => 'Additional address info (optional)';
+
+  @override
+  String get mobilePhone => 'Mobile phone';
+
+  @override
+  String get saveAddress => 'Save address';
+
+  @override
   String get manageAddress => 'Manage Address';
 
   @override
@@ -700,9 +749,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deliveryDetails => 'Delivery details';
-
-  @override
-  String get recipientName => 'Recipient name';
 
   @override
   String get recipientTel => 'Recipient tel';

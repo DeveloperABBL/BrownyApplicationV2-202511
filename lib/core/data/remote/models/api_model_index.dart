@@ -1,3 +1,4 @@
+export 'package:browny_applications_new/core/data/remote/models/request/address_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/banner_collect_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/change_password_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/coupon_list_request.dart';
@@ -27,6 +28,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/cart_it
 export 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_clear_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';

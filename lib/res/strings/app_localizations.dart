@@ -1240,6 +1240,102 @@ abstract class AppLocalizations {
   /// **'Add new address'**
   String get addNewAddress;
 
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @addAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add address'**
+  String get addAddress;
+
+  /// No description provided for @mainAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Main address'**
+  String get mainAddress;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @selectAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Select address'**
+  String get selectAddress;
+
+  /// No description provided for @setAsMainAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as main address'**
+  String get setAsMainAddress;
+
+  /// No description provided for @deleteAddressConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this address?'**
+  String get deleteAddressConfirm;
+
+  /// No description provided for @recipientName.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient name'**
+  String get recipientName;
+
+  /// No description provided for @recipientNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get recipientNameHint;
+
+  /// No description provided for @provinceDistrictZipSubdistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Province / District / Postal code / Subdistrict'**
+  String get provinceDistrictZipSubdistrict;
+
+  /// No description provided for @deliveryAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery address'**
+  String get deliveryAddressHint;
+
+  /// No description provided for @roadBuilding.
+  ///
+  /// In en, this message translates to:
+  /// **'Road / Building name'**
+  String get roadBuilding;
+
+  /// No description provided for @unitFloorHouseNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit / Floor or house no.'**
+  String get unitFloorHouseNo;
+
+  /// No description provided for @additionalAddressInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional address info (optional)'**
+  String get additionalAddressInfo;
+
+  /// No description provided for @mobilePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile phone'**
+  String get mobilePhone;
+
+  /// No description provided for @saveAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Save address'**
+  String get saveAddress;
+
   /// No description provided for @manageAddress.
   ///
   /// In en, this message translates to:
@@ -1461,12 +1557,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivery details'**
   String get deliveryDetails;
-
-  /// No description provided for @recipientName.
-  ///
-  /// In en, this message translates to:
-  /// **'Recipient name'**
-  String get recipientName;
 
   /// No description provided for @recipientTel.
   ///

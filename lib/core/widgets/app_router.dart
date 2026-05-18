@@ -7,6 +7,10 @@ import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/ship_to_detail_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/viewmodel/customer_ship_to_viewmodel.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/authentication/screen/biometric_page.dart';
@@ -111,6 +115,25 @@ class AppRouter {
         builder: (context, state) => BrownyShopSelected(
           viewModel: state.extra as BrownyShopSelectedViewModel,
         ),
+      ),
+      GoRoute(
+        path: CustomerShipToPage.pagePath,
+        name: CustomerShipToPage.pageName,
+        builder: (context, state) => const CustomerShipToPage(),
+      ),
+      GoRoute(
+        path: ShipToDetailPage.pagePath,
+        name: ShipToDetailPage.pageName,
+        builder: (context, state) {
+          final extra =
+              state.extra
+                  as (ShipToDetailMode, CustomerShipToViewModel, AddressData?);
+          return ShipToDetailPage(
+            mode: extra.$1,
+            viewModel: extra.$2,
+            address: extra.$3,
+          );
+        },
       ),
       GoRoute(
         path: AppNotificationsPage.pagePath,

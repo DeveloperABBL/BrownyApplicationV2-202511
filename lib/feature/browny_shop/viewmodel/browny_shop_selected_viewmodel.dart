@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:flutter/foundation.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/address_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
@@ -93,6 +96,7 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   @override
   void dispose() {
     _debounce?.cancel();
+    _shippingAddressNotifier.dispose();
     super.dispose();
   }
 
@@ -287,5 +291,37 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
     _isSyncing = false;
     _syncError = hadError || reloadError;
     notifyListeners();
+  }
+
+  // ========== ที่อยู่จัดส่ง ==========
+
+  final AddressRepo _addressRepo = AddressRepo();
+
+  /// ที่อยู่จัดส่งที่เลือกสำหรับออร์เดอร์นี้ (null = ยังไม่เลือก)
+  final ValueNotifier<AddressData?> _shippingAddressNotifier = ValueNotifier(
+    null,
+  );
+  ValueListenable<AddressData?> get shippingAddressNotifier =>
+      _shippingAddressNotifier;
+
+  /// ตั้งที่อยู่จัดส่ง — เรียกหลังเลือกจาก [CustomerShipToPage]
+  void setShippingAddress(AddressData? address) {
+    _shippingAddressNotifier.value = address;
+  }
+
+  /// โหลดที่อยู่หลักมาแสดงเป็นค่าเริ่มต้นในหน้า checkout
+  /// (ข้ามถ้า user เลือกที่อยู่ไว้แล้ว)
+  Future<void> loadDefaultShippingAddress() async {
+    if (_shippingAddressNotifier.value != null) return;
+    final result = await _addressRepo.fetchAddresses(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+    );
+    if (!result.isSuccess) return;
+    final list = result.data;
+    if (list.isEmpty) return;
+    final defaults = list.where((a) => a.isDefaultAddress);
+    _shippingAddressNotifier.value = defaults.isNotEmpty
+        ? defaults.first
+        : list.first;
   }
 }

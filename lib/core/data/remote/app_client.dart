@@ -914,4 +914,83 @@ abstract class AppClient {
   Future<HttpResponse<CartClearResponse>> clearCart(
     @Path('customerId') String customerId,
   );
+
+  /// DONG 2026-05-18
+  ///
+  /// API fetch รายการที่อยู่จัดส่งของลูกค้า
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Response:
+  /// - AddressListResponse with list of AddressData
+  @GET('/customer/{customerId}/addresses')
+  Future<HttpResponse<AddressListResponse>> fetchAddresses(
+    @Path('customerId') String customerId,
+  );
+
+  /// DONG 2026-05-18
+  ///
+  /// API เพิ่มที่อยู่จัดส่งใหม่ของลูกค้า
+  ///
+  /// Path parameters:
+  /// - customerId: String (uuid)
+  ///
+  /// Body:
+  /// - AddressRequest (first_name, last_name, phone, zipcode, province,
+  ///   district, subdistrict, address_line, note)
+  ///
+  /// Response:
+  /// - AddressResponse with created AddressData
+  @POST('/customer/{customerId}/addresses')
+  Future<HttpResponse<AddressResponse>> createAddress(
+    @Path('customerId') String customerId,
+    @Body() AddressRequest body,
+  );
+
+  /// DONG 2026-05-18
+  ///
+  /// API แก้ไขที่อยู่จัดส่ง
+  ///
+  /// Path parameters:
+  /// - addressId: int (id ของที่อยู่)
+  ///
+  /// Body:
+  /// - AddressRequest (เหมือน createAddress)
+  ///
+  /// Response:
+  /// - AddressResponse with updated AddressData
+  @PUT('/addresses/{addressId}')
+  Future<HttpResponse<AddressResponse>> updateAddress(
+    @Path('addressId') int addressId,
+    @Body() AddressRequest body,
+  );
+
+  /// DONG 2026-05-18
+  ///
+  /// API ลบที่อยู่จัดส่ง
+  ///
+  /// Path parameters:
+  /// - addressId: int (id ของที่อยู่)
+  ///
+  /// Response:
+  /// - BaseResponse (success + message)
+  @DELETE('/addresses/{addressId}')
+  Future<HttpResponse<BaseResponse>> deleteAddress(
+    @Path('addressId') int addressId,
+  );
+
+  /// DONG 2026-05-18
+  ///
+  /// API ตั้งค่าที่อยู่จัดส่งเป็นค่าเริ่มต้น (default)
+  ///
+  /// Path parameters:
+  /// - addressId: int (id ของที่อยู่)
+  ///
+  /// Response:
+  /// - BaseResponse (success + message)
+  @PATCH('/addresses/{addressId}/default')
+  Future<HttpResponse<BaseResponse>> setDefaultAddress(
+    @Path('addressId') int addressId,
+  );
 }

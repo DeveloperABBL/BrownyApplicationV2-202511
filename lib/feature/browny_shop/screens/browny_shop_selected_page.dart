@@ -1,4 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
@@ -55,8 +57,11 @@ class _BrownyShopSelectedWidgetState extends State<_BrownyShopSelectedWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ตะกร้า (vm.lines) ถูกโหลดจากหน้าตะกร้าแล้ว — ที่นี่โหลดแค่ payment methods
-      context.read<BrownyShopSelectedViewModel>().fetchPaymentMethod(context);
+      // ตะกร้า (vm.lines) ถูกโหลดจากหน้าตะกร้าแล้ว — ที่นี่โหลด payment methods
+      // + ที่อยู่จัดส่งเริ่มต้น (ที่อยู่หลัก)
+      final vm = context.read<BrownyShopSelectedViewModel>();
+      vm.fetchPaymentMethod(context);
+      vm.loadDefaultShippingAddress();
     });
   }
 
@@ -279,75 +284,98 @@ class _FreeShippingBadge extends StatelessWidget {
 // Frame 2087327034 — ที่อยู่จัดส่ง
 // ============================================================
 
-/// TODO(api): API เลือกที่อยู่จัดส่งยังไม่พร้อม — mock ข้อมูลตาม design ไปก่อน
+/// การ์ดที่อยู่จัดส่ง — โชว์ที่อยู่ที่เลือก, แตะเพื่อเปลี่ยนใน [CustomerShipToPage]
 class _ShipToCard extends StatelessWidget {
   const _ShipToCard();
 
-  // ===== mock data (รอ API) =====
-  static const _name = 'บราวนี รักสะอาด';
-  static const _phone = '0800000000';
-  static const _address =
-      '100/1100 ชั้น 6 โครงการบราวนีรักสะอาด คอนโนนบราวนี จ.กรุงเทพ...';
-
   @override
   Widget build(BuildContext context) {
-    return _SectionCard(
-      onTap: () => debugPrint('tap ship-to (TODO)'),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Assets.svg.icLocationRoundedGreen.svg(width: 28.w, height: 28.w),
-          SizedBox(width: AppDims.size_8.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: AppText(
-                        _name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          fontSize: 14.sp,
-                          color: AppColors.darkBrown,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: AppDims.size_4.w),
-                    AppText(
-                      _phone,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        fontSize: 14.sp,
-                        color: AppColors.gray500,
-                      ),
-                    ),
-                  ],
+    final vm = context.read<BrownyShopSelectedViewModel>();
+    return ValueListenableBuilder(
+      valueListenable: vm.shippingAddressNotifier,
+      builder: (context, address, _) {
+        return _SectionCard(
+          onTap: () async {
+            final selected = await CustomerShipToPage.goToPage(context);
+            if (selected != null) vm.setShippingAddress(selected);
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Assets.svg.icLocationRoundedGreen.svg(width: 28.w, height: 28.w),
+              SizedBox(width: AppDims.size_8.w),
+              Expanded(
+                child: address == null
+                    ? _buildEmpty(context)
+                    : _buildAddress(context, address),
+              ),
+              SizedBox(width: AppDims.size_8.w),
+              Padding(
+                padding: EdgeInsets.only(top: AppDims.size_4.h),
+                child: Assets.svg.icArrowForward.svg(
+                  width: AppDims.size_16.w,
+                  height: AppDims.size_16.w,
                 ),
-                SizedBox(height: AppDims.size_2.h),
-                AppText(
-                  _address,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    fontSize: 14.sp,
-                    color: AppColors.gray600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          SizedBox(width: AppDims.size_8.w),
-          Padding(
-            padding: EdgeInsets.only(top: AppDims.size_4.h),
-            child: Assets.svg.icArrowForward.svg(
-              width: AppDims.size_16.w,
-              height: AppDims.size_16.w,
-            ),
-          ),
-        ],
+        );
+      },
+    );
+  }
+
+  /// ยังไม่มีที่อยู่ที่เลือก — โชว์ข้อความชวนเลือก
+  Widget _buildEmpty(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppDims.size_4.h),
+      child: AppText(
+        context.wording.selectAddress,
+        style: context.textTheme.titleSmall?.copyWith(
+          fontSize: 14.sp,
+          color: AppColors.gray500,
+        ),
       ),
+    );
+  }
+
+  Widget _buildAddress(BuildContext context, AddressData address) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Flexible(
+              child: AppText(
+                address.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.titleSmall?.copyWith(
+                  fontSize: 14.sp,
+                  color: AppColors.darkBrown,
+                ),
+              ),
+            ),
+            SizedBox(width: AppDims.size_4.w),
+            AppText(
+              address.phone ?? '',
+              style: context.textTheme.titleSmall?.copyWith(
+                fontSize: 14.sp,
+                color: AppColors.gray500,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: AppDims.size_2.h),
+        AppText(
+          address.fullAddress,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium?.copyWith(
+            fontSize: 14.sp,
+            color: AppColors.gray600,
+          ),
+        ),
+      ],
     );
   }
 }

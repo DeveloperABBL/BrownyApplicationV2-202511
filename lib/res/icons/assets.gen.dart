@@ -1,3 +1,5 @@
+// dart format width=80
+
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -5,7 +7,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
+// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -170,6 +172,10 @@ class $AssetsIcShopGen {
   AssetGenImage get brownyShopBannerZh =>
       const AssetGenImage('assets/ic_shop/browny_shop_banner_zh.png');
 
+  /// File path: assets/ic_shop/ic_address_house.png
+  AssetGenImage get icAddressHouse =>
+      const AssetGenImage('assets/ic_shop/ic_address_house.png');
+
   /// File path: assets/ic_shop/ic_bag.png
   AssetGenImage get icBag => const AssetGenImage('assets/ic_shop/ic_bag.png');
 
@@ -235,6 +241,10 @@ class $AssetsIcShopGen {
   AssetGenImage get icTicketRounded =>
       const AssetGenImage('assets/ic_shop/ic_ticket_rounded.png');
 
+  /// File path: assets/ic_shop/ic_trash.png
+  AssetGenImage get icTrash =>
+      const AssetGenImage('assets/ic_shop/ic_trash.png');
+
   /// File path: assets/ic_shop/ic_truck_tick.svg
   SvgGenImage get icTruckTick =>
       const SvgGenImage('assets/ic_shop/ic_truck_tick.svg');
@@ -252,6 +262,7 @@ class $AssetsIcShopGen {
     brownyShopBannerEn,
     brownyShopBannerTh,
     brownyShopBannerZh,
+    icAddressHouse,
     icBag,
     icBagCart,
     icBagOutline,
@@ -269,6 +280,7 @@ class $AssetsIcShopGen {
     icShoppingBag,
     icTicket,
     icTicketRounded,
+    icTrash,
     icTruckTick,
     midBanner,
   ];
@@ -1422,12 +1434,18 @@ class Assets {
 }
 
 class AssetGenImage {
-  const AssetGenImage(this._assetName, {this.size, this.flavors = const {}});
+  const AssetGenImage(
+    this._assetName, {
+    this.size,
+    this.flavors = const {},
+    this.animation,
+  });
 
   final String _assetName;
 
   final Size? size;
   final Set<String> flavors;
+  final AssetGenImageAnimation? animation;
 
   Image image({
     Key? key,
@@ -1491,6 +1509,18 @@ class AssetGenImage {
   String get keyName => _assetName;
 }
 
+class AssetGenImageAnimation {
+  const AssetGenImageAnimation({
+    required this.isAnimation,
+    required this.duration,
+    required this.frames,
+  });
+
+  final bool isAnimation;
+  final Duration duration;
+  final int frames;
+}
+
 class SvgGenImage {
   const SvgGenImage(this._assetName, {this.size, this.flavors = const {}})
     : _isVecFormat = false;
@@ -1517,6 +1547,7 @@ class SvgGenImage {
     String? semanticsLabel,
     bool excludeFromSemantics = false,
     _svg.SvgTheme? theme,
+    _svg.ColorMapper? colorMapper,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
@@ -1536,6 +1567,7 @@ class SvgGenImage {
         assetBundle: bundle,
         packageName: package,
         theme: theme,
+        colorMapper: colorMapper,
       );
     }
     return _svg.SvgPicture(

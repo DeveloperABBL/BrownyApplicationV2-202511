@@ -224,15 +224,15 @@ class _BrownyShopCartWidgetState extends State<_BrownyShopCartWidget> {
     BrownyShopSelectedViewModel vm,
     CartLine line,
   ) async {
-    final confirmed = await AppOverlays.showBrownyDialog(
+    await AppOverlays.showBrownyDialog(
       context,
       message: context.wording.removeCartItemConfirm,
       confirmText: context.wording.confirm,
       cancelText: context.wording.cancel,
+      onConfirm: () {
+        vm.removeLine(line);
+      },
     );
-    if (confirmed == true) {
-      vm.removeLine(line);
-    }
   }
 
   /// AppBar — bg gradient image + back (white) + title "ตะกร้า"

@@ -591,6 +591,55 @@ class AppLocalizationsTh extends AppLocalizations {
   String get addNewAddress => 'เพิ่มที่อยู่ใหม่';
 
   @override
+  String get address => 'ที่อยู่';
+
+  @override
+  String get addAddress => 'เพิ่มที่อยู่';
+
+  @override
+  String get mainAddress => 'ที่อยู่หลัก';
+
+  @override
+  String get edit => 'แก้ไข';
+
+  @override
+  String get selectAddress => 'เลือกที่อยู่';
+
+  @override
+  String get setAsMainAddress => 'ตั้งเป็นที่อยู่หลัก';
+
+  @override
+  String get deleteAddressConfirm => 'ต้องการลบที่อยู่นี้ใช่หรือไม่?';
+
+  @override
+  String get recipientName => 'ชื่อผู้รับสินค้า';
+
+  @override
+  String get recipientNameHint => 'ชื่อ-นามสกุล';
+
+  @override
+  String get provinceDistrictZipSubdistrict =>
+      'จังหวัด/เขต(อำเภอ)/รหัสไปรษณีย์/แขวง(ตำบล)';
+
+  @override
+  String get deliveryAddressHint => 'ที่อยู่ในการจัดส่ง';
+
+  @override
+  String get roadBuilding => 'ถนน/ชื่ออาคาร';
+
+  @override
+  String get unitFloorHouseNo => 'เลขที่ยูนิต/ชั้น หรือบ้านเลขที่';
+
+  @override
+  String get additionalAddressInfo => 'ข้อมูลที่อยู่เพิ่มเติม (ถ้ามี)';
+
+  @override
+  String get mobilePhone => 'เบอร์โทรศัพท์มือถือ';
+
+  @override
+  String get saveAddress => 'บันทึกที่อยู่';
+
+  @override
   String get manageAddress => 'จัดการที่อยู่';
 
   @override
@@ -701,9 +750,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get deliveryDetails => 'รายละเอียดที่อยู่จัดส่ง';
-
-  @override
-  String get recipientName => 'ชื่อผู้รับสินค้า';
 
   @override
   String get recipientTel => 'เบอร์โทรผู้รับสินค้า';
