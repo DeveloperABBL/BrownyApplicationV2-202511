@@ -20,7 +20,9 @@
       "Bash(grep -rnA8 \"enum CouponVoucherState\" lib --include=\"*.dart\")",
       "Bash(grep -rnA40 \"class PaymentMethodModel\" lib --include=\"*.dart\")",
       "mcp__figma-dev-mode__get_screenshot",
-      "mcp__figma-dev-mode__get_design_context"
+      "mcp__figma-dev-mode__get_design_context",
+      "Bash(curl -s -o figma_dialog.png \"https://www.figma.com/api/mcp/asset/d31a7c0f-8032-40e9-b12b-19c2d43d8c4f\")",
+      "Bash(curl -s -o figma_bottombar.png \"https://www.figma.com/api/mcp/asset/ed4846f7-0e3f-4b26-8dc3-b466e246b56b\")"
     ]
   }
 }

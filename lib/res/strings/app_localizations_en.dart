@@ -1790,4 +1790,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orderProduct => 'Place order';
+
+  @override
+  String get deleteAddress => 'Delete address';
+
+  @override
+  String get deleteAddressTitle => 'Delete this address?';
+
+  @override
+  String get deleteAddressRecheck => 'Please double-check before confirming.';
 }

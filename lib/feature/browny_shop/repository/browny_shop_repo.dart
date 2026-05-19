@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:browny_applications_new/core/data/remote/models/request/cart_item_add_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/cart_item_quantity_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
@@ -10,7 +11,18 @@ import 'package:browny_applications_new/core/data/remote/models/response/product
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/repo_result.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+
+/// ข้อผิดพลาด "สต็อกไม่พอ" — พก message จาก API (HTTP 422)
+class CartStockException implements Exception {
+  CartStockException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
 
 /// Mixin Interface สำหรับ Repository ของ Browny Shop
 mixin BrownyShopDataSourceMixin {
@@ -48,10 +60,12 @@ mixin BrownyShopDataSourceMixin {
     required int quantity,
   });
 
-  /// API ลดจำนวนสินค้าในตะกร้าทีละ 1
-  Future<RepoResult<CartItemData>> decreaseCartItem({
+  /// API ปรับจำนวนสินค้าในตะกร้า — ส่ง quantity สุดท้ายไปตั้งค่าโดยตรง
+  /// (error เป็น [CartStockException] เมื่อสต็อกไม่พอ — HTTP 422)
+  Future<RepoResult<CartItemData>> updateCartItemQuantity({
     required String customerId,
     required int itemId,
+    required int quantity,
   });
 
   /// API ลบสินค้า 1 รายการออกจากตะกร้า
@@ -191,14 +205,16 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }
 
   @override
-  Future<RepoResult<CartItemData>> decreaseCartItem({
+  Future<RepoResult<CartItemData>> updateCartItemQuantity({
     required String customerId,
     required int itemId,
+    required int quantity,
   }) async {
     try {
-      final response = await requireRemote.decreaseCartItemQuantity(
+      final response = await requireRemote.updateCartItemQuantity(
         customerId,
         itemId,
+        CartItemQuantityRequest(quantity: quantity),
       );
       if (!response.isSuccessful) {
         return RepoResult.empty();
@@ -208,6 +224,14 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
         return RepoResult.empty();
       }
       return RepoResult.success(data: data);
+    } on DioException catch (e) {
+      // HTTP 422 = สต็อกไม่พอ — ดึง message จาก response body มาแจ้ง user
+      final body = e.response?.data;
+      final message = body is Map ? body['message']?.toString() : null;
+      if (message != null && message.isNotEmpty) {
+        return RepoResult.error(error: CartStockException(message));
+      }
+      return RepoResult.error(error: e);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }

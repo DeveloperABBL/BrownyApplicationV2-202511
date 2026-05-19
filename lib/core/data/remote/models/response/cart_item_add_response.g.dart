@@ -47,6 +47,9 @@ CartItemData _$CartItemDataFromJson(Map<String, dynamic> json) => CartItemData(
   product: json['product'] == null
       ? null
       : ProductData.fromJson(json['product'] as Map<String, dynamic>),
+  variant: json['variant'] == null
+      ? null
+      : ProductSubData.fromJson(json['variant'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$CartItemDataToJson(CartItemData instance) =>
@@ -70,4 +73,5 @@ Map<String, dynamic> _$CartItemDataToJson(CartItemData instance) =>
       'current_is_flash_sale': instance.currentIsFlashSale,
       'current_flash_sale_id': instance.currentFlashSaleId,
       'product': instance.product,
+      'variant': instance.variant,
     };

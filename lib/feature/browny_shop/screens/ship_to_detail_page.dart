@@ -162,75 +162,110 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     }
   }
 
+  /// ลบที่อยู่ — ยืนยันก่อนผ่าน dialog (ปุ่ม "ลบที่อยู่" สีแดงตาม design)
+  void _onDelete() {
+    final id = widget.address?.id;
+    if (id == null) return;
+    AppOverlays.showBrownyDialog(
+      context,
+      title: context.wording.deleteAddressTitle,
+      message: context.wording.deleteAddressRecheck,
+      confirmText: context.wording.deleteAddress,
+      cancelText: context.wording.cancel,
+      confirmColor: AppColors.error,
+      cancelColor: AppColors.ci3,
+      cancelTextColor: AppColors.ci,
+      onConfirm: () => _confirmDelete(id),
+    );
+  }
+
+  /// เรียก API ลบ — สำเร็จแล้ว pop กลับ (list หน้า [CustomerShipToPage]
+  /// refresh เองจาก [CustomerShipToViewModel])
+  Future<void> _confirmDelete(int id) async {
+    AppOverlays.showLoading(context);
+    final ok = await widget.viewModel.deleteAddress(id);
+    if (!mounted) return;
+    AppOverlays.hideLoading();
+
+    if (ok) {
+      context.pop();
+    } else {
+      AppOverlays.showBrownyDialog(context, message: context.wording.errorUi);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
         backgroundColor: AppColors.white,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: AppColors.darkBrown),
-        title: AppText(
-          context.wording.address,
-          style: context.textTheme.titleMedium?.copyWith(
-            fontSize: 18.sp,
-            color: AppColors.darkBrown,
+        appBar: AppBar(
+          backgroundColor: AppColors.white,
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: AppColors.darkBrown),
+          title: AppText(
+            context.wording.address,
+            style: context.textTheme.titleMedium?.copyWith(
+              fontSize: 18.sp,
+              color: AppColors.darkBrown,
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        padding: EdgeInsets.all(AppDims.size_16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: AppDims.size_16.h,
-          children: [
-            _field(
-              context,
-              label: context.wording.recipientName,
-              required: true,
-              child: _textInput(
-                _nameController,
-                hint: context.wording.recipientNameHint,
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.all(AppDims.size_16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: AppDims.size_16.h,
+            children: [
+              _field(
+                context,
+                label: context.wording.recipientName,
+                required: true,
+                child: _textInput(
+                  _nameController,
+                  hint: context.wording.recipientNameHint,
+                ),
               ),
-            ),
-            _field(
-              context,
-              label: context.wording.provinceDistrictZipSubdistrict,
-              required: true,
-              child: _tapInput(context),
-            ),
-            _field(
-              context,
-              label: context.wording.roadBuilding,
-              required: true,
-              child: _textInput(_roadController),
-            ),
-            _field(
-              context,
-              label: context.wording.unitFloorHouseNo,
-              required: true,
-              child: _textInput(_unitController),
-            ),
-            _field(
-              context,
-              label: context.wording.additionalAddressInfo,
-              child: _textInput(_noteController),
-            ),
-            _field(
-              context,
-              label: context.wording.mobilePhone,
-              child: _textInput(
-                _phoneController,
-                hint: '+66',
-                keyboardType: TextInputType.phone,
+              _field(
+                context,
+                label: context.wording.provinceDistrictZipSubdistrict,
+                required: true,
+                child: _tapInput(context),
               ),
-            ),
-            _defaultCheckbox(context),
-          ],
+              _field(
+                context,
+                label: context.wording.roadBuilding,
+                required: true,
+                child: _textInput(_roadController),
+              ),
+              _field(
+                context,
+                label: context.wording.unitFloorHouseNo,
+                required: true,
+                child: _textInput(_unitController),
+              ),
+              _field(
+                context,
+                label: context.wording.additionalAddressInfo,
+                child: _textInput(_noteController),
+              ),
+              _field(
+                context,
+                label: context.wording.mobilePhone,
+                child: _textInput(
+                  _phoneController,
+                  hint: '+66',
+                  keyboardType: TextInputType.phone,
+                ),
+              ),
+              _defaultCheckbox(context),
+            ],
+          ),
         ),
+        bottomNavigationBar: _buildBottomBar(context),
       ),
-      bottomNavigationBar: _buildBottomBar(context),
     );
   }
 
@@ -308,8 +343,8 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
       child: Row(
         children: [
           Container(
-            width: 14.w,
-            height: 14.w,
+            width: 16.w,
+            height: 16.w,
             decoration: BoxDecoration(
               color: _isDefault ? AppColors.ci : AppColors.transparent,
               border: Border.all(color: AppColors.ci),
@@ -317,7 +352,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
             ),
             alignment: Alignment.center,
             child: _isDefault
-                ? Icon(Icons.check, size: 10.w, color: AppColors.white)
+                ? Icon(Icons.check, size: 12.w, color: AppColors.white)
                 : null,
           ),
           SizedBox(width: AppDims.size_8.w),
@@ -333,7 +368,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     );
   }
 
-  /// แถบล่าง — ปุ่ม "บันทึกที่อยู่" (กดได้เมื่อกรอกช่องบังคับครบ)
+  /// แถบล่าง — ปุ่ม "บันทึกที่อยู่" + ปุ่ม "ลบที่อยู่" (เฉพาะโหมดแก้ไข)
   Widget _buildBottomBar(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -350,36 +385,65 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
       ),
       child: SafeArea(
         top: false,
-        child: ListenableBuilder(
-          listenable: Listenable.merge([
-            _nameController,
-            _roadController,
-            _unitController,
-          ]),
-          builder: (context, _) {
-            final enabled = _canSave;
-            return GestureDetector(
-              onTap: enabled ? _onSave : null,
-              child: Container(
-                width: double.infinity,
-                height: AppDims.size_40.h,
-                decoration: BoxDecoration(
-                  color: enabled
-                      ? AppColors.ci
-                      : AppColors.ctaPrimaryDisable,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                alignment: Alignment.center,
-                child: AppText(
-                  context.wording.saveAddress,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontSize: 16.sp,
-                    color: AppColors.white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ปุ่มบันทึกที่อยู่ — กดได้เมื่อกรอกช่องบังคับครบ
+            ListenableBuilder(
+              listenable: Listenable.merge([
+                _nameController,
+                _roadController,
+                _unitController,
+              ]),
+              builder: (context, _) {
+                final enabled = _canSave;
+                return GestureDetector(
+                  onTap: enabled ? _onSave : null,
+                  child: Container(
+                    width: double.infinity,
+                    height: AppDims.size_40.h,
+                    decoration: BoxDecoration(
+                      color: enabled
+                          ? AppColors.ci
+                          : AppColors.ctaPrimaryDisable,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    alignment: Alignment.center,
+                    child: AppText(
+                      context.wording.saveAddress,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontSize: 16.sp,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            // ปุ่มลบที่อยู่ — แสดงเฉพาะตอนแก้ไขที่อยู่เดิม
+            if (widget.mode == ShipToDetailMode.edit) ...[
+              SizedBox(height: AppDims.size_16.h),
+              GestureDetector(
+                onTap: _onDelete,
+                child: Container(
+                  width: double.infinity,
+                  height: AppDims.size_40.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.ci3,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  alignment: Alignment.center,
+                  child: AppText(
+                    context.wording.deleteAddress,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontSize: 16.sp,
+                      color: AppColors.ci,
+                    ),
                   ),
                 ),
               ),
-            );
-          },
+            ],
+          ],
         ),
       ),
     );

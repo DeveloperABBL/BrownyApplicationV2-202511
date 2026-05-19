@@ -24,6 +24,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/product
 export 'package:browny_applications_new/core/data/remote/models/response/product_detail_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/request/cart_item_add_request.dart';
+export 'package:browny_applications_new/core/data/remote/models/request/cart_item_quantity_request.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';

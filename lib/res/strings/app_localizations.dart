@@ -3525,6 +3525,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Place order'**
   String get orderProduct;
+
+  /// No description provided for @deleteAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete address'**
+  String get deleteAddress;
+
+  /// No description provided for @deleteAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this address?'**
+  String get deleteAddressTitle;
+
+  /// No description provided for @deleteAddressRecheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Please double-check before confirming.'**
+  String get deleteAddressRecheck;
 }
 
 class _AppLocalizationsDelegate

@@ -238,8 +238,8 @@ class _FreeShippingBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: AppDims.size_4.w,
-        vertical: AppDims.size_2.h,
+        horizontal: AppDims.size_8.w,
+        vertical: AppDims.size_6.h,
       ),
       decoration: BoxDecoration(
         color: solid ? AppColors.ci7 : null,
@@ -257,13 +257,9 @@ class _FreeShippingBadge extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: Assets.icShop.icTruckTick.svg(
+            child: Assets.icShop.icTruckTick.image(
               width: 12.w,
               height: 12.w,
-              colorFilter: const ColorFilter.mode(
-                AppColors.ci,
-                BlendMode.srcIn,
-              ),
             ),
           ),
           SizedBox(width: AppDims.size_4.w),
@@ -400,10 +396,10 @@ class _ShippingCard extends StatelessWidget {
         children: [
           _SectionTitleRow(
             icon: _SectionIcon(
-              child: Assets.icShop.icBox.image(
+              child: Assets.icShop.icBoxLineWhite.image(
                 width: 20.w,
                 height: 20.w,
-                color: AppColors.white,
+                // color: AppColors.white,
               ),
             ),
             title: context.wording.shipping,
@@ -480,10 +476,17 @@ class _CouponCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitleRow(
-            icon: Assets.icShop.icCouponRoundedGreen.image(
-              width: 28.w,
-              height: 28.w,
+            icon: _SectionIcon(
+              child: Assets.icShop.icTicketLineWhite.image(
+                width: 20.w,
+                height: 20.w,
+                // color: AppColors.white,
+              ),
             ),
+            // icon: Assets.icShop.icTicketLineWhite.image(
+            //   width: 28.w,
+            //   height: 28.w,
+            // ),
             title: context.wording.couponAndVoucherCode,
             trailing: GestureDetector(
               onTap: () => CouponVoucherPage.goToPage(
@@ -525,13 +528,9 @@ class _CouponCard extends StatelessWidget {
             height: AppDims.size_85.w,
             color: const Color(0xA681E287),
             alignment: Alignment.center,
-            child: Assets.icShop.icTruckTick.svg(
+            child: Assets.icShop.icTruckTick.image(
               width: 32.w,
               height: 32.w,
-              colorFilter: const ColorFilter.mode(
-                AppColors.ci,
-                BlendMode.srcIn,
-              ),
             ),
           ),
           SizedBox(width: AppDims.size_8.w),
@@ -542,6 +541,7 @@ class _CouponCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
+                    // คูปองส่งฟรี ไม่มีขั้นต่ำ
                     context.wording.freeShippingCouponNoMin,
                     style: context.textTheme.titleSmall?.copyWith(
                       fontSize: 12.sp,
@@ -727,12 +727,16 @@ class _ProductItem extends StatelessWidget {
       child: url == null || url.isEmpty
           ? Icon(Icons.image_outlined, size: 32.w, color: AppColors.gray400)
           : CachedNetworkImage(
-              imageUrl: url,
+              imageUrl: line.data.product!.mainImageUrl.orEmpty,
               fit: BoxFit.contain,
-              errorWidget: (_, _, _) => Icon(
-                Icons.image_outlined,
-                size: 32.w,
-                color: AppColors.gray400,
+              errorWidget: (_, _, _) => CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.contain,
+                errorWidget: (_, _, _) => Icon(
+                  Icons.image_outlined,
+                  size: 32.w,
+                  color: AppColors.gray400,
+                ),
               ),
             ),
     );
@@ -1089,61 +1093,84 @@ class _PaymentMethodTile extends StatelessWidget {
 // Frame 2087327041 — สรุปการสั่งซื้อ
 // ============================================================
 
-/// TODO(api): ยอดสรุปจริงรอ shop order API — mock ตาม design ไปก่อน
+/// สรุปยอด — ยึดราคา/ส่วนลดจริงจากรายการที่ติ๊กเลือกในตะกร้า ([CartLine])
+///
+/// TODO(api): ส่วนลดคูปอง + ค่าจัดส่ง รอ shop coupon/order API — แสดง ฿0.00
 class _OrderSummaryCard extends StatelessWidget {
   const _OrderSummaryCard();
 
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitleRow(
-            icon: Assets.svg.icListRoundedGreen.svg(width: 28.w, height: 28.w),
-            title: context.wording.orderSummary,
-          ),
-          SizedBox(height: AppDims.size_16.h),
-          _line(
-            context,
-            title: context.wording.productSubtotal,
-            value: '฿75.00',
-          ),
-          SizedBox(height: AppDims.size_16.h),
-          _line(
-            context,
-            title: context.wording.productDiscount,
-            value: '฿75.00',
-            valueColor: AppColors.error,
-          ),
-          SizedBox(height: AppDims.size_16.h),
-          _line(
-            context,
-            icon: _lineIcon(
-              Assets.icShop.icTicket.image(width: 16.w, height: 16.w),
-            ),
-            title: context.wording.couponAndVoucherCode,
-            value: '฿20.00',
-            valueColor: AppColors.error,
-          ),
-          SizedBox(height: AppDims.size_16.h),
-          _line(
-            context,
-            icon: _lineIcon(
-              Assets.icShop.icBox.image(width: 16.w, height: 16.w),
-            ),
-            title: context.wording.shipping,
-            value: '฿0.00',
-          ),
-          SizedBox(height: AppDims.size_16.h),
-          _line(
-            context,
-            title: context.wording.totalPayment,
-            value: '฿75.00',
-            valueColor: AppColors.ci,
-            bold: true,
-          ),
-        ],
+      child: Consumer<BrownyShopSelectedViewModel>(
+        builder: (context, vm, _) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitleRow(
+                icon: Assets.svg.icListRoundedGreen.svg(
+                  width: 28.w,
+                  height: 28.w,
+                ),
+                title: context.wording.orderSummary,
+              ),
+              SizedBox(height: AppDims.size_16.h),
+              // ราคาสินค้า — ยอดรวมก่อนหักส่วนลด
+              _line(
+                context,
+                title: context.wording.productSubtotal,
+                value: formatCurrency(
+                  value: vm.selectedMoneySubtotal,
+                  leadingSign: '฿',
+                ),
+              ),
+              SizedBox(height: AppDims.size_16.h),
+              // ส่วนลดสินค้า — รวมส่วนลดของรายการที่เลือก
+              _line(
+                context,
+                title: context.wording.productDiscount,
+                value: formatCurrency(
+                  value: vm.selectedMoneyDiscount,
+                  leadingSign: '฿',
+                ),
+                valueColor: AppColors.error,
+              ),
+              SizedBox(height: AppDims.size_16.h),
+              // คูปอง / E-Voucher — TODO(api): รอ API คูปองของ shop
+              _line(
+                context,
+                icon: _lineIcon(
+                  Assets.icShop.icTicket.image(width: 16.w, height: 16.w),
+                ),
+                title: context.wording.couponAndVoucherCode,
+                value: formatCurrency(value: 0, leadingSign: '฿'),
+                valueColor: AppColors.error,
+              ),
+              SizedBox(height: AppDims.size_16.h),
+              // ค่าจัดส่ง — TODO(api): รอ API วิธีจัดส่ง
+              _line(
+                context,
+                icon: _lineIcon(
+                  Assets.icShop.icBox.image(width: 16.w, height: 16.w),
+                ),
+                title: context.wording.shipping,
+                value: formatCurrency(value: 0, leadingSign: '฿'),
+              ),
+              SizedBox(height: AppDims.size_16.h),
+              // ยอดชำระทั้งหมด
+              _line(
+                context,
+                title: context.wording.totalPayment,
+                value: formatCurrency(
+                  value: vm.selectedMoneyGrandTotal,
+                  leadingSign: '฿',
+                ),
+                valueColor: AppColors.ci,
+                bold: true,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -1198,7 +1225,9 @@ class _OrderSummaryCard extends StatelessWidget {
 // Frame 2087326691 — bar ล่าง
 // ============================================================
 
-/// TODO(api): ยอด/ปุ่ม checkout รอ shop order API — mock ตาม design
+/// bar ล่าง — ส่วนลด/ยอดชำระยึดจากรายการที่ติ๊กเลือกในตะกร้า
+///
+/// TODO(api): การกดปุ่มชำระเงินรอ shop order API — ตอนนี้ยัง debugPrint
 class _BottomBar extends StatelessWidget {
   const _BottomBar();
 
@@ -1217,46 +1246,49 @@ class _BottomBar extends StatelessWidget {
         top: AppDims.size_8.h,
         bottom: AppDims.size_32.h,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      child: Consumer<BrownyShopSelectedViewModel>(
+        builder: (context, vm, _) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              AppText(
-                '${context.wording.totalDiscount} ',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14.sp,
-                  color: AppColors.darkBrown,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppText(
+                    '${context.wording.totalDiscount} ',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14.sp,
+                      color: AppColors.darkBrown,
+                    ),
+                  ),
+                  AppText(
+                    formatCurrency(
+                      value: vm.selectedMoneyDiscount,
+                      leadingSign: '฿',
+                    ),
+                    style: context.textTheme.titleSmall?.copyWith(
+                      fontSize: 14.sp,
+                      color: AppColors.error,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              AppText(
-                '฿5',
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 14.sp,
-                  color: AppColors.error,
-                  fontWeight: FontWeight.w500,
-                ),
+              SizedBox(height: AppDims.size_8.h),
+              _button(
+                context,
+                label:
+                    '${context.wording.makePayment} '
+                    '${formatCurrency(value: vm.selectedMoneyGrandTotal, leadingSign: '฿')}',
+                background: AppColors.ci,
+                textColor: AppColors.white,
+                // ปิดปุ่มระหว่าง sync ตะกร้า / ยังไม่มีของติ๊กเลือก
+                enabled: vm.canCheckout,
+                onTap: () => debugPrint('tap pay (TODO)'),
               ),
             ],
-          ),
-          SizedBox(height: AppDims.size_8.h),
-          _button(
-            context,
-            label: '${context.wording.makePayment} ฿55.00',
-            background: AppColors.ci,
-            textColor: AppColors.white,
-            onTap: () => debugPrint('tap pay (TODO)'),
-          ),
-          SizedBox(height: AppDims.size_8.h),
-          // _button(
-          //   context,
-          //   label: context.wording.orderProduct,
-          //   background: AppColors.ci3,
-          //   textColor: AppColors.ci,
-          //   onTap: () => debugPrint('tap order (TODO)'),
-          // ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -1267,14 +1299,15 @@ class _BottomBar extends StatelessWidget {
     required Color background,
     required Color textColor,
     required VoidCallback onTap,
+    bool enabled = true,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: Container(
         width: double.infinity,
         height: AppDims.size_40.h,
         decoration: BoxDecoration(
-          color: background,
+          color: enabled ? background : AppColors.gray400,
           borderRadius: BorderRadius.circular(8.r),
         ),
         alignment: Alignment.center,

@@ -652,5 +652,8 @@
   "removeCartItemConfirm": "Remove this item from your cart?",
   "shipping": "Shipping",
   "productSubtotal": "Product subtotal",
-  "orderProduct": "Place order"
+  "orderProduct": "Place order",
+  "deleteAddress": "Delete address",
+  "deleteAddressTitle": "Delete this address?",
+  "deleteAddressRecheck": "Please double-check before confirming."
 }

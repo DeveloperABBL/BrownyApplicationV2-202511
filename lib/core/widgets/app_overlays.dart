@@ -154,6 +154,10 @@ class AppOverlays {
   /// [onConfirm] - Callback เมื่อกดปุ่มยืนยัน
   /// [onCancel] - Callback เมื่อกดปุ่มยกเลิก
   /// [barrierDismissible] - กำหนดว่าสามารถปิด dialog ด้วยการแตะพื้นหลังได้หรือไม่
+  /// [confirmColor] - สีพื้นปุ่มยืนยัน (ไม่ส่ง = สี default ตาม design)
+  /// [confirmTextColor] - สีตัวอักษรปุ่มยืนยัน (ไม่ส่ง = สี default ตาม design)
+  /// [cancelColor] - สีพื้นปุ่มยกเลิก — ส่งมาจะเป็นปุ่มทึบ, ไม่ส่ง = ปุ่มขอบ (default)
+  /// [cancelTextColor] - สีตัวอักษรปุ่มยกเลิก (ไม่ส่ง = สี default ตาม design)
   ///
   /// Returns Future<bool?> - true ถ้ากดยืนยัน, false ถ้ากดยกเลิก, null ถ้าปิดด้วยวิธีอื่น
   static Future<bool?> showBrownyDialog(
@@ -167,6 +171,10 @@ class AppOverlays {
     bool barrierDismissible = true,
     Widget? image,
     String? imageAsset,
+    Color? confirmColor,
+    Color? confirmTextColor,
+    Color? cancelColor,
+    Color? cancelTextColor,
   }) async {
     late OverlayEntry overlayEntry;
     bool? result;
@@ -184,6 +192,10 @@ class AppOverlays {
         cancelText: cancelText,
         image: image,
         imageAsset: imageAsset ?? Assets.png.brownyError1.path,
+        confirmColor: confirmColor,
+        confirmTextColor: confirmTextColor,
+        cancelColor: cancelColor,
+        cancelTextColor: cancelTextColor,
         onConfirm: () {
           onConfirm?.call();
           dismiss(true);
@@ -423,6 +435,10 @@ class _BrownyDialog extends StatelessWidget {
     this.onDismiss,
     this.image,
     this.imageAsset,
+    this.confirmColor,
+    this.confirmTextColor,
+    this.cancelColor,
+    this.cancelTextColor,
   });
 
   final String? title;
@@ -434,6 +450,14 @@ class _BrownyDialog extends StatelessWidget {
   final VoidCallback? onDismiss;
   final Widget? image;
   final String? imageAsset;
+
+  /// สีพื้น/ตัวอักษรปุ่มยืนยัน — null = ใช้ค่า default
+  final Color? confirmColor;
+  final Color? confirmTextColor;
+
+  /// สีพื้นปุ่มยกเลิก — null = ปุ่มขอบ (OutlinedButton), มีค่า = ปุ่มทึบ
+  final Color? cancelColor;
+  final Color? cancelTextColor;
 
   @override
   Widget build(BuildContext context) {
@@ -494,36 +518,53 @@ class _BrownyDialog extends StatelessWidget {
                   // Buttons
                   if (cancelText != null && onCancel != null) ...[
                     // มีทั้งปุ่มยืนยันและยกเลิก
-                    ElevatedButton(
-                      onPressed: onConfirm,
-                      style: ElevatedButton.styleFrom(
-                        // padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: onConfirm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: confirmColor ?? AppColors.primary,
+                          foregroundColor: confirmTextColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        confirmText,
+                        child: Text(
+                          confirmText,
+                        ),
                       ),
                     ),
                     AppDims.vericalPadding_8,
 
-                    OutlinedButton(
-                      onPressed: onCancel,
-                      style: OutlinedButton.styleFrom(
-                        // padding: const EdgeInsets.symmetric(vertical: 14),
-                        // side: BorderSide(
-                        //   color: AppColors.primary,
-                        //   width: 2,
-                        // ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                      ),
-                      child: AppText(
-                        cancelText!,
-                      ),
+                    // cancelColor = ปุ่มทึบ, ไม่ส่ง = ปุ่มขอบ (default)
+                    SizedBox(
+                      width: double.infinity,
+                      child: cancelColor != null
+                          ? ElevatedButton(
+                              onPressed: onCancel,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cancelColor,
+                                foregroundColor: cancelTextColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                              ),
+                              child: AppText(
+                                cancelText!,
+                              ),
+                            )
+                          : OutlinedButton(
+                              onPressed: onCancel,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: cancelTextColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                              ),
+                              child: AppText(
+                                cancelText!,
+                              ),
+                            ),
                     ),
                   ] else ...[
                     // มีแค่ปุ่มยืนยัน
@@ -533,17 +574,17 @@ class _BrownyDialog extends StatelessWidget {
                         onPressed: onConfirm,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: confirmColor ?? AppColors.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Text(
                           confirmText,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: confirmTextColor ?? Colors.white,
                           ),
                         ),
                       ),

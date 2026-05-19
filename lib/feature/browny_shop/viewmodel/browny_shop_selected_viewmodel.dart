@@ -123,7 +123,16 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   /// true เมื่อ batch sync รอบล่าสุดมีบาง request ล้มเหลว
   /// (View อ่านแล้วเรียก [consumeSyncError] เพื่อเคลียร์)
   bool get syncError => _syncError;
-  void consumeSyncError() => _syncError = false;
+
+  /// ข้อความ error เฉพาะเจาะจง (เช่น "สต็อกไม่พอ" จาก HTTP 422)
+  /// — null = error ทั่วไป (View ใช้ wording กลางแทน)
+  String? _syncErrorMessage;
+  String? get syncErrorMessage => _syncErrorMessage;
+
+  void consumeSyncError() {
+    _syncError = false;
+    _syncErrorMessage = null;
+  }
 
   List<CartLine> _lines = [];
   List<CartLine> get lines => List.unmodifiable(_lines);
@@ -145,6 +154,13 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
 
   num get selectedMoneyDiscount =>
       _selectedLines.fold<num>(0, (s, e) => s + e.lineMoneyDiscount);
+
+  /// ราคาสินค้ารวมก่อนหักส่วนลด (gross) = ยอดสุทธิ + ส่วนลดสินค้า
+  num get selectedMoneySubtotal => selectedMoneyTotal + selectedMoneyDiscount;
+
+  /// ยอดที่ต้องชำระจริง = ราคาสินค้า − ส่วนลดสินค้า
+  /// TODO(api): ยังไม่รวมส่วนลดคูปอง/ค่าจัดส่ง — รอ shop order API
+  num get selectedMoneyGrandTotal => selectedMoneyTotal;
 
   bool get isAllSelected =>
       _lines.isNotEmpty && _lines.every((e) => e.selected);
@@ -239,7 +255,7 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
 
   /// sync การเปลี่ยนแปลงทั้งหมดขึ้น server แบบ batch
   ///
-  /// ทำตามลำดับ: ลบรายการที่กดลบ → (ลบ+addCartItem) รายการที่จำนวนเปลี่ยน
+  /// ทำตามลำดับ: ลบรายการที่กดลบ → PATCH จำนวนสุดท้ายของรายการที่เปลี่ยน
   /// → fetchCart ใหม่เสมอ เพื่อให้ state ตรงกับ server
   Future<void> _runSync() async {
     _pendingSync = false;
@@ -248,6 +264,7 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
 
     final customerId = currentCustomerProvider.current.id.orEmpty;
     var hadError = false;
+    String? stockMessage;
 
     // 1) ลบรายการที่ user กดลบ
     for (final id in _pendingRemovalIds) {
@@ -256,30 +273,22 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
     }
     _pendingRemovalIds.clear();
 
-    // 2) รายการที่จำนวนเปลี่ยน → ลบทิ้งก่อน แล้ว addCartItem จำนวนใหม่
-    //    (addCartItem จะ merge ถ้า line ยังอยู่ จึงต้องลบก่อนเสมอ)
+    // 2) รายการที่จำนวนเปลี่ยน → PATCH ส่งจำนวนสุดท้ายไปตั้งค่าโดยตรง
     final changed = _lines.where((e) => e.isChanged).toList();
     for (final line in changed) {
       final id = line.itemId;
-      final productId = line.data.productId;
-      final subId = line.data.productSubId;
-      if (id == null || productId == null || subId == null) continue;
-
-      final removed = await _repo.removeCartItem(
+      if (id == null) continue;
+      final result = await _repo.updateCartItemQuantity(
         customerId: customerId,
         itemId: id,
-      );
-      if (removed.hasError) {
-        hadError = true;
-        continue; // ไม่ add ต่อ ถ้าลบไม่สำเร็จ
-      }
-      final added = await _repo.addCartItem(
-        customerId: customerId,
-        productId: productId,
-        subId: subId,
         quantity: line.quantity,
       );
-      if (added.hasError) hadError = true;
+      if (result.hasError) {
+        hadError = true;
+        // เก็บข้อความ "สต็อกไม่พอ" (HTTP 422) ไว้แจ้ง user
+        final err = result.error;
+        if (err is CartStockException) stockMessage = err.message;
+      }
     }
 
     // 3) fetchCart ใหม่เสมอ — ให้ state ตรง server (คง selection ตาม product+sub)
@@ -290,6 +299,7 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
 
     _isSyncing = false;
     _syncError = hadError || reloadError;
+    _syncErrorMessage = stockMessage;
     notifyListeners();
   }
 

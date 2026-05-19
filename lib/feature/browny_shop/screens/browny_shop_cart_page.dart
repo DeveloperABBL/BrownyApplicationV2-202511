@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
@@ -139,12 +141,17 @@ class _BrownyShopCartWidgetState extends State<_BrownyShopCartWidget> {
   }
 
   /// surface sync error เป็น toast (อ่านครั้งเดียวแล้วเคลียร์)
+  /// — มีข้อความเฉพาะ (เช่น สต็อกไม่พอ HTTP 422) แสดงข้อความนั้นแทน wording กลาง
   void _onVmChanged() {
     final vm = _vmRef;
     if (vm != null && vm.syncError) {
+      final message = vm.syncErrorMessage;
       vm.consumeSyncError();
       if (mounted) {
-        AppOverlays.showToast(context, message: context.wording.errorUi);
+        AppOverlays.showToast(
+          context,
+          message: message ?? context.wording.errorUi,
+        );
       }
     }
   }
@@ -442,12 +449,7 @@ class _CartItemCardState extends State<_CartItemCard> {
             SizedBox(width: AppDims.size_8.w),
             _buildImage(),
             SizedBox(width: AppDims.size_8.w),
-            Expanded(
-              child: SizedBox(
-                height: 100.w,
-                child: _buildInfo(context),
-              ),
-            ),
+            Expanded(child: _buildInfo(context)),
           ],
         ),
       ),
@@ -469,12 +471,18 @@ class _CartItemCardState extends State<_CartItemCard> {
       child: url == null || url.isEmpty
           ? Icon(Icons.image_outlined, size: 32.w, color: AppColors.gray400)
           : CachedNetworkImage(
+              // แสดงด้วย imageurl ของ subproduct ก่อน
               imageUrl: url,
               fit: BoxFit.contain,
-              errorWidget: (_, _, _) => Icon(
-                Icons.image_outlined,
-                size: 32.w,
-                color: AppColors.gray400,
+              errorWidget: (_, _, _) => CachedNetworkImage(
+                // ถ้า error ใช้ main_image
+                imageUrl: _line.data.product!.mainImageUrl.orEmpty,
+                fit: BoxFit.contain,
+                errorWidget: (_, _, _) => Icon(
+                  Icons.image_outlined,
+                  size: 32.w,
+                  color: AppColors.gray400,
+                ),
               ),
             ),
     );
@@ -482,7 +490,8 @@ class _CartItemCardState extends State<_CartItemCard> {
 
   Widget _buildInfo(BuildContext context) {
     final locale = context.languageCode;
-    final productName = _line.data.product?.getNameDisplay(locale);
+    final product = _line.data.product;
+    final productName = product?.getNameDisplay(locale);
     final name = (productName != null && productName.isNotEmpty)
         ? productName
         : (_line.data.productName ?? '');
@@ -490,20 +499,21 @@ class _CartItemCardState extends State<_CartItemCard> {
     final variant = (variantName != null && variantName.isNotEmpty)
         ? variantName
         : (_line.data.variantName ?? '');
+    final isFreeShipping = product?.isFreeShipping ?? false;
+    final hasFlashSale = product?.hasFlashSale ?? false;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: AppText(
-            name,
-            style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 16.sp,
-              color: AppColors.darkBrown,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+        AppText(
+          name,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontSize: 16.sp,
+            color: AppColors.darkBrown,
           ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
         if (variant.isNotEmpty)
           AppText(
@@ -515,6 +525,11 @@ class _CartItemCardState extends State<_CartItemCard> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+        // badge ส่งฟรี (is_free_shipping)
+        if (isFreeShipping) ...[
+          SizedBox(height: AppDims.size_4.h),
+          _freeShippingBadge(context),
+        ],
         SizedBox(height: AppDims.size_4.h),
         if (_line.data.unitCoinPrice != null) _buildCoinRow(context),
         SizedBox(height: 2.h),
@@ -525,7 +540,44 @@ class _CartItemCardState extends State<_CartItemCard> {
             _buildQtyStepper(context),
           ],
         ),
+        // flash sale (has_flash_sale) — โลโก้ + นับถอยหลังเวลาหมดเขต
+        if (hasFlashSale) ...[
+          SizedBox(height: AppDims.size_4.h),
+          _FlashSaleCountdown(endAt: product?.flashSaleEndsAt),
+        ],
       ],
+    );
+  }
+
+  /// Badge "ส่งฟรี" — pill gradient เหลือง→เขียว + ไอคอนกล่อง
+  Widget _freeShippingBadge(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_4.w,
+        vertical: 2.h,
+      ),
+      decoration: BoxDecoration(
+        gradient: AppColors.claimCoinButtonGradient,
+        borderRadius: BorderRadius.circular(4.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Assets.icShop.icBox.image(
+            width: 12.w,
+            height: 12.w,
+            color: AppColors.white,
+          ),
+          SizedBox(width: 2.w),
+          AppText(
+            context.wording.freeShipping,
+            style: context.textTheme.labelSmall?.copyWith(
+              fontSize: 10.sp,
+              color: AppColors.white,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -658,6 +710,74 @@ class _CartItemCardState extends State<_CartItemCard> {
         ),
         alignment: Alignment.center,
         child: Icon(icon, size: 12.w, color: AppColors.white),
+      ),
+    );
+  }
+}
+
+/// แถว Flash Sale ในการ์ดสินค้า — โลโก้ Browny Flash + นับถอยหลัง HH:MM:SS
+///
+/// นับถอยหลังถึง [endAt] (flash_sale_ends_at) อัพเดททุก 1 วินาที
+/// ครอบ [RepaintBoundary] กัน set|State ทุกวินาทีไปกระทบ list ทั้งหน้า
+class _FlashSaleCountdown extends StatefulWidget {
+  const _FlashSaleCountdown({required this.endAt});
+
+  /// เวลาหมดเขต flash sale (ISO datetime string)
+  final String? endAt;
+
+  @override
+  State<_FlashSaleCountdown> createState() => _FlashSaleCountdownState();
+}
+
+class _FlashSaleCountdownState extends State<_FlashSaleCountdown> {
+  Timer? _timer;
+  Duration _remaining = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRemaining();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) _updateRemaining();
+    });
+  }
+
+  void _updateRemaining() {
+    final end = DateTime.tryParse(widget.endAt ?? '');
+    final diff = end?.difference(DateTime.now());
+    setState(() {
+      _remaining = (diff == null || diff.isNegative) ? Duration.zero : diff;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _pad2(int n) => n.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final hh = _pad2(_remaining.inHours);
+    final mm = _pad2(_remaining.inMinutes.remainder(60));
+    final ss = _pad2(_remaining.inSeconds.remainder(60));
+    return RepaintBoundary(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Assets.icShop.bronwyShopFlashSales.image(height: 14.h),
+          SizedBox(width: AppDims.size_4.w),
+          AppText(
+            '$hh : $mm : $ss',
+            style: context.textTheme.labelSmall?.copyWith(
+              fontSize: 10.sp,
+              color: AppColors.ci,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

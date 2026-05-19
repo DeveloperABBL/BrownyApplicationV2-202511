@@ -53,6 +53,7 @@ class CartItemData {
     this.currentIsFlashSale,
     this.currentFlashSaleId,
     this.product,
+    this.variant,
   });
 
   @JsonKey(name: 'id')
@@ -120,18 +121,22 @@ class CartItemData {
   @JsonKey(name: 'current_flash_sale_id')
   final int? currentFlashSaleId;
 
-  /// ข้อมูลสินค้าเต็ม (translations, รูป, product_subs)
-  ///
-  /// TODO(backend): รอ API nest object `product` มาในแต่ละ cart item
-  /// ระหว่างนี้จะเป็น null → UI fallback ไปใช้ [productName] / placeholder
+  /// ข้อมูลสินค้าเต็ม — translations, รูปหลัก, is_free_shipping, has_flash_sale
   @JsonKey(name: 'product')
   final ProductData? product;
+
+  /// ตัวเลือกย่อย (product_sub) ของรายการนี้ — API nest มาให้ตรง ๆ
+  @JsonKey(name: 'variant')
+  final ProductSubData? variant;
 
   /// เช็คว่าราคาเปลี่ยนไปจากตอนหยิบใส่ตะกร้าหรือไม่
   bool get hasPriceChanged => priceChanged == true;
 
-  /// product_sub ที่ตรงกับ [productSubId] (อาศัย [product] ที่ nest มา — null ถ้าไม่มี)
+  /// product_sub (variant) ของรายการนี้
+  ///
+  /// API ใหม่ nest `variant` มาตรง ๆ — ใช้ก่อน, fallback ค้นใน [product]
   ProductSubData? get matchedSub {
+    if (variant != null) return variant;
     final subs = product?.productSubs;
     if (subs == null) return null;
     for (final s in subs) {

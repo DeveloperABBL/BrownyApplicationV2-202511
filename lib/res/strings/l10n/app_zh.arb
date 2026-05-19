@@ -601,5 +601,8 @@
   "removeCartItemConfirm": "要将此商品从购物车中移除吗？",
   "shipping": "配送",
   "productSubtotal": "商品小计",
-  "orderProduct": "下单"
+  "orderProduct": "下单",
+  "deleteAddress": "删除地址",
+  "deleteAddressTitle": "确定要删除此地址吗",
+  "deleteAddressRecheck": "请再次确认"
 }

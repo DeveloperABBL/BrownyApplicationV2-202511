@@ -603,5 +603,8 @@
   "removeCartItemConfirm": "ต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?",
   "shipping": "การจัดส่ง",
   "productSubtotal": "ยอดรวมสินค้า",
-  "orderProduct": "สั่งซื้อสินค้า"
+  "orderProduct": "สั่งซื้อสินค้า",
+  "deleteAddress": "ลบที่อยู่",
+  "deleteAddressTitle": "คุณต้องการที่จะลบที่อยู่",
+  "deleteAddressRecheck": "กรุณาตรวจสอบใหม่อีกครั้ง"
 }

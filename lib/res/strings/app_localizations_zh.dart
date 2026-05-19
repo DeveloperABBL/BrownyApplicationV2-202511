@@ -1742,4 +1742,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get orderProduct => '下单';
+
+  @override
+  String get deleteAddress => '删除地址';
+
+  @override
+  String get deleteAddressTitle => '确定要删除此地址吗';
+
+  @override
+  String get deleteAddressRecheck => '请再次确认';
 }

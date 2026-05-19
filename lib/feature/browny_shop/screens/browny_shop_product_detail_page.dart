@@ -587,13 +587,9 @@ class _CouponCard extends StatelessWidget {
             height: AppDims.size_85.w,
             color: const Color(0x6681E287),
             alignment: Alignment.center,
-            child: Assets.icShop.icTruckTick.svg(
+            child: Assets.icShop.icTruckTick.image(
               width: 32.w,
               height: 32.w,
-              colorFilter: const ColorFilter.mode(
-                AppColors.ci,
-                BlendMode.srcIn,
-              ),
             ),
           ),
           SizedBox(width: AppDims.size_8.w),

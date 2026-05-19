@@ -869,20 +869,25 @@ abstract class AppClient {
     @Path('customerId') String customerId,
   );
 
-  /// DONG 2026-05-16
+  /// DONG 2026-05-19
   ///
-  /// API ลดจำนวนสินค้าในตะกร้าทีละ 1 (ไม่มี body)
+  /// API ปรับจำนวนสินค้าในตะกร้า — ส่ง quantity สุดท้ายไปตั้งค่าโดยตรง
   ///
   /// Path parameters:
   /// - customerId: String (uuid)
   /// - itemId: int (id ของ cart item)
   ///
+  /// Body:
+  /// - CartItemQuantityRequest (quantity)
+  ///
   /// Response:
   /// - CartItemAddResponse with updated cart item data
+  /// - HTTP 422 เมื่อสต็อกไม่พอ ({"success": false, "message": "..."})
   @PATCH('/customer/{customerId}/cart/items/{itemId}')
-  Future<HttpResponse<CartItemAddResponse>> decreaseCartItemQuantity(
+  Future<HttpResponse<CartItemAddResponse>> updateCartItemQuantity(
     @Path('customerId') String customerId,
     @Path('itemId') int itemId,
+    @Body() CartItemQuantityRequest body,
   );
 
   /// DONG 2026-05-16

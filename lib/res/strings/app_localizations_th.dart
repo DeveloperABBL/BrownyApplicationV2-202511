@@ -1781,4 +1781,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get orderProduct => 'สั่งซื้อสินค้า';
+
+  @override
+  String get deleteAddress => 'ลบที่อยู่';
+
+  @override
+  String get deleteAddressTitle => 'คุณต้องการที่จะลบที่อยู่';
+
+  @override
+  String get deleteAddressRecheck => 'กรุณาตรวจสอบใหม่อีกครั้ง';
 }
