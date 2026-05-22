@@ -813,6 +813,12 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
         _isFirstReviewScore = receiptResponse.reviewScore == null;
         _machineTransactionStateNotifier.value = UiResult.success(
           data: MachinePaymentTransactionState(
+            // DONG 19-05-2026 แก้ไข Issue ไม่สามารถ submit review ร้านค้าได้
+            // เพราะไม่มี OrderID
+            paymentStatus: PaymentStatusCheckResponse(
+              status: 'paid',
+              orderId: orderId,
+            ),
             receipt: receiptResponse,
             step: TransactionStep.receiptLoaded,
           ),
