@@ -95,18 +95,24 @@ class CustomerShipToViewModel extends ChangeNotifier {
   }
 
   // ========== CRUD ==========
+  //
+  // คืน [UiResult] เพื่อให้ View อ่านผลลัพธ์แบบเดียวกับ notifier ตัวอื่น
+  // (success/empty/error) — ไม่ใช่แค่ bool
+  //
+  // VM ไม่ reload รายการเองหลัง action — ปล่อยให้ View เป็นคนตัดสินใจ
+  // เรียก [load] ตามจังหวะ (เช่น หลัง pop กลับมาแล้ว) เพื่อให้ data flow ชัด
 
-  /// ลบที่อยู่ — คืน true ถ้าสำเร็จ
-  Future<bool> deleteAddress(int addressId) =>
-      _runAction(() => _repo.deleteAddress(addressId: addressId));
+  /// ลบที่อยู่ — success = true ถ้าฝั่ง server ตอบสำเร็จ
+  Future<UiResult<bool>> deleteAddress(int addressId) =>
+      _runAction<bool>(() => _repo.deleteAddress(addressId: addressId));
 
-  /// ตั้งเป็นที่อยู่เริ่มต้น — คืน true ถ้าสำเร็จ
-  Future<bool> setDefault(int addressId) =>
-      _runAction(() => _repo.setDefaultAddress(addressId: addressId));
+  /// ตั้งเป็นที่อยู่เริ่มต้น
+  Future<UiResult<bool>> setDefault(int addressId) =>
+      _runAction<bool>(() => _repo.setDefaultAddress(addressId: addressId));
 
   /// บันทึกที่อยู่ — [addressId] null = เพิ่มใหม่, ไม่ null = แก้ไข
-  /// ถ้า [makeDefault] จะตั้งเป็นที่อยู่หลักต่อหลังบันทึก — คืน true ถ้าสำเร็จ
-  Future<bool> saveAddress({
+  /// [makeDefault] = ตั้งเป็นที่อยู่หลักต่อเนื่องหลังบันทึก
+  Future<UiResult<AddressData>> saveAddress({
     int? addressId,
     required AddressRequest body,
     required bool makeDefault,
@@ -117,38 +123,34 @@ class CustomerShipToViewModel extends ChangeNotifier {
         ? await _repo.createAddress(customerId: customerId, body: body)
         : await _repo.updateAddress(addressId: addressId, body: body);
 
-    final ok = saved.isSuccess;
-    if (ok) {
-      if (makeDefault) {
-        final id = saved.data.id ?? addressId;
-        if (id != null) {
-          await _repo.setDefaultAddress(addressId: id);
-        }
+    if (!saved.isSuccess) {
+      _busyNotifier.value = false;
+      return saved.hasError
+          ? UiResult.error(error: saved.error)
+          : UiResult.empty();
+    }
+
+    if (makeDefault) {
+      final id = saved.data.id ?? addressId;
+      if (id != null) {
+        await _repo.setDefaultAddress(addressId: id);
       }
-      await _reload();
     }
 
     _busyNotifier.value = false;
-    return ok;
+    return UiResult.success(data: saved.data);
   }
 
-  /// ทำ action แล้ว reload รายการใหม่ให้ตรง server (default/รายการเปลี่ยน)
-  Future<bool> _runAction(Future<RepoResult<Object>> Function() action) async {
+  /// helper — แปลง [RepoResult] เป็น [UiResult] + คุม busy flag
+  Future<UiResult<T>> _runAction<T>(
+    Future<RepoResult<T>> Function() action,
+  ) async {
     _busyNotifier.value = true;
     final result = await action();
-    final ok = result.isSuccess;
-    if (ok) await _reload();
     _busyNotifier.value = false;
-    return ok;
-  }
-
-  /// โหลดรายการที่อยู่ใหม่จาก server (คงสถานะ selected)
-  Future<void> _reload() async {
-    final reload = await _repo.fetchAddresses(customerId: customerId);
-    if (!reload.hasError) {
-      final list = reload.isSuccess ? reload.data : <AddressData>[];
-      _ensureSelection(list);
-      _addressesNotifier.value = UiResult.success(data: list);
-    }
+    if (result.isSuccess) return UiResult.success(data: result.data);
+    return result.hasError
+        ? UiResult.error(error: result.error)
+        : UiResult.empty();
   }
 }

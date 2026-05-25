@@ -29,6 +29,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/cart_it
 export 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_clear_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/address_master_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_highlight_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
@@ -61,6 +62,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/machine
 export 'package:browny_applications_new/core/data/remote/models/response/machine_programs_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/working_machine_data.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/location_search_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/map_location_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/notification_preferences_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/payment_method_response.dart';

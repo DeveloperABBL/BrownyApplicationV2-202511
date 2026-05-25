@@ -1799,4 +1799,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAddressRecheck => 'Please double-check before confirming.';
+
+  @override
+  String get selectProvince => 'Select province';
+
+  @override
+  String get selectDistrict => 'Select district';
+
+  @override
+  String get selectSubdistrict => 'Select subdistrict';
 }

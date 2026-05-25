@@ -57,7 +57,7 @@ class _CustomerShipToWidget extends StatelessWidget {
     );
   }
 
-  /// ลบที่อยู่ — ยืนยันก่อน
+  /// ลบที่อยู่ — ยืนยันก่อน, สำเร็จแล้ว load รายการใหม่
   Future<void> _onDelete(
     BuildContext context,
     CustomerShipToViewModel vm,
@@ -65,20 +65,29 @@ class _CustomerShipToWidget extends StatelessWidget {
   ) async {
     final id = address.id;
     if (id == null) return;
-    final confirmed = await AppOverlays.showBrownyDialog(
+    AppOverlays.showBrownyDialog(
       context,
-      message: context.wording.deleteAddressConfirm,
-      confirmText: context.wording.confirm,
+      title: context.wording.deleteAddressTitle,
+      message: context.wording.deleteAddressRecheck,
+      confirmColor: AppColors.error,
+      confirmText: context.wording.deleteAddress,
+      cancelColor: AppColors.ci3,
+      cancelTextColor: AppColors.primary,
       cancelText: context.wording.cancel,
+      onConfirm: () async {
+        final result = await vm.deleteAddress(id);
+        if (!context.mounted) return;
+        if (result.isSuccess) {
+          // โหลดรายการใหม่จาก server หลังลบสำเร็จ
+          vm.load();
+        } else {
+          AppOverlays.showToast(context, message: context.wording.errorUi);
+        }
+      },
     );
-    if (confirmed != true || !context.mounted) return;
-    final ok = await vm.deleteAddress(id);
-    if (!ok && context.mounted) {
-      AppOverlays.showToast(context, message: context.wording.errorUi);
-    }
   }
 
-  /// ตั้งที่อยู่นี้เป็นค่าเริ่มต้น
+  /// ตั้งที่อยู่นี้เป็นค่าเริ่มต้น — สำเร็จแล้ว load รายการใหม่
   Future<void> _onSetDefault(
     BuildContext context,
     CustomerShipToViewModel vm,
@@ -86,8 +95,11 @@ class _CustomerShipToWidget extends StatelessWidget {
   ) async {
     final id = address.id;
     if (id == null) return;
-    final ok = await vm.setDefault(id);
-    if (!ok && context.mounted) {
+    final result = await vm.setDefault(id);
+    if (!context.mounted) return;
+    if (result.isSuccess) {
+      vm.load();
+    } else {
       AppOverlays.showToast(context, message: context.wording.errorUi);
     }
   }
@@ -328,12 +340,14 @@ class _AddressCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: selected ? Border.all(color: AppColors.ci) : null,
+          border: Border.all(
+            color: selected ? AppColors.ci : AppColors.background,
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Assets.icShop.icAddressHouse.image(width: 22.w, height: 22.w),
+            Assets.svg.icLocationRoundedGreen.svg(width: 22.w, height: 22.w),
             SizedBox(width: AppDims.size_8.w),
             Expanded(child: _buildInfo(context)),
             SizedBox(width: AppDims.size_8.w),

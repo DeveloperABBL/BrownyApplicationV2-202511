@@ -44,6 +44,7 @@ class HomePageViewmodel extends AppViewModel {
     _customerNotificationsCountNotifier.dispose();
     _shopProductsNotifier.dispose();
     _shopSelectedCategoryNotifier.dispose();
+    _brownyLiveNotifier.dispose();
     super.dispose();
   }
 
@@ -109,6 +110,12 @@ class HomePageViewmodel extends AppViewModel {
   ValueListenable<String> get shopSelectedCategoryNotifier =>
       _shopSelectedCategoryNotifier;
 
+  /// Notifier fetch Browny Live (เปิด/ปิดไอคอน + ลิงก์ external)
+  final ValueNotifier<UiResult<BrownyLiveResponse>> _brownyLiveNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<BrownyLiveResponse>> get brownyLiveNotifier =>
+      _brownyLiveNotifier;
+
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
   }
@@ -137,6 +144,7 @@ class HomePageViewmodel extends AppViewModel {
     await fetchBannersHighlight();
     await fetchWorkingMachines();
     unawaited(fetchCustomerNotifications());
+    unawaited(fetchBrownyLive());
     final profileResult = await _repo.fetchProfileInfo('');
     if (profileResult.isSuccess) {
       currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
@@ -206,16 +214,26 @@ class HomePageViewmodel extends AppViewModel {
     );
   }
 
-  Future<UiResult<BrownyLiveResponse>> fetchBrownyLive() async {
+  /// Fetch Browny Live + อัปเดต [_brownyLiveNotifier]
+  ///
+  /// เรียกครั้งเดียวตอนเข้าหน้า + ตอน pull-to-refresh — view subscribe ผ่าน
+  /// notifier ไม่ต้อง re-fetch ทุก rebuild (กันบั๊ก keyboard เปิด/ปิด
+  /// แล้ว `MediaQuery` propagate มาทำให้ HomePage rebuild → ยิงรัว ๆ)
+  Future<void> fetchBrownyLive() async {
+    _brownyLiveNotifier.value = UiResult.loading();
     try {
       final result = await _repo.fetchBrownyLive();
-      if (result.isEmpty || result.hasError) {
-        return UiResult.empty(error: result.error);
+      if (result.hasError) {
+        _brownyLiveNotifier.value = UiResult.error(error: result.error);
+        return;
       }
-
-      return UiResult.success(data: result.data);
+      if (result.isEmpty) {
+        _brownyLiveNotifier.value = UiResult.empty(error: result.error);
+        return;
+      }
+      _brownyLiveNotifier.value = UiResult.success(data: result.data);
     } on Exception catch (e) {
-      return UiResult.error(error: e);
+      _brownyLiveNotifier.value = UiResult.error(error: e);
     }
   }
 

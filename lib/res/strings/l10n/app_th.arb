@@ -606,5 +606,8 @@
   "orderProduct": "สั่งซื้อสินค้า",
   "deleteAddress": "ลบที่อยู่",
   "deleteAddressTitle": "คุณต้องการที่จะลบที่อยู่",
-  "deleteAddressRecheck": "กรุณาตรวจสอบใหม่อีกครั้ง"
+  "deleteAddressRecheck": "กรุณาตรวจสอบใหม่อีกครั้ง",
+  "selectProvince": "เลือกจังหวัด",
+  "selectDistrict": "เลือกอำเภอ/เขต",
+  "selectSubdistrict": "เลือกแขวง/ตำบล"
 }

@@ -998,4 +998,80 @@ abstract class AppClient {
   Future<HttpResponse<BaseResponse>> setDefaultAddress(
     @Path('addressId') int addressId,
   );
+
+  /// DONG 2026-05-19
+  ///
+  /// API ค้นหาที่อยู่ — ใช้สำหรับ picker จังหวัด/อำเภอ/ตำบล/รหัสไปรษณีย์
+  /// ในหน้า ShipToDetailPage
+  ///
+  /// Query parameters:
+  /// - q: String (required, min 1 ตัวอักษร) — คำค้น (zipcode/ตำบล/อำเภอ/จังหวัด)
+  /// - limit: int? (default 20, max 50) — จำนวนสูงสุดที่ส่งกลับ
+  /// - type: String? (default 'all') — 'all' / 'zipcode' / 'subdistrict'
+  ///
+  /// พฤติกรรม server:
+  /// - q เป็นตัวเลข 3–5 หลัก จะค้น zip_code แบบ prefix
+  /// - ค้น name_th ของตำบล/อำเภอ/จังหวัด แบบ LIKE %q%
+  /// - เรียง: ตรง zip prefix ก่อน แล้วตามชื่อตำบล
+  /// - cache 5 นาที
+  ///
+  /// Response:
+  /// - LocationSearchResponse (success + data: List of LocationSearchData)
+  @GET('/locations/search')
+  Future<HttpResponse<LocationSearchResponse>> searchLocations({
+    @Query('q') required String q,
+    @Query('limit') int? limit,
+    @Query('type') String? type,
+  });
+
+  /// DONG 2026-05-19
+  ///
+  /// ดึงรายการจังหวัดทั้งหมดของประเทศไทย
+  ///
+  /// Response:
+  /// - List ของ [ProvinceData] (id + name_th + name_en)
+  @GET('/provinces')
+  Future<HttpResponse<List<ProvinceData>>> fetchProvinces();
+
+  /// DONG 2026-05-19
+  ///
+  /// ดึงรายการอำเภอตามจังหวัด
+  ///
+  /// Query parameters:
+  /// - province_id: int (id ของจังหวัด — required)
+  ///
+  /// Response:
+  /// - List ของ [DistrictData] (id + name_th + name_en)
+  /// - HTTP 422 ถ้า province_id ไม่ถูกต้อง
+  @GET('/districts')
+  Future<HttpResponse<List<DistrictData>>> fetchDistricts(
+    @Query('province_id') int provinceId,
+  );
+
+  /// DONG 2026-05-19
+  ///
+  /// ดึงรายการตำบลตามอำเภอ พร้อมรหัสไปรษณีย์
+  ///
+  /// Query parameters:
+  /// - district_id: int (id ของอำเภอ — required)
+  ///
+  /// Response:
+  /// - List ของ [SubdistrictData] (id + name_th + name_en + zip_code)
+  /// - HTTP 422 ถ้า district_id ไม่ถูกต้อง
+  @GET('/subdistricts')
+  Future<HttpResponse<List<SubdistrictData>>> fetchSubdistricts(
+    @Query('district_id') int districtId,
+  );
+
+  /// DONG 2026-05-19
+  ///
+  /// ดึงข้อมูลที่อยู่ทั้งหมดของประเทศไทย — flat list ทุกตำบล
+  /// พร้อมชื่อจังหวัด/อำเภอ/ตำบล (เฉพาะภาษาไทย) + รหัสไปรษณีย์
+  ///
+  /// NOTE: payload ค่อนข้างใหญ่ — เหมาะกับ cache + เรียกครั้งเดียวพอ
+  ///
+  /// Response:
+  /// - List ของ [LocationItemData] (id + data: [LocationDetailData])
+  @GET('/locations')
+  Future<HttpResponse<List<LocationItemData>>> fetchLocations();
 }

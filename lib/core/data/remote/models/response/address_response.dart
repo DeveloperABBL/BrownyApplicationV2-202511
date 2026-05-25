@@ -68,6 +68,7 @@ class AddressData {
     this.district,
     this.subdistrict,
     this.address,
+    this.fullAddressServer,
     this.note,
     this.isDefault,
   });
@@ -109,6 +110,11 @@ class AddressData {
   @JsonKey(name: 'address')
   final String? address;
 
+  /// ที่อยู่แบบเต็มที่ server format มาให้ — มีใน GET /customer/{id}/addresses
+  /// รูปแบบ: "{address} {subdistrict} {district} {province} {zipcode}"
+  @JsonKey(name: 'full_address')
+  final String? fullAddressServer;
+
   @JsonKey(name: 'note')
   final String? note;
 
@@ -126,15 +132,22 @@ class AddressData {
   /// เช็คว่าเป็นที่อยู่เริ่มต้นหรือไม่
   bool get isDefaultAddress => isDefault ?? false;
 
-  /// ที่อยู่แบบเต็มบรรทัดเดียว — รวม address + ตำบล/อำเภอ/จังหวัด/รหัสไปรษณีย์
-  /// (ข้าม field ที่ว่าง)
-  String get fullAddress => [
-    address,
-    subdistrict,
-    district,
-    province,
-    zipcode,
-  ].where((e) => e != null && e.trim().isNotEmpty).map((e) => e!.trim()).join(' ');
+  /// ที่อยู่แบบเต็มบรรทัดเดียว — ใช้ค่า [fullAddressServer] จาก API ก่อน
+  /// (มีใน GET list); ไม่งั้นรวมเอง (address + ตำบล/อำเภอ/จังหวัด/รหัสไปรษณีย์
+  /// ข้าม field ว่าง) — สำหรับ response ที่ไม่มี full_address (เช่น POST/PUT)
+  String get fullAddress {
+    final fromServer = fullAddressServer?.trim() ?? '';
+    if (fromServer.isNotEmpty) return fromServer;
+    return [
+      address,
+      subdistrict,
+      district,
+      province,
+      zipcode,
+    ].where((e) => e != null && e.trim().isNotEmpty)
+        .map((e) => e!.trim())
+        .join(' ');
+  }
 
   factory AddressData.fromJson(Map<String, dynamic> json) =>
       _$AddressDataFromJson(json);

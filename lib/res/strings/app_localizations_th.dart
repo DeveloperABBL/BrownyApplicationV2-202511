@@ -1790,4 +1790,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get deleteAddressRecheck => 'กรุณาตรวจสอบใหม่อีกครั้ง';
+
+  @override
+  String get selectProvince => 'เลือกจังหวัด';
+
+  @override
+  String get selectDistrict => 'เลือกอำเภอ/เขต';
+
+  @override
+  String get selectSubdistrict => 'เลือกแขวง/ตำบล';
 }

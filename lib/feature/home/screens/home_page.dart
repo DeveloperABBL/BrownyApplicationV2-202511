@@ -102,6 +102,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
     await _viewmodel.fetchWorkingMachines();
     // ดึงสินค้า Browny Shop
     unawaited(_viewmodel.fetchShopProducts());
+    // ดึงสถานะ Browny Live (เปิด/ปิดไอคอน + ลิงก์)
+    unawaited(_viewmodel.fetchBrownyLive());
 
     if (mounted) {
       // ดึงข้อมูลแสดง Popup เพื่อนเชิญเพื่อน ของวันนี้
@@ -183,6 +185,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       edgeOffset: 10.h,
       backgroundColor: AppColors.background,
       onRefresh: () async {
+        // refresh() ใน VM ดึง Browny Live ใหม่อยู่แล้ว
         await _viewmodel.refresh();
       },
       child: Scaffold(
@@ -802,21 +805,17 @@ class _HomePageWidgetState extends State<HomePageWidget>
         child: IntrinsicHeight(
           child: Row(
             children: [
-              FutureBuilder<UiResult<BrownyLiveResponse>>(
-                future: _viewmodel.fetchBrownyLive(),
-                builder: (context, snapshot) {
-                  final hasData =
-                      snapshot.hasData && snapshot.requireData.isSuccess;
-                  if (!hasData || snapshot.requireData.data!.enabled == false) {
-                    return SizedBox();
+              ValueListenableBuilder(
+                valueListenable: _viewmodel.brownyLiveNotifier,
+                builder: (context, result, _) {
+                  if (!result.isSuccess ||
+                      result.data?.enabled == false) {
+                    return const SizedBox.shrink();
                   }
+                  final link = result.data?.link;
                   return GestureDetector(
-                    onTap: hasData
-                        ? () {
-                            LaunchHelper.openUrlInBrowser(
-                              snapshot.requireData.data!.link!,
-                            );
-                          }
+                    onTap: (link?.isNotEmpty ?? false)
+                        ? () => LaunchHelper.openUrlInBrowser(link!)
                         : null,
                     child: Container(
                       padding: EdgeInsets.only(

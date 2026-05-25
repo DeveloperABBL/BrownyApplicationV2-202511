@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/address_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/customer_ship_to_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/address_picker_bottom_sheet.dart';
 
 /// โหมดของหน้า [ShipToDetailPage] — เพิ่มที่อยู่ใหม่ / แก้ไขที่อยู่เดิม
 enum ShipToDetailMode { add, edit }
@@ -55,7 +56,7 @@ class ShipToDetailPage extends StatefulWidget {
 
 class _ShipToDetailPageState extends State<ShipToDetailPage> {
   late final TextEditingController _nameController;
-  late final TextEditingController _roadController;
+  // late final TextEditingController _roadController;
   late final TextEditingController _unitController;
   late final TextEditingController _noteController;
   late final TextEditingController _phoneController;
@@ -63,10 +64,14 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
   /// ช่องที่อยู่ (จังหวัด/เขต/แขวง) — read-only, ค่ามาจาก picker
   late final TextEditingController _geoController;
 
-  // ที่อยู่เชิงพื้นที่ — เลือกจาก picker (รอ Figma + API master)
+  // ที่อยู่เชิงพื้นที่ — Th = ค่าส่ง API, En = แสดงผลคู่ในรูปแบบ "Th/En"
+  // ค่า En จะมีเฉพาะตอน user เลือกจาก picker — edit prefill จาก API มีเฉพาะ Th
   String? _province;
+  String? _provinceEn;
   String? _district;
+  String? _districtEn;
   String? _subdistrict;
+  String? _subdistrictEn;
   String? _zipcode;
 
   bool _isDefault = false;
@@ -76,7 +81,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     super.initState();
     final a = widget.address;
     _nameController = TextEditingController(text: a?.displayName ?? '');
-    _roadController = TextEditingController();
+    // _roadController = TextEditingController();
     _unitController = TextEditingController(text: a?.address ?? '');
     _noteController = TextEditingController(text: a?.note ?? '');
     _phoneController = TextEditingController(text: a?.phone ?? '');
@@ -91,7 +96,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
   @override
   void dispose() {
     _nameController.dispose();
-    _roadController.dispose();
+    // _roadController.dispose();
     _unitController.dispose();
     _noteController.dispose();
     _phoneController.dispose();
@@ -99,22 +104,55 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     super.dispose();
   }
 
-  /// ข้อความที่อยู่ที่เลือกจาก picker (ว่าง = ยังไม่เลือก)
-  String get _geoText => [_province, _district, _subdistrict, _zipcode]
-      .where((e) => e != null && e.trim().isNotEmpty)
-      .map((e) => e!.trim())
-      .join(' ');
+  /// ข้อความที่อยู่ที่เลือก — แสดงผล "Th/En" ถ้ามี En, ไม่มีก็ Th อย่างเดียว
+  /// ลำดับ: จังหวัด, เขต/อำเภอ, รหัสไปรษณีย์, แขวง/ตำบล (ตาม label)
+  String get _geoText {
+    final parts = <String>[
+      if ((_province ?? '').trim().isNotEmpty)
+        _bilingual(_province, _provinceEn),
+      if ((_district ?? '').trim().isNotEmpty)
+        _bilingual(_district, _districtEn),
+      if ((_subdistrict ?? '').trim().isNotEmpty)
+        _bilingual(_subdistrict, _subdistrictEn),
+      if ((_zipcode ?? '').trim().isNotEmpty) _zipcode!.trim(),
+    ];
+    return parts.join(', ');
+  }
 
-  /// กรอกครบช่องบังคับ (ชื่อ / ถนน / เลขที่)
+  /// รวมชื่อ Th + En ในรูปแบบ "Th/En" — ตัวใดว่างใช้อีกตัว
+  String _bilingual(String? th, String? en) {
+    final t = th?.trim() ?? '';
+    final e = en?.trim() ?? '';
+    if (t.isEmpty) return e;
+    if (e.isEmpty) return t;
+    return '$t/$e';
+  }
+
+  /// กรอกครบช่องบังคับ — ชื่อ / ถนน / เลขที่ / จังหวัด-เขต-แขวง-zip ครบ
   bool get _canSave =>
       _nameController.text.trim().isNotEmpty &&
-      _roadController.text.trim().isNotEmpty &&
-      _unitController.text.trim().isNotEmpty;
+      // _roadController.text.trim().isNotEmpty &&
+      _unitController.text.trim().isNotEmpty &&
+      (_province ?? '').trim().isNotEmpty &&
+      (_district ?? '').trim().isNotEmpty &&
+      (_subdistrict ?? '').trim().isNotEmpty &&
+      (_zipcode ?? '').trim().isNotEmpty;
 
-  void _onPickAddress() {
-    // TODO(figma): showModalBottomSheet เลือกจังหวัด→เขต→แขวง ตามลำดับ
-    // รอ Figma ของ picker + API master ที่อยู่ — เลือกเสร็จ setState ค่า geo
-    debugPrint('TODO: open address picker');
+  /// เปิด BottomSheet เลือกที่อยู่ — เลือกครบจะ setState ค่า geo + อัปเดต field
+  Future<void> _onPickAddress() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final picked = await AddressPickerBottomSheet.show(context);
+    if (picked == null || !mounted) return;
+    setState(() {
+      _province = picked.province.nameTh;
+      _provinceEn = picked.province.nameEn;
+      _district = picked.district.nameTh;
+      _districtEn = picked.district.nameEn;
+      _subdistrict = picked.subdistrict.nameTh;
+      _subdistrictEn = picked.subdistrict.nameEn;
+      _zipcode = picked.subdistrict.zipCode;
+      _geoController.text = _geoText;
+    });
   }
 
   Future<void> _onSave() async {
@@ -138,14 +176,15 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
       district: _district ?? '',
       subdistrict: _subdistrict ?? '',
       // API มี address_line เดียว — รวมเลขที่ + ถนน/อาคาร
-      addressLine: [_unitController.text.trim(), _roadController.text.trim()]
-          .where((e) => e.isNotEmpty)
-          .join(' '),
+      addressLine: [
+        _unitController.text.trim(),
+        // _roadController.text.trim(),
+      ].where((e) => e.isNotEmpty).join(' '),
       note: note.isEmpty ? null : note,
     );
 
     AppOverlays.showLoading(context);
-    final ok = await widget.viewModel.saveAddress(
+    final result = await widget.viewModel.saveAddress(
       addressId: widget.mode == ShipToDetailMode.edit
           ? widget.address?.id
           : null,
@@ -155,8 +194,10 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     if (!mounted) return;
     AppOverlays.hideLoading();
 
-    if (ok) {
+    if (result.isSuccess) {
       context.pop();
+      // โหลดรายการใหม่ในหน้า list หลัง pop กลับ
+      widget.viewModel.load();
     } else {
       AppOverlays.showBrownyDialog(context, message: context.wording.errorUi);
     }
@@ -179,16 +220,17 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     );
   }
 
-  /// เรียก API ลบ — สำเร็จแล้ว pop กลับ (list หน้า [CustomerShipToPage]
-  /// refresh เองจาก [CustomerShipToViewModel])
+  /// เรียก API ลบ — สำเร็จแล้ว pop กลับ แล้วค่อย load รายการใหม่
   Future<void> _confirmDelete(int id) async {
     AppOverlays.showLoading(context);
-    final ok = await widget.viewModel.deleteAddress(id);
+    final result = await widget.viewModel.deleteAddress(id);
     if (!mounted) return;
     AppOverlays.hideLoading();
 
-    if (ok) {
+    if (result.isSuccess) {
       context.pop();
+      // หลัง pop กลับหน้า list แล้ว ค่อยโหลดรายการใหม่
+      widget.viewModel.load();
     } else {
       AppOverlays.showBrownyDialog(context, message: context.wording.errorUi);
     }
@@ -220,6 +262,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
             spacing: AppDims.size_16.h,
             children: [
               _field(
+                // ชื่อผู้รับสินค้า
                 context,
                 label: context.wording.recipientName,
                 required: true,
@@ -229,29 +272,34 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
                 ),
               ),
               _field(
+                // จังหวัด/เขต(อำเภอ)/รหัสไปรษณีย์/แขวง(ตำบล)
                 context,
                 label: context.wording.provinceDistrictZipSubdistrict,
                 required: true,
                 child: _tapInput(context),
               ),
+              // _field(
+              //   // ถนน/ชื่ออาคาร
+              //   context,
+              //   label: context.wording.roadBuilding,
+              //   required: true,
+              //   child: _textInput(_roadController),
+              // ),
               _field(
-                context,
-                label: context.wording.roadBuilding,
-                required: true,
-                child: _textInput(_roadController),
-              ),
-              _field(
+                // เลขที่ยูนิต/ชั้น หรือบ้านเลขที่
                 context,
                 label: context.wording.unitFloorHouseNo,
                 required: true,
                 child: _textInput(_unitController),
               ),
               _field(
+                // ข้อมูลที่อยู่เพิ่มเติม (ถ้ามี)
                 context,
                 label: context.wording.additionalAddressInfo,
                 child: _textInput(_noteController),
               ),
               _field(
+                // เบอร์โทรศัพท์มือถือ
                 context,
                 label: context.wording.mobilePhone,
                 child: _textInput(
@@ -320,12 +368,16 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
     );
   }
 
-  /// ช่องที่อยู่ (จังหวัด/เขต/แขวง) — [AppTextFormField] read-only แตะเปิด picker
+  /// ช่องที่อยู่ (จังหวัด/เขต/แขวง) — read-only แตะเปิด picker
+  ///
+  /// `maxLines: null` ให้ field ขยายความสูงตามข้อความ — user เห็นข้อมูลเต็ม
+  /// ทุกบรรทัด (ไม่ ellipsis เหมือนใน design)
   Widget _tapInput(BuildContext context) {
     return AppTextFormField(
       controller: _geoController,
       readOnly: true,
       onTap: _onPickAddress,
+      maxLines: null,
       decoration: InputDecoration(
         hintText: context.wording.deliveryAddressHint,
         hintStyle: context.inputTextStyle.copyWith(color: AppColors.gray500),
@@ -392,7 +444,7 @@ class _ShipToDetailPageState extends State<ShipToDetailPage> {
             ListenableBuilder(
               listenable: Listenable.merge([
                 _nameController,
-                _roadController,
+                // _roadController,
                 _unitController,
               ]),
               builder: (context, _) {

@@ -55,6 +55,7 @@ AddressData _$AddressDataFromJson(Map<String, dynamic> json) => AddressData(
   district: json['district'] as String?,
   subdistrict: json['subdistrict'] as String?,
   address: json['address'] as String?,
+  fullAddressServer: json['full_address'] as String?,
   note: json['note'] as String?,
   isDefault: json['is_default'] as bool?,
 );
@@ -72,6 +73,7 @@ Map<String, dynamic> _$AddressDataToJson(AddressData instance) =>
       'district': instance.district,
       'subdistrict': instance.subdistrict,
       'address': instance.address,
+      'full_address': instance.fullAddressServer,
       'note': instance.note,
       'is_default': instance.isDefault,
     };

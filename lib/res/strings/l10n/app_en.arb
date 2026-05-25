@@ -655,5 +655,8 @@
   "orderProduct": "Place order",
   "deleteAddress": "Delete address",
   "deleteAddressTitle": "Delete this address?",
-  "deleteAddressRecheck": "Please double-check before confirming."
+  "deleteAddressRecheck": "Please double-check before confirming.",
+  "selectProvince": "Select province",
+  "selectDistrict": "Select district",
+  "selectSubdistrict": "Select subdistrict"
 }

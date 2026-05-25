@@ -604,5 +604,8 @@
   "orderProduct": "下单",
   "deleteAddress": "删除地址",
   "deleteAddressTitle": "确定要删除此地址吗",
-  "deleteAddressRecheck": "请再次确认"
+  "deleteAddressRecheck": "请再次确认",
+  "selectProvince": "选择省份",
+  "selectDistrict": "选择区/县",
+  "selectSubdistrict": "选择街道/乡"
 }

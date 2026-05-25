@@ -3543,6 +3543,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please double-check before confirming.'**
   String get deleteAddressRecheck;
+
+  /// No description provided for @selectProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Select province'**
+  String get selectProvince;
+
+  /// No description provided for @selectDistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Select district'**
+  String get selectDistrict;
+
+  /// No description provided for @selectSubdistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Select subdistrict'**
+  String get selectSubdistrict;
 }
 
 class _AppLocalizationsDelegate

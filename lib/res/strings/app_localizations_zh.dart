@@ -1751,4 +1751,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteAddressRecheck => '请再次确认';
+
+  @override
+  String get selectProvince => '选择省份';
+
+  @override
+  String get selectDistrict => '选择区/县';
+
+  @override
+  String get selectSubdistrict => '选择街道/乡';
 }

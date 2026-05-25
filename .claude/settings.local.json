@@ -22,7 +22,11 @@
       "mcp__figma-dev-mode__get_screenshot",
       "mcp__figma-dev-mode__get_design_context",
       "Bash(curl -s -o figma_dialog.png \"https://www.figma.com/api/mcp/asset/d31a7c0f-8032-40e9-b12b-19c2d43d8c4f\")",
-      "Bash(curl -s -o figma_bottombar.png \"https://www.figma.com/api/mcp/asset/ed4846f7-0e3f-4b26-8dc3-b466e246b56b\")"
+      "Bash(curl -s -o figma_bottombar.png \"https://www.figma.com/api/mcp/asset/ed4846f7-0e3f-4b26-8dc3-b466e246b56b\")",
+      "Bash(grep -nB1 \"@Query\" lib/core/data/remote/app_client.dart)",
+      "Bash(curl -s -o picker1.png \"https://www.figma.com/api/mcp/asset/d5454e8f-b048-4f7b-8d64-20ac1dba0178\")",
+      "Bash(curl -s -o picker2.png \"https://www.figma.com/api/mcp/asset/2a9add1b-f027-4a97-9f89-c93ac05f3447\")",
+      "Bash(curl -s -o tapinput.png \"https://www.figma.com/api/mcp/asset/89d4364d-508b-4c8c-b2e9-91104ecd10f1\")"
     ]
   }
 }
