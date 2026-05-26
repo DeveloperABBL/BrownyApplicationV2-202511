@@ -100,8 +100,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
     await _viewmodel.fetchBannersHighlight();
     // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
     await _viewmodel.fetchWorkingMachines();
-    // ดึงสินค้า Browny Shop
+    // ดึงสินค้า Browny Shop + ประเภทสำหรับ chip filter
     unawaited(_viewmodel.fetchShopProducts());
+    unawaited(_viewmodel.fetchShopProductTypes());
     // ดึงสถานะ Browny Live (เปิด/ปิดไอคอน + ลิงก์)
     unawaited(_viewmodel.fetchBrownyLive());
 
@@ -312,6 +313,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
   Widget _buildShopCategoriesGridWrapper(BuildContext context) {
     return BrownyShopCategoriesGridSection(
       productsListenable: _viewmodel.shopProductsNotifier,
+      productTypesListenable: _viewmodel.shopProductTypesNotifier,
       selectedCategoryListenable: _viewmodel.shopSelectedCategoryNotifier,
       onCategorySelected: _viewmodel.onShopCategorySelected,
       showShowMore: true,

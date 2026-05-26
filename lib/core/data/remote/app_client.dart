@@ -810,6 +810,16 @@ abstract class AppClient {
     @Query('customer_id') String customerId,
   );
 
+  /// DONG 2026-05-26
+  ///
+  /// API fetch รายการประเภทสินค้า (product types) — ใช้สำหรับกรอง
+  /// สินค้าใน Browny Shop (Tab/Chip categories)
+  ///
+  /// Response:
+  /// - ProductTypesResponse with list of [ProductTypeData] (id + ContentLocalizeData name)
+  @GET('/product-types')
+  Future<HttpResponse<ProductTypesResponse>> fetchProductTypes();
+
   /// DONG 2026-05-09
   ///
   /// API fetch รายละเอียดสินค้า Browny Shop
@@ -918,6 +928,55 @@ abstract class AppClient {
   @DELETE('/customer/{customerId}/cart')
   Future<HttpResponse<CartClearResponse>> clearCart(
     @Path('customerId') String customerId,
+  );
+
+  /// DONG 2026-05-26
+  ///
+  /// API สร้าง draft order ของ Browny Shop ก่อนชำระเงิน
+  /// (รวมยอด, ส่วนลด, ที่อยู่จัดส่ง, รายการสินค้า)
+  ///
+  /// Body:
+  /// - CheckoutDraftRequest (customer_id, coupon_customer_id, payment_method)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse with order data (id, totals, shipping_address, items)
+  @POST('/browny-shop/checkout/draft')
+  Future<HttpResponse<CheckoutDraftResponse>> createCheckoutDraft(
+    @Body() CheckoutDraftRequest body,
+  );
+
+  /// DONG 2026-05-26
+  ///
+  /// API fetch รายละเอียด draft order ของ Browny Shop ตาม orderId
+  /// (data shape เดียวกับ POST /checkout/draft + เพิ่ม `summary` ละเอียดกว่า)
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid ของ draft order)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse with order data + breakdown summary
+  @GET('/browny-shop/checkout/{orderId}')
+  Future<HttpResponse<CheckoutDraftResponse>> fetchCheckoutDraft(
+    @Path('orderId') String orderId,
+  );
+
+  /// DONG 2026-05-26
+  ///
+  /// API แก้ไข draft order — เปลี่ยนคูปอง / วิธีชำระเงิน
+  /// (ส่งเฉพาะ field ที่จะแก้ field ที่ไม่ส่ง / ส่ง null = ไม่กำหนด)
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid ของ draft order)
+  ///
+  /// Body:
+  /// - CheckoutUpdateRequest (coupon_customer_id, payment_method)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse (data shape เดียวกับ GET — มี summary recalculated ใหม่)
+  @PATCH('/browny-shop/checkout/{orderId}')
+  Future<HttpResponse<CheckoutDraftResponse>> updateCheckoutDraft(
+    @Path('orderId') String orderId,
+    @Body() CheckoutUpdateRequest body,
   );
 
   /// DONG 2026-05-18

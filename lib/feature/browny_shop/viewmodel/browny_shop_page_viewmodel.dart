@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
@@ -22,9 +23,36 @@ class BrownyShopPageViewmodel extends AppViewModel {
   @override
   void dispose() {
     _productsNotifier.dispose();
+    _productTypesNotifier.dispose();
     _selectedCategoryNotifier.dispose();
     _flashSalesNotifier.dispose();
     super.dispose();
+  }
+
+  /// รายการประเภทสินค้า (chip filter)
+  final ValueNotifier<UiResult<List<ProductTypeData>>> _productTypesNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<ProductTypeData>>> get productTypesNotifier =>
+      _productTypesNotifier;
+
+  /// ดึงรายการประเภทสินค้าจาก API
+  Future<void> fetchProductTypes() async {
+    _productTypesNotifier.value = UiResult.loading();
+    final result = await _repo.fetchProductTypes();
+    if (result.hasError) {
+      _productTypesNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _productTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    final types = result.data.productType ?? const <ProductTypeData>[];
+    if (types.isEmpty) {
+      _productTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    _productTypesNotifier.value = UiResult.success(data: types);
   }
 
   /// รายการ Flash Sale ที่ active อยู่

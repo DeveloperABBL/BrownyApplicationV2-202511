@@ -46,6 +46,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _vm.attachContext(context);
       _vm.fetchProducts();
+      _vm.fetchProductTypes();
       _vm.fetchFlashSales();
     });
   }
@@ -84,6 +85,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
             BrownyShopCategoriesGridSection(
               topBoxDecoration: BoxDecoration(),
               productsListenable: _vm.productsNotifier,
+              productTypesListenable: _vm.productTypesNotifier,
               selectedCategoryListenable: _vm.selectedCategoryNotifier,
               onCategorySelected: _vm.onCategorySelected,
               onProductTap: (p) {

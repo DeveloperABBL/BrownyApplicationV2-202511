@@ -26,7 +26,8 @@
       "Bash(grep -nB1 \"@Query\" lib/core/data/remote/app_client.dart)",
       "Bash(curl -s -o picker1.png \"https://www.figma.com/api/mcp/asset/d5454e8f-b048-4f7b-8d64-20ac1dba0178\")",
       "Bash(curl -s -o picker2.png \"https://www.figma.com/api/mcp/asset/2a9add1b-f027-4a97-9f89-c93ac05f3447\")",
-      "Bash(curl -s -o tapinput.png \"https://www.figma.com/api/mcp/asset/89d4364d-508b-4c8c-b2e9-91104ecd10f1\")"
+      "Bash(curl -s -o tapinput.png \"https://www.figma.com/api/mcp/asset/89d4364d-508b-4c8c-b2e9-91104ecd10f1\")",
+      "WebFetch(domain:web.postman.co)"
     ]
   }
 }

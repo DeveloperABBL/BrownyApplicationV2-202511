@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
@@ -43,6 +44,7 @@ class HomePageViewmodel extends AppViewModel {
     _workingMachinesNotifier.dispose();
     _customerNotificationsCountNotifier.dispose();
     _shopProductsNotifier.dispose();
+    _shopProductTypesNotifier.dispose();
     _shopSelectedCategoryNotifier.dispose();
     _brownyLiveNotifier.dispose();
     super.dispose();
@@ -102,6 +104,12 @@ class HomePageViewmodel extends AppViewModel {
   ValueListenable<UiResult<List<ProductData>>> get shopProductsNotifier =>
       _shopProductsNotifier;
 
+  /// Notifier fetch รายการประเภทสินค้า Browny Shop (chip filter)
+  final ValueNotifier<UiResult<List<ProductTypeData>>>
+  _shopProductTypesNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<ProductTypeData>>>
+  get shopProductTypesNotifier => _shopProductTypesNotifier;
+
   /// Notifier เก็บ category ที่ user เลือกอยู่ใน Shop section
   /// ค่าเริ่มต้น = "all"
   final ValueNotifier<String> _shopSelectedCategoryNotifier = ValueNotifier(
@@ -145,6 +153,7 @@ class HomePageViewmodel extends AppViewModel {
     await fetchWorkingMachines();
     unawaited(fetchCustomerNotifications());
     unawaited(fetchBrownyLive());
+    unawaited(fetchShopProductTypes());
     final profileResult = await _repo.fetchProfileInfo('');
     if (profileResult.isSuccess) {
       currentCustomerProvider.newUser = UserModel.fromCustomerProfileData(
@@ -433,6 +442,28 @@ class HomePageViewmodel extends AppViewModel {
     if (_shopSelectedCategoryNotifier.value == category) return;
     _shopSelectedCategoryNotifier.value = category;
     await fetchShopProducts(productType: category);
+  }
+
+  /// DONG 2026-05-26
+  ///
+  /// API fetch รายการประเภทสินค้า Browny Shop — ใช้สร้าง chip filter
+  Future<void> fetchShopProductTypes() async {
+    _shopProductTypesNotifier.value = UiResult.loading();
+    final result = await _brownyShopRepo.fetchProductTypes();
+    if (result.hasError) {
+      _shopProductTypesNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _shopProductTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    final types = result.data.productType ?? const <ProductTypeData>[];
+    if (types.isEmpty) {
+      _shopProductTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    _shopProductTypesNotifier.value = UiResult.success(data: types);
   }
 
   /// DONG 2026-05-10

@@ -96,6 +96,7 @@ class __CoinContentState extends State<_CoinContent> {
       await _viewModel.fetchCoinCliamData();
       if (!mounted) return;
       unawaited(_viewModel.fetchShopProducts());
+      unawaited(_viewModel.fetchShopProductTypes());
       _showCondition(context);
     });
   }
@@ -261,6 +262,7 @@ class __CoinContentState extends State<_CoinContent> {
             BrownyShopCategoriesGridSection(
               topBoxDecoration: BoxDecoration(),
               productsListenable: _viewModel.shopProductsNotifier,
+              productTypesListenable: _viewModel.shopProductTypesNotifier,
               selectedCategoryListenable:
                   _viewModel.shopSelectedCategoryNotifier,
               onCategorySelected: _viewModel.onShopCategorySelected,

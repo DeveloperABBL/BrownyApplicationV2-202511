@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/product_item_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +14,7 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
   const BrownyShopCategoriesGridSection({
     super.key,
     required this.productsListenable,
+    required this.productTypesListenable,
     required this.selectedCategoryListenable,
     required this.onCategorySelected,
     this.showShowMore = false,
@@ -23,6 +25,11 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
   });
 
   final ValueListenable<UiResult<List<ProductData>>> productsListenable;
+
+  /// รายการประเภทสินค้าสำหรับ chip filter — มาจาก API
+  /// (chip.value = ProductTypeData.id, chip.label = name ตาม locale)
+  final ValueListenable<UiResult<List<ProductTypeData>>> productTypesListenable;
+
   final ValueListenable<String> selectedCategoryListenable;
   final ValueChanged<String> onCategorySelected;
 
@@ -63,47 +70,62 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
     );
   }
 
+  /// Chip filter — รายการมาจาก API (`productTypesListenable`)
+  /// value = [ProductTypeData.id], label = name ตาม `context.languageCode`
   Widget _buildChips(BuildContext context) {
-    final chips = <_ShopChip>[
-      _ShopChip(value: 'all', label: context.wording.all),
-      _ShopChip(value: 'popular', label: context.wording.popular),
-      _ShopChip(value: 'browny_sale', label: context.wording.brownySale),
-      _ShopChip(value: 'browny_doll', label: context.wording.brownyDoll),
-      _ShopChip(value: 'housework', label: context.wording.housework),
-    ];
-
     return SizedBox(
       height: AppDims.size_24.h,
-      child: ValueListenableBuilder<String>(
-        valueListenable: selectedCategoryListenable,
-        builder: (context, selected, _) {
-          return ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: chips.length,
-            separatorBuilder: (_, _) => SizedBox(width: AppDims.size_8.w),
-            itemBuilder: (context, index) {
-              final chip = chips[index];
-              final isActive = chip.value == selected;
-              return GestureDetector(
-                onTap: () => onCategorySelected(chip.value),
-                child: Container(
-                  height: AppDims.size_24.h,
-                  padding: EdgeInsets.symmetric(horizontal: AppDims.size_8.w),
-                  decoration: BoxDecoration(
-                    color: isActive ? AppColors.primary : AppColors.transparent,
-                    border: Border.all(
-                      color: isActive ? AppColors.primary : AppColors.gray400,
+      child: ValueListenableBuilder(
+        valueListenable: productTypesListenable,
+        builder: (context, typesResult, _) {
+          final types = typesResult.data ?? const <ProductTypeData>[];
+          // loading / error / empty — ไม่แสดง chip (data ยังไม่พร้อม)
+          if (types.isEmpty) return const SizedBox.shrink();
+          return ValueListenableBuilder<String>(
+            valueListenable: selectedCategoryListenable,
+            builder: (context, selected, _) {
+              final locale = context.languageCode;
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: types.length,
+                separatorBuilder: (_, _) => SizedBox(width: AppDims.size_8.w),
+                itemBuilder: (context, index) {
+                  final type = types[index];
+                  // chip chain (selected category / fetch param / query) เป็น String
+                  // → convert id (int) ตรงนี้
+                  final value = type.id?.toString() ?? '';
+                  final label = type.getNameDisplay(locale);
+                  final isActive = value == selected;
+                  return GestureDetector(
+                    onTap: () => onCategorySelected(value),
+                    child: Container(
+                      height: AppDims.size_24.h,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_8.w,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primary
+                            : AppColors.transparent,
+                        border: Border.all(
+                          color: isActive
+                              ? AppColors.primary
+                              : AppColors.gray400,
+                        ),
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      alignment: Alignment.center,
+                      child: AppText(
+                        label,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: isActive
+                              ? AppColors.white
+                              : AppColors.textPrimary,
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
-                  alignment: Alignment.center,
-                  child: AppText(
-                    chip.label,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: isActive ? AppColors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           );
@@ -205,9 +227,3 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
   }
 }
 
-/// Chip data สำหรับ category filter
-class _ShopChip {
-  const _ShopChip({required this.value, required this.label});
-  final String value;
-  final String label;
-}

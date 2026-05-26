@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/response/coin_claimed_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coin_history_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
@@ -29,8 +30,37 @@ class CoinViewmModel extends AppViewModel {
     _coinHistoryNotifier.dispose();
     _coinHistoryGroupsNotifier.dispose();
     _shopProductsNotifier.dispose();
+    _shopProductTypesNotifier.dispose();
     _shopSelectedCategoryNotifier.dispose();
     super.dispose();
+  }
+
+  /// Notifier fetch รายการประเภทสินค้า Browny Shop (chip filter)
+  final ValueNotifier<UiResult<List<ProductTypeData>>>
+  _shopProductTypesNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<ProductTypeData>>>
+  get shopProductTypesNotifier => _shopProductTypesNotifier;
+
+  /// DONG 2026-05-26
+  ///
+  /// API fetch รายการประเภทสินค้า Browny Shop — ใช้สร้าง chip filter
+  Future<void> fetchShopProductTypes() async {
+    _shopProductTypesNotifier.value = UiResult.loading();
+    final result = await brownyShopRepo.fetchProductTypes();
+    if (result.hasError) {
+      _shopProductTypesNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _shopProductTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    final types = result.data.productType ?? const <ProductTypeData>[];
+    if (types.isEmpty) {
+      _shopProductTypesNotifier.value = UiResult.empty();
+      return;
+    }
+    _shopProductTypesNotifier.value = UiResult.success(data: types);
   }
 
   // ========== ValueNotifier, Controller ==========

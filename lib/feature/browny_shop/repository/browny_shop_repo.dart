@@ -7,6 +7,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/cart_it
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/data/repo/app_repository.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -38,6 +39,9 @@ mixin BrownyShopDataSourceMixin {
 
   /// API fetch รายการ Flash Sale ที่ active อยู่ (Browny Shop)
   Future<RepoResult<FlashSalesResponse>> fetchFlashSales();
+
+  /// API fetch รายการประเภทสินค้า (สำหรับ chip filter) — Browny Shop
+  Future<RepoResult<ProductTypesResponse>> fetchProductTypes();
 
   /// API fetch รายละเอียดสินค้า Browny Shop
   ///
@@ -122,6 +126,17 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
       if (!response.isSuccessful) {
         return RepoResult.empty();
       }
+      return RepoResult.success(data: response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<ProductTypesResponse>> fetchProductTypes() async {
+    try {
+      final response = await requireRemote.fetchProductTypes();
+      if (!response.isSuccessful) return RepoResult.empty();
       return RepoResult.success(data: response.data);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
