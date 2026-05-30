@@ -104,6 +104,35 @@ class CouponData {
   @JsonKey(name: 'applies_to')
   final String? appliesTo;
 
+  // ฟิลด์พิเศษสำหรับ Browny Shop coupon
+  /// "product" / "shipping" — เป้าหมายของส่วนลด
+  @JsonKey(name: 'discount_target')
+  final String? discountTarget;
+
+  /// "fixed" / "percent" — ประเภทส่วนลด
+  @JsonKey(name: 'discount_type')
+  final String? discountType;
+
+  /// มูลค่าส่วนลด (เช่น "50.00" สำหรับ fixed, "10.00" สำหรับ percent)
+  @JsonKey(name: 'value')
+  final String? value;
+
+  /// เพดานส่วนลด (เฉพาะ discount_type = percent) — null = ไม่จำกัด
+  @JsonKey(name: 'max_discount')
+  final String? maxDiscount;
+
+  /// ยอดสั่งซื้อขั้นต่ำที่ใช้คูปองได้
+  @JsonKey(name: 'min_order_amount')
+  final String? minOrderAmount;
+
+  /// ใช้คู่กับโปรโมชั่นอื่นได้หรือไม่ (เช่น Flash Sale)
+  @JsonKey(name: 'allow_with_promotion')
+  final bool? allowWithPromotion;
+
+  /// ใช้คู่กับส่วนลดสินค้าได้หรือไม่
+  @JsonKey(name: 'allow_with_product_discount')
+  final bool? allowWithProductDiscount;
+
   CouponData({
     this.couponId,
     this.customerCouponId,
@@ -135,6 +164,13 @@ class CouponData {
     this.redeemPrice,
     this.deliveryFee,
     this.appliesTo,
+    this.discountTarget,
+    this.discountType,
+    this.value,
+    this.maxDiscount,
+    this.minOrderAmount,
+    this.allowWithPromotion,
+    this.allowWithProductDiscount,
   });
 
   factory CouponData.fromJson(Map<String, dynamic> json) =>
@@ -225,4 +261,18 @@ class CouponEVoucherResponse {
       _$CouponEVoucherResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CouponEVoucherResponseToJson(this);
+}
+
+/// Response สำหรับคูปอง Browny Shop ของลูกค้า
+@JsonSerializable()
+class CouponBrownyShopResponse {
+  @JsonKey(name: 'data')
+  final List<CouponData>? data;
+
+  CouponBrownyShopResponse({this.data});
+
+  factory CouponBrownyShopResponse.fromJson(Map<String, dynamic> json) =>
+      _$CouponBrownyShopResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CouponBrownyShopResponseToJson(this);
 }

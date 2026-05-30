@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/scaner/screen/scanner_page.dart';
@@ -17,6 +16,10 @@ enum CouponVoucherState {
   purshasing,
   redeeming,
   brownyShop,
+
+  /// เปิดจาก Browny Shop เพื่อ "เลือกใช้คูปอง" — แสดง checkbox + default checked
+  /// ที่คูปองที่เลือกไว้ก่อนหน้า (กดคูปองเดิมซ้ำ = ยกเลิกการใช้งาน)
+  brownyUsing,
 }
 
 class CouponVoucherPage extends StatelessWidget {
@@ -25,6 +28,7 @@ class CouponVoucherPage extends StatelessWidget {
     required this.state,
     this.autoCollectQRData,
     this.machineProgram,
+    this.brownyShopSelectedCouponId,
   });
 
   static final pagePath = '/coupon_voucher';
@@ -39,12 +43,17 @@ class CouponVoucherPage extends StatelessWidget {
   /// และ re-fetch หลัง collectCoupon สำเร็จ
   final MachineProgramModel? machineProgram;
 
+  /// customer_coupon_id ของคูปองที่เลือกไว้ก่อนหน้า (เฉพาะ flow brownyUsing)
+  /// ใช้ default-check + ตรวจการกดซ้ำเพื่อยกเลิก
+  final int? brownyShopSelectedCouponId;
+
   /// util function route to pageName
   static Future<T?> goToPage<T>(
     BuildContext context, {
     CouponVoucherState state = CouponVoucherState.purshasing,
     String? autoCollectQRData,
     MachineProgramModel? machineUsing,
+    int? brownyShopSelectedCouponId,
   }) async {
     if (context.read<CustomerProvider>().current.isGuest) {
       return await AuthenticationPage.goToPage(
@@ -54,7 +63,12 @@ class CouponVoucherPage extends StatelessWidget {
     }
     return await context.pushNamed(
       CouponVoucherPage.pageName,
-      extra: [state, autoCollectQRData, machineUsing],
+      extra: [
+        state,
+        autoCollectQRData,
+        machineUsing,
+        brownyShopSelectedCouponId,
+      ],
     );
   }
 
@@ -71,6 +85,7 @@ class CouponVoucherPage extends StatelessWidget {
         state: state,
         autoCollectQRData: autoCollectQRData,
         machineProgram: machineProgram,
+        brownyShopSelectedCouponId: brownyShopSelectedCouponId,
       ),
     );
   }
@@ -81,11 +96,13 @@ class _CouponVoucherWidget extends StatefulWidget {
     required this.state,
     this.autoCollectQRData,
     this.machineProgram,
+    this.brownyShopSelectedCouponId,
   });
 
   final CouponVoucherState state;
   final String? autoCollectQRData;
   final MachineProgramModel? machineProgram;
+  final int? brownyShopSelectedCouponId;
 
   @override
   State<_CouponVoucherWidget> createState() => _CouponVoucherWidgetState();
@@ -108,6 +125,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
       case CouponVoucherState.redeeming:
         return 0;
       case CouponVoucherState.brownyShop:
+      case CouponVoucherState.brownyUsing:
         return 2;
     }
   }
@@ -364,10 +382,9 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
               ),
 
               // Browny Shop
-              _buildTabContent(
-                context: context,
-                icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
-                title: context.wording.brownyShop,
+              _BrownyShopCoupon(
+                viewModel: _viewmodel,
+                selectedCouponId: widget.brownyShopSelectedCouponId,
               ),
             ],
           ),
@@ -484,12 +501,40 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
       ],
     );
   }
+}
 
-  Widget _buildTabContent({
-    required BuildContext context,
-    required Widget icon,
-    required String title,
-  }) {
+/// Tab "Browny Shop" — คูปองส่วนลดของร้านค้า Browny Shop
+///
+/// เบื้องต้นแสดง section เดียว (คูปองส่วนลด) — backend ยังแยกหมวดไม่ละเอียด
+/// เท่าคูปองซักอบ ([_CustomerWashDryCouponWidget]) จึงยังไม่ group
+class _BrownyShopCoupon extends StatefulWidget {
+  const _BrownyShopCoupon({
+    required TransactionsViewmodel viewModel,
+    this.selectedCouponId,
+  }) : _viewModel = viewModel;
+
+  final TransactionsViewmodel _viewModel;
+
+  /// customer_coupon_id ที่เลือกไว้ก่อนหน้า (flow brownyUsing) — default checked
+  final int? selectedCouponId;
+
+  @override
+  State<_BrownyShopCoupon> createState() => _BrownyShopCouponState();
+}
+
+class _BrownyShopCouponState extends State<_BrownyShopCoupon> {
+  bool _expanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await widget._viewModel.fetchCustomerBrownyShopCoupon();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: AppDims.size_16.w,
@@ -501,322 +546,146 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
       ),
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Assets.png.brownySuccess1.image(
-                width: 145.w,
-                height: 100.h,
-              ),
-            ),
-            AppDims.vericalPadding_16,
+        child: ValueListenableBuilder(
+          valueListenable: widget._viewModel.brownyShopCouponNotifier,
+          builder: (context, result, child) {
+            if (result.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-            AppText(
-              // พบกันเร็ว ๆ นี้
-              ContentLocalizeData(
-                en: 'Coming Soon.',
-                zh: '敬请期待',
-                th: 'พบกันเร็ว ๆ นี้',
-              ).getTextByLocale(context.languageCode),
-              style: context.textTheme.labelLarge!.copyWith(
-                fontSize: AppDims.size_16.sp,
-              ),
-            ),
+            // คูปองที่ใช้ได้เท่านั้น
+            final coupons = (result.data ?? [])
+                .where((c) => c.brownyCanUse)
+                .toList();
 
-            // ElevatedButton.icon(
-            //   onPressed: null,
-            //   icon: Assets.svg.icCouponWashRoundedGreen.svg(),
-            //   label: AppText(
-            //     'คูปองซัก',
-            //     style: context.textTheme.labelLarge,
-            //   ),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: AppColors.transparent,
-            //     foregroundColor: AppColors.primary,
-            //     alignment: AlignmentDirectional.centerStart,
-            //     padding: EdgeInsets.zero,
-            //     disabledBackgroundColor: AppColors.transparent,
-            //     overlayColor: AppColors.transparent,
-            //   ),
-            // ),
-            // AppDims.vericalPadding_16,
+            if (result.isEmpty || result.hasError || coupons.isEmpty) {
+              return _buildSectionHeaderWithEmpty(context);
+            }
 
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Assets.png.brownyError1.image(
-            //         width: 145.w,
-            //         height: 100.h,
-            //       ),
-            //     ),
-            //     AppDims.vericalPadding_16,
-
-            //     AppText(
-            //       'ไม่พบคูปอง',
-            //       style: context.textTheme.labelLarge!.copyWith(
-            //         fontSize: AppDims.size_16.sp,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-
-            // ...List.generate(6, (index) => '').map(
-            //   (e) => CouponEVoucherCardWidget(
-            //     icon: Assets.png.brownyCreatePin.image(),
-            //     title: 'Title',
-            //     description: 'Description',
-            //     detailUsing: 'Detail using',
-            //     expired: 'Expired',
-            //   ),
-            // ),
-            // ElevatedButton.icon(
-            //   onPressed: null,
-            //   icon: Assets.svg.icCouponDryRoundedGreen.svg(),
-            //   label: AppText(
-            //     'คูปองอบ',
-            //     style: context.textTheme.labelLarge,
-            //   ),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: AppColors.transparent,
-            //     foregroundColor: AppColors.primary,
-            //     alignment: AlignmentDirectional.centerStart,
-            //     padding: EdgeInsets.zero,
-            //     disabledBackgroundColor: AppColors.transparent,
-            //     overlayColor: AppColors.transparent,
-            //   ),
-            // ),
-            // AppDims.vericalPadding_16,
-
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Assets.png.brownyError1.image(
-            //         width: 145.w,
-            //         height: 100.h,
-            //       ),
-            //     ),
-            //     AppDims.vericalPadding_16,
-
-            //     AppText(
-            //       'ไม่พบคูปอง',
-            //       style: context.textTheme.labelLarge!.copyWith(
-            //         fontSize: AppDims.size_16.sp,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-
-            // ...List.generate(3, (index) => '').map(
-            //   (e) => Container(
-            //     // Disable
-            //     // foregroundDecoration: BoxDecoration(
-            //     //   color: Colors.grey,
-            //     //   backgroundBlendMode: BlendMode.saturation,
-            //     // ),
-            //     height: 85.h,
-            //     margin: EdgeInsets.only(bottom: AppDims.size_12),
-            //     decoration: BoxDecoration(
-            //       border: BoxBorder.all(
-            //         width: 1,
-            //         color: AppColors.primary,
-            //       ),
-            //       color: AppColors.white,
-            //       borderRadius: BorderRadius.circular(8.r),
-            //     ),
-            //     child: Row(
-            //       children: [
-            //         // Icon
-            //         Container(
-            //           width: 100,
-            //           height: 85.h,
-            //           padding: EdgeInsets.all(8),
-            //           decoration: BoxDecoration(
-            //             border: BoxBorder.fromLTRB(
-            //               right: BorderSide(
-            //                 width: 1,
-            //                 color: AppColors.primary,
-            //               ),
-            //             ),
-            //             color: AppColors.white,
-            //             borderRadius: BorderRadius.only(
-            //               bottomLeft: Radius.circular(8.r),
-            //               topLeft: Radius.circular(8.r),
-            //             ),
-            //           ),
-            //           // child: Icon(Icons.discount_rounded),
-            //           child: Assets.png.brownyCreatePin.image(),
-            //         ),
-
-            //         Container(
-            //           padding: EdgeInsets.all(AppDims.size_8),
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               AppText(
-            //                 'Title',
-            //                 style: context.textTheme.titleSmall,
-            //               ),
-            //               AppText(
-            //                 'Description',
-            //                 style: context.textTheme.labelSmall!.copyWith(
-            //                   color: AppColors.primary,
-            //                 ),
-            //               ),
-            //               Spacer(),
-
-            //               RichText(
-            //                 text: TextSpan(
-            //                   text: 'Expried',
-            //                   style: context.textTheme.bodySmall?.copyWith(
-            //                     fontSize: AppDims.size_10.sp,
-            //                     color: AppColors.textSecondary,
-            //                   ),
-            //                   children: [
-            //                     TextSpan(text: ' '),
-            //                     TextSpan(
-            //                       text: 'เงื่อนไข',
-            //                       style: context.textTheme.labelSmall?.copyWith(
-            //                         color: AppColors.primary,
-            //                         fontSize: AppDims.size_10.sp,
-            //                       ),
-            //                       recognizer: TapGestureRecognizer()
-            //                         ..onTap = () {},
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            // ElevatedButton.icon(
-            //   onPressed: null,
-            //   icon: Assets.svg.icCrossRoundGreen.svg(),
-            //   label: AppText(
-            //     'คูปองที่ใช้ไม่ได้',
-            //     style: context.textTheme.labelLarge,
-            //   ),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: AppColors.transparent,
-            //     foregroundColor: AppColors.primary,
-            //     alignment: AlignmentDirectional.centerStart,
-            //     padding: EdgeInsets.zero,
-            //     disabledBackgroundColor: AppColors.transparent,
-            //     overlayColor: AppColors.transparent,
-            //   ),
-            // ),
-            // AppDims.vericalPadding_16,
-
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Assets.png.brownyError1.image(
-            //         width: 145.w,
-            //         height: 100.h,
-            //       ),
-            //     ),
-            //     AppDims.vericalPadding_16,
-
-            //     AppText(
-            //       'ไม่พบคูปอง',
-            //       style: context.textTheme.labelLarge!.copyWith(
-            //         fontSize: AppDims.size_16.sp,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // ...List.generate(2, (index) => '').map(
-            //   (e) => Container(
-            //     // Disable
-            //     // foregroundDecoration: BoxDecoration(
-            //     //   color: Colors.grey,
-            //     //   backgroundBlendMode: BlendMode.saturation,
-            //     // ),
-            //     height: 85.h,
-            //     margin: EdgeInsets.only(bottom: AppDims.size_12),
-            //     decoration: BoxDecoration(
-            //       border: BoxBorder.all(
-            //         width: 1,
-            //         color: AppColors.primary,
-            //       ),
-            //       color: AppColors.white,
-            //       borderRadius: BorderRadius.circular(8.r),
-            //     ),
-            //     child: Row(
-            //       children: [
-            //         // Icon
-            //         Container(
-            //           width: 100,
-            //           height: 85.h,
-            //           padding: EdgeInsets.all(8),
-            //           decoration: BoxDecoration(
-            //             border: BoxBorder.fromLTRB(
-            //               right: BorderSide(
-            //                 width: 1,
-            //                 color: AppColors.primary,
-            //               ),
-            //             ),
-            //             color: AppColors.white,
-            //             borderRadius: BorderRadius.only(
-            //               bottomLeft: Radius.circular(8.r),
-            //               topLeft: Radius.circular(8.r),
-            //             ),
-            //           ),
-            //           // child: Icon(Icons.discount_rounded),
-            //           child: Assets.png.brownyCreatePin.image(),
-            //         ),
-
-            //         Container(
-            //           padding: EdgeInsets.all(AppDims.size_8),
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               AppText(
-            //                 'Title',
-            //                 style: context.textTheme.titleSmall,
-            //               ),
-            //               AppText(
-            //                 'Description',
-            //                 style: context.textTheme.labelSmall!.copyWith(
-            //                   color: AppColors.primary,
-            //                 ),
-            //               ),
-            //               Spacer(),
-
-            //               RichText(
-            //                 text: TextSpan(
-            //                   text: 'Expried',
-            //                   style: context.textTheme.bodySmall?.copyWith(
-            //                     fontSize: AppDims.size_10.sp,
-            //                     color: AppColors.textSecondary,
-            //                   ),
-            //                   children: [
-            //                     TextSpan(text: ' '),
-            //                     TextSpan(
-            //                       text: 'เงื่อนไข',
-            //                       style: context.textTheme.labelSmall?.copyWith(
-            //                         color: AppColors.primary,
-            //                         fontSize: AppDims.size_10.sp,
-            //                       ),
-            //                       recognizer: TapGestureRecognizer()
-            //                         ..onTap = () {},
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-          ],
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _buildSection(context, coupons),
+            );
+          },
         ),
+      ),
+    );
+  }
+
+  /// หัวข้อ section "คูปองส่วนลด"
+  Widget _buildSectionTitle(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: null,
+      icon: Assets.svg.icCouponCheckRoundedGreen.svg(),
+      label: AppText(
+        // คูปองส่วนลด
+        context.wording.discountCoupon,
+        style: context.textTheme.labelLarge!.copyWith(
+          fontSize: AppDims.size_16.sp,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.primary,
+        alignment: AlignmentDirectional.centerStart,
+        padding: EdgeInsets.zero,
+        disabledBackgroundColor: AppColors.transparent,
+        overlayColor: AppColors.transparent,
+      ),
+    );
+  }
+
+  List<Widget> _buildSection(
+    BuildContext context,
+    List<CustomerCouponModel> coupons,
+  ) {
+    final needButtonExpanding = coupons.length > 2;
+    return [
+      _buildSectionTitle(context),
+      AppDims.vericalPadding_8,
+      ...coupons
+          .take(_expanded ? coupons.length : 2)
+          .map((coupon) => _buildCoupon(context, coupon)),
+      if (needButtonExpanding)
+        _buildButtonExpandable(
+          () => setState(() => _expanded = !_expanded),
+          _expanded,
+        ),
+    ];
+  }
+
+  Widget _buildCoupon(BuildContext context, CustomerCouponModel coupon) {
+    // flow "เลือกใช้คูปอง" (จาก Browny Shop) → แสดง checkbox + default checked
+    final isUsing =
+        widget._viewModel.couponState == CouponVoucherState.brownyUsing;
+    // คูปองนี้คือตัวที่เลือกไว้ก่อนหน้าหรือไม่
+    final isSelected =
+        widget.selectedCouponId != null &&
+        coupon.customerCouponId == widget.selectedCouponId;
+
+    // แตะเลือกคูปอง → ส่งกลับให้หน้าที่เปิด (product detail / checkout)
+    // - กดคูปองเดิมที่เลือกไว้ซ้ำ = ยกเลิกการใช้งาน (pop false)
+    // - กดคูปองอื่น = เลือกใช้ (pop CustomerCouponModel)
+    void onTap() {
+      if (isUsing && isSelected) {
+        context.pop(false);
+      } else {
+        context.pop(coupon);
+      }
+    }
+
+    return CouponEVoucherCardWidget(
+      icon: Image.network(
+        coupon.imageUrlDisplay(context),
+        errorBuilder: (_, _, _) => Container(color: AppColors.transparent),
+      ),
+      title: coupon.nameDisplay(context),
+      description: coupon.brownyDescriptionDisplay(context),
+      detailUsing: coupon.brownyUsageLabelDisplay(context),
+      expired: coupon.expiresAtBrownyShopDisplay(context),
+      borderColor: isSelected ? AppColors.primary : null,
+      showCheckBox: isUsing,
+      initialChecked: isSelected,
+      onChanged: (_) => onTap(),
+      onTap: onTap,
+    );
+  }
+
+  /// state ว่าง — แสดงหัวข้อ section + รูป/ข้อความ "ไม่พบคูปอง"
+  Widget _buildSectionHeaderWithEmpty(BuildContext context) {
+    return Column(
+      children: [
+        _buildSectionTitle(context),
+        AppDims.vericalPadding_16,
+        Center(
+          child: Assets.png.brownyError1.image(width: 145.w, height: 100.h),
+        ),
+        AppDims.vericalPadding_16,
+        AppText(
+          // ไม่พบคูปองส่วนลด
+          context.wording.couponNotFoundOf(context.wording.discountCoupon),
+          style: context.textTheme.labelLarge!.copyWith(
+            fontSize: AppDims.size_16.sp,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButtonExpandable(VoidCallback onPressed, bool expanded) {
+    return TextButton(
+      style: context.appTheme.textButtonTheme.style!.copyWith(
+        textStyle: WidgetStatePropertyAll(context.textTheme.labelLarge),
+        foregroundColor: WidgetStatePropertyAll(AppColors.gray500),
+      ),
+      onPressed: onPressed,
+      child: Column(
+        children: [
+          AppText(
+            expanded ? context.wording.collapseMore : context.wording.showMore,
+          ),
+          expanded ? Assets.svg.icArrowUp.svg() : Assets.svg.icArrowDown.svg(),
+        ],
       ),
     );
   }

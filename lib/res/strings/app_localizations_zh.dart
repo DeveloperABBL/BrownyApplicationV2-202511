@@ -1645,6 +1645,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couponFullyRedeemed => '已满额';
 
   @override
+  String get couponCannotUseWithPromotion => '不可与促销同时使用';
+
+  @override
+  String get couponCannotUseWithProductDiscount => '不可与商品折扣同时使用';
+
+  @override
   String get freeShipping => '免运费';
 
   @override
@@ -1760,4 +1766,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectSubdistrict => '选择街道/乡';
+
+  @override
+  String get orderShopping => '订单详情';
+
+  @override
+  String get shippingInfo => '配送信息';
+
+  @override
+  String get shippingAddressDetail => '配送地址详情';
+
+  @override
+  String get orderStatus => '订单状态';
+
+  @override
+  String get ordered => '已下单';
+
+  @override
+  String get delivery => '配送';
+
+  @override
+  String get waitingForDelivery => '等待配送';
+
+  @override
+  String get pendingPayment => '等待付款';
+
+  @override
+  String get parcelNumber => '包裹编号';
+
+  @override
+  String get copy => '复制';
+
+  @override
+  String get orderTotal => '订单合计';
+
+  @override
+  String get afterSalesService => '售后服务';
+
+  @override
+  String get order => '订单';
+
+  @override
+  String get orderTime => '下单时间';
+
+  @override
+  String get paymentTime => '付款时间';
+
+  @override
+  String get deliveryTime => '配送时间';
 }

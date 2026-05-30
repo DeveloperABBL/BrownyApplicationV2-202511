@@ -3328,6 +3328,18 @@ abstract class AppLocalizations {
   /// **'Fully Redeemed'**
   String get couponFullyRedeemed;
 
+  /// No description provided for @couponCannotUseWithPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be used with promotions'**
+  String get couponCannotUseWithPromotion;
+
+  /// No description provided for @couponCannotUseWithProductDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be used with product discounts'**
+  String get couponCannotUseWithProductDiscount;
+
   /// No description provided for @freeShipping.
   ///
   /// In en, this message translates to:
@@ -3561,6 +3573,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select subdistrict'**
   String get selectSubdistrict;
+
+  /// No description provided for @orderShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Order details'**
+  String get orderShopping;
+
+  /// No description provided for @shippingInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping information'**
+  String get shippingInfo;
+
+  /// No description provided for @shippingAddressDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping address details'**
+  String get shippingAddressDetail;
+
+  /// No description provided for @orderStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Order status'**
+  String get orderStatus;
+
+  /// No description provided for @ordered.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordered'**
+  String get ordered;
+
+  /// No description provided for @delivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery'**
+  String get delivery;
+
+  /// No description provided for @waitingForDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting delivery'**
+  String get waitingForDelivery;
+
+  /// No description provided for @pendingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending payment'**
+  String get pendingPayment;
+
+  /// No description provided for @parcelNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Parcel number'**
+  String get parcelNumber;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @orderTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Order total'**
+  String get orderTotal;
+
+  /// No description provided for @afterSalesService.
+  ///
+  /// In en, this message translates to:
+  /// **'After-sales service'**
+  String get afterSalesService;
+
+  /// No description provided for @order.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get order;
+
+  /// No description provided for @orderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Order time'**
+  String get orderTime;
+
+  /// No description provided for @paymentTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment time'**
+  String get paymentTime;
+
+  /// No description provided for @deliveryTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery time'**
+  String get deliveryTime;
 }
 
 class _AppLocalizationsDelegate

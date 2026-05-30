@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
+import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
+import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/models/coupon_detail_model.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:browny_applications_new/feature/transactions/screens/available_payment_method_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
@@ -52,17 +59,310 @@ class _BrownyShopSelectedWidget extends StatefulWidget {
       _BrownyShopSelectedWidgetState();
 }
 
-class _BrownyShopSelectedWidgetState extends State<_BrownyShopSelectedWidget> {
+class _BrownyShopSelectedWidgetState extends State<_BrownyShopSelectedWidget>
+    with WidgetsBindingObserver {
+  Timer? _pollingTimer;
+  String? _currentPaymentRef;
+  bool _isPolling = false;
+  bool _paymentProcessing = false;
+
+  /// กันกดปุ่มชำระเงินซ้ำระหว่าง process
+  bool _isPurchaseClicked = false;
+
+  BrownyShopSelectedViewModel get _vm =>
+      context.read<BrownyShopSelectedViewModel>();
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // ตะกร้า (vm.lines) ถูกโหลดจากหน้าตะกร้าแล้ว — ที่นี่โหลด payment methods
-      // + ที่อยู่จัดส่งเริ่มต้น (ที่อยู่หลัก)
-      final vm = context.read<BrownyShopSelectedViewModel>();
+      // + ที่อยู่จัดส่งเริ่มต้น (ที่อยู่หลัก) แล้ว preview summary จาก server
+      final vm = _vm;
       vm.fetchPaymentMethod(context);
       vm.loadDefaultShippingAddress();
+      vm.fetchCartSummary();
     });
+  }
+
+  @override
+  void dispose() {
+    _stopPolling();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // กลับเข้าแอประหว่างรอชำระ → เช็คสถานะทันที
+    if (state == AppLifecycleState.resumed && _isPolling) {
+      _checkPaymentStatus();
+    }
+  }
+
+  void _startPolling(String paymentRef) {
+    _currentPaymentRef = paymentRef;
+    _isPolling = true;
+    _checkPaymentStatus();
+    _pollingTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _checkPaymentStatus(),
+    );
+  }
+
+  void _stopPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+    _isPolling = false;
+    _currentPaymentRef = null;
+  }
+
+  Future<void> _checkPaymentStatus() async {
+    final ref = _currentPaymentRef;
+    if (ref == null) return;
+    final result = await _vm.checkBrownyShopPaymentStatus(ref);
+    if (!mounted) return;
+    if (result.isSuccess && (result.data?.isPaid ?? false)) {
+      _stopPolling();
+      // ปิด dialog QR ถ้ายังเปิดอยู่
+      if (_paymentProcessing && context.canPop()) context.pop();
+      _showSuccessThenReceipt(result.data?.orderId?.toString());
+    }
+    // pending → polling ต่อ
+  }
+
+  /// popup สำเร็จ → replace ไปหน้าใบเสร็จ Browny Shop
+  void _showSuccessThenReceipt(String? orderId) {
+    AppOverlays.showBrownyDialog(
+      context,
+      imageAsset: Assets.png.brownySuccess3.path,
+      title: context.wording.transactionSuccessful,
+      message: context.wording.orderCompletedMessage,
+      confirmText: context.wording.confirm,
+      onConfirm: () {
+        if (!mounted) return;
+        ReceiptBrownyShop.goReplacementPage(context, orderId: orderId ?? '');
+      },
+    );
+  }
+
+  /// กดปุ่มชำระเงิน — ลอก flow ของ [MachineTransactionPage2._onPurchaseClicked]
+  /// มาครบทุกเงื่อนไข (เพิ่ม guard ที่อยู่/วิธีชำระ ที่เป็นของ Browny Shop เอง)
+  ///
+  /// guard ที่อยู่/วิธีชำระ → verifyBalance (wallet/coin) → PIN/Biometric เฉพาะ
+  /// TP+ Wallet → confirmCheckout → ตรวจ order/paymentRef → ถ้า paid (coin/wallet/
+  /// free) เช็คสถานะไปใบเสร็จ; ถ้า pending แสดง QR ในแอป (qr/wechat) หรือเปิด web
+  /// ภายนอก + หน้ารอดำเนินการ แล้ว polling จน paid
+  Future<void> _onPurchaseClicked() async {
+    if (_isPurchaseClicked) return;
+    final vm = _vm;
+
+    // guard: ที่อยู่จัดส่ง
+    if (vm.shippingAddressNotifier.value == null) {
+      AppOverlays.showBrownyDialog(
+        context,
+        message: context.wording.selectAddress,
+      );
+      return;
+    }
+    // guard: วิธีชำระเงิน
+    final payment = vm.paymentSelected;
+    if (payment == null) {
+      AppOverlays.showBrownyDialog(
+        context,
+        message: context.wording.selectPaymentMethod,
+      );
+      return;
+    }
+
+    // flag กันคลิกเบิ้ล
+    _isPurchaseClicked = true;
+
+    // ตรวจยอดคงเหลือก่อน (verifyBalance คืน success ทันทีถ้าไม่ใช่ wallet/coin)
+    AppOverlays.showLoading(context);
+    final verify = await vm.verifyBalance();
+    if (!mounted) return;
+    AppOverlays.hideLoading();
+    if (verify.isEmpty && (payment.isTpWallet || payment.isCoin)) {
+      _isPurchaseClicked = false;
+      final String title;
+      final String message;
+      if (payment.isTpWallet) {
+        // TP+ Wallet เงินไม่เพียงพอ / กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
+        title = context.wording.insufficientWalletBalanceTitle;
+        message = context.wording.insufficientWalletBalanceMessage;
+      } else {
+        // Browny Coin ไม่เพียงพอ / กรุณาเปลี่ยนวิธีชำระเงิน
+        title = context.wording.insufficientCoinTitle;
+        message = context.wording.changePaymentMethod;
+      }
+      AppOverlays.showBrownyDialog(context, title: title, message: message);
+      return;
+    }
+
+    // ผ่าน PIN/Biometric เฉพาะ TP+ Wallet
+    if (payment.isTpWallet) {
+      final authed = await TransactionAuthenPage.goToPage(context);
+      if (!mounted) return;
+      if (authed is! bool || !authed) {
+        _isPurchaseClicked = false;
+        return;
+      }
+    }
+
+    AppOverlays.showLoading(context, timeout: Duration.zero);
+    final result = await vm.confirmCheckout();
+    if (!mounted) return;
+
+    if (!result.isSuccess) {
+      AppOverlays.hideLoading();
+      _isPurchaseClicked = false;
+      final err = result.error;
+      AppOverlays.showBrownyDialog(
+        context,
+        message: err is BrownyShopApiException
+            ? err.message
+            : context.wording.errorUi,
+      );
+      return;
+    }
+
+    // ไม่มีข้อมูล order → สร้างคำสั่งซื้อไม่ได้
+    final order = result.data;
+    if (order == null) {
+      AppOverlays.hideLoading();
+      _isPurchaseClicked = false;
+      AppOverlays.showBrownyDialog(
+        context,
+        // เดิม: ไม่สามารถสร้างคำสั่งซื้อได้
+        message: context.wording.cannotCreateOrder,
+      );
+      return;
+    }
+
+    // ตรวจ payment_ref
+    final paymentRef = order.paymentRef;
+    if (paymentRef == null || paymentRef.isEmpty) {
+      AppOverlays.hideLoading();
+      _isPurchaseClicked = false;
+      AppOverlays.showBrownyDialog(
+        context,
+        // เดิม: ไม่พบข้อมูล Payment Reference
+        message: context.wording.paymentReferenceNotFound,
+      );
+      return;
+    }
+
+    // ชำระทันที (coin / wallet / free) → เช็คสถานะแล้วไปหน้าใบเสร็จ
+    final isPaid = order.status == 'paid' || order.paymentStatus == 'paid';
+    if (isPaid) {
+      _paymentProcessing = false;
+      // เก็บ paymentRef ก่อน call payment check
+      _currentPaymentRef = paymentRef;
+      await _checkPaymentStatus();
+      if (!mounted) return;
+      AppOverlays.hideLoading();
+      return;
+    }
+
+    // ปิด loading ถ้าผ่าน condition ข้างบนทั้งหมด
+    AppOverlays.hideLoading();
+
+    // เก็บ QRCode ที่ได้จาก payload — เฉพาะวิธีที่โชว์ QR ในแอป
+    String? qrData = '';
+    if (payment.isShowInAppQR) {
+      if (payment.isWeChat) {
+        // WeChat
+        qrData = order.responsePayload?.wechat;
+      } else {
+        // QR Promptpay
+        qrData = order.responsePayload?.qrcode;
+      }
+    }
+    // ถ้ามีค่าเป็น null จะ error
+    if (qrData == null) {
+      _isPurchaseClicked = false;
+      AppOverlays.showBrownyDialog(
+        context,
+        // ข้อมูลการชำระไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง
+        message: context.wording.incompletePaymentData,
+      );
+      return;
+    }
+
+    // เริ่ม polling สถานะการชำระเงิน
+    _startPolling(paymentRef);
+    _paymentProcessing = true;
+    if (payment.isShowInAppQR) {
+      // QR ในแอป (PromptPay / WeChat)
+      await showDialog(
+        useSafeArea: false,
+        context: context,
+        builder: (_) => Dialog.fullscreen(
+          child: QrPromptpayDialog(
+            qrData: qrData!,
+            paymentDadge: payment.isWeChat
+                ? Assets.png.wechatPayBadge
+                : Assets.png.promptpayBadgeNoLine,
+          ),
+        ),
+      );
+    } else {
+      // เปิด web ภายนอก (ถ้าวิธีชำระต้องเปิด) + แสดงหน้ารอดำเนินการ
+      if (payment.isLaunchExternalWeb && order.paymentUrl != null) {
+        LaunchHelper.openUrlInBrowser(order.paymentUrl!);
+      }
+      await showModalBottomSheet(
+        context: context,
+        showDragHandle: true,
+        enableDrag: false,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (dialogContext) {
+          return SizedBox(
+            height: 812.h * 0.85,
+            child: Scaffold(
+              persistentFooterDecoration: const BoxDecoration(),
+              persistentFooterButtons: [
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () => dialogContext.pop(),
+                      child: AppText(context.wording.backToMainPage),
+                    ),
+                  ),
+                ),
+              ],
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: AppDims.size_8.h,
+                  children: [
+                    const CircularProgressIndicator(),
+                    AppText(
+                      // กำลังดำเนินการ กรุณารอซักครู่...
+                      context.wording.processingPleaseWait,
+                      style: context.textTheme.labelLarge,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+    // ปิด QR/web เอง (ยังไม่จ่าย) → เช็คอีกรอบ แล้วปลดล็อกปุ่มให้กดใหม่ได้
+    _paymentProcessing = false;
+    _stopPolling();
+    await _checkPaymentStatus();
+    if (mounted) _isPurchaseClicked = false;
   }
 
   @override
@@ -100,7 +400,9 @@ class _BrownyShopSelectedWidgetState extends State<_BrownyShopSelectedWidget> {
           ],
         ),
       ),
-      bottomNavigationBar: const _BottomBar(), // Frame 2087326691
+      bottomNavigationBar: _BottomBar(
+        onPay: _onPurchaseClicked,
+      ), // Frame 2087326691
     );
   }
 
@@ -380,16 +682,18 @@ class _ShipToCard extends StatelessWidget {
 // Frame 2087327035 — การจัดส่ง
 // ============================================================
 
-/// TODO(api): API วิธีจัดส่งยังไม่พร้อม — mock ข้อมูลตาม design ไปก่อน
+/// การจัดส่ง — ชื่อ/ระยะเวลายัง mock (รอ API วิธีจัดส่ง) แต่ "ค่าจัดส่ง" ยึดจาก
+/// summary จริง (field `shipping_total`) — ถ้า 0 แสดง Badge "ส่งฟรี"
 class _ShippingCard extends StatelessWidget {
   const _ShippingCard();
 
-  // ===== mock data (รอ API) =====
+  // ===== mock data (รอ API วิธีจัดส่ง) =====
   static const _methodName = 'Standard Shipping';
   static const _estimate = 'ขนส่งโดยประมาณ 8-11 วัน';
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<BrownyShopSelectedViewModel>();
     return _SectionCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,19 +703,25 @@ class _ShippingCard extends StatelessWidget {
               child: Assets.icShop.icBoxLineWhite.image(
                 width: 20.w,
                 height: 20.w,
-                // color: AppColors.white,
               ),
             ),
             title: context.wording.shipping,
           ),
           SizedBox(height: AppDims.size_8.h),
-          _buildOption(context),
+          ValueListenableBuilder(
+            valueListenable: vm.summaryNotifier,
+            builder: (context, result, _) {
+              final shipping = result.data?.shippingTotal ?? 0;
+              return _buildOption(context, shipping);
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildOption(BuildContext context) {
+  Widget _buildOption(BuildContext context, num shipping) {
+    final isFree = shipping <= 0;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppDims.size_16.w),
@@ -435,7 +745,7 @@ class _ShippingCard extends StatelessWidget {
                 ),
               ),
               AppText(
-                formatCurrency(value: 0, leadingSign: '฿'),
+                formatCurrency(value: shipping, leadingSign: '฿'),
                 style: context.textTheme.titleSmall?.copyWith(
                   fontSize: 14.sp,
                   color: AppColors.ci,
@@ -451,8 +761,11 @@ class _ShippingCard extends StatelessWidget {
               color: AppColors.gray600,
             ),
           ),
-          SizedBox(height: AppDims.size_8.h),
-          const _FreeShippingBadge(),
+          // แสดง badge "ส่งฟรี" เฉพาะเมื่อค่าจัดส่งจริง = 0
+          if (isFree) ...[
+            SizedBox(height: AppDims.size_8.h),
+            const _FreeShippingBadge(),
+          ],
         ],
       ),
     );
@@ -463,11 +776,31 @@ class _ShippingCard extends StatelessWidget {
 // Frame 2087327036 — คูปอง / E-Voucher
 // ============================================================
 
-/// กด → เข้าหน้าเลือกคูปอง/E-Voucher ([CouponVoucherPage] state brownyShop)
+/// กด → เข้าหน้าเลือกคูปอง ([CouponVoucherPage] tab Browny Shop)
 ///
-/// TODO(api): การ์ดคูปองที่เลือกยัง mock — รอ API คูปองของ shop
+/// คูปองที่เลือกเก็บใน [BrownyShopSelectedViewModel.selectedCouponNotifier]
+/// (auto-apply จาก buy-now ได้ด้วย) — re-validate ทุกครั้งที่แก้จำนวนสินค้า
 class _CouponCard extends StatelessWidget {
   const _CouponCard();
+
+  /// เปิดหน้าเลือกคูปอง (tab Browny Shop, flow brownyUsing) แล้วเก็บผลลัพธ์
+  Future<void> _onTapCoupon(BuildContext context) async {
+    final vm = context.read<BrownyShopSelectedViewModel>();
+    final result = await CouponVoucherPage.goToPage(
+      context,
+      state: CouponVoucherState.brownyUsing,
+      brownyShopSelectedCouponId:
+          vm.selectedCouponNotifier.value?.customerCouponId,
+    );
+    if (!context.mounted) return;
+    // เลือกคูปอง → CustomerCouponModel | กดคูปองเดิมซ้ำ (ยกเลิก) → false
+    // กดกลับเฉยๆ → true/null (ไม่เปลี่ยน)
+    if (result is CustomerCouponModel) {
+      vm.setSelectedCoupon(result);
+    } else if (result == false) {
+      vm.setSelectedCoupon(null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -480,19 +813,11 @@ class _CouponCard extends StatelessWidget {
               child: Assets.icShop.icTicketLineWhite.image(
                 width: 20.w,
                 height: 20.w,
-                // color: AppColors.white,
               ),
             ),
-            // icon: Assets.icShop.icTicketLineWhite.image(
-            //   width: 28.w,
-            //   height: 28.w,
-            // ),
             title: context.wording.couponAndVoucherCode,
             trailing: GestureDetector(
-              onTap: () => CouponVoucherPage.goToPage(
-                context,
-                state: CouponVoucherState.brownyShop,
-              ),
+              onTap: () => _onTapCoupon(context),
               child: Assets.svg.icArrowForward.svg(
                 width: AppDims.size_16.w,
                 height: AppDims.size_16.w,
@@ -500,77 +825,80 @@ class _CouponCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppDims.size_8.h),
-          GestureDetector(
-            onTap: () => CouponVoucherPage.goToPage(
-              context,
-              state: CouponVoucherState.brownyShop,
-            ),
-            behavior: HitTestBehavior.opaque,
-            child: _buildCouponPreview(context),
+          // Consumer — rebuild ทั้งตอนเปลี่ยนคูปองและตอนแก้จำนวน (re-validate)
+          Consumer<BrownyShopSelectedViewModel>(
+            builder: (context, vm, _) {
+              final coupon = vm.selectedCouponNotifier.value;
+              if (coupon == null) return _buildUnselected(context);
+              return _buildSelected(context, vm, coupon);
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCouponPreview(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border.all(color: AppColors.ci),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        children: [
-          Container(
-            width: AppDims.size_85.w,
-            height: AppDims.size_85.w,
-            color: const Color(0xA681E287),
-            alignment: Alignment.center,
-            child: Assets.icShop.icTruckTick.image(
-              width: 32.w,
-              height: 32.w,
-            ),
+  /// ยังไม่เลือกคูปอง — แสดง background ตาม design
+  Widget _buildUnselected(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _onTapCoupon(context),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 85.h,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: Assets.png.bgUnselectedCouponEvoucher.provider(),
+            fit: BoxFit.contain,
           ),
-          SizedBox(width: AppDims.size_8.w),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppText(
-                    // คูปองส่งฟรี ไม่มีขั้นต่ำ
-                    context.wording.freeShippingCouponNoMin,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 12.sp,
-                      color: AppColors.darkBrown,
-                    ),
+        ),
+      ),
+    );
+  }
+
+  /// เลือกคูปองแล้ว — การ์ด + กรอบเขียว/แดงตามเงื่อนไข + ข้อความ error
+  Widget _buildSelected(
+    BuildContext context,
+    BrownyShopSelectedViewModel vm,
+    CustomerCouponModel coupon,
+  ) {
+    // error คูปองมาจาก server (cart/summary 422) — null = ใช้ได้
+    final errorMessage = vm.summaryCouponError;
+    final isValid = errorMessage == null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => _onTapCoupon(context),
+          behavior: HitTestBehavior.opaque,
+          child: CouponEVoucherCardWidget(
+            icon: Image.network(
+              coupon.imageUrlDisplay(context),
+              errorBuilder: (_, _, _) => Container(color: AppColors.ci2),
+            ),
+            title: coupon.nameDisplay(context),
+            description: coupon.brownyDescriptionDisplay(context),
+            detailUsing: coupon.brownyUsageLabelDisplay(context),
+            expired: coupon.expiresAtBrownyShopDisplay(context),
+            isDisabled: !isValid,
+            borderColor: isValid ? AppColors.primary : AppColors.error,
+          ),
+        ),
+        if (!isValid)
+          Row(
+            spacing: AppDims.size_4.w,
+            children: [
+              Assets.svg.icInfoRad.svg(),
+              Expanded(
+                child: AppText(
+                  errorMessage,
+                  style: context.textTheme.labelSmall!.copyWith(
+                    color: AppColors.error,
                   ),
-                  SizedBox(height: 2.h),
-                  AppText(
-                    context.wording.onlyParticipatingItems,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      fontSize: 10.sp,
-                      color: AppColors.ci,
-                    ),
-                  ),
-                  SizedBox(height: AppDims.size_8.h),
-                  AppText(
-                    // mock — รอ API
-                    '${context.wording.couponExpiresLabel} 12 พ.ย. 2025',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      fontSize: 10.sp,
-                      color: AppColors.gray500,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -1101,9 +1429,15 @@ class _OrderSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<BrownyShopSelectedViewModel>();
     return _SectionCard(
-      child: Consumer<BrownyShopSelectedViewModel>(
-        builder: (context, vm, _) {
+      child: ValueListenableBuilder(
+        valueListenable: vm.summaryNotifier,
+        builder: (context, result, _) {
+          final s = result.data;
+          // ส่วนลดสินค้า = flash sale + product discount (รวมเป็นบรรทัดเดียว)
+          final productDiscount =
+              (s?.flashSaleDiscount ?? 0) + (s?.productDiscount ?? 0);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1115,54 +1449,54 @@ class _OrderSummaryCard extends StatelessWidget {
                 title: context.wording.orderSummary,
               ),
               SizedBox(height: AppDims.size_16.h),
-              // ราคาสินค้า — ยอดรวมก่อนหักส่วนลด
+              // ราคาสินค้า — ยอดรวมก่อนหักส่วนลด (subtotal)
               _line(
                 context,
                 title: context.wording.productSubtotal,
-                value: formatCurrency(
-                  value: vm.selectedMoneySubtotal,
-                  leadingSign: '฿',
-                ),
+                value: formatCurrency(value: s?.subtotal ?? 0, leadingSign: '฿'),
               ),
               SizedBox(height: AppDims.size_16.h),
-              // ส่วนลดสินค้า — รวมส่วนลดของรายการที่เลือก
+              // ส่วนลดสินค้า (flash sale + product discount)
               _line(
                 context,
                 title: context.wording.productDiscount,
-                value: formatCurrency(
-                  value: vm.selectedMoneyDiscount,
-                  leadingSign: '฿',
-                ),
+                value: formatCurrency(value: productDiscount, leadingSign: '฿'),
                 valueColor: AppColors.error,
               ),
               SizedBox(height: AppDims.size_16.h),
-              // คูปอง / E-Voucher — TODO(api): รอ API คูปองของ shop
+              // คูปอง / E-Voucher — coupon_discount จาก summary
               _line(
                 context,
                 icon: _lineIcon(
                   Assets.icShop.icTicket.image(width: 16.w, height: 16.w),
                 ),
                 title: context.wording.couponAndVoucherCode,
-                value: formatCurrency(value: 0, leadingSign: '฿'),
+                value: formatCurrency(
+                  value: s?.couponDiscount ?? 0,
+                  leadingSign: '฿',
+                ),
                 valueColor: AppColors.error,
               ),
               SizedBox(height: AppDims.size_16.h),
-              // ค่าจัดส่ง — TODO(api): รอ API วิธีจัดส่ง
+              // ค่าจัดส่ง — shipping_total จาก summary
               _line(
                 context,
                 icon: _lineIcon(
                   Assets.icShop.icBox.image(width: 16.w, height: 16.w),
                 ),
                 title: context.wording.shipping,
-                value: formatCurrency(value: 0, leadingSign: '฿'),
+                value: formatCurrency(
+                  value: s?.shippingTotal ?? 0,
+                  leadingSign: '฿',
+                ),
               ),
               SizedBox(height: AppDims.size_16.h),
-              // ยอดชำระทั้งหมด
+              // ยอดชำระทั้งหมด (final_price)
               _line(
                 context,
                 title: context.wording.totalPayment,
                 value: formatCurrency(
-                  value: vm.selectedMoneyGrandTotal,
+                  value: s?.finalPrice ?? 0,
                   leadingSign: '฿',
                 ),
                 valueColor: AppColors.ci,
@@ -1225,11 +1559,13 @@ class _OrderSummaryCard extends StatelessWidget {
 // Frame 2087326691 — bar ล่าง
 // ============================================================
 
-/// bar ล่าง — ส่วนลด/ยอดชำระยึดจากรายการที่ติ๊กเลือกในตะกร้า
-///
-/// TODO(api): การกดปุ่มชำระเงินรอ shop order API — ตอนนี้ยัง debugPrint
+/// bar ล่าง — ส่วนลด/ยอดชำระยึดจาก summary จริง (cart/summary)
+/// ปุ่มชำระเงิน → [onPay] (POST /checkout/confirm)
 class _BottomBar extends StatelessWidget {
-  const _BottomBar();
+  const _BottomBar({required this.onPay});
+
+  /// callback เมื่อกดปุ่มชำระเงิน — orchestrate confirm/QR/polling ที่ page state
+  final VoidCallback onPay;
 
   @override
   Widget build(BuildContext context) {
@@ -1248,6 +1584,13 @@ class _BottomBar extends StatelessWidget {
       ),
       child: Consumer<BrownyShopSelectedViewModel>(
         builder: (context, vm, _) {
+          final summary = vm.summaryNotifier.value;
+          final s = summary.data;
+          // enable ครั้งเดียวหลัง POST /cart/summary เสร็จ — ระหว่างแก้จำนวน/
+          // คูปอง/วิธีชำระ summary จะเป็น loading ทำให้ปุ่ม disable (กันกระพริบ)
+          // + ปิดปุ่มถ้าคูปองที่เลือกไม่เข้าเงื่อนไข (summaryCouponError != null)
+          final enabled =
+              summary.isSuccess && s != null && vm.summaryCouponError == null;
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1263,7 +1606,7 @@ class _BottomBar extends StatelessWidget {
                   ),
                   AppText(
                     formatCurrency(
-                      value: vm.selectedMoneyDiscount,
+                      value: s?.totalDiscount ?? 0,
                       leadingSign: '฿',
                     ),
                     style: context.textTheme.titleSmall?.copyWith(
@@ -1279,12 +1622,11 @@ class _BottomBar extends StatelessWidget {
                 context,
                 label:
                     '${context.wording.makePayment} '
-                    '${formatCurrency(value: vm.selectedMoneyGrandTotal, leadingSign: '฿')}',
+                    '${formatCurrency(value: s?.finalPrice ?? 0, leadingSign: '฿')}',
                 background: AppColors.ci,
                 textColor: AppColors.white,
-                // ปิดปุ่มระหว่าง sync ตะกร้า / ยังไม่มีของติ๊กเลือก
-                enabled: vm.canCheckout,
-                onTap: () => debugPrint('tap pay (TODO)'),
+                enabled: enabled,
+                onTap: onPay,
               ),
             ],
           );

@@ -6,6 +6,7 @@ import 'package:browny_applications_new/feature/authentication/viewmodel/authent
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 
@@ -22,6 +23,7 @@ class BrownyShopCartPage extends StatelessWidget {
     super.key,
     this.buyNowSubId,
     this.buyNowQuantity,
+    this.buyNowCoupon,
   });
 
   /// productSubId ของสินค้าที่กด "ซื้อเลย" — null = เข้าตะกร้าปกติ
@@ -30,6 +32,9 @@ class BrownyShopCartPage extends StatelessWidget {
   /// จำนวนที่เลือกใน bottom sheet (ใช้คู่กับ [buyNowSubId])
   final int? buyNowQuantity;
 
+  /// คูปองที่เลือกไว้หน้ารายละเอียดสินค้า — carry ไป auto-apply หน้า checkout
+  final CustomerCouponModel? buyNowCoupon;
+
   static final pagePath = '/browny_shop_cart';
   static final pageName = 'BrownyShopCart';
 
@@ -37,11 +42,12 @@ class BrownyShopCartPage extends StatelessWidget {
     BuildContext context, {
     int? buyNowSubId,
     int? buyNowQuantity,
+    CustomerCouponModel? buyNowCoupon,
   }) async {
-    // (subId, quantity) สำหรับ flow ซื้อเลย — null = เข้าตะกร้าปกติ
+    // (subId, quantity, coupon) สำหรับ flow ซื้อเลย — null = เข้าตะกร้าปกติ
     final Object? extra = buyNowSubId == null
         ? null
-        : (buyNowSubId, buyNowQuantity ?? 1);
+        : (buyNowSubId, buyNowQuantity ?? 1, buyNowCoupon);
     if (context.read<CustomerProvider>().current.isGuest) {
       await AuthenticationPage.goToPage(
         context,
@@ -67,6 +73,7 @@ class BrownyShopCartPage extends StatelessWidget {
       create: (_) => BrownyShopSelectedViewModel(
         context: context,
         repo: BrownyShopRepo(),
+        buyNowCoupon: buyNowCoupon,
       ),
       child: _BrownyShopCartWidget(
         buyNowSubId: buyNowSubId,

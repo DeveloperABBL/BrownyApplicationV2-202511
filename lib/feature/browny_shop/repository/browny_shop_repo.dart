@@ -2,10 +2,15 @@ import 'dart:convert';
 
 import 'package:browny_applications_new/core/data/remote/models/request/cart_item_add_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/cart_item_quantity_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/cart_summary_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/checkout_confirm_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_receipt_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
@@ -18,6 +23,18 @@ import 'package:flutter/foundation.dart';
 /// ข้อผิดพลาด "สต็อกไม่พอ" — พก message จาก API (HTTP 422)
 class CartStockException implements Exception {
   CartStockException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+/// ข้อผิดพลาดทั่วไปจาก Browny Shop API (HTTP 422) — พก message จาก server
+/// เช่น "คูปองนี้ใช้ร่วมกับ Flash Sale ไม่ได้", "กรุณาเลือกที่อยู่จัดส่ง",
+/// "จำนวน Browny Coin ไม่เพียงพอ"
+class BrownyShopApiException implements Exception {
+  BrownyShopApiException(this.message);
 
   final String message;
 
@@ -76,6 +93,35 @@ mixin BrownyShopDataSourceMixin {
   Future<RepoResult<CartItemRemoveData>> removeCartItem({
     required String customerId,
     required int itemId,
+  });
+
+  /// API คำนวณ summary (ยอด/ส่วนลด/คูปอง/ค่าจัดส่ง) จาก items ที่เลือก
+  /// — POST /browny-shop/cart/summary
+  /// error เป็น [BrownyShopApiException] เมื่อคูปองใช้ไม่ได้ (HTTP 422)
+  Future<RepoResult<CheckoutSummaryData>> fetchCartSummary({
+    required String customerId,
+    required List<CartSummaryItemRequest> items,
+    int? couponCustomerId,
+    String? paymentMethod,
+  });
+
+  /// API ยืนยันสั่งซื้อ + เริ่ม process ชำระเงิน — POST /browny-shop/checkout/confirm
+  /// error เป็น [BrownyShopApiException] เมื่อ 422 (ตะกร้าว่าง/ไม่มีที่อยู่/coin ไม่พอ/ฯลฯ)
+  Future<RepoResult<CheckoutDraftData>> confirmCheckout({
+    required String customerId,
+    required int customerAddressId,
+    required String paymentMethod,
+    int? couponCustomerId,
+  });
+
+  /// API polling สถานะการชำระเงิน — GET /payment/browny-shop/status/{paymentRef}
+  Future<RepoResult<PaymentStatusCheckResponse>> checkPaymentStatus({
+    required String paymentRef,
+  });
+
+  /// API ดึงใบเสร็จ Browny Shop — GET /browny-shop/orders/{orderId}/receipt
+  Future<RepoResult<BrownyShopReceiptResponse>> fetchBrownyShopReceipt({
+    required String orderId,
   });
 }
 
@@ -274,4 +320,181 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
       return RepoResult.error(error: e);
     }
   }
+
+  /// ดึง message จาก error body (HTTP 422) — ใช้ทั้ง cart summary / confirm
+  String? _messageOf(DioException e) {
+    final body = e.response?.data;
+    final message = body is Map ? body['message']?.toString() : null;
+    return (message != null && message.isNotEmpty) ? message : null;
+  }
+
+  @override
+  Future<RepoResult<CheckoutSummaryData>> fetchCartSummary({
+    required String customerId,
+    required List<CartSummaryItemRequest> items,
+    int? couponCustomerId,
+    String? paymentMethod,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ตาม changelog ก่อน
+      if (kDebugMode) {
+        final json = couponCustomerId != null
+            ? _mockSummaryWithCoupon
+            : _mockSummaryNoCoupon;
+        return RepoResult.success(
+          data: CheckoutSummaryData.fromJson(
+            jsonDecode(json)['data'] as Map<String, dynamic>,
+          ),
+        );
+      }
+      final response = await requireRemote.calculateBrownyShopCartSummary(
+        CartSummaryRequest(
+          customerId: customerId,
+          items: items,
+          couponCustomerId: couponCustomerId,
+          paymentMethod: paymentMethod,
+        ),
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final data = response.data.data;
+      if (data == null) return RepoResult.empty();
+      return RepoResult.success(data: data);
+    } on DioException catch (e) {
+      // 422 = คูปองใช้ไม่ได้ — พก message มาแจ้ง user
+      final message = _messageOf(e);
+      if (e.response?.statusCode == 422 && message != null) {
+        return RepoResult.error(error: BrownyShopApiException(message));
+      }
+      return RepoResult.error(error: e);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CheckoutDraftData>> confirmCheckout({
+    required String customerId,
+    required int customerAddressId,
+    required String paymentMethod,
+    int? couponCustomerId,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ตาม changelog ก่อน
+      if (kDebugMode) {
+        final json = paymentMethod == 'coin'
+            ? _mockConfirmCoin
+            : paymentMethod == 'tp_wallet'
+            ? _mockConfirmWallet
+            : _mockConfirmQr;
+        return RepoResult.success(
+          data: CheckoutDraftData.fromJson(
+            jsonDecode(json)['data'] as Map<String, dynamic>,
+          ),
+        );
+      }
+      final response = await requireRemote.confirmBrownyShopCheckout(
+        CheckoutConfirmRequest(
+          customerId: customerId,
+          customerAddressId: customerAddressId,
+          paymentMethod: paymentMethod,
+          couponCustomerId: couponCustomerId,
+        ),
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final data = response.data.data;
+      if (data == null) return RepoResult.empty();
+      return RepoResult.success(data: data);
+    } on DioException catch (e) {
+      // 422 = ตะกร้าว่าง / ไม่มีที่อยู่ / coin ไม่พอ / สร้าง QR ไม่ได้ ฯลฯ
+      final message = _messageOf(e);
+      if (e.response?.statusCode == 422 && message != null) {
+        return RepoResult.error(error: BrownyShopApiException(message));
+      }
+      return RepoResult.error(error: e);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<PaymentStatusCheckResponse>> checkPaymentStatus({
+    required String paymentRef,
+  }) async {
+    try {
+      // TODO(api): mock = paid เพื่อให้ flow เดินจนถึงหน้า receipt ตอน debug
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: PaymentStatusCheckResponse.fromJson(
+            jsonDecode(_mockPaymentPaid) as Map<String, dynamic>,
+          ),
+        );
+      }
+      final response = await requireRemote.checkBrownyShopPaymentStatus(
+        paymentRef,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      return RepoResult.success(data: response.data);
+    } on DioException catch (e) {
+      // 412 = ยังไม่ชำระ (pending) — ไม่ใช่ error จริง, parse body เป็น pending
+      final body = e.response?.data;
+      if (e.response?.statusCode == 412 && body is Map<String, dynamic>) {
+        return RepoResult.success(
+          data: PaymentStatusCheckResponse.fromJson(body),
+        );
+      }
+      return RepoResult.error(error: e);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<BrownyShopReceiptResponse>> fetchBrownyShopReceipt({
+    required String orderId,
+  }) async {
+    try {
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: BrownyShopReceiptResponse.fromJson(
+            jsonDecode(_mockReceipt) as Map<String, dynamic>,
+          ),
+        );
+      }
+      final response = await requireRemote.fetchBrownyShopReceipt(orderId);
+      if (!response.isSuccessful) return RepoResult.empty();
+      return RepoResult.success(data: response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  // ===== Mock responses (kDebugMode) — ตาม browny-shop-api-changelog-2026-05-30 =====
+
+  static const _mockSummaryWithCoupon = '''
+{"success":true,"data":{"subtotal":300.0,"shipping_total":25.0,"flash_sale_discount":50.0,"product_discount":0.0,"coupon_discount":30.0,"total_discount":80.0,"price_original":325.0,"final_price":295.0,"coin_amount_required":null,"coin_value":10.0,"coupon_customer_id":123,"payment_method":"qr","coupon":{"coupon_id":10,"customer_coupon_id":123,"discount_target":"product","discount_type":"percent","value":"10.00","max_discount":"100.00","min_order_amount":"500.00","allow_with_promotion":false,"allow_with_product_discount":true,"remaining":"1","expires_at":"2026-12-31 23:59:59","used_quantity":"0","name":{"th":"ลด 10%","en":"10% off","zh":"九折"},"description":{"th":"ใช้ได้กับ Browny Shop","en":"Valid for Browny Shop","zh":""},"image_url":{"th":"","en":"","zh":""}},"items":[]}}
+''';
+
+  static const _mockSummaryNoCoupon = '''
+{"success":true,"data":{"subtotal":300.0,"shipping_total":25.0,"flash_sale_discount":0.0,"product_discount":0.0,"coupon_discount":0.0,"total_discount":0.0,"price_original":325.0,"final_price":325.0,"coin_amount_required":null,"coin_value":10.0,"coupon_customer_id":null,"payment_method":null,"items":[]}}
+''';
+
+  static const _mockConfirmQr = '''
+{"success":true,"data":{"id":"c3d4e5f6-a7b8-9012-cdef-345678901234","customer_id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","status":"pending_payment","payment_method":"qr","payment_status":"pending","payment_ref":"202605301234567","subtotal":300.0,"shipping_total":25.0,"flash_sale_discount":0.0,"product_discount":0.0,"coupon_discount":30.0,"discount_amount":30.0,"price_original":325.0,"price_final":295.0,"coin_amount_used":null,"coin_value":10.0,"expires_at":"2026-05-30 18:00:00","paid_at":null,"receipt_no":null,"customer_address_id":1,"payment_url":"https://example.com/pay/browny-shop/202605301234567","response_payload":{"qrcode":"00020101021229370016A000000677010112011300668999999999530376454032755802TH6304ABCD"}}}
+''';
+
+  static const _mockConfirmCoin = '''
+{"success":true,"data":{"id":"c3d4e5f6-a7b8-9012-cdef-345678901234","customer_id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","status":"paid","payment_method":"coin","payment_status":"paid","payment_ref":"202605301234568","subtotal":300.0,"shipping_total":25.0,"coupon_discount":0.0,"discount_amount":0.0,"price_original":325.0,"price_final":325.0,"coin_amount_used":3250.0,"coin_value":10.0,"paid_at":"2026-05-30 13:05:22","receipt_no":"BNS20260530-130522123456","customer_address_id":1,"payment_url":null,"response_payload":{"method":"coin","amount":325.0,"coin_amount_used":3250.0}}}
+''';
+
+  static const _mockConfirmWallet = '''
+{"success":true,"data":{"id":"c3d4e5f6-a7b8-9012-cdef-345678901234","status":"paid","payment_method":"tp_wallet","payment_status":"paid","price_final":295.0,"payment_ref":"202605301234570","receipt_no":"BNS20260530-130522777777","paid_at":"2026-05-30 13:05:22","customer_address_id":1,"payment_url":null,"response_payload":{"method":"wallet","amount":295.0,"coin_amount_used":null}}}
+''';
+
+  static const _mockPaymentPaid = '''
+{"status":"success","payment_status":"paid","order_id":"c3d4e5f6-a7b8-9012-cdef-345678901234","receipt_no":"BNS20260530-130522123456","redirect":"https://example.com/api/browny-shop/orders/c3d4e5f6-a7b8-9012-cdef-345678901234/receipt"}
+''';
+
+  static const _mockReceipt = '''
+{"order_id":"c3d4e5f6-a7b8-9012-cdef-345678901234","payment_ref":"202605301234568","receipt_no":"BNS20260530-130522123456","type":"browny_shop","total":"295.00","price_original":"325.00","price_final":"295.00","discount_amount":"75.00","total_quantity":6,"payment_icon":"","payment_channel":"tp_wallet","payment_display":{"th":"TrueMoney Wallet","en":"TrueMoney Wallet","zh":"TrueMoney Wallet"},"paid_at":"2026-05-30 13:05:22","receipt_at":"2026-05-30 13:05:22","coin_amount_used":null,"coin_value":null,"lucky_no":"23","lucky_image":"","shipping_address":{"id":1,"recipient_name":"บราวนี่ รักสะอาด","first_name":"บราวนี่","last_name":"รักสะอาด","phone":"080-000-0000","zipcode":"10160","province":"กรุงเทพมหานคร","district":"ภาษีเจริญ","subdistrict":"บางหว้า","address":"459 ถ.เพชรเกษม","full_address":"ชั้น 2 Intree Organic Cafe 459 ถ.เพชรเกษม แขวง บางหว้า เขตภาษีเจริญ กรุงเทพมหานคร 10160 ประเทศไทย","country":"Thailand"},"summary":{"quantity":{"wording":{"th":"จำนวน","en":"Quantity","zh":""},"amount":"6"},"subtotal":{"wording":{"th":"ยอดรวมสินค้า","en":"Subtotal","zh":""},"amount":"76.00"},"discount":{"wording":{"th":"ส่วนลด","en":"Discount","zh":""},"amount":"-75.00"},"flash_sale_discount":{"wording":{"th":"ส่วนลด Flash Sale","en":"Flash Sale","zh":""},"amount":"-50.00"},"product_discount":{"wording":{"th":"ส่วนลดสินค้า","en":"Product Discount","zh":""},"amount":"0.00"},"coupon_discount":{"wording":{"th":"คูปองและรหัสคูปอง","en":"Coupon","zh":""},"amount":"-20.00","code":"PROMO2026","coupon_name":{"th":"ลด 20 บาท","en":"20 Baht Off","zh":""}},"shipping":{"wording":{"th":"การจัดส่ง","en":"Shipping","zh":""},"amount":"0.00"},"total":{"wording":{"th":"ยอดชำระทั้งหมด","en":"Total","zh":""},"amount":"295.00"}},"items":[],"call_center":"099-635-1211","line_link":"https://line.me/ti/p/@browny", "lucky_image": "https://gateway2026.abgroup.co.th/images/lucky_no/85.png","qr_image": "https://gateway2026.abgroup.co.th/storage/qrcodes/5159.png"}
+''';
 }

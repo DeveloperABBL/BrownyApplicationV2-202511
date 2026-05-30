@@ -1,4 +1,5 @@
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -59,6 +60,8 @@ class CheckoutDraftData {
     this.shippingAddress,
     this.items,
     this.summary,
+    this.paymentUrl,
+    this.responsePayload,
   });
 
   @JsonKey(name: 'id')
@@ -153,10 +156,52 @@ class CheckoutDraftData {
   @JsonKey(name: 'summary')
   final CheckoutSummaryData? summary;
 
+  /// URL สำหรับเปิดหน้าจ่ายเงิน (null เมื่อชำระทันที เช่น coin/wallet/free)
+  @JsonKey(name: 'payment_url')
+  final String? paymentUrl;
+
+  /// payload การชำระเงิน — QR (qrcode/wechat) หรือ ข้อมูล coin/wallet/free
+  @JsonKey(name: 'response_payload')
+  final CheckoutResponsePayload? responsePayload;
+
   factory CheckoutDraftData.fromJson(Map<String, dynamic> json) =>
       _$CheckoutDraftDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$CheckoutDraftDataToJson(this);
+}
+
+/// payload การชำระเงินที่ได้จาก confirm / get order
+/// - QR/WeChat: ใช้ [qrcode]/[wechat] render QR โดยตรง (เหมือน machine-order)
+/// - coin/wallet/free: ใช้ [method], [amount], [coinAmountUsed]
+@JsonSerializable()
+class CheckoutResponsePayload {
+  CheckoutResponsePayload({
+    this.qrcode,
+    this.wechat,
+    this.method,
+    this.amount,
+    this.coinAmountUsed,
+  });
+
+  @JsonKey(name: 'qrcode')
+  final String? qrcode;
+
+  @JsonKey(name: 'wechat')
+  final String? wechat;
+
+  @JsonKey(name: 'method')
+  final String? method;
+
+  @JsonKey(name: 'amount')
+  final num? amount;
+
+  @JsonKey(name: 'coin_amount_used')
+  final num? coinAmountUsed;
+
+  factory CheckoutResponsePayload.fromJson(Map<String, dynamic> json) =>
+      _$CheckoutResponsePayloadFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CheckoutResponsePayloadToJson(this);
 }
 
 /// ที่อยู่จัดส่ง — snapshot ใน checkout (มี recipient_name, country เพิ่มจาก
@@ -296,6 +341,7 @@ class CheckoutSummaryData {
     this.coinValue,
     this.couponCustomerId,
     this.paymentMethod,
+    this.coupon,
     this.items,
   });
 
@@ -341,6 +387,10 @@ class CheckoutSummaryData {
 
   @JsonKey(name: 'payment_method')
   final String? paymentMethod;
+
+  /// ข้อมูลคูปองที่ใช้ (มีเฉพาะเมื่อส่ง coupon_customer_id และคูปองใช้ได้)
+  @JsonKey(name: 'coupon')
+  final CouponData? coupon;
 
   @JsonKey(name: 'items')
   final List<CheckoutSummaryItemData>? items;

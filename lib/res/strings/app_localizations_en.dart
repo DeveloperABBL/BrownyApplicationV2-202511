@@ -1693,6 +1693,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couponFullyRedeemed => 'Fully Redeemed';
 
   @override
+  String get couponCannotUseWithPromotion => 'Can\'t be used with promotions';
+
+  @override
+  String get couponCannotUseWithProductDiscount =>
+      'Can\'t be used with product discounts';
+
+  @override
   String get freeShipping => 'Free Shipping';
 
   @override
@@ -1808,4 +1815,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectSubdistrict => 'Select subdistrict';
+
+  @override
+  String get orderShopping => 'Order details';
+
+  @override
+  String get shippingInfo => 'Shipping information';
+
+  @override
+  String get shippingAddressDetail => 'Shipping address details';
+
+  @override
+  String get orderStatus => 'Order status';
+
+  @override
+  String get ordered => 'Ordered';
+
+  @override
+  String get delivery => 'Delivery';
+
+  @override
+  String get waitingForDelivery => 'Awaiting delivery';
+
+  @override
+  String get pendingPayment => 'Pending payment';
+
+  @override
+  String get parcelNumber => 'Parcel number';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get orderTotal => 'Order total';
+
+  @override
+  String get afterSalesService => 'After-sales service';
+
+  @override
+  String get order => 'Order';
+
+  @override
+  String get orderTime => 'Order time';
+
+  @override
+  String get paymentTime => 'Payment time';
+
+  @override
+  String get deliveryTime => 'Delivery time';
 }

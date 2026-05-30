@@ -930,53 +930,246 @@ abstract class AppClient {
     @Path('customerId') String customerId,
   );
 
-  /// DONG 2026-05-26
+  /// DONG 2026-05-27
   ///
-  /// API สร้าง draft order ของ Browny Shop ก่อนชำระเงิน
-  /// (รวมยอด, ส่วนลด, ที่อยู่จัดส่ง, รายการสินค้า)
+  /// API fetch รายการ banner ของหน้า Browny Shop
+  /// (server filter ตามช่วงเวลา + first_login_only ของลูกค้า)
   ///
-  /// Body:
-  /// - CheckoutDraftRequest (customer_id, coupon_customer_id, payment_method)
+  /// Query parameters:
+  /// - customer_id: String (uuid)
   ///
   /// Response:
-  /// - CheckoutDraftResponse with order data (id, totals, shipping_address, items)
-  @POST('/browny-shop/checkout/draft')
-  Future<HttpResponse<CheckoutDraftResponse>> createCheckoutDraft(
-    @Body() CheckoutDraftRequest body,
+  /// - BrownyShopBannerResponse with list of BrownyShopBannerData
+  ///   (id, title, image_url, first_login_only, start_at, end_at, sort_order)
+  @GET('/browny-shop/banners')
+  Future<HttpResponse<BrownyShopBannerResponse>> fetchBrownyShopBanners(
+    @Query('customer_id') String customerId,
   );
 
-  /// DONG 2026-05-26
+  /// DONG 2026-05-27
   ///
-  /// API fetch รายละเอียด draft order ของ Browny Shop ตาม orderId
-  /// (data shape เดียวกับ POST /checkout/draft + เพิ่ม `summary` ละเอียดกว่า)
-  ///
-  /// Path parameters:
-  /// - orderId: String (uuid ของ draft order)
+  /// API fetch รูป title/header ของหน้า Browny Shop
   ///
   /// Response:
-  /// - CheckoutDraftResponse with order data + breakdown summary
+  /// - BrownyShopTitleImageResponse with data.image_url
+  @GET('/browny-shop/title-image')
+  Future<HttpResponse<BrownyShopTitleImageResponse>> fetchBrownyShopTitleImage();
+
+  /// DONG 2026-05-30
+  ///
+  /// API เพิ่มสินค้าโปรด (idempotent — เรียกซ้ำได้)
+  ///
+  /// Body:
+  /// - BrownyShopFavoriteRequest (customer_id, product_id)
+  ///
+  /// Response:
+  /// - BrownyShopFavoriteResponse (data.favorite_status = true)
+  @POST('/browny-shop/favorites')
+  Future<HttpResponse<BrownyShopFavoriteResponse>> addBrownyShopFavorite(
+    @Body() BrownyShopFavoriteRequest body,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API ลบสินค้าโปรด (ลบซ้ำ/ลบที่ไม่มีอยู่ได้ — ยังคืน 200)
+  ///
+  /// Path parameters:
+  /// - productId: String (uuid สินค้า)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid ลูกค้า — บังคับ)
+  ///
+  /// Response:
+  /// - BrownyShopFavoriteResponse (data.favorite_status = false)
+  @DELETE('/browny-shop/favorites/{productId}')
+  Future<HttpResponse<BrownyShopFavoriteResponse>> removeBrownyShopFavorite(
+    @Path('productId') String productId,
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API ดึงรายการสินค้าโปรดของลูกค้า (เฉพาะสินค้าที่ publish, ใหม่สุดก่อน)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid — บังคับ)
+  /// - lang: String? (locale เดียว เช่น "th" — ไม่ส่ง = คืนทุกภาษา)
+  ///
+  /// Response:
+  /// - BrownyShopFavoriteListResponse (data.items = List<ProductData>)
+  @GET('/browny-shop/favorites')
+  Future<HttpResponse<BrownyShopFavoriteListResponse>>
+  fetchBrownyShopFavorites(
+    @Query('customer_id') String customerId,
+    @Query('lang') String? lang,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API preview ยอด/ส่วนลด/คูปอง จากตะกร้าลูกค้า (ก่อน confirm)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid — บังคับ)
+  /// - coupon_customer_id: int? (ส่งเมื่อใช้คูปอง — response จะมี data.coupon)
+  /// - payment_method: String? ("qr"/"coin"/"tp_wallet" — มีผลกับ coin_amount_required)
+  ///
+  /// Response:
+  /// - CartSummaryResponse (CheckoutSummaryData) — คูปองใช้ไม่ได้ server ตอบ 422
+  @GET('/browny-shop/cart/summary')
+  Future<HttpResponse<CartSummaryResponse>> fetchBrownyShopCartSummary(
+    @Query('customer_id') String customerId,
+    @Query('coupon_customer_id') int? couponCustomerId,
+    @Query('payment_method') String? paymentMethod,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API คำนวณ summary จาก items ที่ส่งมาเอง (ทางเลือกของ GET cart/summary)
+  ///
+  /// Body:
+  /// - CartSummaryRequest (customer_id, coupon_customer_id, payment_method, items)
+  ///
+  /// Response:
+  /// - CartSummaryResponse (รูปแบบเดียวกับ GET)
+  @POST('/browny-shop/cart/summary')
+  Future<HttpResponse<CartSummaryResponse>> calculateBrownyShopCartSummary(
+    @Body() CartSummaryRequest body,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API ยืนยันสั่งซื้อ Browny Shop (flow ใหม่ — ไม่มี draft)
+  /// สร้าง order จากตะกร้า + ที่อยู่ + คูปอง + วิธีชำระ ในครั้งเดียว
+  ///
+  /// Body:
+  /// - CheckoutConfirmRequest (customer_id, customer_address_id, payment_method, coupon_customer_id?)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse (order เต็ม + summary + payment_url + response_payload)
+  ///   - QR: response_payload.qrcode / .wechat | coin/wallet: ชำระทันที (paid)
+  @POST('/browny-shop/checkout/confirm')
+  Future<HttpResponse<CheckoutDraftResponse>> confirmBrownyShopCheckout(
+    @Body() CheckoutConfirmRequest body,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API ยืนยันสั่งซื้อด้วย orderId ที่มีอยู่ (legacy — ยังใช้ได้)
+  /// ต้องส่ง customer_id เพื่อ verify ownership
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid)
+  ///
+  /// Body:
+  /// - CheckoutConfirmRequest (customer_id, customer_address_id)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse (เหมือน /checkout/confirm รวม response_payload)
+  @POST('/browny-shop/checkout/{orderId}/confirm')
+  Future<HttpResponse<CheckoutDraftResponse>> confirmBrownyShopCheckoutById(
+    @Path('orderId') String orderId,
+    @Body() CheckoutConfirmRequest body,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API เช็คคำสั่งซื้อรอชำระเงินล่าสุดของลูกค้า (ตอนเปิดแอป → ปุ่ม "ชำระต่อ")
+  /// ได้ order_id แล้วเรียก GET /browny-shop/checkout/{orderId} ต่อเพื่อดึง QR เต็ม
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid — บังคับ)
+  ///
+  /// Response:
+  /// - BrownyShopPendingPaymentResponse (data.has_pending + order_id/payment_ref/status)
+  @GET('/browny-shop/pending-payment')
+  Future<HttpResponse<BrownyShopPendingPaymentResponse>>
+  fetchBrownyShopPendingPayment(
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-05-30
+  ///
+  /// API ดู order ที่รอชำระเงิน (status = pending_payment เท่านั้น)
+  /// ต้องส่ง customer_id เพื่อ verify ownership
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid — บังคับ)
+  ///
+  /// Response:
+  /// - CheckoutDraftResponse (order + summary) — 404 ถ้าไม่ใช่ pending/ไม่ใช่ของลูกค้า
   @GET('/browny-shop/checkout/{orderId}')
-  Future<HttpResponse<CheckoutDraftResponse>> fetchCheckoutDraft(
+  Future<HttpResponse<CheckoutDraftResponse>> fetchBrownyShopOrder(
+    @Path('orderId') String orderId,
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-05-27
+  ///
+  /// API polling สถานะการชำระเงินของ Browny Shop ตาม payment_ref
+  /// — server ตอบ 200 เมื่อ paid, 412 เมื่อ pending (ยังไม่ชำระ)
+  ///
+  /// Path parameters:
+  /// - paymentRef: String (รหัสอ้างอิงการชำระเงิน)
+  ///
+  /// Response:
+  /// - PaymentStatusCheckResponse (status, payment_status, order_id, receipt_no, redirect, message)
+  @GET('/payment/browny-shop/status/{paymentRef}')
+  Future<HttpResponse<PaymentStatusCheckResponse>> checkBrownyShopPaymentStatus(
+    @Path('paymentRef') String paymentRef,
+  );
+
+  /// DONG 2026-05-27
+  ///
+  /// API fetch ประวัติคำสั่งซื้อเฉพาะ Browny Shop ของลูกค้า (paginated)
+  /// — ข้อมูลเดียวกับ /customer/{id}/order-history เฉพาะ type = browny_shop_order
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid)
+  /// - page: int (default 1)
+  /// - per_page: int (default 20)
+  ///
+  /// Response:
+  /// - OrderHistoryResponse (list of OrderHistoryItem with type='browny_shop_order' + meta)
+  @GET('/browny-shop/orders')
+  Future<HttpResponse<OrderHistoryResponse>> fetchBrownyShopOrders(
+    @Query('customer_id') String customerId,
+    @Query('page') int page,
+    @Query('per_page') int perPage,
+  );
+
+  /// DONG 2026-05-27
+  ///
+  /// API fetch ใบเสร็จคำสั่งซื้อ Browny Shop ตาม orderId
+  /// — รายละเอียดสินค้า / ที่อยู่จัดส่ง / breakdown ราคา / ช่องทางติดต่อ
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid)
+  ///
+  /// Response:
+  /// - BrownyShopReceiptResponse (รูป flat ไม่มี success wrapper)
+  @GET('/browny-shop/orders/{orderId}/receipt')
+  Future<HttpResponse<BrownyShopReceiptResponse>> fetchBrownyShopReceipt(
     @Path('orderId') String orderId,
   );
 
-  /// DONG 2026-05-26
+  /// DONG 2026-05-27
   ///
-  /// API แก้ไข draft order — เปลี่ยนคูปอง / วิธีชำระเงิน
-  /// (ส่งเฉพาะ field ที่จะแก้ field ที่ไม่ส่ง / ส่ง null = ไม่กำหนด)
+  /// API fetch คูปอง Browny Shop ที่ลูกค้าถือครอง
+  /// — ใช้แสดงในหน้าเลือกคูปองตอน checkout
   ///
   /// Path parameters:
-  /// - orderId: String (uuid ของ draft order)
-  ///
-  /// Body:
-  /// - CheckoutUpdateRequest (coupon_customer_id, payment_method)
+  /// - customerId: String (uuid)
   ///
   /// Response:
-  /// - CheckoutDraftResponse (data shape เดียวกับ GET — มี summary recalculated ใหม่)
-  @PATCH('/browny-shop/checkout/{orderId}')
-  Future<HttpResponse<CheckoutDraftResponse>> updateCheckoutDraft(
-    @Path('orderId') String orderId,
-    @Body() CheckoutUpdateRequest body,
+  /// - CouponBrownyShopResponse with list of CouponData
+  ///   (รวม field พิเศษ: discount_target, discount_type, value, max_discount,
+  ///    min_order_amount, allow_with_promotion, allow_with_product_discount)
+  @GET('/customer/coupons/browny-shop/{customerId}')
+  Future<HttpResponse<CouponBrownyShopResponse>> fetchBrownyShopCoupons(
+    @Path('customerId') String customerId,
   );
 
   /// DONG 2026-05-18

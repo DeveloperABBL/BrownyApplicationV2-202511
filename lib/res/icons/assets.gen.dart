@@ -1,5 +1,3 @@
-// dart format width=80
-
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -7,7 +5,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
+// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -172,6 +170,22 @@ class $AssetsIcShopGen {
   AssetGenImage get brownyShopBannerZh =>
       const AssetGenImage('assets/ic_shop/browny_shop_banner_zh.png');
 
+  /// File path: assets/ic_shop/browny_thank_you.png
+  AssetGenImage get brownyThankYou =>
+      const AssetGenImage('assets/ic_shop/browny_thank_you.png');
+
+  /// File path: assets/ic_shop/browny_warning_transfer_en.png
+  AssetGenImage get brownyWarningTransferEn =>
+      const AssetGenImage('assets/ic_shop/browny_warning_transfer_en.png');
+
+  /// File path: assets/ic_shop/browny_warning_transfer_th.png
+  AssetGenImage get brownyWarningTransferTh =>
+      const AssetGenImage('assets/ic_shop/browny_warning_transfer_th.png');
+
+  /// File path: assets/ic_shop/browny_warning_transfer_zh.png
+  AssetGenImage get brownyWarningTransferZh =>
+      const AssetGenImage('assets/ic_shop/browny_warning_transfer_zh.png');
+
   /// File path: assets/ic_shop/ic_address_house.png
   AssetGenImage get icAddressHouse =>
       const AssetGenImage('assets/ic_shop/ic_address_house.png');
@@ -206,9 +220,32 @@ class $AssetsIcShopGen {
   AssetGenImage get icBrownyShop =>
       const AssetGenImage('assets/ic_shop/ic_browny_shop.png');
 
-  /// File path: assets/ic_shop/ic_chevron_right.svg
-  SvgGenImage get icChevronRight =>
-      const SvgGenImage('assets/ic_shop/ic_chevron_right.svg');
+  /// File path: assets/ic_shop/ic_card_rounded_active.png
+  AssetGenImage get icCardRoundedActive =>
+      const AssetGenImage('assets/ic_shop/ic_card_rounded_active.png');
+
+  /// File path: assets/ic_shop/ic_card_rounded_inactive.png
+  AssetGenImage get icCardRoundedInactive =>
+      const AssetGenImage('assets/ic_shop/ic_card_rounded_inactive.png');
+
+  /// File path: assets/ic_shop/ic_card_rounded_orange.png
+  AssetGenImage get icCardRoundedOrange =>
+      const AssetGenImage('assets/ic_shop/ic_card_rounded_orange.png');
+
+  /// File path: assets/ic_shop/ic_cart_rounded_green.png
+  AssetGenImage get icCartRoundedGreen =>
+      const AssetGenImage('assets/ic_shop/ic_cart_rounded_green.png');
+
+  /// File path: assets/ic_shop/ic_cart_rounded_inactive.png
+  AssetGenImage get icCartRoundedInactive =>
+      const AssetGenImage('assets/ic_shop/ic_cart_rounded_inactive.png');
+
+  /// File path: assets/ic_shop/ic_chevron_right.png
+  AssetGenImage get icChevronRight =>
+      const AssetGenImage('assets/ic_shop/ic_chevron_right.png');
+
+  /// File path: assets/ic_shop/ic_copy.svg
+  SvgGenImage get icCopy => const SvgGenImage('assets/ic_shop/ic_copy.svg');
 
   /// File path: assets/ic_shop/ic_coupon_rounded_green.png
   AssetGenImage get icCouponRoundedGreen =>
@@ -228,6 +265,10 @@ class $AssetsIcShopGen {
 
   /// File path: assets/ic_shop/ic_flash.svg
   SvgGenImage get icFlash => const SvgGenImage('assets/ic_shop/ic_flash.svg');
+
+  /// File path: assets/ic_shop/ic_forward.svg
+  SvgGenImage get icForward =>
+      const SvgGenImage('assets/ic_shop/ic_forward.svg');
 
   /// File path: assets/ic_shop/ic_heart.png
   AssetGenImage get icHeart =>
@@ -253,6 +294,22 @@ class $AssetsIcShopGen {
   AssetGenImage get icTrash =>
       const AssetGenImage('assets/ic_shop/ic_trash.png');
 
+  /// File path: assets/ic_shop/ic_truck_rounded_active.png
+  AssetGenImage get icTruckRoundedActive =>
+      const AssetGenImage('assets/ic_shop/ic_truck_rounded_active.png');
+
+  /// File path: assets/ic_shop/ic_truck_rounded_ci3.png
+  AssetGenImage get icTruckRoundedCi3 =>
+      const AssetGenImage('assets/ic_shop/ic_truck_rounded_ci3.png');
+
+  /// File path: assets/ic_shop/ic_truck_rounded_inactive.png
+  AssetGenImage get icTruckRoundedInactive =>
+      const AssetGenImage('assets/ic_shop/ic_truck_rounded_inactive.png');
+
+  /// File path: assets/ic_shop/ic_truck_rounded_orange.png
+  AssetGenImage get icTruckRoundedOrange =>
+      const AssetGenImage('assets/ic_shop/ic_truck_rounded_orange.png');
+
   /// File path: assets/ic_shop/ic_truck_tick.png
   AssetGenImage get icTruckTick =>
       const AssetGenImage('assets/ic_shop/ic_truck_tick.png');
@@ -270,6 +327,10 @@ class $AssetsIcShopGen {
     brownyShopBannerEn,
     brownyShopBannerTh,
     brownyShopBannerZh,
+    brownyThankYou,
+    brownyWarningTransferEn,
+    brownyWarningTransferTh,
+    brownyWarningTransferZh,
     icAddressHouse,
     icBag,
     icBagCart,
@@ -279,18 +340,29 @@ class $AssetsIcShopGen {
     icBoxLineWhite,
     icBrownyPawGradient,
     icBrownyShop,
+    icCardRoundedActive,
+    icCardRoundedInactive,
+    icCardRoundedOrange,
+    icCartRoundedGreen,
+    icCartRoundedInactive,
     icChevronRight,
+    icCopy,
     icCouponRoundedGreen,
     icDiscount,
     icFavActive,
     icFavInactive,
     icFlash,
+    icForward,
     icHeart,
     icShoppingBag,
     icTicket,
     icTicketLineWhite,
     icTicketRounded,
     icTrash,
+    icTruckRoundedActive,
+    icTruckRoundedCi3,
+    icTruckRoundedInactive,
+    icTruckRoundedOrange,
     icTruckTick,
     midBanner,
   ];
@@ -655,6 +727,10 @@ class $AssetsPngGen {
   AssetGenImage get brownySuccess2 =>
       const AssetGenImage('assets/png/browny_success_2.png');
 
+  /// File path: assets/png/browny_success_3.png
+  AssetGenImage get brownySuccess3 =>
+      const AssetGenImage('assets/png/browny_success_3.png');
+
   /// File path: assets/png/browny_washy.png
   AssetGenImage get brownyWashy =>
       const AssetGenImage('assets/png/browny_washy.png');
@@ -792,6 +868,7 @@ class $AssetsPngGen {
     brownySuccess,
     brownySuccess1,
     brownySuccess2,
+    brownySuccess3,
     brownyWashy,
     cardCoinClaim,
     cardCouponEvoucher,
@@ -1444,18 +1521,12 @@ class Assets {
 }
 
 class AssetGenImage {
-  const AssetGenImage(
-    this._assetName, {
-    this.size,
-    this.flavors = const {},
-    this.animation,
-  });
+  const AssetGenImage(this._assetName, {this.size, this.flavors = const {}});
 
   final String _assetName;
 
   final Size? size;
   final Set<String> flavors;
-  final AssetGenImageAnimation? animation;
 
   Image image({
     Key? key,
@@ -1519,18 +1590,6 @@ class AssetGenImage {
   String get keyName => _assetName;
 }
 
-class AssetGenImageAnimation {
-  const AssetGenImageAnimation({
-    required this.isAnimation,
-    required this.duration,
-    required this.frames,
-  });
-
-  final bool isAnimation;
-  final Duration duration;
-  final int frames;
-}
-
 class SvgGenImage {
   const SvgGenImage(this._assetName, {this.size, this.flavors = const {}})
     : _isVecFormat = false;
@@ -1557,7 +1616,6 @@ class SvgGenImage {
     String? semanticsLabel,
     bool excludeFromSemantics = false,
     _svg.SvgTheme? theme,
-    _svg.ColorMapper? colorMapper,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
@@ -1577,7 +1635,6 @@ class SvgGenImage {
         assetBundle: bundle,
         packageName: package,
         theme: theme,
-        colorMapper: colorMapper,
       );
     }
     return _svg.SvgPicture(

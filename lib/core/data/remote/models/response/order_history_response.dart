@@ -75,6 +75,9 @@ class OrderHistoryItem {
     this.paymentMethod,
     this.amount,
     this.packageName,
+    this.itemCount,
+    this.title,
+    this.sortAt,
   });
 
   @JsonKey(name: 'type')
@@ -117,11 +120,31 @@ class OrderHistoryItem {
   @JsonKey(name: 'package_name')
   final ContentLocalizeData? packageName;
 
+  /// สำหรับ type = browny_shop_order — จำนวนรายการสินค้าในออเดอร์
+  @JsonKey(name: 'item_count')
+  final int? itemCount;
+
+  /// สำหรับ type = browny_shop_order — ชื่อย่อสินค้า (เช่น "น้ำยาซักผ้า Browny 2L (+1)")
+  @JsonKey(name: 'title')
+  final ContentLocalizeData? title;
+
+  /// สำหรับ type = browny_shop_order — วันที่/เวลาใช้ sort (paid_at / created_at)
+  @JsonKey(name: 'sort_at')
+  final String? sortAt;
+
   /// เช็คว่าเป็น order ประเภทการใช้เครื่อง
   bool get isMachineOrder => type == 'machine_order';
 
   /// เช็คว่าเป็น order ประเภทซื้อแพ็กเกจคูปอง
   bool get isCouponPackageOrder => type == 'coupon_package_order';
+
+  /// เช็คว่าเป็น order ประเภท Browny Shop
+  bool get isBrownyShopOrder => type == 'browny_shop_order';
+
+  /// ดึงชื่อย่อสินค้าตาม locale (สำหรับ browny_shop_order)
+  String getTitleDisplay(String locale) {
+    return title?.getByLocaleCode(locale) ?? '';
+  }
 
   /// ดึงชื่อแพ็กเกจตาม locale (สำหรับ coupon_package_order)
   String getPackageNameDisplay(String locale) {

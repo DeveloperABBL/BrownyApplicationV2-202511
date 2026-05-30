@@ -65,6 +65,7 @@ class TransactionsViewmodel extends AppViewModel
     _evoucherForSellNotifier.dispose();
     _evoucherNotifier.dispose();
     _discountNotifier.dispose();
+    _brownyShopCouponNotifier.dispose();
     _transactionStateNotifier.dispose();
     _inputCollectCouponNotifier.dispose();
     _inputCollectCouponControler.dispose();
@@ -92,6 +93,14 @@ class TransactionsViewmodel extends AppViewModel
   );
   ValueListenable<UiResult<Map<String, List<CustomerCouponModel>>>>
   get discountNotifier => _discountNotifier;
+
+  /// คูปอง Browny Shop ของลูกค้า — section เดียว (คูปองส่วนลด) ไม่ต้อง group
+  late final ValueNotifier<UiResult<List<CustomerCouponModel>>>
+  _brownyShopCouponNotifier = ValueNotifier(
+    UiResult.loading(),
+  );
+  ValueListenable<UiResult<List<CustomerCouponModel>>>
+  get brownyShopCouponNotifier => _brownyShopCouponNotifier;
 
   late final ValueNotifier<UiResult<CouponListModel>> _evoucherForSellNotifier =
       ValueNotifier(
@@ -689,6 +698,38 @@ class TransactionsViewmodel extends AppViewModel
     }
 
     _discountNotifier.value = UiResult.success(data: groupedMap);
+  }
+
+  /// ดึงคูปอง Browny Shop ของลูกค้า — map เป็น [CustomerCouponModel] แสดงใน
+  /// section เดียว (ยังไม่ต้อง group เหมือนคูปองซักอบ)
+  Future<void> fetchCustomerBrownyShopCoupon() async {
+    if (!brownyShopCouponNotifier.value.isLoading) {
+      _brownyShopCouponNotifier.value = UiResult.loading();
+    }
+
+    final id = currentCustomerProvider.current.id!;
+    final result = await _couponRepo.fetchCouponBrownyShop(id);
+
+    if (result.isEmpty || result.data.data.orEmpty.isEmpty) {
+      _brownyShopCouponNotifier.value = UiResult.empty();
+      return;
+    }
+
+    if (result.hasError) {
+      _brownyShopCouponNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+
+    final coupons = result.data.data!
+        .map(
+          (e) => CustomerCouponModel.fromCouponData(
+            e,
+            customerCouponModelSelected?.customerCouponId == e.customerCouponId,
+          ),
+        )
+        .toList();
+
+    _brownyShopCouponNotifier.value = UiResult.success(data: coupons);
   }
 
   void onCustomerDiscountSelected(CustomerCouponModel customerDiscount) {

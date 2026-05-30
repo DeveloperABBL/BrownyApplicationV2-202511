@@ -70,6 +70,11 @@ OrderHistoryItem _$OrderHistoryItemFromJson(Map<String, dynamic> json) =>
           : ContentLocalizeData.fromJson(
               json['package_name'] as Map<String, dynamic>,
             ),
+      itemCount: (json['item_count'] as num?)?.toInt(),
+      title: json['title'] == null
+          ? null
+          : ContentLocalizeData.fromJson(json['title'] as Map<String, dynamic>),
+      sortAt: json['sort_at'] as String?,
     );
 
 Map<String, dynamic> _$OrderHistoryItemToJson(OrderHistoryItem instance) =>
@@ -87,6 +92,9 @@ Map<String, dynamic> _$OrderHistoryItemToJson(OrderHistoryItem instance) =>
       'payment_method': instance.paymentMethod,
       'amount': instance.amount,
       'package_name': instance.packageName,
+      'item_count': instance.itemCount,
+      'title': instance.title,
+      'sort_at': instance.sortAt,
     };
 
 OrderHistoryStore _$OrderHistoryStoreFromJson(Map<String, dynamic> json) =>

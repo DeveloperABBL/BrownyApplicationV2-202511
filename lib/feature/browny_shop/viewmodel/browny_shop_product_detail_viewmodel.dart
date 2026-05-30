@@ -3,6 +3,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/cart_it
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:flutter/foundation.dart';
 
 /// 1 รายการ thumbnail — ต้องเก็บคู่ (id, imageUrl) เพราะ
@@ -45,6 +46,7 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
   void dispose() {
     _productNotifier.dispose();
     _selectedThumbnailNotifier.dispose();
+    _selectedCouponNotifier.dispose();
     super.dispose();
   }
 
@@ -61,6 +63,41 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
 
   void onThumbnailSelected(ProductImageThumb thumb) {
     _selectedThumbnailNotifier.value = thumb;
+  }
+
+  // ========== คูปอง Browny Shop ที่เลือกใช้กับสินค้านี้ ==========
+
+  /// คูปองที่ user เลือกมาใช้ (null = ยังไม่เลือก) — carry ไปหน้า checkout เมื่อ
+  /// กด "ซื้อเลย"
+  final ValueNotifier<CustomerCouponModel?> _selectedCouponNotifier =
+      ValueNotifier(null);
+  ValueListenable<CustomerCouponModel?> get selectedCouponNotifier =>
+      _selectedCouponNotifier;
+
+  /// ตั้ง/ล้างคูปองที่เลือก — เรียกหลังกลับจาก [CouponVoucherPage]
+  void setSelectedCoupon(CustomerCouponModel? coupon) {
+    _selectedCouponNotifier.value = coupon;
+  }
+
+  /// sub แรกของสินค้าปัจจุบัน (ใช้เป็น basis ตรวจเงื่อนไขคูปอง)
+  ProductSubData? get _firstSub {
+    final subs = _productNotifier.value.data?.productSubs;
+    return (subs != null && subs.isNotEmpty) ? subs.first : null;
+  }
+
+  /// ยอดที่ใช้ตรวจ min_order_amount บนหน้า detail = ราคาต่อชิ้น × 1
+  num get couponOrderAmount => _firstSub?.moneyPriceValue ?? 0;
+  bool get couponHasFlashSale => _firstSub?.isFlashSale ?? false;
+  bool get couponHasProductDiscount => _firstSub?.hasMoneyDiscount ?? false;
+
+  /// error message ถ้าคูปองที่เลือกใช้กับสินค้านี้ไม่ได้ (null = ใช้ได้)
+  String? validSelectedCouponMessage(BuildContext context) {
+    return _selectedCouponNotifier.value?.validBrownyShopCouponMessage(
+      context,
+      orderAmount: couponOrderAmount,
+      hasFlashSale: couponHasFlashSale,
+      hasProductDiscount: couponHasProductDiscount,
+    );
   }
 
   /// สร้าง list ของ thumbnail — main image (subId=null) นำหน้า ตามด้วย product_subs

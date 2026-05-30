@@ -60,6 +60,12 @@ CheckoutDraftData _$CheckoutDraftDataFromJson(
   summary: json['summary'] == null
       ? null
       : CheckoutSummaryData.fromJson(json['summary'] as Map<String, dynamic>),
+  paymentUrl: json['payment_url'] as String?,
+  responsePayload: json['response_payload'] == null
+      ? null
+      : CheckoutResponsePayload.fromJson(
+          json['response_payload'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$CheckoutDraftDataToJson(CheckoutDraftData instance) =>
@@ -87,7 +93,29 @@ Map<String, dynamic> _$CheckoutDraftDataToJson(CheckoutDraftData instance) =>
       'shipping_address': instance.shippingAddress,
       'items': instance.items,
       'summary': instance.summary,
+      'payment_url': instance.paymentUrl,
+      'response_payload': instance.responsePayload,
     };
+
+CheckoutResponsePayload _$CheckoutResponsePayloadFromJson(
+  Map<String, dynamic> json,
+) => CheckoutResponsePayload(
+  qrcode: json['qrcode'] as String?,
+  wechat: json['wechat'] as String?,
+  method: json['method'] as String?,
+  amount: json['amount'] as num?,
+  coinAmountUsed: json['coin_amount_used'] as num?,
+);
+
+Map<String, dynamic> _$CheckoutResponsePayloadToJson(
+  CheckoutResponsePayload instance,
+) => <String, dynamic>{
+  'qrcode': instance.qrcode,
+  'wechat': instance.wechat,
+  'method': instance.method,
+  'amount': instance.amount,
+  'coin_amount_used': instance.coinAmountUsed,
+};
 
 CheckoutShippingAddressData _$CheckoutShippingAddressDataFromJson(
   Map<String, dynamic> json,
@@ -164,6 +192,9 @@ CheckoutSummaryData _$CheckoutSummaryDataFromJson(Map<String, dynamic> json) =>
       coinValue: json['coin_value'] as num?,
       couponCustomerId: (json['coupon_customer_id'] as num?)?.toInt(),
       paymentMethod: json['payment_method'] as String?,
+      coupon: json['coupon'] == null
+          ? null
+          : CouponData.fromJson(json['coupon'] as Map<String, dynamic>),
       items: (json['items'] as List<dynamic>?)
           ?.map(
             (e) => CheckoutSummaryItemData.fromJson(e as Map<String, dynamic>),
@@ -187,6 +218,7 @@ Map<String, dynamic> _$CheckoutSummaryDataToJson(
   'coin_value': instance.coinValue,
   'coupon_customer_id': instance.couponCustomerId,
   'payment_method': instance.paymentMethod,
+  'coupon': instance.coupon,
   'items': instance.items,
 };
 

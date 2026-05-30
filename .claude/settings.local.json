@@ -27,7 +27,28 @@
       "Bash(curl -s -o picker1.png \"https://www.figma.com/api/mcp/asset/d5454e8f-b048-4f7b-8d64-20ac1dba0178\")",
       "Bash(curl -s -o picker2.png \"https://www.figma.com/api/mcp/asset/2a9add1b-f027-4a97-9f89-c93ac05f3447\")",
       "Bash(curl -s -o tapinput.png \"https://www.figma.com/api/mcp/asset/89d4364d-508b-4c8c-b2e9-91104ecd10f1\")",
-      "WebFetch(domain:web.postman.co)"
+      "WebFetch(domain:web.postman.co)",
+      "Bash(flutter --version)",
+      "Bash(flutter widget-preview *)",
+      "Bash(awk 'NR>=484 && /^  }$/ {print NR\": \"$0; exit}' lib/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart)",
+      "Bash(sed -i '' '483,818d' lib/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart)",
+      "Bash(sed -n '480,486p' lib/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart)",
+      "Bash(flutter config *)",
+      "Bash(cd /Users/chayakornlaoprasert/Documents/Flutter/browny_v3 *)",
+      "Read(//Users/chayakornlaoprasert/.config/flutter/**)",
+      "Bash(rm -rf ios/Runner.xcworkspace/xcshareddata/swiftpm)",
+      "Bash(rm -rf ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm)",
+      "Bash(rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-*)",
+      "Bash(rm -rf ~/Library/Caches/org.swift.swiftpm)",
+      "Bash(flutter clean *)",
+      "Bash(flutter pub *)",
+      "Bash(pod install *)",
+      "Bash(jq [.[].type] /Users/chayakornlaoprasert/.claude/projects/-Users-chayakornlaoprasert-Documents-Flutter-browny-v3/da795fa5-ef7b-41c9-a14e-e2b713df180f/tool-results/mcp-figma-dev-mode-get_design_context-1780162993744.txt)",
+      "Bash(jq -r .[].text /Users/chayakornlaoprasert/.claude/projects/-Users-chayakornlaoprasert-Documents-Flutter-browny-v3/da795fa5-ef7b-41c9-a14e-e2b713df180f/tool-results/mcp-figma-dev-mode-get_design_context-1780162993744.txt)",
+      "Read(//tmp/**)",
+      "Bash(grep -n 'get icShop\\\\|class $AssetsIcShopGen\\\\|get png\\\\b\\\\|get svg\\\\b' lib/res/icons/assets.gen.dart)",
+      "Bash(grep -m1 '\"__TRACKED_VAR__\":' lib/res/strings/l10n/app_th.arb)",
+      "Bash(grep -nF '\"__TRACKED_VAR__\"' lib/res/strings/l10n/app_th.arb)"
     ]
   }
 }

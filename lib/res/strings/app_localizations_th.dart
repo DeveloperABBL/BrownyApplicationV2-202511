@@ -1684,6 +1684,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get couponFullyRedeemed => 'สิทธิ์เต็ม';
 
   @override
+  String get couponCannotUseWithPromotion => 'ใช้ร่วมกับโปรโมชั่นไม่ได้';
+
+  @override
+  String get couponCannotUseWithProductDiscount =>
+      'ใช้ร่วมกับส่วนลดสินค้าไม่ได้';
+
+  @override
   String get freeShipping => 'ส่งฟรี';
 
   @override
@@ -1799,4 +1806,52 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get selectSubdistrict => 'เลือกแขวง/ตำบล';
+
+  @override
+  String get orderShopping => 'การสั่งซื้อ';
+
+  @override
+  String get shippingInfo => 'ข้อมูลการจัดส่ง';
+
+  @override
+  String get shippingAddressDetail => 'รายละเอียดที่อยู่จัดส่ง';
+
+  @override
+  String get orderStatus => 'สถานะคำสั่งซื้อ';
+
+  @override
+  String get ordered => 'สั่งซื้อ';
+
+  @override
+  String get delivery => 'จัดส่ง';
+
+  @override
+  String get waitingForDelivery => 'รอจัดส่ง';
+
+  @override
+  String get pendingPayment => 'รอชำระเงิน';
+
+  @override
+  String get parcelNumber => 'เลขพัสดุ';
+
+  @override
+  String get copy => 'คัดลอก';
+
+  @override
+  String get orderTotal => 'รวมคำสั่งซื้อ';
+
+  @override
+  String get afterSalesService => 'บริการหลังการขาย';
+
+  @override
+  String get order => 'คำสั่งซื้อ';
+
+  @override
+  String get orderTime => 'เวลาที่สั่งซื้อ';
+
+  @override
+  String get paymentTime => 'เวลาที่ชำระเงิน';
+
+  @override
+  String get deliveryTime => 'เวลาที่จัดส่ง';
 }

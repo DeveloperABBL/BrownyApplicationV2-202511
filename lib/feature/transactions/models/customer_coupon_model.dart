@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/const/app_constants.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/coupon_data_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -258,6 +259,12 @@ class CustomerCouponModel extends CouponData {
     return usageLabel?.getByLocaleCode(locale) ?? '';
   }
 
+  /// ดึง localized usage label ตาม locale ปัจจุบัน
+  String brownyUsageLabelDisplay(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return description?.getByLocaleCode(locale) ?? '';
+  }
+
   /// ดึง localized store name ตาม locale ปัจจุบัน
   String storeNameDisplay(BuildContext context) {
     final locale = context.languageCode;
@@ -269,6 +276,11 @@ class CustomerCouponModel extends CouponData {
   String descriptionDisplay(BuildContext context) {
     final locale = Localizations.localeOf(context).languageCode;
     return description?.getByLocaleCode(locale) ?? '';
+  }
+
+  /// ดึง localized description ตาม locale ปัจจุบัน
+  String brownyDescriptionDisplay(BuildContext context) {
+    return context.wording.onlyParticipatingItems;
   }
 
   /// ดึง localized description
@@ -344,6 +356,95 @@ class CustomerCouponModel extends CouponData {
     }
   }
 
+  /// แสดงวันหมดอายุคูปอง Browny Shop — เช่น "คูปองหมดอายุ 26 มิ.ย. 2026"
+  /// (ต่างจาก [expireDateDisplay] ที่แสดงเป็น "เหลือ N วัน")
+  String expiresAtBrownyShopDisplay(BuildContext context) {
+    final locale = context.languageCode;
+    final date = expiryDate;
+    if (date == null) return '';
+    return '${context.wording.couponExpiresLabel} '
+        '${date.formatDateLocale(locale, pattern: 'dd MMM yyyy')}';
+  }
+
+  // ========== Browny Shop coupon (discount target/condition) ==========
+
+  /// ยอดสั่งซื้อขั้นต่ำที่ใช้คูปองได้ (แปลงจาก string)
+  num get minOrderAmountValue => double.tryParse(minOrderAmount ?? '0') ?? 0;
+
+  /// มูลค่าส่วนลด (fixed = บาท, percent = เปอร์เซ็นต์)
+  num get couponValue => double.tryParse(value ?? '0') ?? 0;
+
+  /// เพดานส่วนลด (เฉพาะ percent) — null = ไม่จำกัด
+  num? get maxDiscountValue => (maxDiscount == null || maxDiscount!.isEmpty)
+      ? null
+      : double.tryParse(maxDiscount!);
+
+  bool get isPercentDiscount => discountType?.toLowerCase() == 'percent';
+  bool get isFixedDiscount => discountType?.toLowerCase() == 'fixed';
+
+  /// คำนวณส่วนลดที่คูปองนี้ให้ เทียบกับยอด [orderAmount]
+  /// (percent คิด % แล้ว cap ด้วย max_discount, fixed คืนค่าคงที่ —
+  /// ทั้งคู่ไม่เกินยอดสั่งซื้อ)
+  num computeBrownyShopDiscount(num orderAmount) {
+    if (orderAmount <= 0) return 0;
+    if (isPercentDiscount) {
+      final raw = orderAmount * couponValue / 100;
+      final cap = maxDiscountValue;
+      final discount = (cap != null && raw > cap) ? cap : raw;
+      return discount > orderAmount ? orderAmount : discount;
+    }
+    // fixed (และ type อื่นที่เป็นจำนวนเงินคงที่)
+    return couponValue > orderAmount ? orderAmount : couponValue;
+  }
+
+  /// ตรวจเงื่อนไขคูปอง Browny Shop แบบไม่ผูก context (ใช้ใน ViewModel)
+  /// — true = ใช้ได้กับยอด/สถานะที่ส่งเข้ามา
+  bool isUsableForBrownyShop({
+    required num orderAmount,
+    bool hasFlashSale = false,
+    bool hasProductDiscount = false,
+  }) {
+    if (remainingCount <= 0) return false;
+    if (orderAmount < minOrderAmountValue) return false;
+    if (hasFlashSale && allowWithPromotion == false) return false;
+    if (hasProductDiscount && allowWithProductDiscount == false) return false;
+    return true;
+  }
+
+  /// ตรวจเงื่อนไขคูปอง Browny Shop กับยอด/สถานะสินค้าปัจจุบัน
+  /// คืน error message (localized) ถ้าใช้ไม่ได้, null = ใช้ได้
+  ///
+  /// - [orderAmount]: ยอดที่ใช้เทียบ min_order_amount
+  /// - [hasFlashSale]: สินค้ามี Flash Sale (ใช้กับ allow_with_promotion)
+  /// - [hasProductDiscount]: สินค้ามีส่วนลด (ใช้กับ allow_with_product_discount)
+  String? validBrownyShopCouponMessage(
+    BuildContext context, {
+    required num orderAmount,
+    bool hasFlashSale = false,
+    bool hasProductDiscount = false,
+  }) {
+    
+    // สิทธิ์คงเหลือ
+    if (remainingCount <= 0) {
+      return context.wording.couponFullyRedeemed;
+    }
+    // ยอดขั้นต่ำ
+    if (orderAmount < minOrderAmountValue) {
+      return context.wording.couponMinimumAmountRequired(
+        formatCurrency(leadingSign: '฿', value: minOrderAmountValue),
+      );
+    }
+    // ใช้ร่วมกับ Flash Sale / โปรโมชั่น
+    if (hasFlashSale && allowWithPromotion == false) {
+      return context.wording.couponCannotUseWithPromotion;
+    }
+    // ใช้ร่วมกับส่วนลดสินค้า
+    if (hasProductDiscount && allowWithProductDiscount == false) {
+      return context.wording.couponCannotUseWithProductDiscount;
+    }
+    return null;
+  }
+
   String dateLeftDisplay(BuildContext context) {
     final locale = context.languageCode;
     if (expiryDate != null) {
@@ -363,6 +464,8 @@ class CustomerCouponModel extends CouponData {
 
   /// ตัวช่วยตรวจสอบว่าคูปองใช้ได้หรือไม่
   bool get canUse => (isAvailable ?? false) && !(isExpired ?? true);
+
+  bool get brownyCanUse => remainingCount > 0;
 
   /// แปลง remaining เป็น int สำหรับแสดงผล
   int get remainingCount => int.tryParse(remaining ?? '0') ?? 0;

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browny Shop API — Changelog (30 พ.ค. 2026)</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1f2733;
+    --muted: #6b7785;
+    --line: #e4e8ee;
+    --brand: #2f9e6f;
+    --brand-soft: #e7f5ee;
+    --code-bg: #1e2430;
+    --code-ink: #e6edf3;
+    --json-key: #79c0ff;
+    --json-str: #a5d6a4;
+    --json-num: #f0a868;
+    --json-bool: #d2a8ff;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.05);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Sarabun", "Noto Sans Thai", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Layout */
+  .layout { display: flex; max-width: 1180px; margin: 0 auto; gap: 28px; padding: 0 20px; }
+  .toc {
+    width: 250px; flex-shrink: 0; position: sticky; top: 0; align-self: flex-start;
+    max-height: 100vh; overflow-y: auto; padding: 28px 0; font-size: 13.5px;
+  }
+  .toc h4 { margin: 18px 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .toc a { display: block; padding: 5px 10px; border-radius: 7px; color: var(--muted); border-left: 2px solid transparent; }
+  .toc a:hover { background: var(--brand-soft); color: var(--brand); text-decoration: none; }
+  .content { flex: 1; min-width: 0; padding: 28px 0 80px; }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, #2f9e6f, #38b27e);
+    color: #fff; border-radius: 16px; padding: 32px 34px; margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+  .hero h1 { margin: 0 0 6px; font-size: 26px; font-weight: 700; }
+  .hero .sub { opacity: .92; font-size: 14px; }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .hero .chip {
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25);
+    padding: 5px 12px; border-radius: 999px; font-size: 12.5px;
+  }
+  .hero .chip code { background: rgba(0,0,0,.18); color: #fff; padding: 1px 6px; border-radius: 5px; }
+
+  /* Cards / sections */
+  section.card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 28px; margin-bottom: 22px; box-shadow: var(--shadow);
+  }
+  h2 { font-size: 20px; margin: 4px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--line); scroll-margin-top: 20px; }
+  h3 { font-size: 16.5px; margin: 26px 0 10px; color: #2a3340; scroll-margin-top: 20px; }
+  h4 { font-size: 14.5px; margin: 18px 0 8px; color: #3a4452; }
+  p { margin: 10px 0; }
+
+  /* Endpoint line */
+  .endpoint {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: #f9fafb; border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px 12px; margin: 12px 0; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13.5px;
+  }
+  .endpoint .path { color: #2a3340; font-weight: 600; word-break: break-all; }
+
+  /* Method badges */
+  .m { font: 700 11px/1 ui-monospace, monospace; padding: 5px 9px; border-radius: 6px; color: #fff; letter-spacing: .03em; flex-shrink: 0; }
+  .m.get { background: #2f86d6; }
+  .m.post { background: #2f9e6f; }
+  .m.put { background: #d98a2b; }
+  .m.patch { background: #b07ad6; }
+  .m.delete { background: #d9534f; }
+
+  /* Status badges */
+  .st { font: 600 11px/1.4 -apple-system, sans-serif; padding: 3px 9px; border-radius: 999px; display: inline-block; }
+  .st.new { background: #e7f5ee; color: #1f7a52; }
+  .st.edit { background: #fff3e0; color: #b5701a; }
+  .st.removed { background: #fdecea; color: #c0392b; text-decoration: line-through; }
+
+  /* Response code pills */
+  .resp { font: 700 12px/1 ui-monospace, monospace; padding: 4px 9px; border-radius: 6px; display: inline-block; margin: 16px 0 6px; }
+  .resp.ok { background: #e7f5ee; color: #1f7a52; }
+  .resp.err { background: #fdecea; color: #c0392b; }
+  .resp .label { font-weight: 500; color: var(--muted); margin-left: 6px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #f4f6f8; font-weight: 600; font-size: 12.5px; color: #44505e; text-transform: uppercase; letter-spacing: .03em; }
+  tbody tr:hover { background: #fafbfc; }
+  td code, th code { font-size: 12.5px; }
+
+  /* Inline code */
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: #eef1f4; color: #b5377a; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+
+  /* Code blocks */
+  .codewrap { position: relative; margin: 10px 0; }
+  pre {
+    background: var(--code-bg); color: var(--code-ink); border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto; margin: 0; font-size: 13px; line-height: 1.6;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: 13px; }
+  .codewrap .lang {
+    position: absolute; top: 8px; right: 10px; font: 600 10.5px/1 ui-monospace, monospace;
+    color: #8b97a6; text-transform: uppercase; letter-spacing: .08em; user-select: none;
+  }
+  /* JSON token colors */
+  .tok-key { color: var(--json-key); }
+  .tok-str { color: var(--json-str); }
+  .tok-num { color: var(--json-num); }
+  .tok-bool { color: var(--json-bool); }
+  .tok-null { color: var(--json-bool); }
+  .tok-punc { color: #8b97a6; }
+
+  /* Note box */
+  .note {
+    background: #fffbe9; border-left: 4px solid #e6b94f; padding: 10px 14px;
+    border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13.5px; color: #6b5a23;
+  }
+  .note b { color: #5a4a1a; }
+
+  /* Flow box */
+  .flow {
+    background: var(--brand-soft); border: 1px dashed #88c8a8; border-radius: 9px;
+    padding: 14px 18px; margin: 12px 0; font-family: ui-monospace, monospace; font-size: 13.5px;
+    color: #1f7a52; white-space: pre-wrap;
+  }
+
+  hr { border: none; border-top: 1px solid var(--line); margin: 26px 0; }
+  .pill-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .toc { display: none; }
+    .content { padding: 18px 0 60px; }
+    .hero { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===== TOC ===== -->
+  <nav class="toc">
+    <h4>เมนู</h4>
+    <a href="#summary">สรุปการเปลี่ยนแปลง</a>
+    <a href="#favorites">1. Favorite Items</a>
+    <a href="#cart-summary">2. Cart Summary</a>
+    <a href="#checkout">3. Checkout (ยกเลิก Draft)</a>
+    <a href="#deprecated">4. Endpoints ที่ยกเลิก</a>
+    <a href="#migration">5. Migration Frontend</a>
+    <h4>เพิ่มเติม (ภายหลัง)</h4>
+    <a href="#pending">Pending payment</a>
+    <a href="#get-checkout">GET checkout · payload</a>
+    <a href="#fav-list">รายการสินค้าโปรด</a>
+    <a href="#shipping-est">Cart · shipping estimate</a>
+    <a href="#lucky">Receipt · lucky no</a>
+  </nav>
+
+  <!-- ===== CONTENT ===== -->
+  <main class="content">
+
+    <header class="hero">
+      <h1>Browny Shop API — Changelog</h1>
+      <div class="sub">เอกสารการเปลี่ยนแปลง / เพิ่มใหม่ของ API</div>
+      <div class="meta">
+        <span class="chip">📅 30 พฤษภาคม 2026</span>
+        <span class="chip">Base URL: <code>{APP_URL}/api</code></span>
+        <span class="chip">Auth: <code>Bearer {TOKEN}</code> · CheckApiToken</span>
+      </div>
+    </header>
+
+    <!-- Summary -->
+    <section class="card" id="summary">
+      <h2>สรุปการเปลี่ยนแปลง</h2>
+      <table>
+        <thead><tr><th>สถานะ</th><th>Method</th><th>Endpoint</th></tr></thead>
+        <tbody>
+          <tr><td><span class="st new">เพิ่มใหม่</span></td><td><span class="m post">POST</span></td><td><code>/browny-shop/favorites</code></td></tr>
+          <tr><td><span class="st new">เพิ่มใหม่</span></td><td><span class="m delete">DELETE</span></td><td><code>/browny-shop/favorites/{product_id}</code></td></tr>
+          <tr><td><span class="st edit">แก้ไข</span></td><td><span class="m get">GET</span></td><td><code>/browny-shop/cart/summary</code></td></tr>
+          <tr><td><span class="st edit">แก้ไข</span></td><td><span class="m post">POST</span></td><td><code>/browny-shop/cart/summary</code></td></tr>
+          <tr><td><span class="st new">เพิ่มใหม่</span></td><td><span class="m post">POST</span></td><td><code>/browny-shop/checkout/confirm</code></td></tr>
+          <tr><td><span class="st edit">แก้ไข</span></td><td><span class="m post">POST</span></td><td><code>/browny-shop/checkout/{order_id}/confirm</code></td></tr>
+          <tr><td><span class="st edit">แก้ไข</span></td><td><span class="m get">GET</span></td><td><code>/browny-shop/checkout/{order_id}</code></td></tr>
+          <tr><td><span class="st removed">ยกเลิก</span></td><td><span class="m post">POST</span></td><td><code>/browny-shop/checkout/draft</code></td></tr>
+          <tr><td><span class="st removed">ยกเลิก</span></td><td><span class="m patch">PATCH</span></td><td><code>/browny-shop/checkout/{order_id}</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 1. Favorites -->
+    <section class="card" id="favorites">
+      <h2>1. Favorite Items <span class="st new">เพิ่มใหม่</span></h2>
+
+      <h3>1.1 เพิ่มสินค้าโปรด</h3>
+      <div class="endpoint"><span class="m post">POST</span><span class="path">/browny-shop/favorites</span></div>
+      <h4>Request body</h4>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "product_id": "f9e8d7c6-b5a4-3210-fedc-ba0987654321"
+}</code></pre></div>
+
+      <div class="resp ok">201 Created</div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "product_id": "f9e8d7c6-b5a4-3210-fedc-ba0987654321",
+    "favorite_status": true
+  }
+}</code></pre></div>
+
+      <div class="resp err">422 <span class="label">validation error</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "message": "The customer id field is required. (and 1 more error)",
+  "errors": {
+    "customer_id": ["The customer id field is required."],
+    "product_id": ["The product id field is required."]
+  }
+}</code></pre></div>
+
+      <div class="resp err">404 <span class="label">สินค้าไม่พบหรือไม่ได้ publish</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "message": "No query results for model [App\\Models\\Product]."
+}</code></pre></div>
+
+      <div class="note"><b>หมายเหตุ:</b> เรียกซ้ำด้วย product เดิมจะได้ <code>201</code> เหมือนเดิม (idempotent ผ่าน <code>firstOrCreate</code>)</div>
+
+      <hr>
+
+      <h3>1.2 ลบสินค้าโปรด</h3>
+      <div class="endpoint"><span class="m delete">DELETE</span><span class="path">/browny-shop/favorites/{product_id}?customer_id={CUSTOMER_ID}</span></div>
+
+      <div class="resp ok">200 OK</div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "product_id": "f9e8d7c6-b5a4-3210-fedc-ba0987654321",
+    "favorite_status": false
+  }
+}</code></pre></div>
+
+      <div class="resp err">422 <span class="label">ไม่ส่ง customer_id</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "message": "The customer id field is required.",
+  "errors": {
+    "customer_id": ["The customer id field is required."]
+  }
+}</code></pre></div>
+
+      <div class="note"><b>หมายเหตุ:</b> ลบซ้ำหรือลบรายการที่ไม่มีอยู่แล้วยังได้ <code>200</code> + <code>favorite_status: false</code></div>
+    </section>
+
+    <!-- 2. Cart Summary -->
+    <section class="card" id="cart-summary">
+      <h2>2. Cart Summary <span class="st edit">แก้ไข</span></h2>
+      <h3>เปลี่ยนแปลง</h3>
+      <ul>
+        <li>รองรับ <b>GET</b> เป็นหลัก (เดิมมีแค่ POST)</li>
+        <li>เมื่อส่ง <code>coupon_customer_id</code> และคูปองใช้ได้ → response มี object <code>coupon</code> เต็มรูปแบบ</li>
+        <li>ไม่ส่ง <code>coupon_customer_id</code> → ไม่มี field <code>coupon</code> ใน response</li>
+      </ul>
+
+      <h3>2.1 GET — จากตะกร้าลูกค้า</h3>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/cart/summary</span></div>
+      <h4>Query params</h4>
+      <table>
+        <thead><tr><th>Param</th><th>Required</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>customer_id</code></td><td>✅ ใช่</td><td>UUID ลูกค้า</td></tr>
+          <tr><td><code>coupon_customer_id</code></td><td>ไม่</td><td>ID จากตาราง <code>coupon_customers</code></td></tr>
+          <tr><td><code>payment_method</code></td><td>ไม่</td><td>เช่น <code>qr</code>, <code>coin</code>, <code>tp_wallet</code> — มีผลกับ <code>coin_amount_required</code></td></tr>
+        </tbody>
+      </table>
+      <div class="codewrap"><span class="lang">bash</span><pre><code>curl -G "{BASE}/browny-shop/cart/summary" \
+  -H "Authorization: Bearer {TOKEN}" \
+  --data-urlencode "customer_id=a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  --data-urlencode "coupon_customer_id=123" \
+  --data-urlencode "payment_method=qr"</code></pre></div>
+
+      <div class="resp ok">200 OK <span class="label">มีคูปอง</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "subtotal": 300.0,
+    "shipping_total": 25.0,
+    "flash_sale_discount": 50.0,
+    "product_discount": 0.0,
+    "coupon_discount": 30.0,
+    "total_discount": 80.0,
+    "price_original": 325.0,
+    "final_price": 295.0,
+    "coin_amount_required": null,
+    "coin_value": 10.0,
+    "coupon_customer_id": 123,
+    "payment_method": "qr",
+    "coupon": {
+      "coupon_id": 10,
+      "customer_coupon_id": 123,
+      "discount_target": "product",
+      "discount_type": "percent",
+      "value": "10.00",
+      "max_discount": "100.00",
+      "min_order_amount": "500.00",
+      "allow_with_promotion": false,
+      "allow_with_product_discount": true,
+      "remaining": "1",
+      "expires_at": "2026-12-31 23:59:59",
+      "used_quantity": "0",
+      "name": { "th": "ลด 10%", "en": "10% off", "zh": "九折" },
+      "description": { "th": "ใช้ได้กับ Browny Shop", "en": "Valid for Browny Shop", "zh": "" },
+      "image_url": {
+        "th": "https://example.com/storage/coupons/th.jpg",
+        "en": "https://example.com/storage/coupons/en.jpg",
+        "zh": ""
+      }
+    },
+    "items": [
+      {
+        "product_id": "f9e8d7c6-b5a4-3210-fedc-ba0987654321",
+        "product_sub_id": 42,
+        "quantity": 2,
+        "unit_coin_price": 150.0,
+        "unit_money_price": 150.0,
+        "original_coin_price": 200.0,
+        "original_money_price": 200.0,
+        "is_flash_sale": true,
+        "flash_sale_id": 5,
+        "flash_sale_discount": 50.0,
+        "product_discount": 0.0,
+        "line_subtotal": 300.0,
+        "unit_shipping_fee": 25.0,
+        "line_shipping_fee": 25.0
+      }
+    ]
+  }
+}</code></pre></div>
+
+      <div class="resp ok">200 OK <span class="label">ไม่มีคูปอง</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "subtotal": 300.0,
+    "shipping_total": 25.0,
+    "flash_sale_discount": 0.0,
+    "product_discount": 0.0,
+    "coupon_discount": 0.0,
+    "total_discount": 0.0,
+    "price_original": 325.0,
+    "final_price": 325.0,
+    "coin_amount_required": null,
+    "coin_value": 10.0,
+    "coupon_customer_id": null,
+    "payment_method": null,
+    "items": [ /* … รายการสินค้า … */ ]
+  }
+}</code></pre></div>
+
+      <div class="resp ok">200 OK <span class="label">payment_method = coin</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "subtotal": 300.0,
+    "shipping_total": 25.0,
+    "total_discount": 0.0,
+    "price_original": 325.0,
+    "final_price": 325.0,
+    "coin_amount_required": 3250.0,
+    "coin_value": 10.0,
+    "payment_method": "coin",
+    "items": []
+  }
+}</code></pre></div>
+
+      <div class="resp err">422 <span class="label">คูปองใช้ไม่ได้</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": false,
+  "message": "คูปองนี้ใช้ร่วมกับ Flash Sale ไม่ได้",
+  "items": [ /* … รายการสินค้า … */ ]
+}</code></pre></div>
+
+      <hr>
+
+      <h3>2.2 POST — จาก items ที่ส่งมาเอง <span class="st" style="background:#eef1f4;color:#6b7785;">ยังใช้ได้</span></h3>
+      <div class="endpoint"><span class="m post">POST</span><span class="path">/browny-shop/cart/summary</span></div>
+      <h4>Request body</h4>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "coupon_customer_id": 123,
+  "payment_method": "coin",
+  "items": [
+    { "product_sub_id": 42, "quantity": 2 }
+  ]
+}</code></pre></div>
+      <p>Response รูปแบบเดียวกับ GET ด้านบน</p>
+    </section>
+
+    <!-- 3. Checkout -->
+    <section class="card" id="checkout">
+      <h2>3. Checkout <span class="st edit">แก้ไข — ยกเลิก Draft</span></h2>
+      <h3>Flow ใหม่</h3>
+      <div class="flow">ตะกร้า → GET cart/summary (preview) → POST checkout/confirm → ชำระเงิน</div>
+      <ul>
+        <li><b>ไม่มี draft</b> อีกต่อไป — กด Back จากหน้า summary = ยกเลิกฝั่ง client ไม่ต้องเรียก API</li>
+        <li><code>POST /checkout/draft</code> และ <code>PATCH /checkout/{order_id}</code> ถูกยกเลิก</li>
+      </ul>
+
+      <h3>3.1 ยืนยันสั่งซื้อ <span class="st new">ใหม่ — แนะนำ</span></h3>
+      <div class="endpoint"><span class="m post">POST</span><span class="path">/browny-shop/checkout/confirm</span></div>
+      <h4>Request body</h4>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "coupon_customer_id": 123,
+  "payment_method": "qr",
+  "customer_address_id": 1
+}</code></pre></div>
+      <table>
+        <thead><tr><th>Field</th><th>Required</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>customer_id</code></td><td>✅ ใช่</td><td>UUID ลูกค้า</td></tr>
+          <tr><td><code>payment_method</code></td><td>✅ ใช่</td><td><code>qr</code>, <code>wechat</code>, <code>coin</code>, <code>tp_wallet</code>, …</td></tr>
+          <tr><td><code>customer_address_id</code></td><td>✅ ใช่</td><td>ID ที่อยู่จัดส่ง</td></tr>
+          <tr><td><code>coupon_customer_id</code></td><td>ไม่</td><td>ID คูปองลูกค้า</td></tr>
+        </tbody>
+      </table>
+
+      <div class="resp ok">200 <span class="label">ชำระด้วย QR (PromptPay)</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "status": "pending_payment",
+    "payment_method": "qr",
+    "payment_status": "pending",
+    "payment_ref": "202605301234567",
+    "subtotal": 300.0,
+    "shipping_total": 25.0,
+    "coupon_discount": 30.0,
+    "discount_amount": 30.0,
+    "price_original": 325.0,
+    "price_final": 295.0,
+    "expires_at": "2026-05-30 18:00:00",
+    "paid_at": null,
+    "receipt_no": null,
+    "customer_address_id": 1,
+    "shipping_address": { "id": 1, "recipient_name": "สมชาย ใจดี", "phone": "0812345678", "full_address": "123 ถนนสุขุมวิท ลุมพินี ปทุมวัน กรุงเทพมหานคร 10110", "...": "…" },
+    "items": [ /* … */ ],
+    "summary": { "final_price": 295.0, "total_discount": 30.0, "coupon": { "...": "…" }, "...": "…" },
+    "payment_url": "https://example.com/pay/browny-shop/202605301234567",
+    "response_payload": {
+      "qrcode": "00020101021229370016A000000677010112011300668999999999530376454032755802TH6304ABCD"
+    }
+  }
+}</code></pre></div>
+      <div class="note"><b>Frontend:</b> ใช้ <code>response_payload.qrcode</code> (หรือ <code>response_payload.wechat</code> สำหรับ WeChat) render QR โดยตรง — ไม่ต้อง capture จาก URL รูปภาพ · <b>รูปแบบเดียวกับ machine-order QR integration</b></div>
+
+      <div class="resp ok">200 <span class="label">ชำระด้วย Browny Coin (instant paid)</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "status": "paid",
+    "payment_method": "coin",
+    "payment_status": "paid",
+    "payment_ref": "202605301234568",
+    "price_final": 325.0,
+    "coin_amount_used": 3250.0,
+    "coin_value": 10.0,
+    "paid_at": "2026-05-30 13:05:22",
+    "receipt_no": "BNS20260530-130522123456",
+    "payment_url": null,
+    "response_payload": { "method": "coin", "amount": 325.0, "coin_amount_used": 3250.0 }
+  }
+}</code></pre></div>
+
+      <div class="resp ok">200 <span class="label">ยอด 0 บาท (instant paid / free)</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "status": "paid",
+    "payment_method": "qr",
+    "payment_status": "paid",
+    "price_final": 0.0,
+    "paid_at": "2026-05-30 13:05:22",
+    "receipt_no": "BNS20260530-130522654321",
+    "shipping_address": {},
+    "items": [],
+    "summary": {},
+    "payment_url": null,
+    "response_payload": { "method": "free", "amount": 0, "coin_amount_used": null }
+  }
+}</code></pre></div>
+
+      <div class="resp ok">200 <span class="label">ชำระด้วย Wallet (instant paid)</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "status": "paid",
+    "payment_method": "tp_wallet",
+    "payment_status": "paid",
+    "price_final": 295.0,
+    "payment_url": null,
+    "response_payload": { "method": "wallet", "amount": 295.0, "coin_amount_used": null }
+  }
+}</code></pre></div>
+
+      <div class="resp err">422 <span class="label">error ต่างๆ</span></div>
+      <table>
+        <thead><tr><th>กรณี</th><th>message</th></tr></thead>
+        <tbody>
+          <tr><td>ตะกร้าว่าง</td><td><code>"ตะกร้าว่าง"</code></td></tr>
+          <tr><td>ไม่มีที่อยู่จัดส่ง</td><td><code>"กรุณาเลือกที่อยู่จัดส่ง"</code></td></tr>
+          <tr><td>สต็อกไม่พอ</td><td><code>"สต็อกไม่พอสำหรับ SKU #42"</code></td></tr>
+          <tr><td>Coin ไม่พอ</td><td><code>"จำนวน Browny Coin ไม่เพียงพอ"</code></td></tr>
+          <tr><td>สร้าง QR ไม่ได้</td><td><code>"ไม่สามารถสร้าง QR Code ได้"</code></td></tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h3>3.2 ยืนยันด้วย Order ID <span class="st" style="background:#eef1f4;color:#6b7785;">legacy — ยังใช้ได้</span></h3>
+      <div class="endpoint"><span class="m post">POST</span><span class="path">/browny-shop/checkout/{order_id}/confirm</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "customer_address_id": 1
+}</code></pre></div>
+      <ul>
+        <li>ต้องส่ง <code>customer_id</code> เพื่อ verify ownership</li>
+        <li>Response รูปแบบเดียวกับ <code>POST /checkout/confirm</code> รวม <code>response_payload</code> สำหรับ QR</li>
+      </ul>
+      <div class="resp err">422 <span class="label">order ไม่ใช่ของ customer หรือไม่พบ</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{ "message": "No query results for model [App\\Models\\BrownyShopOrder]." }</code></pre></div>
+
+      <hr>
+
+      <h3>3.3 ดู Order รอชำระ <span class="st edit">แก้ไข</span></h3>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/checkout/{order_id}?customer_id={CUSTOMER_ID}</span></div>
+      <ul>
+        <li><b>บังคับ</b> query <code>customer_id</code> — ตรวจสอบว่า order เป็นของลูกค้าคนนั้น</li>
+        <li>คืนได้เฉพาะ order สถานะ <code>pending_payment</code> เท่านั้น (ไม่ใช่ draft อีกต่อไป)</li>
+      </ul>
+      <div class="resp ok">200 OK</div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "status": "pending_payment",
+    "payment_method": "qr",
+    "payment_status": "pending",
+    "payment_ref": "202605301234567",
+    "price_final": 295.0,
+    "coupon_discount": 30.0,
+    "shipping_address": { "...": "…" },
+    "items": [ /* … */ ],
+    "summary": { "final_price": 295.0, "total_discount": 30.0, "...": "…" }
+  }
+}</code></pre></div>
+      <div class="resp err">404 <span class="label">ไม่ใช่ pending_payment / customer ไม่ตรง</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{ "success": false, "message": "ไม่พบคำสั่งซื้อที่รอชำระเงิน" }</code></pre></div>
+    </section>
+
+    <!-- 4. Deprecated -->
+    <section class="card" id="deprecated">
+      <h2>4. Endpoints ที่ยกเลิก <span class="st removed">30 พ.ค. 2026</span></h2>
+      <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>ทางเลือกใหม่</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m post">POST</span></td><td><code>/browny-shop/checkout/draft</code></td><td>ใช้ <code>GET /cart/summary</code> preview แล้ว <code>POST /checkout/confirm</code></td></tr>
+          <tr><td><span class="m patch">PATCH</span></td><td><code>/browny-shop/checkout/{order_id}</code></td><td>เปลี่ยน coupon/payment ที่หน้า summary ก่อน confirm</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5. Migration -->
+    <section class="card" id="migration">
+      <h2>5. Migration สำหรับ Frontend</h2>
+      <table>
+        <thead><tr><th>เดิม</th><th>ใหม่</th></tr></thead>
+        <tbody>
+          <tr><td><code>POST /checkout/draft</code> → <code>PATCH</code> → <code>POST /{id}/confirm</code></td><td><code>POST /checkout/confirm</code> ครั้งเดียว</td></tr>
+          <tr><td><code>POST /cart/summary</code></td><td><code>GET /cart/summary?customer_id=…</code></td></tr>
+          <tr><td>ดึง QR จาก payment page URL</td><td>ใช้ <code>response_payload.qrcode</code> จาก confirm response</td></tr>
+          <tr><td><code>GET /checkout/{id}</code> ไม่ต้องส่ง customer_id</td><td>ต้องส่ง <code>?customer_id=</code> และใช้กับ pending_payment เท่านั้น</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--muted);font-size:13.5px;">เอกสาร API ฉบับเต็ม: <a href="./browny-shop-api.md">browny-shop-api.md</a></p>
+    </section>
+
+    <h2 style="margin:40px 0 4px;border:none;font-size:14px;color:var(--muted);letter-spacing:.06em;">— เพิ่มเติมภายหลัง —</h2>
+
+    <!-- Pending payment -->
+    <section class="card" id="pending">
+      <h2>Pending payment ต่อลูกค้า <span class="st new">เพิ่มใหม่</span></h2>
+      <p>ใช้เมื่อ app เปิดใหม่และไม่มี <code>order_id</code> ใน memory — ดึง order รอชำระ <b>ล่าสุด 1 รายการ</b> ต่อ customer</p>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/pending-payment?customer_id={CUSTOMER_ID}</span></div>
+
+      <div class="resp ok">200 <span class="label">ไม่มี order รอชำระ</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{ "success": true, "data": { "has_pending": false } }</code></pre></div>
+
+      <div class="resp ok">200 <span class="label">มี order รอชำระ</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "has_pending": true,
+    "order_id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "payment_ref": "202605301234567",
+    "status": "pending_payment"
+  }
+}</code></pre></div>
+
+      <h4>กฎธุรกิจ</h4>
+      <ul>
+        <li>เลือก order ที่ <code>status = pending_payment</code> และ <code>payment_status = pending</code></li>
+        <li>เรียง <code>requested_at</code> แล้ว <code>created_at</code> จากใหม่ไปเก่า — คืน <b>รายการล่าสุดเพียง 1</b></li>
+        <li>ถ้า order หมดอายุ (<code>expires_at</code> ผ่านแล้ว) ถือว่าไม่มี pending → <code>has_pending: false</code></li>
+        <li>หลังได้ <code>order_id</code> ให้เรียก <code>GET /checkout/{order_id}</code> เพื่อดึง QR และ summary เต็ม</li>
+      </ul>
+      <h4>Flow แนะนำ (Frontend)</h4>
+      <div class="flow">เปิด app
+  → GET /pending-payment?customer_id=
+  → has_pending = false → หน้าปกติ
+  → has_pending = true
+       → GET /checkout/{order_id}?customer_id=
+       → แสดง QR จาก response_payload.qrcode</div>
+    </section>
+
+    <!-- GET checkout payload -->
+    <section class="card" id="get-checkout">
+      <h2>GET checkout — คืน response_payload <span class="st edit">แก้ไข</span></h2>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/checkout/{order_id}?customer_id={CUSTOMER_ID}</span></div>
+      <p>เดิมคืนเฉพาะข้อมูล order + <code>summary</code> — ตอนนี้คืน <code>response_payload</code> และ <code>payment_url</code> เหมือน <code>POST /checkout/confirm</code> เพื่อให้กลับมาหน้า QR ได้โดยไม่ต้อง confirm ซ้ำ</p>
+      <h4>ฟิลด์ที่เพิ่มใน <code>data</code></h4>
+      <table>
+        <thead><tr><th>Field</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>response_payload</code></td><td>Raw JSON จาก GB gateway (<code>qrcode</code> / <code>wechat</code>) หรือ <code>null</code> ถ้ายังไม่มี</td></tr>
+          <tr><td><code>payment_url</code></td><td>URL หน้า web payment (<code>null</code> ถ้าชำระแล้ว)</td></tr>
+        </tbody>
+      </table>
+      <div class="resp ok">200 <span class="label">QR</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "status": "pending_payment",
+    "payment_method": "qr",
+    "payment_status": "pending",
+    "payment_ref": "202605301234567",
+    "price_final": 295.0,
+    "expires_at": "2026-05-30 18:00:00",
+    "payment_url": "{APP_URL}/pay/browny-shop/202605301234567",
+    "response_payload": { "qrcode": "00020101021229370016A0000006770101…6304ABCD" },
+    "items": [],
+    "summary": {}
+  }
+}</code></pre></div>
+      <div class="note"><code>response_payload</code> เก็บใน DB ตั้งแต่ confirm — GET อ่านค่าเดิม ไม่สร้าง QR ใหม่</div>
+      <div class="resp err">404 <span class="label">ไม่ใช่ pending_payment / ไม่ใช่ของ customer</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{ "success": false, "message": "ไม่พบคำสั่งซื้อที่รอชำระเงิน" }</code></pre></div>
+    </section>
+
+    <!-- Favorites list -->
+    <section class="card" id="fav-list">
+      <h2>รายการสินค้าโปรด <span class="st new">เพิ่มใหม่</span></h2>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/favorites?customer_id={CUSTOMER_ID}</span></div>
+      <h4>Query (ไม่บังคับ)</h4>
+      <table>
+        <thead><tr><th>Query</th><th>คำอธิบาย</th></tr></thead>
+        <tbody><tr><td><code>lang</code></td><td>locale เดียว (เช่น <code>th</code>) — ถ้าไม่ส่ง คืนทุก locale ตาม config</td></tr></tbody>
+      </table>
+      <div class="resp ok">200 <span class="label">มีรายการ</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{
+  "success": true,
+  "data": {
+    "customer_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "items": [
+      {
+        "id": "f9e8d7c6-b5a4-3210-fedc-ba0987654321",
+        "is_free_shipping": false,
+        "favorite_status": true,
+        "has_flash_sale": false,
+        "unit": { "th": "ชิ้น", "en": "pc", "zh": "" },
+        "translations": [],
+        "product_subs": [],
+        "main_image_url": "https://example.com/storage/products/a.jpg"
+      }
+    ]
+  }
+}</code></pre></div>
+      <div class="note">รูปแบบ <code>items[]</code> เหมือน product list API (<code>ProductApiFormatter</code>) — ทุกรายการมี <code>favorite_status: true</code></div>
+      <h4>หมายเหตุ</h4>
+      <ul>
+        <li>แสดงเฉพาะสินค้า <code>status = published</code> ที่ยังอยู่ใน <code>product_favorites</code></li>
+        <li>เรียงตามวันที่กดโปรด (ใหม่สุดก่อน)</li>
+        <li>สินค้าที่ถูกลบหรือ unpublish จะไม่ปรากฏใน list แต่แถวใน <code>product_favorites</code> อาจยังอยู่</li>
+      </ul>
+    </section>
+
+    <!-- Shipping estimate -->
+    <section class="card" id="shipping-est">
+      <h2>Cart summary — shipping estimate <span class="st edit">แก้ไข</span></h2>
+      <div class="pill-row">
+        <span class="m get">GET</span><span class="m post">POST</span>
+        <span class="path" style="font-family:ui-monospace,monospace;font-size:13.5px;">/browny-shop/cart/summary</span>
+      </div>
+      <p>เพิ่ม optional param <code>customer_address_id</code> สำหรับแสดงค่าส่ง/ยอดรวมโดยประมาณก่อน checkout</p>
+      <h4>Param ที่เพิ่ม</h4>
+      <table>
+        <thead><tr><th>Param</th><th>Required</th><th>คำอธิบาย</th></tr></thead>
+        <tbody><tr><td><code>customer_address_id</code></td><td>ไม่</td><td>ID ที่อยู่จัดส่ง — ต้องเป็นของ <code>customer_id</code> ที่ส่งมา</td></tr></tbody>
+      </table>
+      <h4>Response fields ที่เพิ่ม</h4>
+      <table>
+        <thead><tr><th>Field</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>shipping_is_estimate</code></td><td><code>true</code> เสมอ — ให้ frontend แสดง "ขนส่งโดยประมาณ"</td></tr>
+          <tr><td><code>customer_address_id</code></td><td>echo กลับเมื่อส่ง address มา</td></tr>
+          <tr><td><code>shipping_address</code></td><td>snapshot ที่อยู่ (ชื่อผู้รับ, เบอร์, จังหวัด ฯลฯ)</td></tr>
+        </tbody>
+      </table>
+      <div class="note">ค่าส่งยังคำนวณจาก SKU/product (<code>shipping_fee</code>, <code>is_free_shipping</code>, flash sale) — <b>ยังไม่ผูก zone ตามที่อยู่</b></div>
+
+      <h4>ตัวอย่าง — Product Detail (POST + items 1 รายการ)</h4>
+      <div class="codewrap"><span class="lang">bash</span><pre><code>curl -X POST "{BASE}/browny-shop/cart/summary" \
+  -H "Authorization: Bearer {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": "{CUSTOMER_ID}",
+    "customer_address_id": 1,
+    "items": [{ "product_sub_id": 42, "quantity": 1 }]
+  }'</code></pre></div>
+
+      <h4>ตัวอย่าง — Summary page (GET จากตะกร้า)</h4>
+      <div class="codewrap"><span class="lang">bash</span><pre><code>curl -G "{BASE}/browny-shop/cart/summary" \
+  -H "Authorization: Bearer {TOKEN}" \
+  --data-urlencode "customer_id={CUSTOMER_ID}" \
+  --data-urlencode "customer_address_id=1" \
+  --data-urlencode "payment_method=qr"</code></pre></div>
+
+      <div class="resp err">422 <span class="label">ที่อยู่ไม่ใช่ของลูกค้า</span></div>
+      <div class="codewrap"><span class="lang">json</span><pre><code class="json">{ "success": false, "message": "ไม่พบที่อยู่จัดส่งของลูกค้านี้" }</code></pre></div>
+    </section>
+
+    <!-- Lucky no -->
+    <section class="card" id="lucky">
+      <h2>Receipt — lucky_no / lucky_image <span class="st edit">แก้ไข</span></h2>
+      <div class="endpoint"><span class="m get">GET</span><span class="path">/browny-shop/orders/{ORDER_ID}/receipt</span></div>
+      <p>เพิ่มฟิลด์เลขนำโชคเหมือน machine order receipt</p>
+      <table>
+        <thead><tr><th>Field</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>lucky_no</code></td><td>เลขนำโชค 1–99 (สุ่มตอนชำระสำเร็จ)</td></tr>
+          <tr><td><code>lucky_image</code></td><td>URL รูป <code>{APP_URL}/images/lucky_no/{lucky_no}.png</code></td></tr>
+        </tbody>
+      </table>
+      <div class="note">Order เก่าที่ paid แล้วแต่ยังไม่มี <code>lucky_no</code> จะถูก backfill ตอนเรียก receipt ครั้งแรก</div>
+
+      <h3>Endpoints ที่เกี่ยวข้อง (เดิม)</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Endpoint</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m post">POST</span></td><td><code>/browny-shop/favorites</code></td></tr>
+          <tr><td><span class="m delete">DELETE</span></td><td><code>/browny-shop/favorites/{product_id}</code></td></tr>
+          <tr><td><span class="m post">POST</span></td><td><code>/browny-shop/checkout/confirm</code></td></tr>
+          <tr><td><span class="m get">GET</span></td><td><code>{APP_URL}/api/payment/browny-shop/status/{PAYMENT_REF}</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ---- JSON syntax highlight (lightweight) ----
+  function highlightJson(text) {
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      // comments /* … */
+      .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tok-punc">$1</span>')
+      // keys
+      .replace(/("(?:\\.|[^"\\])*")(\s*:)/g, '<span class="tok-key">$1</span>$2')
+      // strings (values)
+      .replace(/:(\s*)("(?:\\.|[^"\\])*")/g, ':$1<span class="tok-str">$2</span>')
+      // booleans / null
+      .replace(/\b(true|false)\b/g, '<span class="tok-bool">$1</span>')
+      .replace(/\bnull\b/g, '<span class="tok-null">null</span>')
+      // numbers
+      .replace(/:(\s*)(-?\d+\.?\d*)/g, ':$1<span class="tok-num">$2</span>');
+  }
+  document.querySelectorAll('pre code.json').forEach(function(el){
+    el.innerHTML = highlightJson(el.textContent);
+  });
+
+  // ---- TOC active highlight on scroll ----
+  var links = document.querySelectorAll('.toc a');
+  var sections = Array.from(links).map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = sections.length - 1;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i] && sections[i].offsetTop > pos) { current = i - 1; break; }
+    }
+    links.forEach(function(l){ l.style.borderLeftColor='transparent'; l.style.color=''; l.style.background=''; });
+    if (current >= 0 && links[current]) {
+      links[current].style.borderLeftColor = 'var(--brand)';
+      links[current].style.color = 'var(--brand)';
+      links[current].style.background = 'var(--brand-soft)';
+    }
+  }
+  window.addEventListener('scroll', onScroll); onScroll();
+</script>
+</body>
+</html>

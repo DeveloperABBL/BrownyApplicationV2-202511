@@ -59,6 +59,13 @@ CouponData _$CouponDataFromJson(Map<String, dynamic> json) => CouponData(
   redeemPrice: json['redeem_price'] as String?,
   deliveryFee: json['delivery_fee'] as String?,
   appliesTo: json['applies_to'] as String?,
+  discountTarget: json['discount_target'] as String?,
+  discountType: json['discount_type'] as String?,
+  value: json['value'] as String?,
+  maxDiscount: json['max_discount'] as String?,
+  minOrderAmount: json['min_order_amount'] as String?,
+  allowWithPromotion: json['allow_with_promotion'] as bool?,
+  allowWithProductDiscount: json['allow_with_product_discount'] as bool?,
 );
 
 Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
@@ -93,6 +100,13 @@ Map<String, dynamic> _$CouponDataToJson(CouponData instance) =>
       'redeem_price': instance.redeemPrice,
       'delivery_fee': instance.deliveryFee,
       'applies_to': instance.appliesTo,
+      'discount_target': instance.discountTarget,
+      'discount_type': instance.discountType,
+      'value': instance.value,
+      'max_discount': instance.maxDiscount,
+      'min_order_amount': instance.minOrderAmount,
+      'allow_with_promotion': instance.allowWithPromotion,
+      'allow_with_product_discount': instance.allowWithProductDiscount,
     };
 
 CouponStoreData _$CouponStoreDataFromJson(Map<String, dynamic> json) =>
@@ -140,4 +154,16 @@ CouponEVoucherResponse _$CouponEVoucherResponseFromJson(
 
 Map<String, dynamic> _$CouponEVoucherResponseToJson(
   CouponEVoucherResponse instance,
+) => <String, dynamic>{'data': instance.data};
+
+CouponBrownyShopResponse _$CouponBrownyShopResponseFromJson(
+  Map<String, dynamic> json,
+) => CouponBrownyShopResponse(
+  data: (json['data'] as List<dynamic>?)
+      ?.map((e) => CouponData.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
+
+Map<String, dynamic> _$CouponBrownyShopResponseToJson(
+  CouponBrownyShopResponse instance,
 ) => <String, dynamic>{'data': instance.data};

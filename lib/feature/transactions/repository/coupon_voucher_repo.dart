@@ -30,6 +30,11 @@ mixin CouponVoucherDataSourceMixin on CustomerDataSourceMixin {
     String uuid,
   );
 
+  /// ฟังก์ชันดึงรายการคูปอง Browny Shop ที่ลูกค้าถือครอง ตาม [uuid]
+  Future<RepoResult<CouponBrownyShopResponse>> fetchCouponBrownyShop(
+    String uuid,
+  );
+
   /// ฟังก์ชันดึงรายการสาขาร้านค้าที่ใช้คูปองได้
   Future<RepoResult<CouponStoreListResponse>> fetchCouponStoreList();
 
@@ -410,6 +415,60 @@ class CouponVoucherRepo extends CustomerDataRepo
   ) async {
     try {
       final response = await requireRemote.fetchCouponRedemption(uuid);
+      return RepoResult.dependOn(response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CouponBrownyShopResponse>> fetchCouponBrownyShop(
+    String uuid,
+  ) async {
+    try {
+      // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ไว้ทดสอบการแสดงผลก่อน
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: CouponBrownyShopResponse.fromJson(
+            jsonDecode('''
+{
+    "data": [
+        {
+            "coupon_id": 45,
+            "customer_coupon_id": 123,
+            "discount_target": "product",
+            "discount_type": "fixed",
+            "value": "50.00",
+            "max_discount": null,
+            "min_order_amount": "500.00",
+            "allow_with_promotion": false,
+            "allow_with_product_discount": true,
+            "remaining": "1",
+            "expires_at": "2026-06-26 13:00:00",
+            "used_quantity": "0",
+            "name": {
+                "th": "ลด 50 บาท",
+                "en": "50 THB Off",
+                "zh": "减50泰铢"
+            },
+            "description": {
+                "th": "ใช้ได้เมื่อซื้อครบ 500 บาท",
+                "en": "Min. order 500 THB",
+                "zh": "满500泰铢可用"
+            },
+            "image_url": {
+                "th": "http://localhost/ABI_Backend/public/storage/coupons/promo2026-th.jpg",
+                "en": "http://localhost/ABI_Backend/public/storage/coupons/promo2026-en.jpg",
+                "zh": "http://localhost/ABI_Backend/public/storage/coupons/promo2026-zh.jpg"
+            }
+        }
+    ]
+}
+'''),
+          ),
+        );
+      }
+      final response = await requireRemote.fetchBrownyShopCoupons(uuid);
       return RepoResult.dependOn(response.data);
     } on Exception catch (e) {
       return RepoResult.error(error: e);

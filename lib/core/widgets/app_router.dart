@@ -7,6 +7,8 @@ import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/ship_to_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/customer_ship_to_viewmodel.dart';
@@ -101,11 +103,13 @@ class AppRouter {
         path: BrownyShopCartPage.pagePath,
         name: BrownyShopCartPage.pageName,
         builder: (context, state) {
-          // (subId, quantity) จาก flow "ซื้อเลย" — null = เข้าตะกร้าปกติ
+          // (subId, quantity, coupon?) จาก flow "ซื้อเลย" — null = เข้าตะกร้าปกติ
           final extra = state.extra;
+          final isBuyNow = extra is (int, int, CustomerCouponModel?);
           return BrownyShopCartPage(
-            buyNowSubId: extra is (int, int) ? extra.$1 : null,
-            buyNowQuantity: extra is (int, int) ? extra.$2 : null,
+            buyNowSubId: isBuyNow ? extra.$1 : null,
+            buyNowQuantity: isBuyNow ? extra.$2 : null,
+            buyNowCoupon: isBuyNow ? extra.$3 : null,
           );
         },
       ),
@@ -114,6 +118,20 @@ class AppRouter {
         name: BrownyShopSelected.pageName,
         builder: (context, state) => BrownyShopSelected(
           viewModel: state.extra as BrownyShopSelectedViewModel,
+        ),
+      ),
+      GoRoute(
+        path: ReceiptBrownyShop.pagePath,
+        name: ReceiptBrownyShop.pageName,
+        builder: (context, state) => ReceiptBrownyShop(
+          orderId: state.extra as String,
+        ),
+      ),
+      GoRoute(
+        path: BrownyShopOrderStatusPage.pagePath,
+        name: BrownyShopOrderStatusPage.pageName,
+        builder: (context, state) => BrownyShopOrderStatusPage(
+          orderId: state.extra as String,
         ),
       ),
       GoRoute(
@@ -297,6 +315,7 @@ class AppRouter {
           CouponVoucherState couponState = CouponVoucherState.purshasing;
           String? autoCollectQRData;
           MachineProgramModel? machineProgram;
+          int? brownyShopSelectedCouponId;
           try {
             List<Object?> list = state.extra as List<Object?>;
             couponState = list[0] as CouponVoucherState;
@@ -306,6 +325,9 @@ class AppRouter {
             if (list.length > 2) {
               machineProgram = list[2] as MachineProgramModel?;
             }
+            if (list.length > 3) {
+              brownyShopSelectedCouponId = list[3] as int?;
+            }
           } catch (_) {
             rethrow;
           }
@@ -313,6 +335,7 @@ class AppRouter {
             state: couponState,
             autoCollectQRData: autoCollectQRData,
             machineProgram: machineProgram,
+            brownyShopSelectedCouponId: brownyShopSelectedCouponId,
           );
         },
       ),

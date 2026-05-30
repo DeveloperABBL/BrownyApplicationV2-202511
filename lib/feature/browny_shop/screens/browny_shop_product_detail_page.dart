@@ -6,6 +6,8 @@ import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_
 import 'package:browny_applications_new/feature/browny_shop/widgets/add_to_cart_bottom_sheet.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
+import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
+import 'package:browny_applications_new/feature/transactions/screens/coupons_evoucher/coupon_voucher_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -534,100 +536,139 @@ class _Divider extends StatelessWidget {
   }
 }
 
-/// คูปอง / E-Voucher placeholder (TODO: ดึงจาก API)
+/// คูปอง Browny Shop — แตะเพื่อเลือกใน [CouponVoucherPage] (tab Browny Shop)
+///
+/// คูปองที่เลือกเก็บใน [BrownyShopProductDetailViewmodel.selectedCouponNotifier]
+/// และจะถูก carry ไป auto-apply หน้า checkout เมื่อกด "ซื้อเลย"
 class _CouponCard extends StatelessWidget {
   const _CouponCard();
 
+  /// เปิดหน้าเลือกคูปอง (tab Browny Shop, flow brownyUsing) แล้วเก็บผลลัพธ์
+  Future<void> _onTapCoupon(BuildContext context) async {
+    final vm = context.read<BrownyShopProductDetailViewmodel>();
+    final result = await CouponVoucherPage.goToPage(
+      context,
+      state: CouponVoucherState.brownyUsing,
+      brownyShopSelectedCouponId:
+          vm.selectedCouponNotifier.value?.customerCouponId,
+    );
+    if (!context.mounted) return;
+    // เลือกคูปอง → CustomerCouponModel | กดคูปองเดิมซ้ำ (ยกเลิก) → false
+    // กดกลับเฉยๆ → true/null (ไม่เปลี่ยน)
+    if (result is CustomerCouponModel) {
+      vm.setSelectedCoupon(result);
+    } else if (result == false) {
+      vm.setSelectedCoupon(null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<BrownyShopProductDetailViewmodel>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Assets.icShop.icCouponRoundedGreen.image(
-              width: AppDims.size_20.w,
-              height: AppDims.size_20.w,
-            ),
-            SizedBox(width: 6.w),
-            Expanded(
-              child: AppText(
-                // 'คูปอง / E-Voucher',
-                context.wording.couponAndEVoucher,
-                style: context.textTheme.labelLarge?.copyWith(
-                  fontSize: 16.sp,
-                  color: AppColors.darkBrown,
+        GestureDetector(
+          onTap: () => _onTapCoupon(context),
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            children: [
+              Assets.icShop.icCouponRoundedGreen.image(
+                width: AppDims.size_20.w,
+                height: AppDims.size_20.w,
+              ),
+              SizedBox(width: 6.w),
+              Expanded(
+                child: AppText(
+                  // 'คูปอง / E-Voucher',
+                  context.wording.couponAndEVoucher,
+                  style: context.textTheme.labelLarge?.copyWith(
+                    fontSize: 16.sp,
+                    color: AppColors.darkBrown,
+                  ),
                 ),
               ),
-            ),
-            Assets.svg.icArrowForward.svg(
-              width: AppDims.size_16.w,
-              height: AppDims.size_16.w,
-            ),
-          ],
+              Assets.svg.icArrowForward.svg(
+                width: AppDims.size_16.w,
+                height: AppDims.size_16.w,
+              ),
+            ],
+          ),
         ),
         AppDims.vericalPadding_8,
-        _buildCouponPreview(context),
+        ValueListenableBuilder(
+          valueListenable: vm.selectedCouponNotifier,
+          builder: (context, coupon, _) {
+            if (coupon == null) {
+              return _buildUnselected(context);
+            }
+            return _buildSelected(context, vm, coupon);
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildCouponPreview(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border.all(color: AppColors.ci, width: 2),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        children: [
-          Container(
-            width: AppDims.size_85.w,
-            height: AppDims.size_85.w,
-            color: const Color(0x6681E287),
-            alignment: Alignment.center,
-            child: Assets.icShop.icTruckTick.image(
-              width: 32.w,
-              height: 32.w,
-            ),
+  /// ยังไม่เลือกคูปอง — แสดง background ตาม design
+  Widget _buildUnselected(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _onTapCoupon(context),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 85.h,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: Assets.png.bgUnselectedCouponEvoucher.provider(),
+            fit: BoxFit.fill,
           ),
-          SizedBox(width: AppDims.size_8.w),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppText(
-                    context.wording.freeShippingCouponNoMin,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 14.sp,
-                      color: AppColors.darkBrown,
-                    ),
+        ),
+      ),
+    );
+  }
+
+  /// เลือกคูปองแล้ว — แสดงการ์ด + กรอบเขียว/แดงตามเงื่อนไข + ข้อความ error
+  Widget _buildSelected(
+    BuildContext context,
+    BrownyShopProductDetailViewmodel vm,
+    CustomerCouponModel coupon,
+  ) {
+    final errorMessage = vm.validSelectedCouponMessage(context);
+    final isValid = errorMessage == null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => _onTapCoupon(context),
+          behavior: HitTestBehavior.opaque,
+          child: CouponEVoucherCardWidget(
+            icon: Image.network(
+              coupon.imageUrlDisplay(context),
+              errorBuilder: (_, _, _) => Container(color: AppColors.ci2),
+            ),
+            title: coupon.nameDisplay(context),
+            description: coupon.brownyDescriptionDisplay(context),
+            detailUsing: coupon.brownyUsageLabelDisplay(context),
+            expired: coupon.expiresAtBrownyShopDisplay(context),
+            isDisabled: !isValid,
+            borderColor: isValid ? AppColors.primary : AppColors.error,
+          ),
+        ),
+        if (!isValid)
+          Row(
+            spacing: AppDims.size_4.w,
+            children: [
+              Assets.svg.icInfoRad.svg(),
+              Expanded(
+                child: AppText(
+                  errorMessage,
+                  style: context.textTheme.labelSmall!.copyWith(
+                    color: AppColors.error,
                   ),
-                  SizedBox(height: 2.h),
-                  AppText(
-                    context.wording.onlyParticipatingItems,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      fontSize: 12.sp,
-                      color: AppColors.ci,
-                    ),
-                  ),
-                  SizedBox(height: AppDims.size_8.h),
-                  AppText(
-                    '${context.wording.couponExpiresLabel} 12 พ.ย. 2025',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      fontSize: 12.sp,
-                      color: AppColors.gray500,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -795,9 +836,8 @@ class _BottomActionBar extends StatelessWidget {
     required int quantity,
     required bool goToCart,
   }) async {
-    final result = await context
-        .read<BrownyShopProductDetailViewmodel>()
-        .addToCart(subId: subId, quantity: quantity);
+    final vm = context.read<BrownyShopProductDetailViewmodel>();
+    final result = await vm.addToCart(subId: subId, quantity: quantity);
     if (!context.mounted) return;
 
     if (!result.isSuccess) {
@@ -807,10 +847,12 @@ class _BottomActionBar extends StatelessWidget {
 
     if (goToCart) {
       // ซื้อเลย → ผ่านหน้าตะกร้า แล้วเด้งเข้าหน้าสรุปเฉพาะสินค้านี้
+      // carry คูปองที่เลือกไว้ไป auto-apply หน้า checkout
       BrownyShopCartPage.goToPage(
         context,
         buyNowSubId: subId,
         buyNowQuantity: quantity,
+        buyNowCoupon: vm.selectedCouponNotifier.value,
       );
     } else {
       AppOverlays.showToast(
