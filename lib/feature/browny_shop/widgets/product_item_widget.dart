@@ -249,7 +249,7 @@ class ProductItemWidget extends StatelessWidget {
       name,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
-      style: context.textTheme.labelSmall?.copyWith(
+      style: context.textTheme.titleSmall?.copyWith(
         color: AppColors.textPrimary,
       ),
     );

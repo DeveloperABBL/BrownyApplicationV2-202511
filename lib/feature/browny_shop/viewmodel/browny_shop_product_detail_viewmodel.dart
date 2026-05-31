@@ -1,7 +1,11 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/cart_summary_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/address_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/address_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
 import 'package:flutter/foundation.dart';
@@ -42,11 +46,15 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
   final BrownyShopDataSourceMixin _repo;
   final String productId;
 
+  final AddressRepo _addressRepo = AddressRepo();
+
   @override
   void dispose() {
     _productNotifier.dispose();
     _selectedThumbnailNotifier.dispose();
     _selectedCouponNotifier.dispose();
+    _shippingAddressNotifier.dispose();
+    _summaryNotifier.dispose();
     super.dispose();
   }
 
@@ -75,8 +83,69 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
       _selectedCouponNotifier;
 
   /// ตั้ง/ล้างคูปองที่เลือก — เรียกหลังกลับจาก [CouponVoucherPage]
+  /// แล้ว re-fetch summary เพื่ออัปเดตค่าจัดส่ง/ส่วนลด
   void setSelectedCoupon(CustomerCouponModel? coupon) {
     _selectedCouponNotifier.value = coupon;
+    fetchSummary();
+  }
+
+  // ========== ที่อยู่จัดส่ง + summary (ค่าจัดส่งโดยประมาณ) ==========
+
+  /// ที่อยู่จัดส่งที่เลือก (เริ่มต้น = ที่อยู่หลักของลูกค้า)
+  final ValueNotifier<AddressData?> _shippingAddressNotifier =
+      ValueNotifier(null);
+  ValueListenable<AddressData?> get shippingAddressNotifier =>
+      _shippingAddressNotifier;
+
+  /// summary จาก POST /browny-shop/cart/summary — แหล่งของ shipping_total
+  final ValueNotifier<UiResult<CheckoutSummaryData>> _summaryNotifier =
+      ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<CheckoutSummaryData>> get summaryNotifier =>
+      _summaryNotifier;
+
+  /// ตั้งที่อยู่จัดส่ง — เรียกหลังเลือกจาก [CustomerShipToPage] แล้ว re-fetch summary
+  void setShippingAddress(AddressData? address) {
+    _shippingAddressNotifier.value = address;
+    fetchSummary();
+  }
+
+  /// โหลดที่อยู่หลักมาเป็นค่าเริ่มต้น (ข้ามถ้าเลือกไว้แล้ว)
+  Future<void> loadDefaultShippingAddress() async {
+    if (_shippingAddressNotifier.value != null) return;
+    final result = await _addressRepo.fetchAddresses(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+    );
+    if (!result.isSuccess) return;
+    final list = result.data;
+    if (list.isEmpty) return;
+    final defaults = list.where((a) => a.isDefaultAddress);
+    _shippingAddressNotifier.value = defaults.isNotEmpty
+        ? defaults.first
+        : list.first;
+  }
+
+  /// POST /browny-shop/cart/summary — คำนวณค่าจัดส่งโดยประมาณของสินค้านี้
+  /// (sub แรก จำนวน 1) แนบคูปอง + ที่อยู่จัดส่งที่เลือก
+  Future<void> fetchSummary() async {
+    final subId = _firstSub?.id;
+    if (subId == null) {
+      _summaryNotifier.value = UiResult.empty();
+      return;
+    }
+    _summaryNotifier.value = UiResult.loading();
+    final result = await _repo.fetchCartSummary(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+      items: [CartSummaryItemRequest(productSubId: subId, quantity: 1)],
+      couponCustomerId: _selectedCouponNotifier.value?.customerCouponId,
+      customerAddressId: _shippingAddressNotifier.value?.id,
+    );
+    if (result.isSuccess) {
+      _summaryNotifier.value = UiResult.success(data: result.data);
+    } else if (result.isEmpty) {
+      _summaryNotifier.value = UiResult.empty();
+    } else {
+      _summaryNotifier.value = UiResult.error(error: result.error);
+    }
   }
 
   /// sub แรกของสินค้าปัจจุบัน (ใช้เป็น basis ตรวจเงื่อนไขคูปอง)
@@ -143,6 +212,47 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
       );
     }
     _productNotifier.value = UiResult.success(data: product);
+
+    // หลังได้สินค้าแล้ว → โหลดที่อยู่หลัก แล้วประเมินค่าจัดส่ง (cart/summary)
+    await loadDefaultShippingAddress();
+    fetchSummary();
+  }
+
+  /// toggle "สินค้าโปรด" ของสินค้าที่กำลังดูอยู่ — optimistic update + revert ถ้า fail
+  Future<void> toggleFavorite() async {
+    final product = _productNotifier.value.data;
+    final id = product?.id;
+    if (product == null || id == null) return;
+
+    final current = product.favoriteStatus ?? false;
+    final next = !current;
+
+    // อัปเดต UI ทันที (optimistic)
+    _productNotifier.value = UiResult.success(
+      data: product.copyWith(favoriteStatus: next),
+    );
+
+    final result = await _repo.setFavorite(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+      productId: id,
+      favorite: next,
+    );
+
+    final latest = _productNotifier.value.data;
+    if (latest == null || latest.id != id) return;
+    if (!result.isSuccess) {
+      // ล้มเหลว → คืนค่าเดิม
+      _productNotifier.value = UiResult.success(
+        data: latest.copyWith(favoriteStatus: current),
+      );
+      return;
+    }
+    // sync กับสถานะจริงจาก server
+    if (result.data != next) {
+      _productNotifier.value = UiResult.success(
+        data: latest.copyWith(favoriteStatus: result.data),
+      );
+    }
   }
 
   /// เพิ่มสินค้าลงตะกร้าออนไลน์ (ระบุ subId + จำนวน)

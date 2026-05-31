@@ -3,10 +3,14 @@ import 'dart:convert';
 import 'package:browny_applications_new/core/data/remote/models/request/cart_item_add_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/cart_item_quantity_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/cart_summary_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/browny_shop_favorite_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/checkout_confirm_request.dart';
+import 'package:browny_applications_new/core/data/remote/models/request/machine_order_review_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_order_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/flash_sales_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_receipt_response.dart';
@@ -103,6 +107,7 @@ mixin BrownyShopDataSourceMixin {
     required List<CartSummaryItemRequest> items,
     int? couponCustomerId,
     String? paymentMethod,
+    int? customerAddressId,
   });
 
   /// API ยืนยันสั่งซื้อ + เริ่ม process ชำระเงิน — POST /browny-shop/checkout/confirm
@@ -112,6 +117,7 @@ mixin BrownyShopDataSourceMixin {
     required int customerAddressId,
     required String paymentMethod,
     int? couponCustomerId,
+    List<CartSummaryItemRequest>? items,
   });
 
   /// API polling สถานะการชำระเงิน — GET /payment/browny-shop/status/{paymentRef}
@@ -122,6 +128,50 @@ mixin BrownyShopDataSourceMixin {
   /// API ดึงใบเสร็จ Browny Shop — GET /browny-shop/orders/{orderId}/receipt
   Future<RepoResult<BrownyShopReceiptResponse>> fetchBrownyShopReceipt({
     required String orderId,
+  });
+
+  /// API toggle สินค้าโปรด
+  /// - [favorite] = true  → POST /browny-shop/favorites (เพิ่ม)
+  /// - [favorite] = false → DELETE /browny-shop/favorites/{productId} (ลบ)
+  ///
+  /// คืน favorite_status ล่าสุดจาก server
+  Future<RepoResult<bool>> setFavorite({
+    required String customerId,
+    required String productId,
+    required bool favorite,
+  });
+
+  /// API ส่งคะแนนรีวิวร้าน — POST /browny-shop/orders/{orderId}/review
+  /// คืน true เมื่อ status == "success"
+  Future<RepoResult<bool>> submitReview({
+    required String orderId,
+    required int score,
+  });
+
+  /// API ดึงรายละเอียด + สถานะคำสั่งซื้อ Browny Shop
+  /// — GET /browny-shop/orders/{orderId}?customer_id=
+  /// ใช้กับหน้า [BrownyShopOrderStatusPage]
+  Future<RepoResult<BrownyShopOrderDetailData>> fetchOrderDetail({
+    required String orderId,
+    required String customerId,
+  });
+
+  /// API ดึง order ที่ยังรอชำระเงิน (pending_payment) พร้อม response_payload/
+  /// payment_url — GET /browny-shop/checkout/{orderId}?customer_id=
+  /// ใช้กลับเข้า process ชำระเงินจากหน้าสถานะคำสั่งซื้อ
+  Future<RepoResult<CheckoutDraftData>> fetchPendingOrder({
+    required String orderId,
+    required String customerId,
+  });
+
+  /// API ดึงประวัติคำสั่งซื้อ Browny Shop — GET /browny-shop/orders
+  /// กรองช่วงวันที่ได้ด้วย [startDate]/[endDate] (yyyy-MM-dd)
+  Future<RepoResult<List<BrownyShopOrderItem>>> fetchBrownyShopOrders({
+    required String customerId,
+    String? startDate,
+    String? endDate,
+    int page,
+    int perPage,
   });
 }
 
@@ -334,6 +384,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
     required List<CartSummaryItemRequest> items,
     int? couponCustomerId,
     String? paymentMethod,
+    int? customerAddressId,
   }) async {
     try {
       // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ตาม changelog ก่อน
@@ -353,6 +404,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
           items: items,
           couponCustomerId: couponCustomerId,
           paymentMethod: paymentMethod,
+          customerAddressId: customerAddressId,
         ),
       );
       if (!response.isSuccessful) return RepoResult.empty();
@@ -377,6 +429,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
     required int customerAddressId,
     required String paymentMethod,
     int? couponCustomerId,
+    List<CartSummaryItemRequest>? items,
   }) async {
     try {
       // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ตาม changelog ก่อน
@@ -398,6 +451,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
           customerAddressId: customerAddressId,
           paymentMethod: paymentMethod,
           couponCustomerId: couponCustomerId,
+          items: items,
         ),
       );
       if (!response.isSuccessful) return RepoResult.empty();
@@ -468,6 +522,152 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
     }
   }
 
+  @override
+  Future<RepoResult<bool>> setFavorite({
+    required String customerId,
+    required String productId,
+    required bool favorite,
+  }) async {
+    try {
+      if (favorite) {
+        final response = await requireRemote.addBrownyShopFavorite(
+          BrownyShopFavoriteRequest(
+            customerId: customerId,
+            productId: productId,
+          ),
+        );
+        if (!response.isSuccessful) return RepoResult.empty();
+        return RepoResult.success(
+          data: response.data.data?.favoriteStatus ?? true,
+        );
+      }
+      final response = await requireRemote.removeBrownyShopFavorite(
+        productId,
+        customerId,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      return RepoResult.success(
+        data: response.data.data?.favoriteStatus ?? false,
+      );
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<bool>> submitReview({
+    required String orderId,
+    required int score,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่พร้อม — mock = success ตอน debug
+      if (kDebugMode) {
+        return RepoResult.success(data: true);
+      }
+      final response = await requireRemote.submitBrownyShopReview(
+        orderId,
+        MachineOrderReviewRequest(score: score),
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      return RepoResult.success(data: response.data.isSuccess);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<BrownyShopOrderDetailData>> fetchOrderDetail({
+    required String orderId,
+    required String customerId,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่พร้อม — mock ตาม changelog ตอน debug
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: BrownyShopOrderDetailData.fromJson(
+      //       jsonDecode(_mockOrderDetail)['data'] as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
+      final response = await requireRemote.fetchBrownyShopOrderDetail(
+        orderId,
+        customerId,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final data = response.data.data;
+      if (data == null) return RepoResult.empty();
+      return RepoResult.success(data: data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<CheckoutDraftData>> fetchPendingOrder({
+    required String orderId,
+    required String customerId,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่พร้อม — mock = order รอชำระ (QR) ตอน debug
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: CheckoutDraftData.fromJson(
+            jsonDecode(_mockConfirmQr)['data'] as Map<String, dynamic>,
+          ),
+        );
+      }
+      final response = await requireRemote.fetchBrownyShopOrder(
+        orderId,
+        customerId,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final data = response.data.data;
+      if (data == null) return RepoResult.empty();
+      return RepoResult.success(data: data);
+    } on DioException catch (e) {
+      // 404 = ไม่ใช่ pending / ไม่ใช่ของลูกค้า
+      final message = _messageOf(e);
+      if (message != null) {
+        return RepoResult.error(error: BrownyShopApiException(message));
+      }
+      return RepoResult.error(error: e);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<List<BrownyShopOrderItem>>> fetchBrownyShopOrders({
+    required String customerId,
+    String? startDate,
+    String? endDate,
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    try {
+      // TODO(api): backend ยังไม่พร้อม — mock ตาม changelog ตอน debug
+      // if (kDebugMode) {
+      //   final res = BrownyShopOrdersResponse.fromJson(
+      //     jsonDecode(_mockOrders) as Map<String, dynamic>,
+      //   );
+      //   return RepoResult.success(data: res.data ?? const []);
+      // }
+      final response = await requireRemote.fetchBrownyShopOrders(
+        customerId,
+        page,
+        perPage,
+        startDate: startDate,
+        endDate: endDate,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final data = response.data.data;
+      if (data == null) return RepoResult.empty();
+      return RepoResult.success(data: data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
   // ===== Mock responses (kDebugMode) — ตาม browny-shop-api-changelog-2026-05-30 =====
 
   static const _mockSummaryWithCoupon = '''
@@ -496,5 +696,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
 
   static const _mockReceipt = '''
 {"order_id":"c3d4e5f6-a7b8-9012-cdef-345678901234","payment_ref":"202605301234568","receipt_no":"BNS20260530-130522123456","type":"browny_shop","total":"295.00","price_original":"325.00","price_final":"295.00","discount_amount":"75.00","total_quantity":6,"payment_icon":"","payment_channel":"tp_wallet","payment_display":{"th":"TrueMoney Wallet","en":"TrueMoney Wallet","zh":"TrueMoney Wallet"},"paid_at":"2026-05-30 13:05:22","receipt_at":"2026-05-30 13:05:22","coin_amount_used":null,"coin_value":null,"lucky_no":"23","lucky_image":"","shipping_address":{"id":1,"recipient_name":"บราวนี่ รักสะอาด","first_name":"บราวนี่","last_name":"รักสะอาด","phone":"080-000-0000","zipcode":"10160","province":"กรุงเทพมหานคร","district":"ภาษีเจริญ","subdistrict":"บางหว้า","address":"459 ถ.เพชรเกษม","full_address":"ชั้น 2 Intree Organic Cafe 459 ถ.เพชรเกษม แขวง บางหว้า เขตภาษีเจริญ กรุงเทพมหานคร 10160 ประเทศไทย","country":"Thailand"},"summary":{"quantity":{"wording":{"th":"จำนวน","en":"Quantity","zh":""},"amount":"6"},"subtotal":{"wording":{"th":"ยอดรวมสินค้า","en":"Subtotal","zh":""},"amount":"76.00"},"discount":{"wording":{"th":"ส่วนลด","en":"Discount","zh":""},"amount":"-75.00"},"flash_sale_discount":{"wording":{"th":"ส่วนลด Flash Sale","en":"Flash Sale","zh":""},"amount":"-50.00"},"product_discount":{"wording":{"th":"ส่วนลดสินค้า","en":"Product Discount","zh":""},"amount":"0.00"},"coupon_discount":{"wording":{"th":"คูปองและรหัสคูปอง","en":"Coupon","zh":""},"amount":"-20.00","code":"PROMO2026","coupon_name":{"th":"ลด 20 บาท","en":"20 Baht Off","zh":""}},"shipping":{"wording":{"th":"การจัดส่ง","en":"Shipping","zh":""},"amount":"0.00"},"total":{"wording":{"th":"ยอดชำระทั้งหมด","en":"Total","zh":""},"amount":"295.00"}},"items":[],"call_center":"099-635-1211","line_link":"https://line.me/ti/p/@browny", "lucky_image": "https://gateway2026.abgroup.co.th/images/lucky_no/85.png","qr_image": "https://gateway2026.abgroup.co.th/storage/qrcodes/5159.png"}
+''';
+
+  static const _mockOrderDetail = '''
+{"success":true,"data":{"type":"browny_shop_order","order_id":"019db31a-8688-7100-9a0d-58f0d0394224","payment_ref":"202605311234567","receipt_no":"BS-20260531-0001","status":"pending_shipment","status_label":{"th":"รอจัดส่ง","en":"Awaiting shipment","zh":"待发货"},"status_steps":{"ordered":{"done":true,"at":"2026-05-31 10:00:00"},"paid":{"done":true,"at":"2026-05-31 10:05:00"},"shipping":{"done":false,"at":null}},"tracking_number":"TH123456789","price_original":"650.00","price_final":"599.00","amount":"599.00","discount_amount":"51.00","total_quantity":3,"item_count":3,"payment_method":"qr","payment_icon":"https://gateway.abgroup.co.th/assets/images/customerNotificationIconPaymnet/qr.png","payment_channel":"qr","payment_display":{"th":"QR Code","en":"QR Code","zh":"二维码"},"created_at":"2026-05-31 10:00:00","paid_at":"2026-05-31 10:05:00","shipped_at":null,"delivered_at":null,"delivery_date":null,"receipt_at":"2026-05-31 10:05:00","review_score":null,"bonus":"5500.00","qr_image": "https://gateway2026.abgroup.co.th/storage/qrcodes/5159.png","shipping_address":{"id":1,"recipient_name":"สมชาย ใจดี","first_name":"สมชาย","last_name":"ใจดี","phone":"0812345678","zipcode":"10110","province":"กรุงเทพมหานคร","district":"คลองเตย","subdistrict":"คลองเตย","address":"123 ถ.สุขุมวิท","full_address":"123 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110","country":"ประเทศไทย","note":null},"summary":{"quantity":{"wording":{"th":"จำนวน","en":"Quantity","zh":"数量"},"amount":"3"},"subtotal":{"wording":{"th":"ยอดรวมสินค้า","en":"Subtotal","zh":"商品合计"},"amount":"625.00"},"discount":{"wording":{"th":"ส่วนลด","en":"Discount","zh":"折扣"},"amount":"-26.00"},"flash_sale_discount":{"wording":{"th":"Flash Sale","en":"Flash Sale","zh":"闪购优惠"},"amount":"-26.00"},"coupon_discount":{"wording":{"th":"คูปองและรหัสคูปอง","en":"Coupon & code","zh":"优惠券及代码"},"amount":"","code":"","coupon_name":{"th":"","en":"","zh":""}},"shipping":{"wording":{"th":"การจัดส่ง","en":"Shipping","zh":"配送"},"amount":"25.00"},"total":{"wording":{"th":"ยอดชำระทั้งหมด","en":"Total payment","zh":"应付总额"},"amount":"599.00"}},"items":[{"product_id":"019db31a-8688-7100-9a0d-58f0d0394224","product_sub_id":16,"quantity":1,"name":{"th":"เสื้อยืด Browny","en":"Browny T-Shirt","zh":"Browny T-Shirt"},"unit":{"th":"ตัว","en":"pc","zh":"pc"},"image_url":"https://gateway.abgroup.co.th/storage/products/tshirt-red.jpg","bonus":"2750.00","is_flash_sale":true,"unit_coin_price":2750,"unit_money_price":249,"original_coin_price":2750,"original_money_price":275,"flash_sale_id":5,"flash_sale_discount":26,"product_discount":0,"line_subtotal":249,"unit_shipping_fee":25,"line_shipping_fee":25},{"product_id":"019db31a-9999-7100-9a0d-58f0d0399999","product_sub_id":42,"quantity":2,"name":{"th":"กระเป๋าผ้า","en":"Canvas Bag","zh":"Canvas Bag"},"unit":{"th":"ใบ","en":"pc","zh":"pc"},"image_url":"https://gateway.abgroup.co.th/storage/products/bag.jpg","bonus":"2750.00","is_flash_sale":false,"unit_coin_price":1375,"unit_money_price":137.5,"original_coin_price":1375,"original_money_price":137.5,"flash_sale_id":null,"flash_sale_discount":0,"product_discount":0,"line_subtotal":275,"unit_shipping_fee":0,"line_shipping_fee":0}],"call_center":"099-635-1211","line_link":"https://line.me/R/ti/p/%40browny"}}
+''';
+
+  static const _mockOrders = '''
+{"success":true,"data":[{"type":"browny_shop_order","order_id":"9234545","receipt_no":null,"status":"pending_payment","status_label":{"th":"รอชำระเงิน","en":"Awaiting payment","zh":"待付款"},"delivered_at":null,"delivery_date":null,"amount":"299.00","price_final":"299.00","item_count":1,"line_count":1,"title":{"th":"หมวก Browny","en":"Browny Cap","zh":"Browny Cap"},"preview_image":"https://gateway.abgroup.co.th/storage/products/bag.jpg","items":[{"name":{"th":"หมวก Browny","en":"Browny Cap","zh":"Browny Cap"},"image_url":"https://gateway.abgroup.co.th/storage/products/bag.jpg","quantity":1}],"sort_at":"2026-05-31 09:00:00"},{"type":"browny_shop_order","order_id":"019db31a-8688-7100-9a0d-58f0d0394224","receipt_no":"BS-20260531-0001","status":"delivered","status_label":{"th":"จัดส่งแล้ว","en":"Delivered","zh":"已发货"},"delivered_at":"2026-05-31 15:30:00","delivery_date":"2026-05-31","amount":"599.00","price_final":"599.00","item_count":3,"line_count":2,"title":{"th":"เสื้อยืด Browny (+1)","en":"Browny T-Shirt (+1)","zh":"Browny T-Shirt (+1)"},"preview_image":"https://gateway.abgroup.co.th/storage/products/tshirt-red.jpg","items":[],"sort_at":"2026-05-31 15:30:00"}],"meta":{"current_page":1,"per_page":20,"total":2,"last_page":1}}
 ''';
 }

@@ -480,5 +480,8 @@ class AppColors {
 
   static const Color errorBackground = Color(0xFFFFE4E9); // #FFE4E9
 
+  /// พื้นหลังป้ายสถานะรอดำเนินการ (รอชำระเงิน / รอจัดส่ง)
+  static const Color warningBackground = Color(0xFFFFEDBC); // #FFEDBC
+
   static const Color walletButtonForegroundColor = paleOrange; // #FF334B
 }

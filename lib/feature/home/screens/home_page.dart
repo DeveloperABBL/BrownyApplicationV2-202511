@@ -25,9 +25,12 @@ import 'package:browny_applications_new/feature/transactions/screens/machines/ma
 import 'package:browny_applications_new/feature/wallet/screen/wallet_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -100,6 +103,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
     await _viewmodel.fetchBannersHighlight();
     // ดึงเครื่องที่อาจจะกำลังทำงานอยู่ ของลูกค้ารายนี้
     await _viewmodel.fetchWorkingMachines();
+    // ดึงคำสั่งซื้อ Browny Shop ที่รอชำระเงิน (6 ชม.ล่าสุด)
+    unawaited(_viewmodel.fetchBrownyShopPendingOrders());
     // ดึงสินค้า Browny Shop + ประเภทสำหรับ chip filter
     unawaited(_viewmodel.fetchShopProducts());
     unawaited(_viewmodel.fetchShopProductTypes());
@@ -157,6 +162,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
     ).routeInformationProvider.value.uri.path;
     if (location == HomePage.pagePath && mounted) {
       _viewmodel.fetchWorkingMachines();
+      _viewmodel.fetchBrownyShopPendingOrders();
     }
   }
 
@@ -176,6 +182,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       // ถ้ามีการพับแอพหรือไปแอพอื่นกลับมา จะทำการ fetch ใหม่
       if (mounted) {
         Future.microtask(_viewmodel.fetchWorkingMachines);
+        Future.microtask(_viewmodel.fetchBrownyShopPendingOrders);
       }
     }
   }
@@ -323,7 +330,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           BrownyShopProductDetailPage.goToPage(context, productId: p.id!);
         }
       },
-      onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
+      onProductFavoriteTap: _viewmodel.toggleProductFavorite,
     );
   }
 
@@ -705,85 +712,38 @@ class _HomePageWidgetState extends State<HomePageWidget>
                   AppToggleData(
                     lable: context.wording.orderPlacement,
                     value: 2,
-                    enable: false,
                   ),
                 ],
-                onChange: (index) {},
+                // 0 = ทั้งหมด, 1 = ซัก-อบ, 2 = การสั่งซื้อ
+                onChange: (data) => _viewmodel.setServiceFilter(data.value),
               ),
             ),
 
+            // รายการสถานะ — กรองตาม toggle (เครื่องซัก-อบ + คำสั่งซื้อ Browny Shop)
             Align(
               alignment: Alignment.center,
               child: ValueListenableBuilder(
-                valueListenable: _viewmodel.workingMachinesNotifier,
-                builder: (context, result, child) {
-                  if (result.isLoading) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (result.isEmpty || result.hasError) {
-                    // เกิด Error
-                    return Padding(
-                      padding: EdgeInsets.only(top: AppDims.size_12.h),
-                      child: Column(
-                        children: [
-                          Assets.png.brownyError1.image(
-                            width: AppDims.size_60.w,
-                          ),
-                          AppDims.vericalPadding_8,
-
-                          Align(
-                            alignment: Alignment.center,
-                            child: AppText(context.wording.errorUi),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (result.data!.data.orEmpty.isEmpty) {
-                    // รักใครให้ซักผ้า
-                    return Padding(
-                      padding: EdgeInsets.only(top: AppDims.size_12.h),
-                      child: Column(
-                        children: [
-                          Assets.png.brownyWashy.image(
-                            width: AppDims.size_90.w,
-                          ),
-                          AppDims.vericalPadding_8,
-
-                          Align(
-                            alignment: Alignment.center,
-                            // #รักใครให้ซักผ้า
-                            child: AppText(context.wording.loveAnyoneDoLaundry),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final workingList = result.data!.data.orEmpty;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ...List.generate(
-                        workingList.length,
-                        (index) =>
-                            // Single Item Card Service ที่กำลังทำงาน
-                            CustomerServicesWorkingWidget(
-                              data:
-                                  CustomerServicesWorkingModel.fromWorkingMachineResponse(
-                                    workingList[index],
-                                  ),
-                              onTap: () {
-                                MachineStatusPage.goToPage(
-                                  context,
-                                  machineId: workingList[index].id!.toString(),
-                                );
-                              },
-                            ),
-                      ),
-                    ],
+                valueListenable: _viewmodel.serviceFilterNotifier,
+                builder: (context, filter, _) {
+                  // 1 = ซัก-อบเท่านั้น, 2 = การสั่งซื้อเท่านั้น, 0 = ทั้งหมด
+                  final showMachines = filter != 2;
+                  final showOrders = filter != 1;
+                  return ValueListenableBuilder(
+                    valueListenable: _viewmodel.workingMachinesNotifier,
+                    builder: (context, machineResult, _) {
+                      return ValueListenableBuilder(
+                        valueListenable: _viewmodel.brownyOrdersNotifier,
+                        builder: (context, orderResult, _) {
+                          return _buildServicesContent(
+                            context,
+                            showMachines: showMachines,
+                            showOrders: showOrders,
+                            machineResult: machineResult,
+                            orderResult: orderResult,
+                          );
+                        },
+                      );
+                    },
                   );
                 },
               ),
@@ -793,6 +753,77 @@ class _HomePageWidgetState extends State<HomePageWidget>
         ),
       ),
     );
+  }
+
+  /// เนื้อหาในการ์ด "สถานะการทำงาน" — รวมเครื่องซัก-อบ + คำสั่งซื้อ Browny Shop
+  /// ตาม toggle ที่เลือก (ทั้งหมด / ซัก-อบ / การสั่งซื้อ)
+  Widget _buildServicesContent(
+    BuildContext context, {
+    required bool showMachines,
+    required bool showOrders,
+    required UiResult<WorkingMachinesResponse> machineResult,
+    required UiResult<List<BrownyShopOrderItem>> orderResult,
+  }) {
+    // ยังโหลดแหล่งข้อมูลที่เกี่ยวข้องอยู่ → spinner
+    final machinesLoading = showMachines && machineResult.isLoading;
+    final ordersLoading = showOrders && orderResult.isLoading;
+    if (machinesLoading || ordersLoading) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 12),
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    final children = <Widget>[];
+    // เครื่องซัก-อบที่กำลังทำงาน
+    if (showMachines && machineResult.isSuccess) {
+      for (final machine in machineResult.data?.data.orEmpty ?? const []) {
+        children.add(
+          CustomerServicesWorkingWidget(
+            data: CustomerServicesWorkingModel.fromWorkingMachineResponse(
+              machine,
+            ),
+            onTap: () => MachineStatusPage.goToPage(
+              context,
+              machineId: machine.id!.toString(),
+            ),
+          ),
+        );
+      }
+    }
+    // คำสั่งซื้อ Browny Shop ที่รอชำระเงิน
+    if (showOrders && orderResult.isSuccess) {
+      for (final order in orderResult.data ?? const <BrownyShopOrderItem>[]) {
+        children.add(
+          _BrownyShopOrderWorkingWidget(
+            order: order,
+            onTap: () => BrownyShopOrderStatusPage.goToPage(
+              context,
+              orderId: order.orderId.orEmpty,
+            ),
+          ),
+        );
+      }
+    }
+
+    if (children.isEmpty) {
+      // #รักใครให้ซักผ้า
+      return Padding(
+        padding: EdgeInsets.only(top: AppDims.size_12.h),
+        child: Column(
+          children: [
+            Assets.png.brownyWashy.image(width: AppDims.size_90.w),
+            AppDims.vericalPadding_8,
+            Align(
+              alignment: Alignment.center,
+              child: AppText(context.wording.loveAnyoneDoLaundry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(mainAxisSize: MainAxisSize.min, children: children);
   }
 
   Widget _buildRishIcons(BuildContext context) {
@@ -810,8 +841,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
               ValueListenableBuilder(
                 valueListenable: _viewmodel.brownyLiveNotifier,
                 builder: (context, result, _) {
-                  if (!result.isSuccess ||
-                      result.data?.enabled == false) {
+                  if (!result.isSuccess || result.data?.enabled == false) {
                     return const SizedBox.shrink();
                   }
                   final link = result.data?.link;
@@ -1801,5 +1831,110 @@ class _CustomerServicesWorkingWidgetState
     String secondStr = second < 10 ? '0$second' : '$second';
 
     return '$hourStr : $minuteStr : $secondStr';
+  }
+}
+
+/// การ์ดสถานะคำสั่งซื้อ Browny Shop (รอชำระเงิน) ในหน้า Home (Frame 2087326534)
+///
+/// แสดงรูป preview + "Order : {order_id}" + "สถานะ : {status_label}" — แตะแล้ว
+/// ไปหน้า [BrownyShopOrderStatusPage]
+class _BrownyShopOrderWorkingWidget extends StatelessWidget {
+  const _BrownyShopOrderWorkingWidget({
+    required this.order,
+    required this.onTap,
+  });
+
+  final BrownyShopOrderItem order;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = order.previewImage;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+        padding: EdgeInsets.all(12.r),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // รูป preview สินค้า
+            Container(
+              padding: EdgeInsets.symmetric(
+                vertical: AppDims.size_5.h,
+                horizontal: AppDims.size_12.w,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+                color: AppColors.border,
+              ),
+              alignment: Alignment.center,
+              child: Image.network(
+                preview.orEmpty,
+                width: AppDims.size_50.w,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => SizedBox(
+                  width: AppDims.size_50.w,
+                  height: 70.h,
+                ),
+              ),
+            ),
+            AppDims.horizonPadding_8,
+
+            // Order ID + สถานะ
+            Expanded(
+              child: Column(
+                spacing: AppDims.size_4.h,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppText(
+                    'Order : ${order.orderId.orEmpty}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.labelLarge,
+                  ),
+                  Row(
+                    children: [
+                      AppText(
+                        '${context.wording.status} : ',
+                        style: context.textTheme.labelMedium!.copyWith(
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                      Expanded(
+                        child: AppText(
+                          order.getStatusLabelDisplay(context.languageCode),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.labelMedium!.copyWith(
+                            color: order.isPendingPayment
+                                ? AppColors.error
+                                : AppColors.gray600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            AppDims.horizonPadding_16,
+
+            // ปุ่มลูกศรไปหน้าสถานะ
+            Container(
+              width: AppDims.size_26.w,
+              height: AppDims.size_26.w,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Assets.svg.arrowRight.svg(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

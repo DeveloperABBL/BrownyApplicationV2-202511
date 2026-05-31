@@ -996,7 +996,7 @@ abstract class AppClient {
   /// - lang: String? (locale เดียว เช่น "th" — ไม่ส่ง = คืนทุกภาษา)
   ///
   /// Response:
-  /// - BrownyShopFavoriteListResponse (data.items = List<ProductData>)
+  /// - BrownyShopFavoriteListResponse (data.items = `List<ProductData>`)
   @GET('/browny-shop/favorites')
   Future<HttpResponse<BrownyShopFavoriteListResponse>>
   fetchBrownyShopFavorites(
@@ -1121,10 +1121,10 @@ abstract class AppClient {
     @Path('paymentRef') String paymentRef,
   );
 
-  /// DONG 2026-05-27
+  /// DONG 2026-05-27 (model อัปเดต 2026-05-31)
   ///
-  /// API fetch ประวัติคำสั่งซื้อเฉพาะ Browny Shop ของลูกค้า (paginated)
-  /// — ข้อมูลเดียวกับ /customer/{id}/order-history เฉพาะ type = browny_shop_order
+  /// API fetch Order History ประวัติคำสั่งซื้อเฉพาะ Browny Shop ของลูกค้า (paginated)
+  /// — แต่ละออร์เดอร์มีสถานะ (status/status_label), รายการสินค้าย่อ + รูป preview
   ///
   /// Query parameters:
   /// - customer_id: String (uuid)
@@ -1132,13 +1132,15 @@ abstract class AppClient {
   /// - per_page: int (default 20)
   ///
   /// Response:
-  /// - OrderHistoryResponse (list of OrderHistoryItem with type='browny_shop_order' + meta)
+  /// - BrownyShopOrdersResponse (list of BrownyShopOrderItem + meta pagination)
   @GET('/browny-shop/orders')
-  Future<HttpResponse<OrderHistoryResponse>> fetchBrownyShopOrders(
+  Future<HttpResponse<BrownyShopOrdersResponse>> fetchBrownyShopOrders(
     @Query('customer_id') String customerId,
     @Query('page') int page,
-    @Query('per_page') int perPage,
-  );
+    @Query('per_page') int perPage, {
+    @Query('start_date') String? startDate,
+    @Query('end_date') String? endDate,
+  });
 
   /// DONG 2026-05-27
   ///
@@ -1153,6 +1155,45 @@ abstract class AppClient {
   @GET('/browny-shop/orders/{orderId}/receipt')
   Future<HttpResponse<BrownyShopReceiptResponse>> fetchBrownyShopReceipt(
     @Path('orderId') String orderId,
+  );
+
+  /// DONG 2026-05-31
+  ///
+  /// API ดึงรายละเอียดออร์เดอร์ Browny Shop — สถานะ + stepper (สั่งซื้อ/ชำระเงิน/
+  /// จัดส่ง), เลขพัสดุ, รายการสินค้า, โบนัส, ที่อยู่จัดส่ง, รีวิว
+  /// — ใช้กับหน้า BrownyShopOrderStatusPage
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid)
+  ///
+  /// Query parameters:
+  /// - customer_id: String (uuid — บังคับ, ต้องเป็นเจ้าของ order)
+  ///
+  /// Response:
+  /// - BrownyShopOrderDetailResponse (status, status_steps, items, bonus, ฯลฯ)
+  @GET('/browny-shop/orders/{orderId}')
+  Future<HttpResponse<BrownyShopOrderDetailResponse>>
+  fetchBrownyShopOrderDetail(
+    @Path('orderId') String orderId,
+    @Query('customer_id') String customerId,
+  );
+
+  /// DONG 2026-05-31
+  ///
+  /// API ส่งคะแนนรีวิวร้านของคำสั่งซื้อ Browny Shop
+  ///
+  /// Path parameters:
+  /// - orderId: String (uuid)
+  ///
+  /// Body (reuse [MachineOrderReviewRequest]):
+  /// - score: int (1-5)
+  ///
+  /// Response:
+  /// - BrownyShopReviewResponse ({status, message}) — status == "success" เมื่อสำเร็จ
+  @POST('/browny-shop/orders/{orderId}/review')
+  Future<HttpResponse<BrownyShopReviewResponse>> submitBrownyShopReview(
+    @Path('orderId') String orderId,
+    @Body() MachineOrderReviewRequest body,
   );
 
   /// DONG 2026-05-27

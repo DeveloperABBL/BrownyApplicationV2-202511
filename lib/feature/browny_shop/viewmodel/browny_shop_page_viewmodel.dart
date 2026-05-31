@@ -4,6 +4,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/product
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_favorite_mixin.dart';
 import 'package:flutter/foundation.dart';
 
 /// ViewModel หลักของหน้า BrownyShopPage
@@ -11,14 +12,23 @@ import 'package:flutter/foundation.dart';
 /// รับผิดชอบ:
 /// - state ของ category ที่เลือก
 /// - fetch รายการสินค้าตาม category
+/// - toggle สินค้าโปรด ([BrownyShopFavoriteMixin])
 /// - (อนาคต) flash deals, banners ฯลฯ
-class BrownyShopPageViewmodel extends AppViewModel {
+class BrownyShopPageViewmodel extends AppViewModel
+    with BrownyShopFavoriteMixin {
   BrownyShopPageViewmodel({
     required super.context,
     required BrownyShopDataSourceMixin repo,
   }) : _repo = repo;
 
   final BrownyShopDataSourceMixin _repo;
+
+  @override
+  BrownyShopDataSourceMixin get favoriteRepo => _repo;
+
+  @override
+  ValueNotifier<UiResult<List<ProductData>>> get favoriteProductsNotifier =>
+      _productsNotifier;
 
   @override
   void dispose() {

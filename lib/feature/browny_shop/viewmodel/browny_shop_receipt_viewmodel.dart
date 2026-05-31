@@ -59,11 +59,24 @@ class BrownyShopReceiptViewModel extends AppViewModel {
   }
 
   /// เลือกคะแนนรีวิว — ถ้าเคยรีวิวแล้วจะแก้ไม่ได้ (ล้อ machine)
-  ///
-  /// TODO(api): ยังไม่มี API SubmitReview ของ Browny Shop — เก็บคะแนนไว้ฝั่ง
-  /// client ก่อน (ยังไม่ส่งขึ้น server)
+  /// เก็บคะแนนไว้ก่อน แล้วส่งขึ้น server ตอนออกจากหน้า ([submitReview])
   void onScoreTap(int score) {
     if (!_isFirstReviewScore) return;
     _reviewScoreNotifier.value = score;
+  }
+
+  /// ส่งคะแนนรีวิวขึ้น server — เรียกตอนออกจากหน้าใบเสร็จ (ล้อ machine `_popPage`)
+  ///
+  /// ทำงานเฉพาะเมื่อยังไม่เคยรีวิว + มีการเลือกคะแนนแล้ว (1-5)
+  /// สำเร็จแล้วตั้ง [isFirstReviewed] = false กันส่งซ้ำ
+  Future<void> submitReview() async {
+    if (!_isFirstReviewScore) return;
+    final score = _reviewScoreNotifier.value;
+    if (score == null || score < 1) return;
+
+    final result = await _repo.submitReview(orderId: orderId, score: score);
+    if (result.isSuccess && result.data) {
+      _isFirstReviewScore = false;
+    }
   }
 }

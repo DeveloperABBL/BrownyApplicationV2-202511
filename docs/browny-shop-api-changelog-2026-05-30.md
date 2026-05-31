@@ -1057,3 +1057,400 @@ Order เก่าที่ paid แล้วแต่ยังไม่มี `
 | `DELETE` | `/browny-shop/favorites/{product_id}` |
 | `POST` | `/browny-shop/checkout/confirm` |
 | `GET` | `{APP_URL}/api/payment/browny-shop/status/{PAYMENT_REF}` |
+
+---
+
+# Browny Shop API — Changelog (Order History, Detail, Review, Bonus)
+
+**วันที่:** 31 พฤษภาคม 2026  
+**Base URL:** `{APP_URL}/api`  
+**Auth:** `Authorization: Bearer {TOKEN}`
+
+
+---
+
+## สรุปการเปลี่ยนแปลง
+
+| สถานะ | Method | Endpoint |
+|-------|--------|----------|
+| แก้ไข | `GET` | `/browny-shop/orders` |
+| เพิ่มใหม่ | `GET` | `/browny-shop/orders/{order_id}` |
+| แก้ไข | `GET` | `/browny-shop/orders/{order_id}/receipt` |
+| เพิ่มใหม่ | `POST` | `/browny-shop/orders/{order_id}/review` |
+
+**Migration:** `review_score`, `tracking_number`, `shipped_at`, `delivered_at` บน `browny_shop_orders`
+
+---
+
+## 1. Order history (`GET /browny-shop/orders`)
+
+### Query
+
+- `customer_id` (required)
+- `page`, `per_page`, `date`, `start_date`, `end_date` (optional)
+
+### กฎ filter
+
+- รวม `status`: `pending_payment`, `paid`, `cancelled`
+- ไม่รวม `draft`, `expired`
+
+### Mock response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "type": "browny_shop_order",
+      "order_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "receipt_no": "BS-20260531-0001",
+      "status": "delivered",
+      "status_label": {
+        "th": "จัดส่งแล้ว",
+        "en": "Delivered",
+        "zh": "已发货"
+      },
+      "delivered_at": "2026-10-14 15:30:00",
+      "delivery_date": "2026-10-14",
+      "receipt_at": "2026-10-10 12:00:00",
+      "payment_method": {
+        "key": "qr",
+        "name": { "th": "QR Code", "en": "QR Code", "zh": "二维码" }
+      },
+      "amount": "599.00",
+      "price_final": "599.00",
+      "item_count": 3,
+      "line_count": 2,
+      "title": {
+        "th": "เสื้อยืด Browny (+1)",
+        "en": "Browny T-Shirt (+1)",
+        "zh": "Browny T-Shirt (+1)"
+      },
+      "preview_image": "https://example.com/storage/products/shirt.png",
+      "items": [
+        {
+          "name": { "th": "เสื้อยืด Browny", "en": "Browny T-Shirt", "zh": "Browny T-Shirt" },
+          "image_url": "https://example.com/storage/products/shirt.png",
+          "quantity": 2
+        },
+        {
+          "name": { "th": "กางเกง Browny", "en": "Browny Pants", "zh": "Browny Pants" },
+          "image_url": "https://example.com/storage/products/pants.png",
+          "quantity": 1
+        }
+      ],
+      "sort_at": "2026-10-14 15:30:00"
+    },
+    {
+      "order_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "receipt_no": null,
+      "status": "pending_payment",
+      "status_label": {
+        "th": "กรุณาชำระเงิน",
+        "en": "Awaiting payment",
+        "zh": "待付款"
+      },
+      "delivered_at": null,
+      "delivery_date": null,
+      "amount": "299.00",
+      "price_final": "299.00",
+      "item_count": 1,
+      "line_count": 1,
+      "items": [
+        {
+          "name": { "th": "หมวก Browny", "en": "Browny Cap", "zh": "Browny Cap" },
+          "image_url": "https://example.com/storage/products/cap.png",
+          "quantity": 1
+        }
+      ],
+      "preview_image": "https://example.com/storage/products/cap.png",
+      "sort_at": "2026-10-12 09:00:00"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 20,
+    "total": 2,
+    "last_page": 1
+  }
+}
+```
+
+### UI status mapping
+
+| DB state | `status` |
+|----------|----------|
+| `cancelled` | `cancelled` |
+| not paid | `pending_payment` |
+| paid + `delivered_at` set | `delivered` |
+| paid, no delivery | `pending_shipment` |
+
+---
+
+## 2. Order detail (`GET /browny-shop/orders/{order_id}`)
+
+### Query
+
+- `customer_id` (required) — ต้องเป็นเจ้าของ order
+
+### Mock response (paid, รอจัดส่ง)
+
+```json
+{
+  "success": true,
+  "data": {
+    "type": "browny_shop_order",
+    "order_id": "019db31a-8688-7100-9a0d-58f0d0394224",
+    "payment_ref": "202605311234567",
+    "receipt_no": "BS-20260531-0001",
+    "status": "pending_shipment",
+    "status_label": {
+      "th": "รอจัดส่ง",
+      "en": "Awaiting shipment",
+      "zh": "待发货"
+    },
+    "status_steps": {
+      "ordered": {
+        "done": true,
+        "at": "2026-05-31 10:00:00"
+      },
+      "paid": {
+        "done": true,
+        "at": "2026-05-31 10:05:00"
+      },
+      "shipping": {
+        "done": true,
+        "at": "2026-05-31 14:00:00"
+      }
+    },
+    "tracking_number": "TH123456789",
+    "price_original": "650.00",
+    "price_final": "599.00",
+    "amount": "599.00",
+    "discount_amount": "51.00",
+    "total_quantity": 3,
+    "item_count": 3,
+    "payment_method": "qr",
+    "payment_icon": "https://gateway.abgroup.co.th/assets/images/customerNotificationIconPaymnet/qr.png",
+    "payment_channel": "qr",
+    "payment_display": {
+      "th": "QR Code",
+      "en": "QR Code",
+      "zh": "二维码"
+    },
+    "created_at": "2026-05-31 10:00:00",
+    "paid_at": "2026-05-31 10:05:00",
+    "shipped_at": "2026-05-31 14:00:00",
+    "delivered_at": null,
+    "delivery_date": null,
+    "receipt_at": "2026-05-31 10:05:00",
+    "review_score": null,
+    "bonus": "5500.00",
+    "qr_image": "https://gateway.abgroup.co.th/storage/qrcodes/019db31a-8688-7100-9a0d-58f0d0394224.png",
+    "shipping_address": {
+      "id": 1,
+      "recipient_name": "สมชาย ใจดี",
+      "first_name": "สมชาย",
+      "last_name": "ใจดี",
+      "phone": "0812345678",
+      "zipcode": "10110",
+      "province": "กรุงเทพมหานคร",
+      "district": "คลองเตย",
+      "subdistrict": "คลองเตย",
+      "address": "123 ถ.สุขุมวิท",
+      "full_address": "123 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110",
+      "country": "ประเทศไทย",
+      "note": null
+    },
+    "summary": {
+      "quantity": {
+        "wording": {
+          "th": "จำนวน",
+          "en": "Quantity",
+          "zh": "数量"
+        },
+        "amount": "3"
+      },
+      "subtotal": {
+        "wording": {
+          "th": "ยอดรวมสินค้า",
+          "en": "Subtotal",
+          "zh": "商品合计"
+        },
+        "amount": "625.00"
+      },
+      "discount": {
+        "wording": {
+          "th": "ส่วนลด",
+          "en": "Discount",
+          "zh": "折扣"
+        },
+        "amount": "-26.00"
+      },
+      "flash_sale_discount": {
+        "wording": {
+          "th": "Flash Sale",
+          "en": "Flash Sale",
+          "zh": "闪购优惠"
+        },
+        "amount": "-26.00"
+      },
+      "coupon_discount": {
+        "wording": {
+          "th": "คูปองและรหัสคูปอง",
+          "en": "Coupon & code",
+          "zh": "优惠券及代码"
+        },
+        "amount": "",
+        "code": "",
+        "coupon_name": {
+          "th": "",
+          "en": "",
+          "zh": ""
+        }
+      },
+      "shipping": {
+        "wording": {
+          "th": "การจัดส่ง",
+          "en": "Shipping",
+          "zh": "配送"
+        },
+        "amount": "25.00"
+      },
+      "total": {
+        "wording": {
+          "th": "ยอดชำระทั้งหมด",
+          "en": "Total payment",
+          "zh": "应付总额"
+        },
+        "amount": "599.00"
+      }
+    },
+    "items": [
+      {
+        "product_id": "019db31a-8688-7100-9a0d-58f0d0394224",
+        "product_sub_id": 16,
+        "quantity": 1,
+        "name": {
+          "th": "เสื้อยืด Browny",
+          "en": "Browny T-Shirt",
+          "zh": "Browny T-Shirt"
+        },
+        "unit": {
+          "th": "ตัว",
+          "en": "pc",
+          "zh": "pc"
+        },
+        "image_url": "https://gateway.abgroup.co.th/storage/products/tshirt-red.jpg",
+        "bonus": "2750.00",
+        "is_flash_sale": true,
+        "unit_coin_price": 2750,
+        "unit_money_price": 249,
+        "original_coin_price": 2750,
+        "original_money_price": 275,
+        "flash_sale_id": 5,
+        "flash_sale_discount": 26,
+        "product_discount": 0,
+        "line_subtotal": 249,
+        "unit_shipping_fee": 25,
+        "line_shipping_fee": 25
+      },
+      {
+        "product_id": "019db31a-9999-7100-9a0d-58f0d0399999",
+        "product_sub_id": 42,
+        "quantity": 2,
+        "name": {
+          "th": "กระเป๋าผ้า",
+          "en": "Canvas Bag",
+          "zh": "Canvas Bag"
+        },
+        "unit": {
+          "th": "ใบ",
+          "en": "pc",
+          "zh": "pc"
+        },
+        "image_url": "https://gateway.abgroup.co.th/storage/products/bag.jpg",
+        "bonus": "2750.00",
+        "is_flash_sale": false,
+        "unit_coin_price": 1375,
+        "unit_money_price": 137.5,
+        "original_coin_price": 1375,
+        "original_money_price": 137.5,
+        "flash_sale_id": null,
+        "flash_sale_discount": 0,
+        "product_discount": 0,
+        "line_subtotal": 275,
+        "unit_shipping_fee": 0,
+        "line_shipping_fee": 0
+      }
+    ],
+    "call_center": "099-635-1211",
+    "line_link": "https://line.me/R/ti/p/%40browny"
+  }
+}
+```
+
+---
+
+## 3. Receipt (`GET /browny-shop/orders/{order_id}/receipt`)
+
+เพิ่มฟิลด์ (ไม่ breaking ฟิลด์เดิม):
+
+- `review_score`, `bonus`, `items[].bonus`
+- `status`, `status_label`, `status_steps`
+- `tracking_number`, `created_at`, `shipped_at`, `delivered_at`, `delivery_date`
+- `payment_method` (key string)
+
+### Mock snippet
+
+```json
+{
+  "type": "browny_shop_order",
+  "order_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "status": "delivered",
+  "review_score": 5,
+  "bonus": "255.00",
+  "tracking_number": "TH123456789TH",
+  "delivered_at": "2026-10-14 15:30:00",
+  "items": [
+    {
+      "quantity": 2,
+      "line_subtotal": "500.00",
+      "bonus": "100.00"
+    }
+  ]
+}
+```
+
+**Bonus calculation:** `sum(unit_coin_price × quantity)` จาก snapshot ใน `browny_shop_order_items` (ยังไม่มี webhook แจก coin จริง)
+
+---
+
+## 4. Review (`POST /browny-shop/orders/{order_id}/review`)
+
+### Body
+
+```json
+{ "score": 5 }
+```
+
+### Success
+
+```json
+{
+  "status": "success",
+  "message": "รีวิวร้านสำเร็จ"
+}
+```
+
+### Errors
+
+| HTTP | message |
+|------|---------|
+| 400 | คำสั่งนี้ได้รีวิวแล้ว |
+| 400 | คำสั่งนี้ยังไม่ได้ชำระเงิน |
+| 404 | ไม่พบข้อมูลคำสั่งที่ต้องการ |
+
+---
+
+

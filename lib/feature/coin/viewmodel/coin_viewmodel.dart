@@ -6,13 +6,14 @@ import 'package:browny_applications_new/core/utils/app_extensions.dart';
 import 'package:browny_applications_new/core/utils/ui_result.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_favorite_mixin.dart';
 import 'package:browny_applications_new/feature/coin/models/coin_data_model.dart';
 import 'package:browny_applications_new/feature/coin/repository/coin_claim_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class CoinViewmModel extends AppViewModel {
+class CoinViewmModel extends AppViewModel with BrownyShopFavoriteMixin {
   CoinViewmModel({
     required super.context,
     required CoinDataSourceMixin repo,
@@ -21,6 +22,13 @@ class CoinViewmModel extends AppViewModel {
 
   final CoinDataSourceMixin _repo;
   final BrownyShopDataSourceMixin brownyShopRepo;
+
+  @override
+  BrownyShopDataSourceMixin get favoriteRepo => brownyShopRepo;
+
+  @override
+  ValueNotifier<UiResult<List<ProductData>>> get favoriteProductsNotifier =>
+      _shopProductsNotifier;
 
   // ========== dispose ==========
   @override

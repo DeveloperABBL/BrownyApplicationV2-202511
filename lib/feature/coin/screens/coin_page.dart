@@ -276,7 +276,7 @@ class __CoinContentState extends State<_CoinContent> {
                   );
                 }
               },
-              onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
+              onProductFavoriteTap: _viewModel.toggleProductFavorite,
             ),
             AppDims.vericalPadding_24
           ],

@@ -1841,6 +1841,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pendingPayment => 'Pending payment';
 
   @override
+  String get orderCancelled => 'Order cancelled';
+
+  @override
+  String get outOfStock => 'Out of stock';
+
+  @override
+  String totalItemsCount(int count) {
+    return '$count items total';
+  }
+
+  @override
   String get parcelNumber => 'Parcel number';
 
   @override

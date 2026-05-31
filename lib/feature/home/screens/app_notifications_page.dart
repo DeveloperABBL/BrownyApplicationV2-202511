@@ -85,18 +85,10 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
           }
 
           // Empty state
-          if (result.isEmpty ||
+          final isEmptyNoti =
+              (result.isEmpty ||
               result.data?.data == null ||
-              result.data!.data!.isEmpty) {
-            return Center(
-              child: AppText(
-                // ไม่มีการแจ้งเตือน
-                context.wording.noNotifications,
-                style: context.textTheme.labelMedium,
-              ),
-            );
-          }
-
+              result.data!.data!.isEmpty);
           // Success state - แสดงรายการ notifications
           final notifications = result.data!.data!;
           return Column(
@@ -129,25 +121,33 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
                   onRefresh: () async {
                     await _viewmodel.fetchCustomerNotifications();
                   },
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 16.h,
-                    ),
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      final notification = notifications[index];
-                      final locale = Localizations.localeOf(
-                        context,
-                      ).languageCode;
+                  child: isEmptyNoti
+                      ? Center(
+                          child: AppText(
+                            // ไม่มีการแจ้งเตือน
+                            context.wording.noNotifications,
+                            style: context.textTheme.labelMedium,
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 16.h,
+                          ),
+                          itemCount: notifications.length,
+                          itemBuilder: (context, index) {
+                            final notification = notifications[index];
+                            final locale = Localizations.localeOf(
+                              context,
+                            ).languageCode;
 
-                      return _NotificationItem(
-                        notification: notification,
-                        locale: locale,
-                      );
-                    },
-                  ),
+                            return _NotificationItem(
+                              notification: notification,
+                              locale: locale,
+                            );
+                          },
+                        ),
                 ),
               ),
             ],

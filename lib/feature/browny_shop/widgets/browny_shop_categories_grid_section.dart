@@ -117,7 +117,7 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
                       alignment: Alignment.center,
                       child: AppText(
                         label,
-                        style: context.textTheme.labelSmall?.copyWith(
+                        style: context.textTheme.titleSmall?.copyWith(
                           color: isActive
                               ? AppColors.white
                               : AppColors.textPrimary,

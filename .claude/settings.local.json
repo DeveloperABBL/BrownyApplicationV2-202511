@@ -48,7 +48,18 @@
       "Read(//tmp/**)",
       "Bash(grep -n 'get icShop\\\\|class $AssetsIcShopGen\\\\|get png\\\\b\\\\|get svg\\\\b' lib/res/icons/assets.gen.dart)",
       "Bash(grep -m1 '\"__TRACKED_VAR__\":' lib/res/strings/l10n/app_th.arb)",
-      "Bash(grep -nF '\"__TRACKED_VAR__\"' lib/res/strings/l10n/app_th.arb)"
+      "Bash(grep -nF '\"__TRACKED_VAR__\"' lib/res/strings/l10n/app_th.arb)",
+      "Bash(curl -s -o b_pending_payment.png \"https://www.figma.com/api/mcp/asset/826e7c13-d3ee-417a-838f-bdb20872c676\")",
+      "Bash(curl -s -o b_pending_shipment.png \"https://www.figma.com/api/mcp/asset/1bb54e24-d86f-44cd-a2e1-2b441ebd0039\")",
+      "Bash(curl -s -o b_delivered.png \"https://www.figma.com/api/mcp/asset/818009d0-faed-48ce-8c7d-9936e1e80ffc\")",
+      "Bash(curl -s -o b_cancelled.png \"https://www.figma.com/api/mcp/asset/ad087e3e-7d53-4d05-989e-123e60dcee3d\")",
+      "Bash(curl -s -o b_paybar.png \"https://www.figma.com/api/mcp/asset/44766e8c-8480-448d-a733-5d6c5e2f791f\")",
+      "Bash(dart format *)",
+      "Bash(curl -s -o cart_oos.png \"https://www.figma.com/api/mcp/asset/a1823eec-a6fc-4aca-a692-5226dbb0c5e4\")",
+      "Bash(curl -s -o home_services.png \"https://www.figma.com/api/mcp/asset/9043097a-d9c4-4cab-998e-4b80d3881f9d\")",
+      "Bash(grep -vE \"Swift Package|maintainers|future version|^$\")",
+      "Bash(curl -s -o hist_shop.png \"https://www.figma.com/api/mcp/asset/086c491e-f658-4a08-b29f-6667d16bea3f\")",
+      "Bash(grep -vE \"Swift Package|maintainers|future version|image_gallery|google_maps|flutter_facebook|^\\\\s*-|^$\")"
     ]
   }
 }

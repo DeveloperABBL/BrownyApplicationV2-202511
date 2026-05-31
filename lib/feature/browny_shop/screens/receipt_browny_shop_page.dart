@@ -138,10 +138,28 @@ class _ReceiptBrownyShopWidgetState extends State<_ReceiptBrownyShopWidget> {
     );
   }
 
-  void _popToHome() {
+  /// ส่งรีวิวขึ้น server (ถ้ายังไม่เคยรีวิว) ก่อนออกจากหน้า — ล้อ machine `_popPage`
+  Future<void> _submitReviewIfNeeded() async {
+    if (!_vm.isFirstReviewed) return;
+    AppOverlays.showLoading(context);
+    await _vm.submitReview();
+    if (!mounted) return;
+    AppOverlays.hideLoading();
+  }
+
+  Future<void> _popToHome() async {
+    await _submitReviewIfNeeded();
+    if (!mounted) return;
     context.popUntil(
       predicate: (route) => route.name.orEmpty == HomePage.pageName,
     );
+  }
+
+  /// ไปหน้าตรวจสอบสถานะ — ส่งรีวิวก่อน (เพราะ replace ออกจากหน้าใบเสร็จ)
+  Future<void> _goToOrderStatus() async {
+    await _submitReviewIfNeeded();
+    if (!mounted) return;
+    BrownyShopOrderStatusPage.goReplacementPage(context, orderId: _vm.orderId);
   }
 
   @override
@@ -183,10 +201,7 @@ class _ReceiptBrownyShopWidgetState extends State<_ReceiptBrownyShopWidget> {
                 child: AppText(context.wording.backToHome),
               ),
               GestureDetector(
-                onTap: () => BrownyShopOrderStatusPage.goReplacementPage(
-                  context,
-                  orderId: _vm.orderId,
-                ),
+                onTap: _goToOrderStatus,
                 child: Container(
                   width: double.infinity,
                   height: AppDims.size_40.h,

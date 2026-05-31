@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/address
 import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_selected_viewmodel.dart';
@@ -358,11 +359,22 @@ class _BrownyShopSelectedWidgetState extends State<_BrownyShopSelectedWidget>
         },
       );
     }
-    // ปิด QR/web เอง (ยังไม่จ่าย) → เช็คอีกรอบ แล้วปลดล็อกปุ่มให้กดใหม่ได้
+    // ปิด QR/web เอง (ยังไม่จ่าย) → เช็คอีกรอบ
     _paymentProcessing = false;
     _stopPolling();
-    await _checkPaymentStatus();
-    if (mounted) _isPurchaseClicked = false;
+    final status = await _vm.checkBrownyShopPaymentStatus(paymentRef);
+    if (!mounted) return;
+    if (status.isSuccess && (status.data?.isPaid ?? false)) {
+      _showSuccessThenReceipt(status.data?.orderId?.toString());
+      return;
+    }
+    // ยังไม่ชำระ → order ถูกสร้างเป็น pending_payment แล้ว ออกจากหน้า checkout
+    // ไปหน้าสถานะคำสั่งซื้อ (ผู้ใช้กลับเข้ามาชำระต่อภายหลังได้)
+    _isPurchaseClicked = false;
+    BrownyShopOrderStatusPage.goReplacementPage(
+      context,
+      orderId: order.id ?? '',
+    );
   }
 
   @override
@@ -516,7 +528,7 @@ class _SectionTitleRow extends StatelessWidget {
           child: AppText(
             title,
             style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 16.sp,
+              // fontSize: 16.sp,
               color: AppColors.darkBrown,
             ),
           ),
@@ -668,7 +680,7 @@ class _ShipToCard extends StatelessWidget {
           address.fullAddress,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodyMedium?.copyWith(
+          style: context.textTheme.titleSmall?.copyWith(
             fontSize: 14.sp,
             color: AppColors.gray600,
           ),
@@ -738,7 +750,7 @@ class _ShippingCard extends StatelessWidget {
               Expanded(
                 child: AppText(
                   _methodName,
-                  style: context.textTheme.titleSmall?.copyWith(
+                  style: context.textTheme.titleMedium?.copyWith(
                     fontSize: 14.sp,
                     color: AppColors.darkBrown,
                   ),
@@ -747,7 +759,6 @@ class _ShippingCard extends StatelessWidget {
               AppText(
                 formatCurrency(value: shipping, leadingSign: '฿'),
                 style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 14.sp,
                   color: AppColors.ci,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1006,8 +1017,7 @@ class _ProductItem extends StatelessWidget {
                   name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 12.sp,
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.darkBrown,
                   ),
                 ),
@@ -1017,7 +1027,6 @@ class _ProductItem extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.labelSmall?.copyWith(
-                      fontSize: 10.sp,
                       color: AppColors.gray600,
                     ),
                   ),
@@ -1077,15 +1086,14 @@ class _ProductItem extends StatelessWidget {
         if (line.data.unitCoinPrice != null)
           Row(
             children: [
-              Assets.png.brownyCoin.image(width: 10.w, height: 10.w),
+              Assets.png.brownyCoin.image(width: 12.w),
               SizedBox(width: AppDims.size_4.w),
               AppText(
                 formatCurrency(
                   value: line.unitCoinPrice,
                   trailingSign: ' ${context.wording.coin}',
                 ),
-                style: context.textTheme.labelSmall?.copyWith(
-                  fontSize: 10.sp,
+                style: context.textTheme.titleSmall?.copyWith(
                   color: AppColors.error,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1096,7 +1104,6 @@ class _ProductItem extends StatelessWidget {
         AppText(
           formatCurrency(value: line.unitMoneyPrice, leadingSign: '฿'),
           style: context.textTheme.titleSmall?.copyWith(
-            fontSize: 14.sp,
             color: AppColors.ci,
             fontWeight: FontWeight.w500,
           ),
@@ -1537,7 +1544,6 @@ class _OrderSummaryCard extends StatelessWidget {
           child: AppText(
             title,
             style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 16.sp,
               color: AppColors.darkBrown,
             ),
           ),
@@ -1545,7 +1551,6 @@ class _OrderSummaryCard extends StatelessWidget {
         AppText(
           value,
           style: context.textTheme.titleMedium?.copyWith(
-            fontSize: 16.sp,
             color: valueColor,
             fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
           ),

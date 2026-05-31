@@ -96,7 +96,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
                   );
                 }
               },
-              onProductFavoriteTap: (p) => debugPrint('fav product: ${p.id}'),
+              onProductFavoriteTap: _vm.toggleProductFavorite,
             ),
             AppDims.vericalPadding_24,
           ],

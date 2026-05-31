@@ -118,7 +118,7 @@ class _BrownyShopCartWidgetState extends State<_BrownyShopCartWidget> {
 
   /// flow "ซื้อเลย" — เลือกเฉพาะสินค้าที่กดมา, ตั้งจำนวนตามที่เลือก
   /// แล้วเด้งเข้าหน้าสรุป ([BrownyShopSelected]) ทันที (ทำครั้งเดียว)
-  void _maybeAutoRouteBuyNow(BrownyShopSelectedViewModel vm) {
+  Future<void> _maybeAutoRouteBuyNow(BrownyShopSelectedViewModel vm) async {
     final subId = widget.buyNowSubId;
     if (subId == null || _didAutoRoute) return;
     if (vm.hasError || vm.isEmpty) return;
@@ -138,7 +138,9 @@ class _BrownyShopCartWidgetState extends State<_BrownyShopCartWidget> {
       vm.setQuantity(line, qty);
     }
 
-    BrownyShopSelected.goToPage(context, viewModel: vm);
+    // กลับจากหน้าสรุป → โหลดตะกร้าใหม่ (ราคา/ส่วนลด/สต็อกอัปเดต)
+    await BrownyShopSelected.goToPage(context, viewModel: vm);
+    if (mounted) vm.loadCart();
   }
 
   @override
@@ -396,6 +398,9 @@ class _CartItemCardState extends State<_CartItemCard> {
     return num.tryParse(raw)?.toInt();
   }
 
+  /// สินค้าหมดสต็อก — เลือก/แก้จำนวนไม่ได้ + แสดงป้าย "หมด"
+  bool get _isOutOfStock => _line.isOutOfStock;
+
   /// ใช้จำนวนใหม่ (clamp 1..stock) แล้วแจ้ง ViewModel
   void _applyQuantity(int next) {
     final clamped = next.clamp(1, _stockMax ?? 99999);
@@ -439,7 +444,7 @@ class _CartItemCardState extends State<_CartItemCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFFCFCFC),
+      color: AppColors.inputFieldDisableBg,
       padding: EdgeInsets.symmetric(
         vertical: AppDims.size_16.h,
         horizontal: AppDims.size_16.w,
@@ -451,7 +456,9 @@ class _CartItemCardState extends State<_CartItemCard> {
           children: [
             _Checkbox(
               checked: _line.selected,
-              onTap: widget.syncing ? null : widget.onToggleSelected,
+              onTap: (widget.syncing || _isOutOfStock)
+                  ? null
+                  : widget.onToggleSelected,
             ),
             SizedBox(width: AppDims.size_8.w),
             _buildImage(),
@@ -465,6 +472,23 @@ class _CartItemCardState extends State<_CartItemCard> {
 
   Widget _buildImage() {
     final url = _line.data.imageUrl;
+    final image = url == null || url.isEmpty
+        ? Icon(Icons.image_outlined, size: 32.w, color: AppColors.gray400)
+        : CachedNetworkImage(
+            // แสดงด้วย imageurl ของ subproduct ก่อน
+            imageUrl: url,
+            fit: BoxFit.contain,
+            errorWidget: (_, _, _) => CachedNetworkImage(
+              // ถ้า error ใช้ main_image
+              imageUrl: _line.data.product!.mainImageUrl.orEmpty,
+              fit: BoxFit.contain,
+              errorWidget: (_, _, _) => Icon(
+                Icons.image_outlined,
+                size: 32.w,
+                color: AppColors.gray400,
+              ),
+            ),
+          );
     return Container(
       width: 100.w,
       height: 100.w,
@@ -473,25 +497,37 @@ class _CartItemCardState extends State<_CartItemCard> {
         borderRadius: BorderRadius.circular(10.r),
       ),
       clipBehavior: Clip.antiAlias,
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(AppDims.size_8.w),
-      child: url == null || url.isEmpty
-          ? Icon(Icons.image_outlined, size: 32.w, color: AppColors.gray400)
-          : CachedNetworkImage(
-              // แสดงด้วย imageurl ของ subproduct ก่อน
-              imageUrl: url,
-              fit: BoxFit.contain,
-              errorWidget: (_, _, _) => CachedNetworkImage(
-                // ถ้า error ใช้ main_image
-                imageUrl: _line.data.product!.mainImageUrl.orEmpty,
-                fit: BoxFit.contain,
-                errorWidget: (_, _, _) => Icon(
-                  Icons.image_outlined,
-                  size: 32.w,
-                  color: AppColors.gray400,
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: [
+          Padding(padding: EdgeInsets.all(AppDims.size_8.w), child: image),
+          // หมดสต็อก — บังภาพให้จาง + ป้าย "หมด" กลางรูป
+          if (_isOutOfStock) ...[
+            ColoredBox(
+              color: AppColors.bareBackground.withValues(alpha: 0.55),
+            ),
+            Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_12.w,
+                  vertical: AppDims.size_4.h,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.bareBackground,
+                  borderRadius: BorderRadius.circular(39.r),
+                ),
+                child: AppText(
+                  context.wording.outOfStock,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: AppColors.gray600,
+                  ),
                 ),
               ),
             ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -552,7 +588,39 @@ class _CartItemCardState extends State<_CartItemCard> {
           SizedBox(height: AppDims.size_4.h),
           _FlashSaleCountdown(endAt: product?.flashSaleEndsAt),
         ],
+        // หมดสต็อก — ป้ายแจ้งเตือนสีแดง
+        if (_isOutOfStock) ...[
+          SizedBox(height: AppDims.size_4.h),
+          _outOfStockBadge(context),
+        ],
       ],
+    );
+  }
+
+  /// ป้าย "หมด" สีแดง (พื้นแดงอ่อน + ไอคอน + ข้อความ error)
+  Widget _outOfStockBadge(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_8.w,
+        vertical: 2.h,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.errorBackground,
+        borderRadius: BorderRadius.circular(4.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Assets.svg.icInfoRad.svg(width: 12.w, height: 12.w),
+          SizedBox(width: AppDims.size_4.w),
+          AppText(
+            context.wording.outOfStock,
+            style: context.textTheme.labelSmall?.copyWith(
+              color: AppColors.error,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -654,7 +722,8 @@ class _CartItemCardState extends State<_CartItemCard> {
   }
 
   Widget _buildQtyStepper(BuildContext context) {
-    final enabled = !widget.syncing;
+    // หมดสต็อก → ปิดปุ่มแก้จำนวนทั้งหมด (เทาตาม design)
+    final enabled = !widget.syncing && !_isOutOfStock;
     final max = _stockMax;
     final atMax = max != null && _line.quantity >= max;
     return Row(
@@ -918,7 +987,11 @@ class _CheckoutBar extends StatelessWidget {
           SizedBox(width: AppDims.size_14.w),
           GestureDetector(
             onTap: canCheckout
-                ? () => BrownyShopSelected.goToPage(context, viewModel: vm)
+                ? () async {
+                    // กลับจากหน้าสรุป → โหลดตะกร้าใหม่ให้ราคา/สต็อกอัปเดต
+                    await BrownyShopSelected.goToPage(context, viewModel: vm);
+                    if (context.mounted) vm.loadCart();
+                  }
                 : null,
             child: Container(
               width: 101.w,

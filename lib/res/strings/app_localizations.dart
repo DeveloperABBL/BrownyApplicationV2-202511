@@ -3622,6 +3622,24 @@ abstract class AppLocalizations {
   /// **'Pending payment'**
   String get pendingPayment;
 
+  /// No description provided for @orderCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Order cancelled'**
+  String get orderCancelled;
+
+  /// No description provided for @outOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of stock'**
+  String get outOfStock;
+
+  /// No description provided for @totalItemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items total'**
+  String totalItemsCount(int count);
+
   /// No description provided for @parcelNumber.
   ///
   /// In en, this message translates to:

@@ -1,5 +1,8 @@
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/core/data/remote/models/response/order_history_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
+import 'package:browny_applications_new/feature/transactions/models/history_entry.dart';
 import 'package:browny_applications_new/feature/transactions/repository/coupon_voucher_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/history_transaction_repo.dart';
 import 'package:browny_applications_new/feature/transactions/repository/machine_transaction_repo.dart';
@@ -7,6 +10,7 @@ import 'package:browny_applications_new/feature/transactions/repository/transact
 import 'package:browny_applications_new/feature/transactions/viewmodel/history_transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_machine_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +35,7 @@ class HistoryTransactionPage extends StatelessWidget {
         transactionRepo: TransactionRepo(),
         machineRepo: MachineRepo(),
         historyTransactionRepo: HistoryTransactionRepo(),
+        brownyShopRepo: BrownyShopRepo(),
       ),
       child: const _HistoryTransactionContent(),
     );
@@ -49,6 +54,9 @@ class __HistoryTransactionContentState
     extends State<_HistoryTransactionContent> {
   late final HistoryTransactionsViewmodel _viewModel;
   final ScrollController _scrollController = ScrollController();
+
+  /// _DateFilterHeader โผล่/ซ่อนตามทิศทาง scroll (scroll ลง = ซ่อน, ขึ้น = โผล่)
+  bool _isHeaderVisible = true;
 
   @override
   void initState() {
@@ -75,7 +83,27 @@ class __HistoryTransactionContentState
     }
   }
 
-  Future<void> _onItemTap(OrderHistoryItem item) async {
+  /// ซ่อน/โผล่ _DateFilterHeader ตามทิศทาง scroll (ล้อ _isAppBarVisible)
+  bool _onUserScroll(UserScrollNotification notification) {
+    final direction = notification.direction;
+    if (direction == ScrollDirection.reverse && _isHeaderVisible) {
+      setState(() => _isHeaderVisible = false);
+    } else if (direction == ScrollDirection.forward && !_isHeaderVisible) {
+      setState(() => _isHeaderVisible = true);
+    }
+    return false;
+  }
+
+  Future<void> _onItemTap(HistoryEntry entry) async {
+    // Browny Shop → ไปหน้าสถานะคำสั่งซื้อ
+    if (entry.isShop) {
+      final orderId = entry.shopItem!.orderId;
+      if (orderId == null || orderId.isEmpty) return;
+      BrownyShopOrderStatusPage.goToPage(context, orderId: orderId);
+      return;
+    }
+
+    final item = entry.machineItem!;
     final orderId = item.orderId;
     if (orderId == null) return;
     AppOverlays.showLoading(context);
@@ -144,86 +172,97 @@ class __HistoryTransactionContentState
         // leading: BackButton(color: AppColors.darkBrown),
       ),
       backgroundColor: AppColors.bareBackground,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Date range filter header
-          _DateFilterHeader(
-            viewModel: _viewModel,
-            onTap: _openDateRangePicker,
-          ),
-          // Content
-          Expanded(
-            child: ValueListenableBuilder<UiResult<List<OrderHistoryItem>>>(
-              valueListenable: _viewModel.orderHistoryNotifier,
-              builder: (context, result, _) {
-                if (result.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (result.hasError) {
-                  return Center(
-                    child: AppText(
-                      context.wording.errorUi,
-                      style: context.textTheme.labelMedium,
-                    ),
-                  );
-                }
-
-                if (result.isEmpty ||
-                    result.data == null ||
-                    result.data!.isEmpty) {
-                  return Center(
-                    child: AppText(
-                      context.wording.noOrderHistory,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  );
-                }
-
-                final items = result.data!;
-                final locale = context.languageCode;
-
-                return RefreshIndicator(
-                  onRefresh: () => _viewModel.fetchOrderHistory(refresh: true),
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    // separatorBuilder: (_, _) => Divider(),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.h,
-                    ),
-                    itemCount: items.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == items.length) {
-                        return ValueListenableBuilder<bool>(
-                          valueListenable: _viewModel.isLoadingMoreNotifier,
-                          builder: (_, isLoading, _) {
-                            if (!isLoading) return SizedBox(height: 16.h);
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.h),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                      return _OrderHistoryItem(
-                        item: items[index],
-                        locale: locale,
-                        onTap: () => _onItemTap(items[index]),
-                      );
-                    },
-                  ),
-                );
-              },
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: _onUserScroll,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // Date range filter header — โผล่/ซ่อนตามทิศทาง scroll
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              alignment: Alignment.topCenter,
+              child: _isHeaderVisible
+                  ? _DateFilterHeader(
+                      viewModel: _viewModel,
+                      onTap: _openDateRangePicker,
+                    )
+                  : const SizedBox(width: double.infinity),
             ),
-          ),
-        ],
+            // Content
+            Expanded(
+              child: ValueListenableBuilder<UiResult<List<HistoryEntry>>>(
+                valueListenable: _viewModel.orderHistoryNotifier,
+                builder: (context, result, _) {
+                  if (result.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (result.hasError) {
+                    return Center(
+                      child: AppText(
+                        context.wording.errorUi,
+                        style: context.textTheme.labelMedium,
+                      ),
+                    );
+                  }
+
+                  if (result.isEmpty ||
+                      result.data == null ||
+                      result.data!.isEmpty) {
+                    return Center(
+                      child: AppText(
+                        context.wording.noOrderHistory,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final items = result.data!;
+                  final locale = context.languageCode;
+
+                  return RefreshIndicator(
+                    onRefresh: () =>
+                        _viewModel.fetchOrderHistory(refresh: true),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      // separatorBuilder: (_, _) => Divider(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 8.h,
+                      ),
+                      itemCount: items.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == items.length) {
+                          return ValueListenableBuilder<bool>(
+                            valueListenable: _viewModel.isLoadingMoreNotifier,
+                            builder: (_, isLoading, _) {
+                              if (!isLoading) return SizedBox(height: 16.h);
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                        return _OrderHistoryItem(
+                          entry: items[index],
+                          locale: locale,
+                          onTap: () => _onItemTap(items[index]),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -316,17 +355,26 @@ class _DateFilterHeader extends StatelessWidget {
 // ─────────────────────────────────────────────
 class _OrderHistoryItem extends StatelessWidget {
   const _OrderHistoryItem({
-    required this.item,
+    required this.entry,
     required this.locale,
     required this.onTap,
   });
 
-  final OrderHistoryItem item;
+  final HistoryEntry entry;
   final String locale;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    // Browny Shop → layout เฉพาะ (Order ID + รูป + ชื่อ + สถานะ)
+    if (entry.isShop) {
+      return _BrownyShopHistoryItem(
+        order: entry.shopItem!,
+        locale: locale,
+        onTap: onTap,
+      );
+    }
+    final item = entry.machineItem!;
     final storeName = item.store?.getNameDisplay(locale) ?? '';
     final receiptDate = item.receiptAtDisplay(locale);
 
@@ -521,6 +569,203 @@ class _OrderHistoryItem extends StatelessWidget {
                     width: AppDims.size_24.w,
                     colorFilter: ColorFilter.mode(
                       AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Browny Shop order history card (Figma 185:3678)
+// ─────────────────────────────────────────────
+class _BrownyShopHistoryItem extends StatelessWidget {
+  const _BrownyShopHistoryItem({
+    required this.order,
+    required this.locale,
+    required this.onTap,
+  });
+
+  final BrownyShopOrderItem order;
+  final String locale;
+  final VoidCallback onTap;
+
+  /// ไอคอน/สี ของแถบสถานะตาม status (รวมสีลูกศร)
+  /// - delivered = ci / pending_payment, paid (รอจัดส่ง) = yellow3 /
+  ///   cancelled, expired = error
+  ({AssetGenImage icon, Color background, Color textColor, Color arrowColor})
+  _statusStyle() {
+    if (order.isCancelled) {
+      return (
+        icon: Assets.icShop.icCanceledRounded,
+        background: AppColors.errorBackground,
+        textColor: AppColors.error,
+        arrowColor: AppColors.error,
+      );
+    }
+    if (order.isDelivered) {
+      return (
+        icon: Assets.icShop.icTruckRoundedCi3,
+        background: AppColors.ci3,
+        textColor: AppColors.ci,
+        arrowColor: AppColors.ci,
+      );
+    }
+    if (order.isPendingPayment) {
+      return (
+        icon: Assets.icShop.icCardRoundedOrange,
+        background: AppColors.warningBackground,
+        textColor: AppColors.gray500,
+        arrowColor: AppColors.yellow3,
+      );
+    }
+    // pending_shipment (paid)
+    return (
+      icon: Assets.icShop.icTruckRoundedOrange,
+      background: AppColors.warningBackground,
+      textColor: AppColors.gray500,
+      arrowColor: AppColors.yellow3,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _statusStyle();
+    final amount = order.amount.ifNullOrEmpty(order.priceFinal.orEmpty);
+    return Container(
+      margin: EdgeInsets.only(bottom: AppDims.size_8.h),
+      padding: EdgeInsets.all(AppDims.size_12.w),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Order ID
+          Container(
+            decoration: BoxDecoration(
+              border: BoxBorder.fromLTRB(
+                bottom: BorderSide(color: AppColors.border),
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: AppDims.size_8.h),
+              child: Row(
+                spacing: AppDims.size_16.w,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppText(
+                    'Order ID',
+                    style: context.textTheme.labelMedium!.copyWith(
+                      color: AppColors.gray600,
+                    ),
+                  ),
+                  Flexible(
+                    child: AppText(
+                      order.receiptNo.ifNullOrEmpty(order.orderId.orEmpty),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.labelMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AppDims.vericalPadding_8,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // รูป preview สินค้า
+              Container(
+                width: AppDims.size_75.w,
+                height: AppDims.size_75.h,
+                padding: EdgeInsets.symmetric(
+                  vertical: AppDims.size_5.h,
+                  horizontal: AppDims.size_12.w,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.r),
+                  color: AppColors.border,
+                ),
+                child: Image.network(
+                  order.previewImage.orEmpty,
+                  width: AppDims.size_50.w,
+                  errorBuilder: (_, _, _) => const SizedBox(),
+                ),
+              ),
+              AppDims.horizonPadding_8,
+              Expanded(
+                child: AppText(
+                  // ชื่อสรุปสินค้า
+                  order.getTitleDisplay(locale),
+                  style: context.textTheme.labelMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          // สินค้ารวม N รายการ + ยอดเงิน
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AppText(
+                context.wording.totalItemsCount(
+                  order.itemCount ?? 0,
+                ),
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: AppColors.gray600,
+                ),
+              ),
+              AppDims.horizonPadding_4,
+              if (amount.isNotEmpty)
+                AppText(
+                  formatCurrency(string: amount, leadingSign: '฿'),
+                  style: context.textTheme.labelMedium?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            ],
+          ),
+          AppDims.vericalPadding_8,
+          // แถบสถานะ — แตะไปหน้าสถานะคำสั่งซื้อ
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDims.size_12.w,
+                vertical: AppDims.size_8.h,
+              ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: status.background,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                spacing: AppDims.size_10.w,
+                children: [
+                  status.icon.image(width: AppDims.size_24.w),
+                  Expanded(
+                    child: AppText(
+                      order.getStatusLabelDisplay(locale),
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: status.textColor,
+                      ),
+                    ),
+                  ),
+                  Assets.svg.icArrowForward.svg(
+                    width: AppDims.size_24.w,
+                    colorFilter: ColorFilter.mode(
+                      status.arrowColor,
                       BlendMode.srcIn,
                     ),
                   ),

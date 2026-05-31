@@ -669,6 +669,16 @@
   "delivery": "Delivery",
   "waitingForDelivery": "Awaiting delivery",
   "pendingPayment": "Pending payment",
+  "orderCancelled": "Order cancelled",
+  "outOfStock": "Out of stock",
+  "totalItemsCount": "{count} items total",
+  "@totalItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "parcelNumber": "Parcel number",
   "copy": "Copy",
   "orderTotal": "Order total",

@@ -20,6 +20,7 @@ class CartSummaryRequest {
     required this.items,
     this.couponCustomerId,
     this.paymentMethod,
+    this.customerAddressId,
   });
 
   @JsonKey(name: 'customer_id')
@@ -27,6 +28,10 @@ class CartSummaryRequest {
 
   @JsonKey(name: 'coupon_customer_id')
   final int? couponCustomerId;
+
+  /// id ที่อยู่จัดส่ง — ใช้ประเมินค่าจัดส่ง (shipping_total) ก่อน checkout
+  @JsonKey(name: 'customer_address_id')
+  final int? customerAddressId;
 
   /// "qr", "coin", "tp_wallet" — มีผลกับ coin_amount_required
   @JsonKey(name: 'payment_method')

@@ -1832,6 +1832,17 @@ class AppLocalizationsTh extends AppLocalizations {
   String get pendingPayment => 'รอชำระเงิน';
 
   @override
+  String get orderCancelled => 'ยกเลิกคำสั่งซื้อ';
+
+  @override
+  String get outOfStock => 'หมด';
+
+  @override
+  String totalItemsCount(int count) {
+    return 'สินค้ารวม $count รายการ';
+  }
+
+  @override
   String get parcelNumber => 'เลขพัสดุ';
 
   @override

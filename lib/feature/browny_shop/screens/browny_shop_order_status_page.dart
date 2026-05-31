@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:browny_applications_new/core/core_index.dart';
-import 'package:browny_applications_new/feature/browny_shop/models/browny_shop_order_status_model.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_order_detail_response.dart';
+import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_order_status_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
@@ -9,8 +14,9 @@ import 'package:flutter/services.dart';
 
 /// หน้าสถานะคำสั่งซื้อ Browny Shop (Figma node 185:4613)
 ///
-/// แสดงสถานะออร์เดอร์ทั้งที่ยังไม่ชำระเงิน / ชำระแล้ว / ระหว่างจัดส่ง — รับ
-/// [orderId] เข้ามาเพื่อให้ VM fetch ข้อมูล (API ยังไม่พร้อม → mock ตาม design)
+/// แสดงสถานะออร์เดอร์ทุกสถานะ (รอชำระเงิน / รอจัดส่ง / จัดส่งแล้ว / ยกเลิก) —
+/// รับ [orderId] เข้ามาเพื่อให้ VM fetch รายละเอียดจริง (GET /browny-shop/orders/
+/// {orderId}); สถานะ pending_payment เปิดให้กลับเข้า process ชำระเงินที่ค้างอยู่
 class BrownyShopOrderStatusPage extends StatelessWidget {
   const BrownyShopOrderStatusPage({super.key, required this.orderId});
 
@@ -36,8 +42,11 @@ class BrownyShopOrderStatusPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (ctx) =>
-          BrownyShopOrderStatusViewModel(context: ctx, orderId: orderId),
+      create: (ctx) => BrownyShopOrderStatusViewModel(
+        context: ctx,
+        repo: BrownyShopRepo(),
+        orderId: orderId,
+      ),
       child: const _OrderStatusWidget(),
     );
   }
@@ -50,16 +59,42 @@ class _OrderStatusWidget extends StatefulWidget {
   State<_OrderStatusWidget> createState() => _OrderStatusWidgetState();
 }
 
-class _OrderStatusWidgetState extends State<_OrderStatusWidget> {
+class _OrderStatusWidgetState extends State<_OrderStatusWidget>
+    with WidgetsBindingObserver {
+  Timer? _pollingTimer;
+  String? _currentPaymentRef;
+  bool _isPolling = false;
+  bool _paymentProcessing = false;
+
+  /// กันกดปุ่ม "ชำระเงิน" ซ้ำระหว่าง process
+  bool _isPayClicked = false;
+
   BrownyShopOrderStatusViewModel get _vm =>
       context.read<BrownyShopOrderStatusViewModel>();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _vm.attachContext(context);
     });
+  }
+
+  @override
+  void dispose() {
+    _stopPolling();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // กลับเข้าแอประหว่างรอชำระ → เช็คสถานะทันที
+    if (state == AppLifecycleState.resumed && _isPolling) {
+      _checkPaymentStatus();
+    }
   }
 
   void _popToHome() {
@@ -83,23 +118,217 @@ class _OrderStatusWidgetState extends State<_OrderStatusWidget> {
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.symmetric(
           horizontal: AppDims.size_24.w,
-          vertical: AppDims.size_16.h,
+          vertical: AppDims.size_46.h,
         ),
+        duration: Durations.medium2,
       ),
     );
+  }
+
+  // ========== Resume payment (สถานะ pending_payment) ==========
+
+  void _startPolling(String paymentRef) {
+    _currentPaymentRef = paymentRef;
+    _isPolling = true;
+    _checkPaymentStatus();
+    _pollingTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _checkPaymentStatus(),
+    );
+  }
+
+  void _stopPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+    _isPolling = false;
+    _currentPaymentRef = null;
+  }
+
+  Future<void> _checkPaymentStatus() async {
+    final ref = _currentPaymentRef;
+    if (ref == null) return;
+    final result = await _vm.checkPaymentStatus(ref);
+    if (!mounted) return;
+    if (result.isSuccess && (result.data?.isPaid ?? false)) {
+      _stopPolling();
+      // ปิด dialog QR ถ้ายังเปิดอยู่
+      if (_paymentProcessing && context.canPop()) context.pop();
+      _showSuccessThenReceipt(result.data?.orderId?.toString());
+    }
+    // pending → polling ต่อ
+  }
+
+  /// popup สำเร็จ → replace ไปหน้าใบเสร็จ Browny Shop
+  void _showSuccessThenReceipt(String? orderId) {
+    AppOverlays.showBrownyDialog(
+      context,
+      imageAsset: Assets.png.brownySuccess3.path,
+      title: context.wording.transactionSuccessful,
+      message: context.wording.orderCompletedMessage,
+      confirmText: context.wording.confirm,
+      onConfirm: () {
+        if (!mounted) return;
+        ReceiptBrownyShop.goReplacementPage(
+          context,
+          orderId: orderId ?? _vm.orderId,
+        );
+      },
+    );
+  }
+
+  /// กดปุ่ม "ชำระเงิน" — กลับเข้า process ชำระเงินของ order ที่ค้างอยู่
+  ///
+  /// ดึง order (GET /checkout/{orderId}) เพื่อเอา response_payload/payment_url
+  /// แล้วแสดง QR ในแอป (PromptPay/WeChat) หรือเปิด web ภายนอก + polling สถานะ
+  /// — เหมือน flow ใน [BrownyShopSelected]
+  Future<void> _onPayPending() async {
+    if (_isPayClicked) return;
+    _isPayClicked = true;
+
+    AppOverlays.showLoading(context);
+    final result = await _vm.fetchPendingOrder();
+    if (!mounted) return;
+    AppOverlays.hideLoading();
+
+    if (!result.isSuccess) {
+      _isPayClicked = false;
+      final err = result.error;
+      AppOverlays.showBrownyDialog(
+        context,
+        message: err is BrownyShopApiException
+            ? err.message
+            : context.wording.errorUi,
+      );
+      return;
+    }
+
+    final order = result.data;
+    final paymentRef = order?.paymentRef;
+    if (order == null || paymentRef == null || paymentRef.isEmpty) {
+      _isPayClicked = false;
+      AppOverlays.showBrownyDialog(
+        context,
+        message: context.wording.paymentReferenceNotFound,
+      );
+      return;
+    }
+
+    // เผื่อชำระไปแล้ว (race) → เช็คสถานะแล้วไปใบเสร็จ
+    final isPaid = order.status == 'paid' || order.paymentStatus == 'paid';
+    if (isPaid) {
+      _currentPaymentRef = paymentRef;
+      await _checkPaymentStatus();
+      if (mounted) _isPayClicked = false;
+      return;
+    }
+
+    // เลือก path: QR ในแอป (qrcode/wechat) หรือเปิด web ภายนอก (payment_url)
+    final qrcode = order.responsePayload?.qrcode;
+    final wechat = order.responsePayload?.wechat;
+    final isWeChat = wechat != null && wechat.isNotEmpty;
+    final qrData = isWeChat ? wechat : qrcode;
+    final hasInAppQr = qrData != null && qrData.isNotEmpty;
+    final paymentUrl = order.paymentUrl;
+
+    if (!hasInAppQr && (paymentUrl == null || paymentUrl.isEmpty)) {
+      _isPayClicked = false;
+      AppOverlays.showBrownyDialog(
+        context,
+        message: context.wording.incompletePaymentData,
+      );
+      return;
+    }
+
+    _startPolling(paymentRef);
+    _paymentProcessing = true;
+
+    if (hasInAppQr) {
+      await showDialog(
+        useSafeArea: false,
+        context: context,
+        builder: (_) => Dialog.fullscreen(
+          child: QrPromptpayDialog(
+            qrData: qrData,
+            paymentDadge: isWeChat
+                ? Assets.png.wechatPayBadge
+                : Assets.png.promptpayBadgeNoLine,
+          ),
+        ),
+      );
+    } else {
+      // เปิด web ภายนอก + หน้ารอดำเนินการ
+      LaunchHelper.openUrlInBrowser(paymentUrl!);
+      await showModalBottomSheet(
+        context: context,
+        showDragHandle: true,
+        enableDrag: false,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (dialogContext) {
+          return SizedBox(
+            height: 812.h * 0.85,
+            child: Scaffold(
+              persistentFooterDecoration: const BoxDecoration(),
+              persistentFooterButtons: [
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () => dialogContext.pop(),
+                      child: AppText(context.wording.backToMainPage),
+                    ),
+                  ),
+                ),
+              ],
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: AppDims.size_8.h,
+                  children: [
+                    const CircularProgressIndicator(),
+                    AppText(
+                      context.wording.processingPleaseWait,
+                      style: context.textTheme.labelLarge,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    // ปิด QR/web เอง (ยังไม่จ่าย) → เช็คอีกรอบ; ถ้ายังไม่จ่ายให้รีเฟรชสถานะหน้า
+    _paymentProcessing = false;
+    _stopPolling();
+    final status = await _vm.checkPaymentStatus(paymentRef);
+    if (!mounted) return;
+    if (status.isSuccess && (status.data?.isPaid ?? false)) {
+      _showSuccessThenReceipt(status.data?.orderId?.toString());
+      return;
+    }
+    _isPayClicked = false;
+    _vm.fetchOrderDetail();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bareBackground,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          AppDims.size_56.h + MediaQuery.of(context).padding.top,
+      appBar: AppBar(
+        title: AppText(
+          context.wording.orderStatus,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontSize: 20.sp,
+            color: AppColors.white,
+          ),
         ),
-        child: _buildAppBar(context),
+        flexibleSpace: _buildAppBar(context),
       ),
-      bottomNavigationBar: _BottomBar(onBack: _popToHome),
       body: ValueListenableBuilder(
         valueListenable: _vm.statusNotifier,
         builder: (context, result, _) {
@@ -115,30 +344,46 @@ class _OrderStatusWidgetState extends State<_OrderStatusWidget> {
             );
           }
           final data = result.data!;
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-              horizontal: AppDims.size_16.w,
-              vertical: AppDims.size_14.h,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: AppDims.size_14.h,
-              children: [
-                // ผู้ขาย / ที่อยู่ติดต่อ
-                // _SellerCard(data: data),
-                // สถานะ + stepper + เลขพัสดุ + ข้อมูลการจัดส่ง
-                _StatusCard(data: data, onCopyTracking: _copy),
-                // Order ID + รายการสินค้า + รวมคำสั่งซื้อ
-                _ProductsCard(data: data, onCopy: _copy),
-                // การชำระเงิน
-                _PaymentCard(data: data),
-                // บริการหลังการขาย
-                const _SupportCard(),
-                // คำสั่งซื้อ + เวลา + QR
-                _OrderDetailCard(data: data, onCopy: _copy),
-              ],
-            ),
+          return Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.ci,
+                  onRefresh: _vm.fetchOrderDetail,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                      vertical: AppDims.size_14.h,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: AppDims.size_14.h,
+                      children: [
+                        // ผู้ขาย / ที่อยู่ติดต่อ
+                        // _SellerCard(data: data),
+                        // สถานะ + stepper + เลขพัสดุ + ข้อมูลการจัดส่ง
+                        _StatusCard(data: data, onCopyTracking: _copy),
+                        // Order ID + รายการสินค้า + รวมคำสั่งซื้อ
+                        _ProductsCard(data: data, onCopy: _copy),
+                        // การชำระเงิน
+                        _PaymentCard(data: data),
+                        // บริการหลังการขาย
+                        const _SupportCard(),
+                        // คำสั่งซื้อ + เวลา + QR
+                        _OrderDetailCard(data: data, onCopy: _copy),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // แถบล่าง — pending_payment = "ชำระเงิน", สถานะอื่น = "กลับสู่หน้าหลัก"
+              _BottomBar(
+                isPendingPayment: data.isPendingPayment,
+                onBack: _popToHome,
+                onPay: _onPayPending,
+              ),
+            ],
           );
         },
       ),
@@ -152,29 +397,6 @@ class _OrderStatusWidgetState extends State<_OrderStatusWidget> {
         image: DecorationImage(
           fit: BoxFit.fill,
           image: Assets.png.bgAppBar.provider(),
-        ),
-      ),
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-        child: SizedBox(
-          height: AppDims.size_56.h,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AppText(
-                context.wording.orderStatus,
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontSize: 20.sp,
-                  color: AppColors.white,
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: BackButton(color: AppColors.white),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -242,8 +464,7 @@ class _SectionTitle extends StatelessWidget {
         Expanded(
           child: AppText(
             title,
-            style: context.textTheme.titleSmall?.copyWith(
-              fontSize: 14.sp,
+            style: context.textTheme.titleMedium?.copyWith(
               color: AppColors.textBare,
             ),
           ),
@@ -267,13 +488,10 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: AppText(
-              label,
-              style: context.textTheme.titleMedium?.copyWith(
-                fontSize: 14.sp,
-                color: AppColors.gray600,
-              ),
+          AppText(
+            label,
+            style: context.textTheme.titleMedium?.copyWith(
+              color: AppColors.gray600,
             ),
           ),
           SizedBox(width: AppDims.size_8.w),
@@ -281,8 +499,7 @@ class _DetailRow extends StatelessWidget {
             child: AppText(
               value ?? '',
               textAlign: TextAlign.end,
-              style: context.textTheme.titleSmall?.copyWith(
-                fontSize: 14.sp,
+              style: context.textTheme.titleMedium?.copyWith(
                 color: AppColors.gray600,
               ),
             ),
@@ -320,7 +537,6 @@ class _CopyChip extends StatelessWidget {
             AppText(
               context.wording.copy,
               style: context.textTheme.titleMedium?.copyWith(
-                fontSize: 14.sp,
                 color: green ? AppColors.ci : AppColors.gray500,
               ),
             ),
@@ -351,95 +567,19 @@ class _Divider extends StatelessWidget {
 }
 
 // ============================================================
-// ผู้ขาย / ที่อยู่ติดต่อ
-// ============================================================
-
-class _SellerCard extends StatelessWidget {
-  const _SellerCard({required this.data});
-
-  final BrownyShopOrderStatusModel data;
-
-  @override
-  Widget build(BuildContext context) {
-    return _Card(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 28.w,
-            height: 28.w,
-            decoration: const BoxDecoration(
-              color: AppColors.ci7,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Assets.icShop.icBoxLineWhite.image(
-              width: 16.w,
-              height: 16.w,
-            ),
-          ),
-          SizedBox(width: AppDims.size_8.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: AppText(
-                        data.recipientName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          fontSize: 14.sp,
-                          color: AppColors.darkBrown,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: AppDims.size_4.w),
-                    AppText(
-                      data.phone,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        fontSize: 14.sp,
-                        color: AppColors.gray500,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppDims.size_2.h),
-                AppText(
-                  data.fullAddress,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontSize: 14.sp,
-                    color: AppColors.gray600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: AppDims.size_8.w),
-          Assets.svg.icArrowForward.svg(width: 16.w, height: 16.w),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================
 // สถานะ + stepper + เลขพัสดุ + ข้อมูลการจัดส่ง
 // ============================================================
 
 class _StatusCard extends StatelessWidget {
   const _StatusCard({required this.data, required this.onCopyTracking});
 
-  final BrownyShopOrderStatusModel data;
+  final BrownyShopOrderDetailData data;
   final void Function(String) onCopyTracking;
 
-  /// hero image (Frame 2087326612) — pending ใช้ warning ตาม locale, นอกนั้น thank you
+  /// hero image (Frame 2087326612) — pending_payment ใช้ warning ตาม locale,
+  /// นอกนั้น thank you
   AssetGenImage _heroAsset(BuildContext context) {
-    if (!data.isPending) return Assets.icShop.brownyThankYou;
+    if (!data.isPendingPayment) return Assets.icShop.brownyThankYou;
     switch (context.languageCode) {
       case 'en':
         return Assets.icShop.brownyWarningTransferEn;
@@ -450,13 +590,46 @@ class _StatusCard extends StatelessWidget {
     }
   }
 
-  String _bannerText(BuildContext context) {
-    if (data.isPending) return context.wording.pendingPayment;
-    return context.wording.waitingForDelivery;
+  /// ป้ายสถานะ (Frame 2087326613) — ไอคอน/สี/ข้อความ ตาม status
+  _StatusBannerStyle _bannerStyle(BuildContext context) {
+    final label = data.getStatusLabelDisplay(context.languageCode);
+    if (data.isCancelled) {
+      return _StatusBannerStyle(
+        icon: Assets.icShop.icCanceledRounded,
+        background: AppColors.errorBackground,
+        textColor: AppColors.error,
+        text: label.isNotEmpty ? label : context.wording.orderCancelled,
+      );
+    }
+    if (data.isDelivered) {
+      return _StatusBannerStyle(
+        icon: Assets.icShop.icTruckRoundedCi3,
+        background: AppColors.ci3,
+        textColor: AppColors.ci,
+        text: label.isNotEmpty ? label : context.wording.delivery,
+      );
+    }
+    if (data.isPendingPayment) {
+      return _StatusBannerStyle(
+        icon: Assets.icShop.icCardRoundedOrange,
+        background: AppColors.warningBackground,
+        textColor: AppColors.gray500,
+        text: label.isNotEmpty ? label : context.wording.pendingPayment,
+      );
+    }
+    // pending_shipment (default)
+    return _StatusBannerStyle(
+      icon: Assets.icShop.icTruckRoundedOrange,
+      background: AppColors.warningBackground,
+      textColor: AppColors.gray500,
+      text: label.isNotEmpty ? label : context.wording.waitingForDelivery,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final address = data.shippingAddress;
+    final banner = _bannerStyle(context);
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,7 +641,7 @@ class _StatusCard extends StatelessWidget {
           _StatusStepper(data: data),
           SizedBox(height: AppDims.size_16.h),
           // banner
-          _StatusBanner(text: _bannerText(context)),
+          _StatusBanner(style: banner),
           SizedBox(height: AppDims.size_16.h),
           // เลขพัสดุ
           _SectionTitle(
@@ -487,7 +660,6 @@ class _StatusCard extends StatelessWidget {
                 child: AppText(
                   'Tracking number',
                   style: context.textTheme.titleMedium?.copyWith(
-                    fontSize: 14.sp,
                     color: AppColors.gray600,
                   ),
                 ),
@@ -495,8 +667,7 @@ class _StatusCard extends StatelessWidget {
               if (data.hasTrackingNumber)
                 AppText(
                   data.trackingNumber!,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 14.sp,
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.gray600,
                   ),
                 ),
@@ -507,12 +678,13 @@ class _StatusCard extends StatelessWidget {
             alignment: Alignment.centerRight,
             // tracking
             child: _CopyChip(
-              onTap: data.trackingNumber.orEmpty.isNotEmpty
+              onTap: data.hasTrackingNumber
                   ? () => onCopyTracking(data.trackingNumber!)
                   : null,
-              green: data.trackingNumber.orEmpty.isNotEmpty,
+              green: data.hasTrackingNumber,
             ),
           ),
+          SizedBox(height: AppDims.size_16.w),
           const _Divider(),
           // ข้อมูลการจัดส่ง
           _SectionTitle(
@@ -524,26 +696,26 @@ class _StatusCard extends StatelessWidget {
           ),
           SizedBox(height: AppDims.size_8.h),
           _DetailRow(
+            // ชื่อผู้รับสินค้า
             label: context.wording.recipientName,
-            value: data.recipientName,
+            value: address?.recipientName,
           ),
           _DetailRow(
+            // เบอร์โทรศัพท์
             label: context.wording.phoneNumber,
-            value: data.phone,
+            value: address?.phone,
           ),
           SizedBox(height: AppDims.size_2.h),
           AppText(
             context.wording.shippingAddressDetail,
             style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 14.sp,
               color: AppColors.gray600,
             ),
           ),
           SizedBox(height: AppDims.size_4.h),
           AppText(
-            data.fullAddress,
+            address?.fullAddress ?? '',
             style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 14.sp,
               color: AppColors.gray600,
             ),
           ),
@@ -557,7 +729,7 @@ class _StatusCard extends StatelessWidget {
 class _StatusStepper extends StatelessWidget {
   const _StatusStepper({required this.data});
 
-  final BrownyShopOrderStatusModel data;
+  final BrownyShopOrderDetailData data;
 
   @override
   Widget build(BuildContext context) {
@@ -585,7 +757,7 @@ class _StatusStepper extends StatelessWidget {
         // จัดส่ง
         _step(
           context,
-          icon: data.isDelivered
+          icon: data.isShipped
               ? Assets.icShop.icTruckRoundedActive
               : Assets.icShop.icTruckRoundedInactive,
           label: context.wording.delivery,
@@ -600,7 +772,6 @@ class _StatusStepper extends StatelessWidget {
     required String label,
   }) {
     return SizedBox(
-      // width: 78.w,
       child: Column(
         children: [
           icon.image(width: 34.w, height: 34.w),
@@ -611,7 +782,6 @@ class _StatusStepper extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.labelMedium?.copyWith(
-              fontSize: 12.sp,
               color: AppColors.darkBrown,
             ),
           ),
@@ -631,11 +801,26 @@ class _StatusStepper extends StatelessWidget {
   }
 }
 
-/// แถบสถานะ — "รอจัดส่ง" / "รอชำระเงิน"
-class _StatusBanner extends StatelessWidget {
-  const _StatusBanner({required this.text});
+/// style ของแถบสถานะ ตาม status
+class _StatusBannerStyle {
+  const _StatusBannerStyle({
+    required this.icon,
+    required this.background,
+    required this.textColor,
+    required this.text,
+  });
 
+  final AssetGenImage icon;
+  final Color background;
+  final Color textColor;
   final String text;
+}
+
+/// แถบสถานะ — ไอคอน + ข้อความ ตาม status (สี/ไอคอนต่างกันตามสถานะ)
+class _StatusBanner extends StatelessWidget {
+  const _StatusBanner({required this.style});
+
+  final _StatusBannerStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -643,21 +828,19 @@ class _StatusBanner extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(AppDims.size_8.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFEDBC),
+        color: style.background,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
-          Assets.icShop.icTruckRoundedOrange.image(
-            width: 24.w,
-            height: 24.w,
-          ),
+          style.icon.image(width: 24.w, height: 24.w),
           SizedBox(width: AppDims.size_8.w),
-          AppText(
-            text,
-            style: context.textTheme.titleMedium?.copyWith(
-              fontSize: 12.sp,
-              color: AppColors.gray500,
+          Expanded(
+            child: AppText(
+              style.text,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: style.textColor,
+              ),
             ),
           ),
         ],
@@ -673,11 +856,12 @@ class _StatusBanner extends StatelessWidget {
 class _ProductsCard extends StatelessWidget {
   const _ProductsCard({required this.data, required this.onCopy});
 
-  final BrownyShopOrderStatusModel data;
+  final BrownyShopOrderDetailData data;
   final void Function(String) onCopy;
 
   @override
   Widget build(BuildContext context) {
+    final items = data.items ?? const <BrownyShopOrderDetailItem>[];
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -688,7 +872,6 @@ class _ProductsCard extends StatelessWidget {
               AppText(
                 'Order ID',
                 style: context.textTheme.titleMedium?.copyWith(
-                  fontSize: 14.sp,
                   color: AppColors.gray600,
                 ),
               ),
@@ -699,8 +882,7 @@ class _ProductsCard extends StatelessWidget {
                   textAlign: TextAlign.end,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 14.sp,
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.gray600,
                   ),
                 ),
@@ -721,9 +903,9 @@ class _ProductsCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppDims.size_16.h),
-          for (var i = 0; i < data.products.length; i++) ...[
+          for (var i = 0; i < items.length; i++) ...[
             if (i > 0) SizedBox(height: AppDims.size_16.h),
-            _ProductItem(product: data.products[i]),
+            _ProductItem(item: items[i]),
           ],
           const _Divider(),
           // รวมคำสั่งซื้อ
@@ -734,15 +916,13 @@ class _ProductsCard extends StatelessWidget {
               children: [
                 AppText(
                   '${context.wording.orderTotal} : ',
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 14.sp,
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.textBare,
                   ),
                 ),
                 AppText(
-                  formatCurrency(value: data.orderTotal, leadingSign: '฿'),
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 14.sp,
+                  formatCurrency(string: data.priceFinal, leadingSign: '฿'),
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.textBare,
                     fontWeight: FontWeight.w500,
                   ),
@@ -757,15 +937,15 @@ class _ProductsCard extends StatelessWidget {
 }
 
 class _ProductItem extends StatelessWidget {
-  const _ProductItem({required this.product});
+  const _ProductItem({required this.item});
 
-  final BrownyShopOrderStatusProduct product;
+  final BrownyShopOrderDetailItem item;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFCFCFC),
+        color: AppColors.inputFieldDisableBg,
         borderRadius: BorderRadius.circular(8.r),
       ),
       padding: EdgeInsets.symmetric(
@@ -781,15 +961,14 @@ class _ProductItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  product.name,
+                  item.getNameDisplay(context.languageCode),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    fontSize: 12.sp,
+                  style: context.textTheme.titleMedium?.copyWith(
                     color: AppColors.darkBrown,
                   ),
                 ),
-                if (product.isFreeShipping) ...[
+                if (item.isFreeShipping) ...[
                   SizedBox(height: AppDims.size_4.h),
                   const _FreeShippingChip(),
                 ],
@@ -799,9 +978,8 @@ class _ProductItem extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: AppText(
-                    'x${product.quantity}',
+                    'x${item.quantity ?? 0}',
                     style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 14.sp,
                       color: AppColors.gray500,
                     ),
                   ),
@@ -815,7 +993,7 @@ class _ProductItem extends StatelessWidget {
   }
 
   Widget _image() {
-    final url = product.imageUrl;
+    final url = item.imageUrl;
     return Container(
       width: 100.w,
       height: 100.w,
@@ -840,17 +1018,19 @@ class _ProductItem extends StatelessWidget {
   }
 
   Widget _prices(BuildContext context) {
+    final coinPrice = item.unitCoinPrice;
+    final moneyPrice = item.unitMoneyPrice ?? 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (product.coinPrice != null)
+        if (coinPrice != null)
           Row(
             children: [
-              _CoinChip(coin: product.coinPrice!),
-              if (product.hasCoinDiscount) ...[
+              _CoinChip(coin: coinPrice),
+              if (item.hasCoinDiscount) ...[
                 SizedBox(width: AppDims.size_4.w),
                 AppText(
-                  formatCurrency(value: product.originalCoinPrice!),
+                  formatCurrency(value: item.originalCoinPrice!),
                   style: context.textTheme.labelSmall?.copyWith(
                     fontSize: 10.sp,
                     color: AppColors.gray500,
@@ -866,22 +1046,20 @@ class _ProductItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             AppText(
-              formatCurrency(value: product.moneyPrice, leadingSign: '฿'),
+              formatCurrency(value: moneyPrice, leadingSign: '฿'),
               style: context.textTheme.titleSmall?.copyWith(
-                fontSize: 14.sp,
                 color: AppColors.ci,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            if (product.hasMoneyDiscount) ...[
+            if (item.hasMoneyDiscount) ...[
               SizedBox(width: AppDims.size_4.w),
               AppText(
                 formatCurrency(
-                  value: product.originalMoneyPrice!,
+                  value: item.originalMoneyPrice!,
                   leadingSign: '฿',
                 ),
                 style: context.textTheme.labelSmall?.copyWith(
-                  fontSize: 10.sp,
                   color: AppColors.gray500,
                   decoration: TextDecoration.lineThrough,
                   decorationColor: AppColors.gray500,
@@ -951,7 +1129,7 @@ class _CoinChip extends StatelessWidget {
         vertical: AppDims.size_2.h,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFC9F3CB),
+        color: AppColors.ci6,
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Row(
@@ -965,7 +1143,6 @@ class _CoinChip extends StatelessWidget {
               trailingSign: ' ${context.wording.coin}',
             ),
             style: context.textTheme.labelSmall?.copyWith(
-              fontSize: 10.sp,
               color: AppColors.error,
               fontWeight: FontWeight.w500,
             ),
@@ -983,10 +1160,11 @@ class _CoinChip extends StatelessWidget {
 class _PaymentCard extends StatelessWidget {
   const _PaymentCard({required this.data});
 
-  final BrownyShopOrderStatusModel data;
+  final BrownyShopOrderDetailData data;
 
   @override
   Widget build(BuildContext context) {
+    final logoUrl = data.paymentIcon;
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1007,7 +1185,6 @@ class _PaymentCard extends StatelessWidget {
                 child: AppText(
                   context.wording.paymentMethod,
                   style: context.textTheme.titleMedium?.copyWith(
-                    fontSize: 14.sp,
                     color: AppColors.gray600,
                   ),
                 ),
@@ -1017,16 +1194,15 @@ class _PaymentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   AppText(
-                    data.paymentChannelName,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 14.sp,
+                    data.getPaymentDisplay(context.languageCode),
+                    style: context.textTheme.titleMedium?.copyWith(
                       color: AppColors.gray600,
                     ),
                   ),
-                  if (data.paymentLogoUrl != null) ...[
+                  if (logoUrl != null && logoUrl.isNotEmpty) ...[
                     SizedBox(height: AppDims.size_4.h),
                     CachedNetworkImage(
-                      imageUrl: data.paymentLogoUrl!,
+                      imageUrl: logoUrl,
                       width: 30.w,
                       height: 30.w,
                       fit: BoxFit.contain,
@@ -1034,23 +1210,31 @@ class _PaymentCard extends StatelessWidget {
                     ),
                   ],
                   SizedBox(height: AppDims.size_8.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDims.size_8.w,
-                      vertical: AppDims.size_4.h,
+                  // ใบเสร็จรับเงิน — แตะเพื่อเปิดหน้าใบเสร็จของออร์เดอร์นี้
+                  GestureDetector(
+                    onTap: () => ReceiptBrownyShop.goToPage(
+                      context,
+                      orderId: data.orderId.orEmpty,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.ci3,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: AppText(
-                      context.wording.receipt,
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontSize: 14.sp,
-                        color: AppColors.ci,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_8.w,
+                        vertical: AppDims.size_4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.ci3,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: AppText(
+                        context.wording.receipt,
+                        style: context.textTheme.titleMedium?.copyWith(
+                          color: AppColors.ci,
+                        ),
                       ),
                     ),
                   ),
+                  SizedBox(height: AppDims.size_8.w),
                 ],
               ),
             ],
@@ -1095,7 +1279,6 @@ class _SupportCard extends StatelessWidget {
                     // ศูนย์ความช่วยเหลือ
                     context.wording.helpCenter,
                     style: context.textTheme.titleMedium?.copyWith(
-                      fontSize: 14.sp,
                       color: AppColors.gray600,
                     ),
                   ),
@@ -1120,7 +1303,7 @@ class _SupportCard extends StatelessWidget {
 class _OrderDetailCard extends StatelessWidget {
   const _OrderDetailCard({required this.data, required this.onCopy});
 
-  final BrownyShopOrderStatusModel data;
+  final BrownyShopOrderDetailData data;
   final void Function(String) onCopy;
 
   @override
@@ -1132,8 +1315,7 @@ class _OrderDetailCard extends StatelessWidget {
         children: [
           AppText(
             context.wording.order,
-            style: context.textTheme.titleSmall?.copyWith(
-              fontSize: 14.sp,
+            style: context.textTheme.titleMedium?.copyWith(
               color: AppColors.textBare,
             ),
           ),
@@ -1143,7 +1325,6 @@ class _OrderDetailCard extends StatelessWidget {
               AppText(
                 'Order ID',
                 style: context.textTheme.titleMedium?.copyWith(
-                  fontSize: 14.sp,
                   color: AppColors.gray600,
                 ),
               ),
@@ -1160,8 +1341,6 @@ class _OrderDetailCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // SizedBox(width: AppDims.size_8.w),
             ],
           ),
           SizedBox(height: AppDims.size_4.w),
@@ -1175,20 +1354,23 @@ class _OrderDetailCard extends StatelessWidget {
           ),
           SizedBox(height: AppDims.size_16.w),
           const _Divider(),
-          if (data.orderTime != null)
+          if (data.createdAt != null)
             _DetailRow(
+              // เวลาที่สั่งซื้อ
               label: context.wording.orderTime,
-              value: data.orderTime,
+              value: data.createdAt,
             ),
-          if (data.paymentTime != null)
+          if (data.paidAt != null)
             _DetailRow(
+              // เวลาที่ชำระเงิน
               label: context.wording.paymentTime,
-              value: data.paymentTime,
+              value: data.paidAt,
             ),
-          if (data.deliveryTime != null)
+          if (data.deliveredAt != null)
             _DetailRow(
+              // เวลาที่จัดส่ง
               label: context.wording.deliveryTime,
-              value: data.deliveryTime,
+              value: data.deliveredAt,
             ),
           SizedBox(height: AppDims.size_8.h),
           // QR สำหรับ Browny Support
@@ -1248,13 +1430,19 @@ class _OrderDetailCard extends StatelessWidget {
 }
 
 // ============================================================
-// bar ล่าง — กลับไปหน้าหลัก
+// bar ล่าง — "ชำระเงิน" (pending_payment) หรือ "กลับสู่หน้าหลัก"
 // ============================================================
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.onBack});
+  const _BottomBar({
+    required this.isPendingPayment,
+    required this.onBack,
+    required this.onPay,
+  });
 
+  final bool isPendingPayment;
   final VoidCallback onBack;
+  final VoidCallback onPay;
 
   @override
   Widget build(BuildContext context) {
@@ -1267,7 +1455,7 @@ class _BottomBar extends StatelessWidget {
         bottom: AppDims.size_32.h,
       ),
       child: GestureDetector(
-        onTap: onBack,
+        onTap: isPendingPayment ? onPay : onBack,
         child: Container(
           width: double.infinity,
           height: AppDims.size_40.h,
@@ -1277,7 +1465,9 @@ class _BottomBar extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: AppText(
-            context.wording.backToHome,
+            isPendingPayment
+                ? context.wording.makePayment
+                : context.wording.backToHome,
             style: context.textTheme.labelLarge?.copyWith(
               fontSize: 14.sp,
               color: AppColors.white,

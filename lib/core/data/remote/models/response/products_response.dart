@@ -92,6 +92,20 @@ class ProductData {
   /// เช็คว่ามี product_subs (ตัวเลือกย่อย) หรือไม่
   bool get hasSubs => (productSubs?.isNotEmpty ?? false);
 
+  /// คัดลอกพร้อมแก้ [favoriteStatus] — ใช้ optimistic update ตอน toggle สินค้าโปรด
+  ProductData copyWith({bool? favoriteStatus}) => ProductData(
+    id: id,
+    isFreeShipping: isFreeShipping,
+    favoriteStatus: favoriteStatus ?? this.favoriteStatus,
+    hasFlashSale: hasFlashSale,
+    flashSaleStartsAt: flashSaleStartsAt,
+    flashSaleEndsAt: flashSaleEndsAt,
+    unit: unit,
+    translations: translations,
+    productSubs: productSubs,
+    mainImageUrl: mainImageUrl,
+  );
+
   factory ProductData.fromJson(Map<String, dynamic> json) =>
       _$ProductDataFromJson(json);
 

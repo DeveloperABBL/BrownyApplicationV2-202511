@@ -1792,6 +1792,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pendingPayment => '等待付款';
 
   @override
+  String get orderCancelled => '订单已取消';
+
+  @override
+  String get outOfStock => '已售罄';
+
+  @override
+  String totalItemsCount(int count) {
+    return '共 $count 件商品';
+  }
+
+  @override
   String get parcelNumber => '包裹编号';
 
   @override

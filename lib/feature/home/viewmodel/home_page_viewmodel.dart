@@ -5,12 +5,14 @@ import 'package:browny_applications_new/core/data/remote/models/response/banner_
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/working_machines_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
 import 'package:browny_applications_new/feature/articles/models/article_detail_model.dart';
 import 'package:browny_applications_new/feature/articles/screens/articles_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_favorite_mixin.dart';
 import 'package:browny_applications_new/feature/home/models/banner_model.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/models/user_model.dart';
@@ -19,7 +21,7 @@ import 'package:flutter/foundation.dart';
 
 enum HomePageState { home, couponVoucher, scan, branches, brownyShop }
 
-class HomePageViewmodel extends AppViewModel {
+class HomePageViewmodel extends AppViewModel with BrownyShopFavoriteMixin {
   HomePageViewmodel({
     required super.context,
     required HomeDataSourceMixin repo,
@@ -34,6 +36,13 @@ class HomePageViewmodel extends AppViewModel {
   final BrownyShopDataSourceMixin _brownyShopRepo;
   BrownyShopDataSourceMixin get brownyShopRepo => _brownyShopRepo;
 
+  @override
+  BrownyShopDataSourceMixin get favoriteRepo => _brownyShopRepo;
+
+  @override
+  ValueNotifier<UiResult<List<ProductData>>> get favoriteProductsNotifier =>
+      _shopProductsNotifier;
+
   // ========== Dispose ==========
   @override
   void dispose() {
@@ -47,6 +56,8 @@ class HomePageViewmodel extends AppViewModel {
     _shopProductTypesNotifier.dispose();
     _shopSelectedCategoryNotifier.dispose();
     _brownyLiveNotifier.dispose();
+    _brownyOrdersNotifier.dispose();
+    _serviceFilterNotifier.dispose();
     super.dispose();
   }
 
@@ -124,6 +135,22 @@ class HomePageViewmodel extends AppViewModel {
   ValueListenable<UiResult<BrownyLiveResponse>> get brownyLiveNotifier =>
       _brownyLiveNotifier;
 
+  /// Notifier fetch คำสั่งซื้อ Browny Shop ที่รอชำระเงิน (pending_payment)
+  /// — แสดงในการ์ดสถานะการทำงานหน้า Home
+  final ValueNotifier<UiResult<List<BrownyShopOrderItem>>>
+  _brownyOrdersNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<BrownyShopOrderItem>>> get brownyOrdersNotifier =>
+      _brownyOrdersNotifier;
+
+  /// ตัวกรองชนิดบริการในการ์ด "สถานะการทำงาน"
+  /// 0 = ทั้งหมด, 1 = ซัก-อบ (เครื่อง), 2 = การสั่งซื้อ (Browny Shop)
+  final ValueNotifier<int> _serviceFilterNotifier = ValueNotifier(0);
+  ValueListenable<int> get serviceFilterNotifier => _serviceFilterNotifier;
+
+  void setServiceFilter(int value) {
+    _serviceFilterNotifier.value = value;
+  }
+
   bool isProfileGuest() {
     return currentCustomerProvider.current.isGuest;
   }
@@ -151,6 +178,7 @@ class HomePageViewmodel extends AppViewModel {
     await fetchBanners();
     await fetchBannersHighlight();
     await fetchWorkingMachines();
+    unawaited(fetchBrownyShopPendingOrders());
     unawaited(fetchCustomerNotifications());
     unawaited(fetchBrownyLive());
     unawaited(fetchShopProductTypes());
@@ -351,6 +379,55 @@ class HomePageViewmodel extends AppViewModel {
     } on Exception catch (e) {
       _workingMachinesNotifier.value = UiResult.error(error: e);
     }
+  }
+
+  /// DONG 2026-05-31
+  ///
+  /// API ดึงคำสั่งซื้อ Browny Shop ที่ "รอชำระเงิน" (pending_payment)
+  /// — กรองช่วง 6 ชั่วโมงล่าสุด (start_date..end_date = yyyy-MM-dd) แล้วคัด
+  /// เฉพาะ status == 'pending_payment' มาแสดงในการ์ดสถานะการทำงานหน้า Home
+  Future<void> fetchBrownyShopPendingOrders() async {
+    final customerId = currentCustomerProvider.current.id.orEmpty;
+    if (customerId.isEmpty) {
+      _brownyOrdersNotifier.value = UiResult.empty();
+      return;
+    }
+    _brownyOrdersNotifier.value = UiResult.loading();
+
+    // ย้อนหลัง 6 ชม. จากเวลาปัจจุบัน
+    final now = DateTime.now();
+    final from = now.subtract(const Duration(hours: 6));
+
+    final result = await _brownyShopRepo.fetchBrownyShopOrders(
+      customerId: customerId,
+      startDate: _formatDate(from),
+      endDate: _formatDate(now),
+    );
+
+    if (result.hasError) {
+      _brownyOrdersNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _brownyOrdersNotifier.value = UiResult.empty();
+      return;
+    }
+    // กรองเฉพาะออร์เดอร์ที่รอชำระเงิน
+    final pending = result.data
+        .where((o) => o.isPendingPayment)
+        .toList();
+    if (pending.isEmpty) {
+      _brownyOrdersNotifier.value = UiResult.empty();
+      return;
+    }
+    _brownyOrdersNotifier.value = UiResult.success(data: pending);
+  }
+
+  /// format วันที่เป็น yyyy-MM-dd สำหรับ query start_date/end_date
+  String _formatDate(DateTime d) {
+    final m = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    return '${d.year}-$m-$day';
   }
 
   /// DONG 2026-03-08

@@ -3,6 +3,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/product
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_product_detail_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/add_to_cart_bottom_sheet.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
@@ -222,18 +223,19 @@ class _RoundIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 31.w,
-        height: 31.w,
+        width: 32.w,
+        height: 32.w,
+        padding: EdgeInsets.all(6.r),
         decoration: BoxDecoration(
           color: AppColors.darkBrown.withValues(alpha: 0.5),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
         child: icon != null
-            ? icon?.image(color: AppColors.white, width: AppDims.size_16.w)
+            ? icon?.image(
+                color: AppColors.white,
+              )
             : svg!.svg(
-                width: AppDims.size_16.w,
-                height: AppDims.size_16.w,
                 colorFilter: const ColorFilter.mode(
                   AppColors.white,
                   BlendMode.srcIn,
@@ -673,72 +675,108 @@ class _CouponCard extends StatelessWidget {
   }
 }
 
-/// TODO Mockup ข้อมูล
-/// ส่งให้ภายใน 30 วัน / address / ราคา ฿30
+/// ข้อมูลการจัดส่ง — แตะเพื่อเลือกที่อยู่ ([CustomerShipToPage])
+///
+/// แสดงที่อยู่จัดส่งที่เลือก (ค่าเริ่มต้น = ที่อยู่หลัก) + ค่าจัดส่งโดยประมาณ
+/// (shipping_total) จาก cart/summary ที่ re-fetch เมื่อเปลี่ยนที่อยู่/คูปอง
 class _ShippingInfo extends StatelessWidget {
   const _ShippingInfo();
 
+  Future<void> _onTap(BuildContext context) async {
+    final vm = context.read<BrownyShopProductDetailViewmodel>();
+    final selected = await CustomerShipToPage.goToPage(context);
+    if (selected != null) vm.setShippingAddress(selected);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: AppDims.size_20.w,
-          height: AppDims.size_20.w,
-          decoration: const BoxDecoration(
-            color: AppColors.ci7,
-            shape: BoxShape.circle,
+    final vm = context.read<BrownyShopProductDetailViewmodel>();
+    return GestureDetector(
+      onTap: () => _onTap(context),
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: AppDims.size_20.w,
+            height: AppDims.size_20.w,
+            decoration: const BoxDecoration(
+              color: AppColors.ci7,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Assets.icShop.icBox.image(width: 16.w, height: 16.w),
           ),
-          alignment: Alignment.center,
-          child: Assets.icShop.icBox.image(width: 16.w, height: 16.w),
-        ),
-        SizedBox(width: 6.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppText(
-                '${context.wording.willReceiveWithin} 30 ${context.wording.dayUnit}',
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 16.sp,
-                  color: AppColors.ci,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              AppText(
-                '${context.wording.deliverToLabel} ยานนาวา',
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 16.sp,
-                  color: AppColors.gray600,
-                ),
-              ),
-              Row(
-                children: [
-                  AppText(
-                    '${context.wording.priceLabel} ',
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 16.sp,
-                      color: AppColors.gray600,
-                    ),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  '${context.wording.willReceiveWithin} 30 ${context.wording.dayUnit}',
+                  style: context.textTheme.titleSmall?.copyWith(
+                    fontSize: 16.sp,
+                    color: AppColors.ci,
+                    fontWeight: FontWeight.w400,
                   ),
-                  AppText(
-                    formatCurrency(value: 30, leadingSign: '฿'),
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 16.sp,
-                      color: AppColors.ci,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                // ที่อยู่จัดส่งที่เลือก (ค่าเริ่มต้น = ที่อยู่หลัก)
+                ValueListenableBuilder(
+                  valueListenable: vm.shippingAddressNotifier,
+                  builder: (context, address, _) {
+                    final place = address == null
+                        ? context.wording.selectAddress
+                        : (address.district ??
+                              address.subdistrict ??
+                              address.province ??
+                              address.displayName);
+                    return AppText(
+                      '${context.wording.deliverToLabel} $place',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        fontSize: 16.sp,
+                        color: AppColors.gray600,
+                      ),
+                    );
+                  },
+                ),
+                // ค่าจัดส่งโดยประมาณ — shipping_total จาก cart/summary
+                ValueListenableBuilder(
+                  valueListenable: vm.summaryNotifier,
+                  builder: (context, result, _) {
+                    return Row(
+                      children: [
+                        AppText(
+                          '${context.wording.priceLabel} ',
+                          style: context.textTheme.titleSmall?.copyWith(
+                            fontSize: 16.sp,
+                            color: AppColors.gray600,
+                          ),
+                        ),
+                        AppText(
+                          formatCurrency(
+                            value: result.data?.shippingTotal ?? 0,
+                            leadingSign: '฿',
+                          ),
+                          style: context.textTheme.titleSmall?.copyWith(
+                            fontSize: 16.sp,
+                            color: AppColors.ci,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        Assets.svg.icArrowForward.svg(
-          width: AppDims.size_16.w,
-          height: AppDims.size_16.w,
-        ),
-      ],
+          Assets.svg.icArrowForward.svg(
+            width: AppDims.size_16.w,
+            height: AppDims.size_16.w,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -877,7 +915,12 @@ class _BottomActionBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _FavoriteButton(isActive: product.favoriteStatus ?? false),
+          _FavoriteButton(
+            isActive: product.favoriteStatus ?? false,
+            onTap: () => context
+                .read<BrownyShopProductDetailViewmodel>()
+                .toggleFavorite(),
+          ),
           SizedBox(width: AppDims.size_8.w),
           Expanded(
             child: _CtaButton(
@@ -924,29 +967,38 @@ class _BottomActionBar extends StatelessWidget {
 }
 
 class _FavoriteButton extends StatelessWidget {
-  const _FavoriteButton({required this.isActive});
+  const _FavoriteButton({required this.isActive, this.onTap});
   final bool isActive;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    // active = หัวใจสีแบรนด์ (ci), inactive = หัวใจเทา — ใช้ asset เดียว tint สี
+    final color = isActive ? AppColors.ci : AppColors.gray500;
     return GestureDetector(
-      onTap: () => debugPrint('tap favorite (TODO)'),
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: AppDims.size_40.w,
         height: AppDims.size_40.h,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Assets.icShop.icHeart.image(
-              width: 19.w,
-              height: 16.h,
-            ),
+            isActive
+                ? Assets.icShop.icHeartActive.image(
+                    width: 19.w,
+                    height: 16.h,
+                  )
+                : Assets.icShop.icHeart.image(
+                    width: 19.w,
+                    height: 16.h,
+                  ),
             SizedBox(height: 2.h),
             AppText(
               context.wording.favoriteLike,
               style: context.textTheme.labelSmall?.copyWith(
                 fontSize: 12.sp,
-                color: AppColors.gray500,
+                color: color,
               ),
             ),
           ],

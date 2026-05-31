@@ -16,12 +16,14 @@ CartSummaryRequest _$CartSummaryRequestFromJson(Map<String, dynamic> json) =>
           .toList(),
       couponCustomerId: (json['coupon_customer_id'] as num?)?.toInt(),
       paymentMethod: json['payment_method'] as String?,
+      customerAddressId: (json['customer_address_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CartSummaryRequestToJson(CartSummaryRequest instance) =>
     <String, dynamic>{
       'customer_id': instance.customerId,
       'coupon_customer_id': ?instance.couponCustomerId,
+      'customer_address_id': ?instance.customerAddressId,
       'payment_method': ?instance.paymentMethod,
       'items': instance.items,
     };

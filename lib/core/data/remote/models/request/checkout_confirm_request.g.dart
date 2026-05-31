@@ -13,6 +13,9 @@ CheckoutConfirmRequest _$CheckoutConfirmRequestFromJson(
   customerAddressId: (json['customer_address_id'] as num).toInt(),
   paymentMethod: json['payment_method'] as String?,
   couponCustomerId: (json['coupon_customer_id'] as num?)?.toInt(),
+  items: (json['items'] as List<dynamic>?)
+      ?.map((e) => CartSummaryItemRequest.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$CheckoutConfirmRequestToJson(
@@ -22,4 +25,5 @@ Map<String, dynamic> _$CheckoutConfirmRequestToJson(
   'customer_address_id': instance.customerAddressId,
   'payment_method': ?instance.paymentMethod,
   'coupon_customer_id': ?instance.couponCustomerId,
+  'items': ?instance.items,
 };

@@ -1,86 +1,71 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_order_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/payment_status_check_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
-import 'package:browny_applications_new/feature/browny_shop/models/browny_shop_order_status_model.dart';
+import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:flutter/foundation.dart';
 
 /// ViewModel หน้าสถานะคำสั่งซื้อ Browny Shop ([BrownyShopOrderStatusPage])
 ///
-/// รับ [orderId] เพื่อใช้ fetch สถานะ/รายละเอียดทั้งหมด — API ยังไม่พร้อม จึง
-/// mock ตาม design ไปก่อน (ดู [fetchOrderStatus])
+/// รับ [orderId] เพื่อ fetch รายละเอียด/สถานะคำสั่งซื้อ (GET /browny-shop/orders/
+/// {orderId}) — กรณีสถานะ pending_payment เปิดให้กลับเข้า process ชำระเงินได้
+/// ([fetchPendingOrder] + [checkPaymentStatus])
 class BrownyShopOrderStatusViewModel extends AppViewModel {
   BrownyShopOrderStatusViewModel({
     required super.context,
+    required BrownyShopDataSourceMixin repo,
     required this.orderId,
-  }) {
-    fetchOrderStatus();
+  }) : _repo = repo {
+    fetchOrderDetail();
   }
 
-  /// id คำสั่งซื้อ — ใช้ fetch สถานะทั้งหมดเมื่อ API พร้อม
+  final BrownyShopDataSourceMixin _repo;
+
+  /// id คำสั่งซื้อ — ใช้ fetch สถานะ + กลับเข้า process ชำระเงิน
   final String orderId;
 
-  final _statusNotifier = ValueNotifier<UiResult<BrownyShopOrderStatusModel>>(
-    UiResult.loading(),
-  );
-  ValueListenable<UiResult<BrownyShopOrderStatusModel>> get statusNotifier =>
+  final _statusNotifier =
+      ValueNotifier<UiResult<BrownyShopOrderDetailData>>(UiResult.loading());
+  ValueListenable<UiResult<BrownyShopOrderDetailData>> get statusNotifier =>
       _statusNotifier;
 
-  /// โหลดสถานะคำสั่งซื้อ
-  ///
-  /// TODO(api): ยังไม่มี API สถานะคำสั่งซื้อ Browny Shop — ตอนนี้คืน mock ตาม
-  /// design; เมื่อ API พร้อมให้เรียก repo ด้วย [orderId] แล้ว map เป็น
-  /// [BrownyShopOrderStatusModel]
-  Future<void> fetchOrderStatus() async {
+  String get _customerId => currentCustomerProvider.current.id.orEmpty;
+
+  /// โหลดรายละเอียด/สถานะคำสั่งซื้อ — GET /browny-shop/orders/{orderId}
+  Future<void> fetchOrderDetail() async {
     _statusNotifier.value = UiResult.loading();
-    _statusNotifier.value = UiResult.success(data: _mockData());
+    final result = await _repo.fetchOrderDetail(
+      orderId: orderId,
+      customerId: _customerId,
+    );
+    if (result.isSuccess) {
+      _statusNotifier.value = UiResult.success(data: result.data);
+    } else if (result.isEmpty) {
+      _statusNotifier.value = UiResult.empty();
+    } else {
+      _statusNotifier.value = UiResult.error(error: result.error);
+    }
   }
 
-  /// mock ข้อมูลตาม design (สถานะ "ชำระเงินแล้ว รอจัดส่ง")
-  BrownyShopOrderStatusModel _mockData() {
-    return BrownyShopOrderStatusModel(
+  /// GET /browny-shop/checkout/{orderId} — ดึง order ที่รอชำระ (response_payload/
+  /// payment_url) เพื่อกลับเข้า process ชำระเงินจากปุ่ม "ชำระเงิน"
+  Future<UiResult<CheckoutDraftData>> fetchPendingOrder() async {
+    final result = await _repo.fetchPendingOrder(
       orderId: orderId,
-      orderIdDisplay: 'BB33O3O4O82O221xx',
-      status: BrownyShopOrderStatusType.paid,
-      trackingNumber: null,
-      recipientName: 'บราวนี่ รักสะอาด',
-      phone: '080-000-0000',
-      fullAddress:
-          'ชั้น 2 Intree Organic Cafe 459 ถ.เพชรเกษม แขวงบางหว้า '
-          'เขตภาษีเจริญ กรุงเทพมหานคร 10160 ประเทศไทย',
-      products: const [
-        BrownyShopOrderStatusProduct(
-          name: 'Hygiene กลิ่นกุหลาบ Hygiene กลิ่นกุหลาบ',
-          moneyPrice: 699,
-          originalMoneyPrice: 1300,
-          coinPrice: 699,
-          originalCoinPrice: 800,
-          quantity: 2,
-          isFreeShipping: true,
-        ),
-        BrownyShopOrderStatusProduct(
-          name: 'Hygiene กลิ่นกุหลาบ Hygiene กลิ่นกุหลาบ',
-          moneyPrice: 699,
-          originalMoneyPrice: 1300,
-          coinPrice: 699,
-          originalCoinPrice: 800,
-          quantity: 2,
-        ),
-        BrownyShopOrderStatusProduct(
-          name: 'Hygiene กลิ่นกุหลาบ Hygiene กลิ่นกุหลาบ',
-          moneyPrice: 699,
-          originalMoneyPrice: 1300,
-          coinPrice: 699,
-          originalCoinPrice: 800,
-          quantity: 2,
-          isFreeShipping: true,
-        ),
-      ],
-      orderTotal: 75,
-      paymentChannelName: 'TrueMoney Wallet',
-      orderTime: '11-10-2-25 00:00',
-      paymentTime: '11-10-2-25 00:00',
-      deliveryTime: '11-10-2-25 00:00',
-      qrImage: null,
+      customerId: _customerId,
     );
+    if (result.isSuccess) return UiResult.success(data: result.data);
+    return UiResult.error(error: result.error);
+  }
+
+  /// GET /payment/browny-shop/status/{paymentRef} — polling สถานะการชำระเงิน
+  Future<UiResult<PaymentStatusCheckResponse>> checkPaymentStatus(
+    String paymentRef,
+  ) async {
+    final result = await _repo.checkPaymentStatus(paymentRef: paymentRef);
+    if (result.isSuccess) return UiResult.success(data: result.data);
+    return UiResult.error(error: result.error);
   }
 
   @override

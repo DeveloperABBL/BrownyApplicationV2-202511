@@ -47,6 +47,16 @@ class CartLine {
   num get unitMoneyPrice => data.unitMoneyPrice ?? 0;
   num get unitCoinPrice => data.unitCoinPrice ?? 0;
 
+  /// สต็อกคงเหลือของ sub นี้ (null = ไม่จำกัด/ไม่มีข้อมูล)
+  int? get stock {
+    final raw = data.matchedSub?.stock;
+    if (raw == null || raw.isEmpty) return null;
+    return num.tryParse(raw)?.toInt();
+  }
+
+  /// สินค้าหมดสต็อก — เลือกชำระเงินไม่ได้ (stock = 0)
+  bool get isOutOfStock => stock != null && stock! <= 0;
+
   /// ยอดรวมบรรทัด (money) ตามจำนวนปัจจุบันฝั่ง app
   num get lineMoneyTotal => unitMoneyPrice * quantity;
   num get lineCoinTotal => unitCoinPrice * quantity;
@@ -271,6 +281,7 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
       customerAddressId: _shippingAddressNotifier.value?.id ?? 0,
       paymentMethod: paymentSelected?.method ?? '',
       couponCustomerId: _selectedCouponNotifier.value?.customerCouponId,
+      items: _selectedSummaryItems(),
     );
     if (result.isSuccess) return UiResult.success(data: result.data);
     return UiResult.error(error: result.error);
@@ -401,8 +412,11 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   num get selectedMoneyGrandTotal =>
       selectedMoneyTotal - selectedMoneyCouponDiscount;
 
-  bool get isAllSelected =>
-      _lines.isNotEmpty && _lines.every((e) => e.selected);
+  /// "เลือกทั้งหมด" พิจารณาเฉพาะสินค้าที่เลือกได้ (ไม่นับที่หมดสต็อก)
+  bool get isAllSelected {
+    final selectable = _lines.where((e) => !e.isOutOfStock);
+    return selectable.isNotEmpty && selectable.every((e) => e.selected);
+  }
 
   /// ปุ่มชำระเงินกดได้เมื่อ: โหลดเสร็จ, ไม่มี event ค้าง/ไม่ได้ sync, มีของติ๊ก
   bool get canCheckout =>
@@ -425,6 +439,8 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
       if (preserveKeys != null) {
         line.selected = preserveKeys.contains(line.selectionKey);
       }
+      // สินค้าหมดสต็อก → บังคับไม่เลือก (ชำระเงินไม่ได้)
+      if (line.isOutOfStock) line.selected = false;
       return line;
     }).toList();
     return false;
@@ -472,12 +488,16 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   // ========== ติ๊กเลือก ==========
 
   void toggleSelected(CartLine line) {
+    // สินค้าหมดสต็อกเลือกไม่ได้
+    if (line.isOutOfStock) return;
     line.selected = !line.selected;
     notifyListeners();
   }
 
   void setAllSelected(bool selected) {
     for (final line in _lines) {
+      // ข้ามสินค้าหมดสต็อก (เลือกไม่ได้)
+      if (line.isOutOfStock) continue;
       line.selected = selected;
     }
     notifyListeners();

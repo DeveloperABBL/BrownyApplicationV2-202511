@@ -1,3 +1,4 @@
+import 'package:browny_applications_new/core/data/remote/models/request/cart_summary_request.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'checkout_confirm_request.g.dart';
@@ -23,6 +24,7 @@ class CheckoutConfirmRequest {
     required this.customerAddressId,
     this.paymentMethod,
     this.couponCustomerId,
+    this.items,
   });
 
   /// UUID ลูกค้า — ใช้ verify ownership
@@ -41,6 +43,10 @@ class CheckoutConfirmRequest {
   /// id ของคูปองที่ใช้ — null = ไม่ใช้คูปอง
   @JsonKey(name: 'coupon_customer_id')
   final int? couponCustomerId;
+
+  /// รายการสินค้าที่สั่งซื้อ (product_sub_id + quantity)
+  @JsonKey(name: 'items')
+  final List<CartSummaryItemRequest>? items;
 
   factory CheckoutConfirmRequest.fromJson(Map<String, dynamic> json) =>
       _$CheckoutConfirmRequestFromJson(json);

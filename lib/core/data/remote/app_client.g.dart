@@ -2664,20 +2664,25 @@ class _AppClient implements AppClient {
   }
 
   @override
-  Future<HttpResponse<OrderHistoryResponse>> fetchBrownyShopOrders(
+  Future<HttpResponse<BrownyShopOrdersResponse>> fetchBrownyShopOrders(
     String customerId,
     int page,
-    int perPage,
-  ) async {
+    int perPage, {
+    String? startDate,
+    String? endDate,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'customer_id': customerId,
       r'page': page,
       r'per_page': perPage,
+      r'start_date': startDate,
+      r'end_date': endDate,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<OrderHistoryResponse>>(
+    final _options = _setStreamType<HttpResponse<BrownyShopOrdersResponse>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -2688,9 +2693,9 @@ class _AppClient implements AppClient {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late OrderHistoryResponse _value;
+    late BrownyShopOrdersResponse _value;
     try {
-      _value = OrderHistoryResponse.fromJson(_result.data!);
+      _value = BrownyShopOrdersResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -2721,6 +2726,70 @@ class _AppClient implements AppClient {
     late BrownyShopReceiptResponse _value;
     try {
       _value = BrownyShopReceiptResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<BrownyShopOrderDetailResponse>>
+  fetchBrownyShopOrderDetail(String orderId, String customerId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'customer_id': customerId};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options =
+        _setStreamType<HttpResponse<BrownyShopOrderDetailResponse>>(
+          Options(method: 'GET', headers: _headers, extra: _extra)
+              .compose(
+                _dio.options,
+                '/browny-shop/orders/${orderId}',
+                queryParameters: queryParameters,
+                data: _data,
+              )
+              .copyWith(
+                baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl),
+              ),
+        );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BrownyShopOrderDetailResponse _value;
+    try {
+      _value = BrownyShopOrderDetailResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<BrownyShopReviewResponse>> submitBrownyShopReview(
+    String orderId,
+    MachineOrderReviewRequest body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<HttpResponse<BrownyShopReviewResponse>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/browny-shop/orders/${orderId}/review',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BrownyShopReviewResponse _value;
+    try {
+      _value = BrownyShopReviewResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
