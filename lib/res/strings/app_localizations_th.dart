@@ -1838,6 +1838,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get outOfStock => 'หมด';
 
   @override
+  String get bestSeller => 'ขายดี';
+
+  @override
   String totalItemsCount(int count) {
     return 'สินค้ารวม $count รายการ';
   }

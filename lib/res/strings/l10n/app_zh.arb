@@ -620,6 +620,8 @@
   "pendingPayment": "等待付款",
   "orderCancelled": "订单已取消",
   "outOfStock": "已售罄",
+  "productOption": "选项",
+  "bestSeller": "热销",
   "totalItemsCount": "共 {count} 件商品",
   "parcelNumber": "包裹编号",
   "copy": "复制",

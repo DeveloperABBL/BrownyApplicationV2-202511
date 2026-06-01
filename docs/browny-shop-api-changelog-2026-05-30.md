@@ -1453,4 +1453,52 @@ Order เก่าที่ paid แล้วแต่ยังไม่มี `
 
 ---
 
+# Browny Shop API — Changelog (Shipping Provider)
+
+**วันที่:** 30 พฤษภาคม 2026 (อัปเดตเพิ่ม)
+**Base URL:** `{APP_URL}/api`
+**Auth:** `Authorization: Bearer {TOKEN}`
+
+---
+
+## สรุปการเปลี่ยนแปลง
+
+เพิ่มข้อมูล **บริษัทขนส่ง** (`shipping_provider`) และเลขพัสดุ (`tracking_number`) ใน 3 endpoint
+— ไม่ breaking ฟิลด์เดิม, signature ไม่เปลี่ยน (เพิ่มเฉพาะ field ใน response)
+
+| Method | Endpoint | field ที่เพิ่ม |
+|--------|----------|----------------|
+| `GET` | `/browny-shop/orders` | `tracking_number`, `shipping_provider` |
+| `GET` | `/browny-shop/orders/{order_id}` | `shipping_provider` (มี `tracking_number` อยู่แล้ว) |
+| `GET` | `/browny-shop/orders/{order_id}/receipt` | `tracking_number`, `shipping_provider` |
+
+## โครงสร้าง `shipping_provider`
+
+`null` เมื่อยังไม่ได้จัดส่ง (`pending_shipment`)
+
+```json
+{
+  "shipping_provider": {
+    "id": 1,
+    "code": "flash",
+    "name": "Flash Express",
+    "logo_url": "https://example.com/storage/shipping-providers/flash.png",
+    "track_url": null
+  }
+}
+```
+
+| Field | คำอธิบาย |
+|-------|----------|
+| `id` | id ขนส่ง |
+| `code` | รหัสขนส่ง (เช่น `flash`) |
+| `name` | ชื่อขนส่ง (เช่น `Flash Express`) |
+| `logo_url` | URL โลโก้ขนส่ง |
+| `track_url` | URL หน้า track พัสดุ (`null` = ไม่มีลิงก์ track โดยตรง) |
+
+**Model (Flutter):** `ShippingProviderData` — ใช้ร่วมใน `BrownyShopOrderItem`,
+`BrownyShopOrderDetailData`, `BrownyShopReceiptResponse`
+
+---
+
 

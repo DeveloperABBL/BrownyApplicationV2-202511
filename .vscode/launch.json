@@ -14,6 +14,15 @@
             ]
         },
         {
+            "name": "browny_app_v3-staging-debug",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--dart-define-from-file=env/staging.json"
+            ]
+        },
+        {
             "name": "browny_app_v3-prd-debug",
             "request": "launch",
             "type": "dart",

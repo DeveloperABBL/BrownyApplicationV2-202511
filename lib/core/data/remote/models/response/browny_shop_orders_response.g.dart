@@ -37,6 +37,12 @@ BrownyShopOrderItem _$BrownyShopOrderItemFromJson(Map<String, dynamic> json) =>
           : ContentLocalizeData.fromJson(
               json['status_label'] as Map<String, dynamic>,
             ),
+      trackingNumber: json['tracking_number'] as String?,
+      shippingProvider: json['shipping_provider'] == null
+          ? null
+          : ShippingProviderData.fromJson(
+              json['shipping_provider'] as Map<String, dynamic>,
+            ),
       deliveredAt: json['delivered_at'] as String?,
       deliveryDate: json['delivery_date'] as String?,
       receiptAt: json['receipt_at'] as String?,
@@ -69,6 +75,8 @@ Map<String, dynamic> _$BrownyShopOrderItemToJson(
   'receipt_no': instance.receiptNo,
   'status': instance.status,
   'status_label': instance.statusLabel?.toJson(),
+  'tracking_number': instance.trackingNumber,
+  'shipping_provider': instance.shippingProvider?.toJson(),
   'delivered_at': instance.deliveredAt,
   'delivery_date': instance.deliveryDate,
   'receipt_at': instance.receiptAt,

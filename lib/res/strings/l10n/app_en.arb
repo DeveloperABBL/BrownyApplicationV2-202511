@@ -671,6 +671,8 @@
   "pendingPayment": "Pending payment",
   "orderCancelled": "Order cancelled",
   "outOfStock": "Out of stock",
+  "productOption": "Option",
+  "bestSeller": "Best Seller",
   "totalItemsCount": "{count} items total",
   "@totalItemsCount": {
     "placeholders": {

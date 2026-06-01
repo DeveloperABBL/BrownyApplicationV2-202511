@@ -1123,10 +1123,11 @@ abstract class AppClient {
     @Path('paymentRef') String paymentRef,
   );
 
-  /// DONG 2026-05-27 (model อัปเดต 2026-05-31)
+  /// DONG 2026-05-27 (model อัปเดต 2026-05-31, เพิ่ม shipping 2026-05-30)
   ///
   /// API fetch Order History ประวัติคำสั่งซื้อเฉพาะ Browny Shop ของลูกค้า (paginated)
   /// — แต่ละออร์เดอร์มีสถานะ (status/status_label), รายการสินค้าย่อ + รูป preview
+  /// — เพิ่ม tracking_number + shipping_provider (null เมื่อยังไม่จัดส่ง)
   ///
   /// Query parameters:
   /// - customer_id: String (uuid)
@@ -1148,6 +1149,7 @@ abstract class AppClient {
   ///
   /// API fetch ใบเสร็จคำสั่งซื้อ Browny Shop ตาม orderId
   /// — รายละเอียดสินค้า / ที่อยู่จัดส่ง / breakdown ราคา / ช่องทางติดต่อ
+  /// — เพิ่ม tracking_number + shipping_provider (รูปแบบเดียวกับ order detail)
   ///
   /// Path parameters:
   /// - orderId: String (uuid)
@@ -1162,7 +1164,8 @@ abstract class AppClient {
   /// DONG 2026-05-31
   ///
   /// API ดึงรายละเอียดออร์เดอร์ Browny Shop — สถานะ + stepper (สั่งซื้อ/ชำระเงิน/
-  /// จัดส่ง), เลขพัสดุ, รายการสินค้า, โบนัส, ที่อยู่จัดส่ง, รีวิว
+  /// จัดส่ง), เลขพัสดุ (tracking_number) + บริษัทขนส่ง (shipping_provider),
+  /// รายการสินค้า, โบนัส, ที่อยู่จัดส่ง, รีวิว
   /// — ใช้กับหน้า BrownyShopOrderStatusPage
   ///
   /// Path parameters:

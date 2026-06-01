@@ -1847,6 +1847,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get outOfStock => 'Out of stock';
 
   @override
+  String get bestSeller => 'Best Seller';
+
+  @override
   String totalItemsCount(int count) {
     return '$count items total';
   }

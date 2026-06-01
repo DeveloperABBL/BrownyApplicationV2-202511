@@ -47,6 +47,11 @@ BrownyShopOrderDetailData _$BrownyShopOrderDetailDataFromJson(
           json['status_steps'] as Map<String, dynamic>,
         ),
   trackingNumber: json['tracking_number'] as String?,
+  shippingProvider: json['shipping_provider'] == null
+      ? null
+      : ShippingProviderData.fromJson(
+          json['shipping_provider'] as Map<String, dynamic>,
+        ),
   priceOriginal: json['price_original'] as String?,
   priceFinal: json['price_final'] as String?,
   amount: json['amount'] as String?,
@@ -100,6 +105,7 @@ Map<String, dynamic> _$BrownyShopOrderDetailDataToJson(
   'status_label': instance.statusLabel?.toJson(),
   'status_steps': instance.statusSteps?.toJson(),
   'tracking_number': instance.trackingNumber,
+  'shipping_provider': instance.shippingProvider?.toJson(),
   'price_original': instance.priceOriginal,
   'price_final': instance.priceFinal,
   'amount': instance.amount,

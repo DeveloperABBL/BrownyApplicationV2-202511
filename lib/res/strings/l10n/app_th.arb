@@ -622,6 +622,8 @@
   "pendingPayment": "รอชำระเงิน",
   "orderCancelled": "ยกเลิกคำสั่งซื้อ",
   "outOfStock": "หมด",
+  "productOption": "ตัวเลือก",
+  "bestSeller": "ขายดี",
   "totalItemsCount": "สินค้ารวม {count} รายการ",
   "parcelNumber": "เลขพัสดุ",
   "copy": "คัดลอก",

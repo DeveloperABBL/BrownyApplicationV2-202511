@@ -477,6 +477,32 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
     setQuantity(line, line.quantity - 1);
   }
 
+  // ========== แก้จำนวนในหน้า checkout (ไม่ sync ตะกร้าขึ้น server) ==========
+
+  /// แก้จำนวนในหน้าสรุปคำสั่งซื้อ ([BrownyShopSelected])
+  ///
+  /// ต่างจาก [setQuantity] (หน้าตะกร้า) ตรงที่ "ไม่" batch sync ขึ้น server +
+  /// ไม่ fetchCart — เพราะ checkout ซื้อเฉพาะรายการที่ติ๊กเลือก (บางไอเทม) ซึ่ง
+  /// fetchCart ไม่รองรับ จึงแค่อัปเดต qty ฝั่ง client แล้ว re-fetch cart/summary
+  /// (POST /cart/summary ด้วย items ที่เลือก) — ยอดสุทธิแต่ละ item + ยอดรวม
+  /// คำนวณจาก summary ที่ได้กลับมา
+  void updateCheckoutQuantity(CartLine line, int quantity) {
+    if (quantity < 1) return;
+    if (line.quantity == quantity) return;
+    line.quantity = quantity;
+    notifyListeners(); // สะท้อนจำนวนใหม่ทันที
+    _scheduleSummaryFetch(); // คำนวณยอดใหม่จาก cart/summary (ไม่แตะ server cart)
+  }
+
+  void incrementCheckout(CartLine line) =>
+      updateCheckoutQuantity(line, line.quantity + 1);
+
+  /// ลดทีละ 1 — ถ้าจำนวน = 1 อยู่แล้ว ไม่ทำอะไร
+  void decrementCheckout(CartLine line) {
+    if (line.quantity <= 1) return;
+    updateCheckoutQuantity(line, line.quantity - 1);
+  }
+
   /// ลบทั้งบรรทัดออกจากตะกร้า — View ต้องยืนยันด้วย dialog ก่อนเรียก
   void removeLine(CartLine line) {
     final id = line.itemId;

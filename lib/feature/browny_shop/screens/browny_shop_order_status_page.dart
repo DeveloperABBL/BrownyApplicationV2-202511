@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_order_detail_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/shipping_provider_data.dart';
 import 'package:browny_applications_new/core/widgets/qr_promptpay_dialog.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_order_status_viewmodel.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
@@ -101,6 +103,7 @@ class _OrderStatusWidgetState extends State<_OrderStatusWidget>
     context.popUntil(
       predicate: (route) => route.name.orEmpty == HomePage.pageName,
     );
+    BrownyShopPage.goToPage(context);
   }
 
   void _copy(String value) {
@@ -579,6 +582,7 @@ class _StatusCard extends StatelessWidget {
   /// hero image (Frame 2087326612) — pending_payment ใช้ warning ตาม locale,
   /// นอกนั้น thank you
   AssetGenImage _heroAsset(BuildContext context) {
+    if (data.isCancelled) return Assets.icShop.brownyWarningCanceled;
     if (!data.isPendingPayment) return Assets.icShop.brownyThankYou;
     switch (context.languageCode) {
       case 'en':
@@ -684,6 +688,11 @@ class _StatusCard extends StatelessWidget {
               green: data.hasTrackingNumber,
             ),
           ),
+          // บริษัทขนส่ง (shipping_provider) — ชื่อ + โลโก้ (Frame 2087327125)
+          if (data.shippingProvider != null) ...[
+            SizedBox(height: AppDims.size_8.h),
+            _ShippingProviderRow(provider: data.shippingProvider!),
+          ],
           SizedBox(height: AppDims.size_16.w),
           const _Divider(),
           // ข้อมูลการจัดส่ง
@@ -725,6 +734,55 @@ class _StatusCard extends StatelessWidget {
   }
 }
 
+/// แถวบริษัทขนส่ง (Frame 2087327125) — ชื่อขนส่ง + โลโก้ ชิดขวา
+class _ShippingProviderRow extends StatelessWidget {
+  const _ShippingProviderRow({required this.provider});
+
+  final ShippingProviderData provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = provider.name;
+    final logoUrl = provider.logoUrl;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (name != null && name.isNotEmpty)
+          Flexible(
+            child: AppText(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: AppColors.gray600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        if (logoUrl != null && logoUrl.isNotEmpty) ...[
+          SizedBox(width: AppDims.size_8.w),
+          Container(
+            width: 30.w,
+            height: 30.w,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(9.r),
+            ),
+            clipBehavior: Clip.antiAlias,
+            alignment: Alignment.center,
+            child: CachedNetworkImage(
+              imageUrl: logoUrl,
+              fit: BoxFit.contain,
+              errorWidget: (_, _, _) => const SizedBox.shrink(),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 /// stepper 3 ขั้น (Frame 2087326634) — สั่งซื้อ → ชำระเงิน → จัดส่ง
 class _StatusStepper extends StatelessWidget {
   const _StatusStepper({required this.data});
@@ -741,7 +799,9 @@ class _StatusStepper extends StatelessWidget {
         // สั่งซื้อ — active เสมอ
         _step(
           context,
-          icon: Assets.icShop.icCartRoundedGreen,
+          icon: data.isCancelled
+              ? Assets.icShop.icCartRoundedInactive
+              : Assets.icShop.icCartRoundedGreen,
           label: context.wording.ordered,
         ),
         _connector(),
@@ -1209,32 +1269,36 @@ class _PaymentCard extends StatelessWidget {
                       errorWidget: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ],
-                  SizedBox(height: AppDims.size_8.h),
                   // ใบเสร็จรับเงิน — แตะเพื่อเปิดหน้าใบเสร็จของออร์เดอร์นี้
-                  GestureDetector(
-                    onTap: () => ReceiptBrownyShop.goToPage(
-                      context,
-                      orderId: data.orderId.orEmpty,
-                    ),
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppDims.size_8.w,
-                        vertical: AppDims.size_4.h,
+                  // ซ่อนเมื่อ order ยังไม่ชำระเงิน (receipt จะตอบ 422)
+                  // หรือเป็น order ที่ canceld แล้ว
+                  if (!data.isPendingPayment && !data.isCancelled) ...[
+                    SizedBox(height: AppDims.size_8.h),
+                    GestureDetector(
+                      onTap: () => ReceiptBrownyShop.goToPage(
+                        context,
+                        orderId: data.orderId.orEmpty,
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.ci3,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: AppText(
-                        context.wording.receipt,
-                        style: context.textTheme.titleMedium?.copyWith(
-                          color: AppColors.ci,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDims.size_8.w,
+                          vertical: AppDims.size_4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.ci3,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: AppText(
+                          context.wording.receipt,
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: AppColors.ci,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: AppDims.size_8.w),
+                    SizedBox(height: AppDims.size_8.w),
+                  ],
                 ],
               ),
             ],

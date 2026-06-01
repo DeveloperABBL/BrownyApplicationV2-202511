@@ -18,6 +18,7 @@ Future<void> showAddToCartBottomSheet(
   required ProductData product,
   required String actionLabel,
   required AddToCartConfirmed onConfirm,
+  int? initialSubId,
 }) async {
   final subs = product.productSubs ?? <ProductSubData>[];
   final selectable = subs.where(_isInStock).toList();
@@ -41,6 +42,7 @@ Future<void> showAddToCartBottomSheet(
       child: _AddToCartBottomSheet(
         product: product,
         actionLabel: actionLabel,
+        initialSubId: initialSubId,
         onConfirm: (subId, qty) {
           Navigator.of(ctx).pop();
           onConfirm(subId, qty);
@@ -57,11 +59,15 @@ class _AddToCartBottomSheet extends StatefulWidget {
     required this.product,
     required this.actionLabel,
     required this.onConfirm,
+    this.initialSubId,
   });
 
   final ProductData product;
   final String actionLabel;
   final AddToCartConfirmed onConfirm;
+
+  /// productSub ที่เลือกไว้จากหน้าก่อน (เช่น _ProductSubsSection) — sync ค่าเริ่มต้น
+  final int? initialSubId;
 
   @override
   State<_AddToCartBottomSheet> createState() => _AddToCartBottomSheetState();
@@ -79,7 +85,18 @@ class _AddToCartBottomSheetState extends State<_AddToCartBottomSheet> {
   void initState() {
     super.initState();
     final subs = widget.product.productSubs ?? <ProductSubData>[];
-    _selectedSub = subs.firstWhere(_isInStock, orElse: () => subs.first);
+    // sync กับตัวเลือกที่เลือกมาจากหน้าก่อน (ถ้ามีและยังมีของ) ไม่งั้น default ตัวแรกที่มีของ
+    ProductSubData? preferred;
+    if (widget.initialSubId != null) {
+      for (final sub in subs) {
+        if (sub.id == widget.initialSubId && _isInStock(sub)) {
+          preferred = sub;
+          break;
+        }
+      }
+    }
+    _selectedSub =
+        preferred ?? subs.firstWhere(_isInStock, orElse: () => subs.first);
     _qtyController = TextEditingController(text: '$_quantity');
   }
 
@@ -141,13 +158,51 @@ class _AddToCartBottomSheetState extends State<_AddToCartBottomSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // แถบแจ้งระยะเวลาจัดส่ง (mockup) — Frame 2087326738
+            _buildDeliveryBanner(context),
+            AppDims.vericalPadding_8,
             _buildProductRow(context),
-            AppDims.vericalPadding_16,
+            AppDims.vericalPadding_8,
+            Divider(),
+            AppDims.vericalPadding_8,
+            // ตัวเลือก (product_subs) — Frame 2087328382
             _buildOptionsSection(context),
+            // TODO(api): "ขนาด" (Frame 2087328383) — ยังไม่มี API รองรับ ข้ามไปก่อน
             AppDims.vericalPadding_16,
             _buildCtaButton(context),
           ],
         ),
+      ),
+    );
+  }
+
+  /// badge "ขายดี" (Frame 2087326874) — ออกแบบเผื่อไว้ แต่ซ่อนเพราะ API ยังไม่มี
+  static const bool _showBestSeller = false;
+
+  /// แถบแจ้ง "จะได้รับภายใน 30 วัน" (mockup wording) — Frame 2087326738
+  Widget _buildDeliveryBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_8.w,
+        vertical: AppDims.size_4.h,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.warningBackground,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Assets.icShop.icBoxRoundedYellow.image(width: 16.w, height: 16.w),
+          SizedBox(width: AppDims.size_4.w),
+          AppText(
+            '${context.wording.willReceiveWithin} 30 ${context.wording.dayUnit}',
+            style: context.textTheme.titleSmall?.copyWith(
+              color: AppColors.gray600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -447,9 +502,11 @@ class _AddToCartBottomSheetState extends State<_AddToCartBottomSheet> {
     );
   }
 
+  /// ตัวเลือก (product_subs) — แสดงเป็นการ์ดรูป+ชื่อ (เหมือน _ProductSubsSection)
   Widget _buildOptionsSection(BuildContext context) {
     final subs = widget.product.productSubs ?? <ProductSubData>[];
-    if (subs.length == 1) return SizedBox.shrink();
+    if (subs.length == 1) return const SizedBox.shrink();
+    final locale = context.languageCode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -461,55 +518,124 @@ class _AddToCartBottomSheetState extends State<_AddToCartBottomSheet> {
           ),
         ),
         AppDims.vericalPadding_8,
-        Wrap(
-          spacing: AppDims.size_8.w,
-          runSpacing: AppDims.size_8.h,
-          children: [for (final sub in subs) _optionChip(context, sub)],
+        SizedBox(
+          height: 90.h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: subs.length,
+            separatorBuilder: (_, _) => SizedBox(width: AppDims.size_8.w),
+            itemBuilder: (context, index) =>
+                _optionCard(context, subs[index], locale),
+          ),
         ),
+        AppDims.vericalPadding_100,
+        AppDims.vericalPadding_100,
       ],
     );
   }
 
-  Widget _optionChip(BuildContext context, ProductSubData sub) {
+  /// 1 การ์ดตัวเลือก — รูป + ชื่อ + (เผื่อไว้) badge "ขายดี"
+  Widget _optionCard(BuildContext context, ProductSubData sub, String locale) {
     final inStock = _isInStock(sub);
     final isSelected = sub.id == _selectedSub.id;
+    final url = sub.imageUrl;
 
-    final Color bg;
-    final Color borderColor;
-    final Color textColor;
-    if (!inStock) {
-      bg = AppColors.transparent;
-      borderColor = AppColors.productStroke;
-      textColor = AppColors.productStroke;
-    } else if (isSelected) {
-      bg = AppColors.ci;
-      borderColor = AppColors.ci;
-      textColor = AppColors.white;
-    } else {
-      bg = AppColors.transparent;
-      borderColor = AppColors.gray400;
-      textColor = AppColors.darkBrown;
-    }
+    final Color borderColor = isSelected
+        ? AppColors.primary
+        : (inStock ? AppColors.border : AppColors.productStroke);
 
     return GestureDetector(
       onTap: inStock ? () => _onSubSelected(sub) : null,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 28.h,
-        padding: EdgeInsets.symmetric(horizontal: AppDims.size_8.w),
-        decoration: BoxDecoration(
-          color: bg,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(4.r),
+        padding: EdgeInsets.only(
+          top: 8.r,
+          left: AppDims.size_4.w,
+          right: AppDims.size_4.w,
         ),
-        child: Center(
-          widthFactor: 1,
-          child: AppText(
-            sub.getNameDisplay(context.languageCode),
-            style: context.textTheme.titleSmall?.copyWith(
-              fontSize: 16.sp,
-              color: textColor,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(color: borderColor, width: 2),
+        ),
+        width: 66.w,
+        child: Column(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 50.w,
+                  height: 50.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.bareBackground,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                    imageUrl: url.orEmpty,
+                    fit: BoxFit.contain,
+                    errorWidget: (_, _, _) => const SizedBox(),
+                  ),
+                ),
+                // หมดสต็อก → ป้าย "หมด" กลางรูป
+                if (!inStock)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_8.w,
+                      vertical: AppDims.size_2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.productStroke,
+                      borderRadius: BorderRadius.circular(39.r),
+                    ),
+                    child: AppText(
+                      context.wording.outOfStock,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 11.sp,
+                        color: AppColors.textBare,
+                      ),
+                    ),
+                  ),
+                // badge "ขายดี" (เผื่อไว้, ซ่อน) — เฉพาะที่ยังมีของ
+                if (_showBestSeller && inStock)
+                  Positioned(
+                    top: -8.h,
+                    right: -4.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_4.w,
+                        vertical: AppDims.size_2.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      child: AppText(
+                        context.wording.bestSeller,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          fontSize: 8.sp,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ),
+            SizedBox(height: AppDims.size_4.h),
+            AppText(
+              sub.getNameDisplay(locale),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.textTheme.labelSmall?.copyWith(
+                fontSize: 12.sp,
+                color: !inStock
+                    ? AppColors.productStroke
+                    : AppColors.gray600,
+              ),
+            ),
+          ],
         ),
       ),
     );

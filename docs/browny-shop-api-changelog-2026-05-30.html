@@ -1579,6 +1579,45 @@ setting_defaults.browny_shop.default_shipping_fee</div>
   </table>
 </section>
 
+<!-- ==================== SHIPPING PROVIDER ==================== -->
+<section class="card" id="shipping-provider">
+  <h2>🚚 Shipping Provider (เพิ่ม field)</h2>
+  <p>เพิ่มข้อมูล <strong>บริษัทขนส่ง</strong> (<code>shipping_provider</code>) และเลขพัสดุ
+  (<code>tracking_number</code>) ใน 3 endpoint — ไม่ breaking ฟิลด์เดิม, signature ไม่เปลี่ยน
+  (เพิ่มเฉพาะ field ใน response)</p>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>field ที่เพิ่ม</th></tr></thead>
+    <tbody>
+      <tr><td><span class="m get">GET</span></td><td><code>/browny-shop/orders</code></td><td><code>tracking_number</code>, <code>shipping_provider</code></td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/browny-shop/orders/{order_id}</code></td><td><code>shipping_provider</code> (มี <code>tracking_number</code> อยู่แล้ว)</td></tr>
+      <tr><td><span class="m get">GET</span></td><td><code>/browny-shop/orders/{order_id}/receipt</code></td><td><code>tracking_number</code>, <code>shipping_provider</code></td></tr>
+    </tbody>
+  </table>
+  <h4>โครงสร้าง <code>shipping_provider</code> (<code>null</code> เมื่อยังไม่ได้จัดส่ง)</h4>
+  <div class="codewrap"><span class="lang-badge">json</span><pre><code class="json">{
+  "shipping_provider": {
+    "id": 1,
+    "code": "flash",
+    "name": "Flash Express",
+    "logo_url": "https://example.com/storage/shipping-providers/flash.png",
+    "track_url": null
+  }
+}</code></pre></div>
+  <table>
+    <thead><tr><th>Field</th><th>คำอธิบาย</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>id ขนส่ง</td></tr>
+      <tr><td><code>code</code></td><td>รหัสขนส่ง (เช่น <code>flash</code>)</td></tr>
+      <tr><td><code>name</code></td><td>ชื่อขนส่ง (เช่น <code>Flash Express</code>)</td></tr>
+      <tr><td><code>logo_url</code></td><td>URL โลโก้ขนส่ง</td></tr>
+      <tr><td><code>track_url</code></td><td>URL หน้า track พัสดุ (<code>null</code> = ไม่มีลิงก์ track โดยตรง)</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Model (Flutter):</strong> <code>ShippingProviderData</code> — ใช้ร่วมใน
+  <code>BrownyShopOrderItem</code>, <code>BrownyShopOrderDetailData</code>,
+  <code>BrownyShopReceiptResponse</code></p>
+</section>
+
 </main>
 </div>
 

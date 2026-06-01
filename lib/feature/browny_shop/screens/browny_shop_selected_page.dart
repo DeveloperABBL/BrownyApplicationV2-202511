@@ -951,17 +951,28 @@ class _ProductsCard extends StatelessWidget {
                   ),
                 );
               }
-              return Column(
-                children: [
-                  for (var i = 0; i < lines.length; i++) ...[
-                    if (i > 0) SizedBox(height: AppDims.size_16.h),
-                    _ProductItem(
-                      line: lines[i],
-                      onIncrement: () => vm.increment(lines[i]),
-                      onDecrement: () => vm.decrement(lines[i]),
-                    ),
+              // กล่อง border ครอบรายการสินค้า (Frame 2087328861)
+              return Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.productStroke),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                padding: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+                child: Column(
+                  children: [
+                    for (var i = 0; i < lines.length; i++) ...[
+                      if (i > 0) SizedBox(height: AppDims.size_8.h),
+                      _ProductItem(
+                        line: lines[i],
+                        // checkout ไม่ sync ตะกร้าขึ้น server — แค่ re-fetch
+                        // cart/summary (รองรับซื้อบางไอเทม) แล้ว map ยอดจาก summary
+                        onIncrement: () => vm.incrementCheckout(lines[i]),
+                        onDecrement: () => vm.decrementCheckout(lines[i]),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               );
             },
           ),
@@ -996,11 +1007,8 @@ class _ProductItem extends StatelessWidget {
         : (line.data.variantName ?? '');
     final isFreeShipping = line.data.product?.isFreeShipping ?? false;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
+    // bg ใส — item อยู่ในกล่อง border ของ _ProductsCard (Frame 2087326971)
+    return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: AppDims.size_8.w,
         vertical: AppDims.size_4.h,

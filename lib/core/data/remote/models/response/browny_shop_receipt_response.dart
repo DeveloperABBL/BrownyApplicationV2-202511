@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/shipping_provider_data.dart';
 import 'package:browny_applications_new/core/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -43,6 +44,8 @@ class BrownyShopReceiptResponse {
     this.qrImage,
     this.reviewScore,
     this.bonus,
+    this.trackingNumber,
+    this.shippingProvider,
   });
 
   @JsonKey(name: 'type')
@@ -126,6 +129,14 @@ class BrownyShopReceiptResponse {
 
   @JsonKey(name: 'bonus')
   final String? bonus;
+
+  /// เลขพัสดุ (null/ว่าง = ยังไม่ได้จัดส่ง) — รูปแบบเดียวกับ order detail
+  @JsonKey(name: 'tracking_number')
+  final String? trackingNumber;
+
+  /// บริษัทขนส่ง (null = ยังไม่ได้จัดส่ง)
+  @JsonKey(name: 'shipping_provider')
+  final ShippingProviderData? shippingProvider;
 
   factory BrownyShopReceiptResponse.fromJson(Map<String, dynamic> json) =>
       _$BrownyShopReceiptResponseFromJson(json);

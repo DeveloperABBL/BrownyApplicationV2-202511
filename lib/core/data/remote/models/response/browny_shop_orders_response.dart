@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/order_history_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/shipping_provider_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'browny_shop_orders_response.g.dart';
@@ -58,6 +59,8 @@ class BrownyShopOrderItem {
     this.receiptNo,
     this.status,
     this.statusLabel,
+    this.trackingNumber,
+    this.shippingProvider,
     this.deliveredAt,
     this.deliveryDate,
     this.receiptAt,
@@ -87,6 +90,14 @@ class BrownyShopOrderItem {
 
   @JsonKey(name: 'status_label')
   final ContentLocalizeData? statusLabel;
+
+  /// เลขพัสดุ (null/ว่าง = ยังไม่ได้จัดส่ง)
+  @JsonKey(name: 'tracking_number')
+  final String? trackingNumber;
+
+  /// บริษัทขนส่ง (null = ยังไม่ได้จัดส่ง)
+  @JsonKey(name: 'shipping_provider')
+  final ShippingProviderData? shippingProvider;
 
   @JsonKey(name: 'delivered_at')
   final String? deliveredAt;

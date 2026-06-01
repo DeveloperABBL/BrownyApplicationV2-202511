@@ -40,6 +40,7 @@ export 'package:browny_applications_new/core/data/remote/models/response/browny_
 export 'package:browny_applications_new/core/data/remote/models/response/browny_shop_pending_payment_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/browny_shop_receipt_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/browny_shop_review_response.dart';
+export 'package:browny_applications_new/core/data/remote/models/response/shipping_provider_data.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/cart_clear_response.dart';
 export 'package:browny_applications_new/core/data/remote/models/response/address_master_response.dart';

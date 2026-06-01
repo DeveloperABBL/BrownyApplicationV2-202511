@@ -120,41 +120,69 @@ class _BrownyShopProductDetailWidgetState
   }
 
   Widget _buildContent(BuildContext context, ProductData product) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _MainImage(vm: _vm, product: product),
-          _ThumbnailStrip(vm: _vm, product: product),
-          AppDims.vericalPadding_16,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _PriceSection(product: product),
-                AppDims.vericalPadding_8,
-                _TitleSection(product: product),
-                AppDims.vericalPadding_16,
-                const _Divider(),
-                AppDims.vericalPadding_16,
-                const _CouponCard(),
-                AppDims.vericalPadding_8,
-                const _ShippingInfo(),
-                AppDims.vericalPadding_16,
-                const _Divider(),
-                AppDims.vericalPadding_16,
-                _DescriptionSection(product: product),
-                AppDims.vericalPadding_16,
-                _ImageGallery(product: product),
-                AppDims.vericalPadding_24,
-              ],
+    // bg #F5F5F5 เห็นเป็นช่องว่าง 8px ระหว่างแต่ละ section
+    return ColoredBox(
+      color: AppColors.inputFieldDefaultBg,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // [Section 1] รูปสินค้า + ราคา + ชื่อ (มุมบนโค้ง 16)
+            _Section(
+              topRounded: true,
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _MainImage(vm: _vm, product: product),
+                  _ThumbnailStrip(vm: _vm, product: product),
+                  AppDims.vericalPadding_16,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _PriceSection(product: product),
+                        AppDims.vericalPadding_8,
+                        _TitleSection(product: product),
+                      ],
+                    ),
+                  ),
+                  AppDims.vericalPadding_16,
+                ],
+              ),
             ),
-          ),
-        ],
+            _sectionGap,
+            // [Section 2] สูตร (product_subs)
+            _Section(
+              child: _ProductSubsSection(vm: _vm, product: product),
+            ),
+            // TODO(api): [Section 3] "ขนาด" — ยังไม่มี API รองรับ ข้ามไปก่อน
+            _sectionGap,
+            // [Section 4] คูปอง/E-Voucher + ที่อยู่จัดส่ง
+            _Section(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _CouponCard(),
+                  AppDims.vericalPadding_8,
+                  const _ShippingInfo(),
+                ],
+              ),
+            ),
+            _sectionGap,
+            // [Section 5] รายละเอียดเพิ่มเติม — คำอธิบาย + แกลเลอรีรูป (collapse)
+            _Section(child: _MoreInfoSection(product: product)),
+          ],
+        ),
       ),
     );
   }
+
+  /// ช่องว่างระหว่าง section (เห็นพื้น #F5F5F5)
+  Widget get _sectionGap => SizedBox(height: AppDims.size_8.h);
 
   /// AppBar overlay — back button + bag + headset (semi-transparent brown)
   ///
@@ -529,12 +557,192 @@ class _TitleSection extends StatelessWidget {
   }
 }
 
-class _Divider extends StatelessWidget {
-  const _Divider();
+/// การ์ดสีขาวครอบ 1 section — section แรกมุมบนโค้ง 16 (Frame 2087328380)
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.child,
+    this.topRounded = false,
+    this.padding,
+  });
+
+  final Widget child;
+  final bool topRounded;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 1, color: AppColors.productStroke);
+    return Container(
+      width: double.infinity,
+      padding: padding ?? EdgeInsets.all(AppDims.size_16.w),
+      clipBehavior: topRounded ? Clip.antiAlias : Clip.none,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: topRounded
+            ? BorderRadius.vertical(top: Radius.circular(16.r))
+            : null,
+      ),
+      child: child,
+    );
+  }
+}
+
+/// [Section 2] สูตร — แสดง product_subs ที่มี (Frame 2087328382)
+///
+/// แตะการ์ดเพื่อเปลี่ยนรูปหลัก (sync กับ thumbnail strip ผ่าน
+/// [BrownyShopProductDetailViewmodel.selectedThumbnailNotifier])
+class _ProductSubsSection extends StatelessWidget {
+  const _ProductSubsSection({required this.vm, required this.product});
+
+  final BrownyShopProductDetailViewmodel vm;
+  final ProductData product;
+
+  @override
+  Widget build(BuildContext context) {
+    final subs = product.productSubs ?? const <ProductSubData>[];
+    if (subs.isEmpty) return const SizedBox.shrink();
+    final locale = context.languageCode;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(
+          context.wording.productOption,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontSize: 16.sp,
+            color: AppColors.darkBrown,
+          ),
+        ),
+        AppDims.vericalPadding_8,
+        SizedBox(
+          height: 94.h,
+          child: ValueListenableBuilder<ProductImageThumb?>(
+            valueListenable: vm.selectedThumbnailNotifier,
+            builder: (context, selected, _) {
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: subs.length,
+                separatorBuilder: (_, _) => SizedBox(width: AppDims.size_8.w),
+                itemBuilder: (context, index) {
+                  final sub = subs[index];
+                  return _ProductSubItem(
+                    name: sub.getNameDisplay(locale),
+                    imageUrl: sub.imageUrl,
+                    isActive: selected?.subId == sub.id,
+                    onTap: () => vm.onThumbnailSelected(
+                      ProductImageThumb(
+                        subId: sub.id,
+                        imageUrl: sub.imageUrl ?? '',
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 1 การ์ดสูตร — รูป + ชื่อ + (เผื่อไว้) badge "ขายดี"
+class _ProductSubItem extends StatelessWidget {
+  const _ProductSubItem({
+    required this.name,
+    required this.imageUrl,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final String name;
+  final String? imageUrl;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  /// badge "ขายดี" (Frame 2087326874) — ออกแบบเผื่อไว้ แต่ซ่อนเพราะ API ยังไม่มี
+  static const bool _showBestSeller = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = imageUrl;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: EdgeInsets.only(
+          top: 8.h,
+          bottom: 8.h,
+          left: 4.w,
+          right: 4.w,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(
+            color: isActive ? AppColors.primary : AppColors.border,
+            width: 2,
+          ),
+        ),
+        width: 66.w,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 50.w,
+                  height: 50.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.bareBackground,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                    imageUrl: url.orEmpty,
+                    fit: BoxFit.contain,
+                    errorWidget: (_, _, _) => SizedBox(),
+                  ),
+                ),
+                if (_showBestSeller)
+                  Positioned(
+                    top: -4.h,
+                    right: -4.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDims.size_4.w,
+                        vertical: AppDims.size_2.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                      child: AppText(
+                        context.wording.bestSeller,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          fontSize: 8.sp,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            Spacer(),
+            AppText(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.textTheme.labelSmall?.copyWith(
+                fontSize: 12.sp,
+                color: AppColors.gray600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -858,6 +1066,79 @@ class _ImageGallery extends StatelessWidget {
   }
 }
 
+/// [Section 5] รายละเอียดเพิ่มเติม (Frame 2087327979)
+///
+/// แสดง product description ก่อน — ส่วน [_ImageGallery] collapse ไว้ แตะปุ่ม
+/// (ไอคอน chevron) เพื่อขยาย (ยังไม่มี wording.showMore จึงใช้ไอคอนล้วน)
+class _MoreInfoSection extends StatefulWidget {
+  const _MoreInfoSection({required this.product});
+
+  final ProductData product;
+
+  @override
+  State<_MoreInfoSection> createState() => _MoreInfoSectionState();
+}
+
+class _MoreInfoSectionState extends State<_MoreInfoSection> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final subs = widget.product.productSubs ?? <ProductSubData>[];
+    final hasGallery = subs.any((s) => (s.imageUrl ?? '').isNotEmpty);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // คำอธิบายสินค้า — แสดงเสมอ
+        _DescriptionSection(product: widget.product),
+        // แกลเลอรีรูป — collapse ไว้ก่อน แตะปุ่มเพื่อขยาย
+        if (hasGallery) ...[
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: _expanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            firstChild: Padding(
+              padding: EdgeInsets.only(top: AppDims.size_16.h),
+              child: _ImageGallery(product: widget.product),
+            ),
+            secondChild: const SizedBox(width: double.infinity),
+          ),
+          Center(
+            child: GestureDetector(
+              onTap: () => setState(() => _expanded = !_expanded),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+                child: Column(
+                  children: [
+                    AppText(
+                      _expanded
+                          ? context.wording.collapseMore
+                          : context.wording.showMore,
+                      style: context.textTheme.titleMedium!.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    Icon(
+                      _expanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      size: AppDims.size_24.w,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 /// แถบล่าง: ถูกใจ + เพิ่มลงรถเข็น (mint) + ซื้อเลย (primary CI)
 class _BottomActionBar extends StatelessWidget {
   const _BottomActionBar({required this.product});
@@ -924,6 +1205,7 @@ class _BottomActionBar extends StatelessWidget {
           SizedBox(width: AppDims.size_8.w),
           Expanded(
             child: _CtaButton(
+              // เพิ่มลงรถเข็น
               label: context.wording.addToCart,
               background: AppColors.mintCartButton,
               textColor: AppColors.ci,
@@ -932,6 +1214,12 @@ class _BottomActionBar extends StatelessWidget {
                 context,
                 product: product,
                 actionLabel: context.wording.addToCart,
+                // sync ตัวเลือกที่เลือกใน _ProductSubsSection
+                initialSubId: context
+                    .read<BrownyShopProductDetailViewmodel>()
+                    .selectedThumbnailNotifier
+                    .value
+                    ?.subId,
                 onConfirm: (subId, qty) => _onConfirm(
                   context,
                   subId: subId,
@@ -944,6 +1232,7 @@ class _BottomActionBar extends StatelessWidget {
           SizedBox(width: AppDims.size_8.w),
           Expanded(
             child: _CtaButton(
+              // ซื้อเลย
               label: context.wording.buyNow,
               background: AppColors.ci,
               textColor: AppColors.white,
@@ -951,6 +1240,12 @@ class _BottomActionBar extends StatelessWidget {
                 context,
                 product: product,
                 actionLabel: context.wording.buyNow,
+                // sync ตัวเลือกที่เลือกใน _ProductSubsSection
+                initialSubId: context
+                    .read<BrownyShopProductDetailViewmodel>()
+                    .selectedThumbnailNotifier
+                    .value
+                    ?.subId,
                 onConfirm: (subId, qty) => _onConfirm(
                   context,
                   subId: subId,

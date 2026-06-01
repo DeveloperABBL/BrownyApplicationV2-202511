@@ -49,6 +49,12 @@ BrownyShopReceiptResponse _$BrownyShopReceiptResponseFromJson(
   qrImage: json['qr_image'] as String?,
   reviewScore: json['review_score'] as String?,
   bonus: json['bonus'] as String?,
+  trackingNumber: json['tracking_number'] as String?,
+  shippingProvider: json['shipping_provider'] == null
+      ? null
+      : ShippingProviderData.fromJson(
+          json['shipping_provider'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$BrownyShopReceiptResponseToJson(
@@ -80,6 +86,8 @@ Map<String, dynamic> _$BrownyShopReceiptResponseToJson(
   'qr_image': instance.qrImage,
   'review_score': instance.reviewScore,
   'bonus': instance.bonus,
+  'tracking_number': instance.trackingNumber,
+  'shipping_provider': instance.shippingProvider?.toJson(),
 };
 
 BrownyShopReceiptSummary _$BrownyShopReceiptSummaryFromJson(

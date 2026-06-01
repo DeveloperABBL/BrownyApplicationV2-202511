@@ -3634,6 +3634,12 @@ abstract class AppLocalizations {
   /// **'Out of stock'**
   String get outOfStock;
 
+  /// No description provided for @bestSeller.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Seller'**
+  String get bestSeller;
+
   /// No description provided for @totalItemsCount.
   ///
   /// In en, this message translates to:

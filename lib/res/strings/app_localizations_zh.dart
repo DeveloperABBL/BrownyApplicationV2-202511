@@ -1798,6 +1798,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get outOfStock => '已售罄';
 
   @override
+  String get bestSeller => '热销';
+
+  @override
   String totalItemsCount(int count) {
     return '共 $count 件商品';
   }

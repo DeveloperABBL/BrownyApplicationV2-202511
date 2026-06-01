@@ -6,6 +6,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/browny_
 import 'package:browny_applications_new/core/utils/share_helper.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_receipt_viewmodel.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:flutter/rendering.dart';
@@ -153,6 +154,7 @@ class _ReceiptBrownyShopWidgetState extends State<_ReceiptBrownyShopWidget> {
     context.popUntil(
       predicate: (route) => route.name.orEmpty == HomePage.pageName,
     );
+    BrownyShopPage.goToPage(context);
   }
 
   /// ไปหน้าตรวจสอบสถานะ — ส่งรีวิวก่อน (เพราะ replace ออกจากหน้าใบเสร็จ)

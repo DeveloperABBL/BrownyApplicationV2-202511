@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/data/remote/models/content_localize
 import 'package:browny_applications_new/core/data/remote/models/response/base_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_receipt_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/shipping_provider_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'browny_shop_order_detail_response.g.dart';
@@ -45,6 +46,7 @@ class BrownyShopOrderDetailData {
     this.statusLabel,
     this.statusSteps,
     this.trackingNumber,
+    this.shippingProvider,
     this.priceOriginal,
     this.priceFinal,
     this.amount,
@@ -95,6 +97,10 @@ class BrownyShopOrderDetailData {
 
   @JsonKey(name: 'tracking_number')
   final String? trackingNumber;
+
+  /// บริษัทขนส่ง (null = ยังไม่ได้จัดส่ง)
+  @JsonKey(name: 'shipping_provider')
+  final ShippingProviderData? shippingProvider;
 
   @JsonKey(name: 'price_original')
   final String? priceOriginal;
