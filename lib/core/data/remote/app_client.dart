@@ -801,14 +801,16 @@ abstract class AppClient {
   /// Query parameters:
   /// - product_type: String (เช่น "all")
   /// - customer_id: String (uuid)
+  /// - search: String (ค้นหาชื่อสินค้า — optional)
   ///
   /// Response:
   /// - ProductsResponse with list of products (แต่ละชิ้นมี translations, product_subs)
   @GET('/products')
   Future<HttpResponse<ProductsResponse>> fetchProducts(
     @Query('product_type') String productType,
-    @Query('customer_id') String customerId,
-  );
+    @Query('customer_id') String customerId, {
+    @Query('search') String? search,
+  });
 
   /// DONG 2026-05-26
   ///

@@ -628,5 +628,6 @@
   "order": "订单",
   "orderTime": "下单时间",
   "paymentTime": "付款时间",
-  "deliveryTime": "配送时间"
+  "deliveryTime": "配送时间",
+  "systemMaintenanceMessage": "系统正在临时维护，请稍后再试"
 }

@@ -2010,13 +2010,16 @@ class _AppClient implements AppClient {
   @override
   Future<HttpResponse<ProductsResponse>> fetchProducts(
     String productType,
-    String customerId,
-  ) async {
+    String customerId, {
+    String? search,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'product_type': productType,
       r'customer_id': customerId,
+      r'search': search,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<ProductsResponse>>(

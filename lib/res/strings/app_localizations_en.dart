@@ -1874,4 +1874,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deliveryTime => 'Delivery time';
+
+  @override
+  String get systemMaintenanceMessage =>
+      'System is temporarily under maintenance. Please try again later.';
 }

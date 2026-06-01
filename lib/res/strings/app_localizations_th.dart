@@ -1865,4 +1865,8 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get deliveryTime => 'เวลาที่จัดส่ง';
+
+  @override
+  String get systemMaintenanceMessage =>
+      'ระบบปิดปรับปรุงชั่วคราว กรุณาลองใหม่ภายหลัง';
 }

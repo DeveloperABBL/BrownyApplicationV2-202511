@@ -1825,4 +1825,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deliveryTime => '配送时间';
+
+  @override
+  String get systemMaintenanceMessage => '系统正在临时维护，请稍后再试';
 }

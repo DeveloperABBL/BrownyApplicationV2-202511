@@ -3687,6 +3687,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivery time'**
   String get deliveryTime;
+
+  /// No description provided for @systemMaintenanceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'System is temporarily under maintenance. Please try again later.'**
+  String get systemMaintenanceMessage;
 }
 
 class _AppLocalizationsDelegate

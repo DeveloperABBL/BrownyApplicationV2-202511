@@ -31,6 +31,7 @@ import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_order_status_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_search_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -413,10 +414,15 @@ class _HomePageWidgetState extends State<HomePageWidget>
     );
   }
 
-  /// [3] Search Box — Tap → BrownyShopSearchPage (TODO)
+  /// [3] Search Box — เปิด BrownyShopPage ก่อน แล้ว push หน้าค้นหาต่อทันที
+  /// (กด back จากหน้าค้นหาจะกลับมาหน้า Browny Shop ไม่ใช่ Home)
   Widget _buildShopSearchBox(BuildContext context) {
     return GestureDetector(
-      onTap: () => debugPrint('tap shop search → SearchPage (TODO)'),
+      onTap: () {
+        BrownyShopPage.goToPage(context);
+        if (!context.mounted) return;
+        BrownyShopSearchPage.goToPage(context);
+      },
       child: Container(
         height: AppDims.size_40.h,
         padding: EdgeInsets.symmetric(

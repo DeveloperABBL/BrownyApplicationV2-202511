@@ -53,9 +53,11 @@ mixin BrownyShopDataSourceMixin {
   /// Parameters:
   /// - productType: String (เช่น "all", "popular", "browny-sale")
   /// - customerId: String (uuid)
+  /// - search: String? (ค้นหาชื่อสินค้า — optional)
   Future<RepoResult<ProductsResponse>> fetchProducts({
     required String productType,
     required String customerId,
+    String? search,
   });
 
   /// API fetch รายการ Flash Sale ที่ active อยู่ (Browny Shop)
@@ -181,6 +183,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   Future<RepoResult<ProductsResponse>> fetchProducts({
     required String productType,
     required String customerId,
+    String? search,
   }) async {
     try {
       //       if (kDebugMode) {
@@ -195,6 +198,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
       final response = await requireRemote.fetchProducts(
         productType,
         customerId,
+        search: search,
       );
       if (!response.isSuccessful) {
         return RepoResult.empty();

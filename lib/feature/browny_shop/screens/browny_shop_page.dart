@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_search_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
@@ -206,7 +207,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
 
   Widget _buildSearchBox(BuildContext context) {
     return GestureDetector(
-      onTap: () => debugPrint('tap search → SearchPage (TODO)'),
+      onTap: () => BrownyShopSearchPage.goToPage(context),
       child: Container(
         height: AppDims.size_40.h,
         padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
@@ -227,8 +228,9 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
             SizedBox(width: AppDims.size_8.w),
             Expanded(
               child: AppText(
+                // ค้นหาสินค้า
                 context.wording.searchProductPlaceholder,
-                style: context.textTheme.titleSmall?.copyWith(
+                style: context.textTheme.titleMedium?.copyWith(
                   color: AppColors.gray500,
                 ),
               ),

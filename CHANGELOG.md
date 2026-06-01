@@ -1,4 +1,9 @@
 # CHANGELOG
+### DONG 2026-06-01
+- เพิ่ม BrownyShop Search Page สำหรับค้นหารายการสินค้า
+- ปรับ API fetch Product รองรับ Query `search`
+- รองรับ Machine status maintenance
+
 ### DONG 2026-05-31
 Browny Shop: เชื่อม API หน้าสถานะคำสั่งซื้อ + แสดงออร์เดอร์ในหน้า Home/ประวัติ
 - เชื่อม API จริงหน้า "สถานะคำสั่งซื้อ" (GET /browny-shop/orders/{orderId})

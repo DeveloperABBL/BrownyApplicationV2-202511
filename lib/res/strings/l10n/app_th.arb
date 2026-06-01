@@ -630,5 +630,6 @@
   "order": "คำสั่งซื้อ",
   "orderTime": "เวลาที่สั่งซื้อ",
   "paymentTime": "เวลาที่ชำระเงิน",
-  "deliveryTime": "เวลาที่จัดส่ง"
+  "deliveryTime": "เวลาที่จัดส่ง",
+  "systemMaintenanceMessage": "ระบบปิดปรับปรุงชั่วคราว กรุณาลองใหม่ภายหลัง"
 }

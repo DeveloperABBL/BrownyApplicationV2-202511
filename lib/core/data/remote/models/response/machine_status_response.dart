@@ -37,6 +37,9 @@ class MachineStatusResponse {
   /// เช็คว่าเครื่องไม่พร้อมใช้งานหรือไม่
   bool get isTimeOut => status?.toLowerCase() == 'timeout';
 
+  /// เครื่องปิดปรับปรุง
+  bool get isMaintenance => status?.toLowerCase() == 'maintenance';
+
   bool get isUnavailable => !isAvailable && !isBusy && !isTimeOut;
 
   factory MachineStatusResponse.fromJson(Map<String, dynamic> json) =>

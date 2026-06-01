@@ -121,6 +121,22 @@ class __MachineContentState extends State<_MachineContent> {
         return;
       }
 
+      if (machine.isMaintenance) {
+        await AppOverlays.showBrownyDialog(
+          context,
+          imageAsset: Assets.png.brownyMachineError1.path,
+          // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+          title: context.wording.machineUnavailable,
+          // ระบบปิดปรับปรุงชั่วคราว กรุณาลองใหม่ภายหลัง
+          message: context.wording.systemMaintenanceMessage,
+          onConfirm: () {
+            if (!mounted) return;
+            context.pop();
+          },
+        );
+        return;
+      }
+
       if (!mounted) return;
       await _viewmodel.fetchMachinePrograms(widget.machineId);
     });

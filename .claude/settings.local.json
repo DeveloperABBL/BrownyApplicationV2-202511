@@ -59,7 +59,8 @@
       "Bash(curl -s -o home_services.png \"https://www.figma.com/api/mcp/asset/9043097a-d9c4-4cab-998e-4b80d3881f9d\")",
       "Bash(grep -vE \"Swift Package|maintainers|future version|^$\")",
       "Bash(curl -s -o hist_shop.png \"https://www.figma.com/api/mcp/asset/086c491e-f658-4a08-b29f-6667d16bea3f\")",
-      "Bash(grep -vE \"Swift Package|maintainers|future version|image_gallery|google_maps|flutter_facebook|^\\\\s*-|^$\")"
+      "Bash(grep -vE \"Swift Package|maintainers|future version|image_gallery|google_maps|flutter_facebook|^\\\\s*-|^$\")",
+      "Bash(curl -s -o shop_search.png \"https://www.figma.com/api/mcp/asset/653642f0-7447-4f47-8343-73eeddf87a46\")"
     ]
   }
 }

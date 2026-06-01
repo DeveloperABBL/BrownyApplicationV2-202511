@@ -686,5 +686,6 @@
   "order": "Order",
   "orderTime": "Order time",
   "paymentTime": "Payment time",
-  "deliveryTime": "Delivery time"
+  "deliveryTime": "Delivery time",
+  "systemMaintenanceMessage": "System is temporarily under maintenance. Please try again later."
 }

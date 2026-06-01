@@ -114,16 +114,19 @@ class MachineDetailResponse extends BaseModelResponse {
       'en': {
         'busy': 'In Use',
         'vacant': 'Success',
+        'maintenance': 'Maintenance',
         'default': 'Failed',
       },
       'zh': {
         'busy': '使用中',
         'vacant': '已完成',
+        'maintenance': '系统维护中',
         'default': '故障',
       },
       'th': {
         'busy': 'กำลังทำงาน',
         'vacant': 'สำเร็จ',
+        'maintenance': 'ปิดปรับปรุง',
         'default': 'ขัดข้อง',
       },
     };
@@ -140,6 +143,9 @@ class MachineDetailResponse extends BaseModelResponse {
 
   /// เช็คว่าเครื่องสามารถเชื่อมต่อได้หรือไม่
   bool get isTimeOut => status?.toLowerCase() == 'timeout';
+
+  /// เครื่องปิดปรับปรุง
+  bool get isMaintenance => status?.toLowerCase() == 'maintenance';
 
   /// เช็คว่าเครื่องเป็นสถานะ Failed หรือไม่
   bool get isFailed => !isAvailable && !isBusy;

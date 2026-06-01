@@ -267,6 +267,25 @@ class ScannerViewModel extends AppViewModel {
                       );
                       return;
                     }
+
+                    if (machine.isMaintenance) {
+                      await AppOverlays.showBrownyDialog(
+                        context,
+                        imageAsset: Assets.png.brownyMachineError1.path,
+                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                        title: context.wording.machineUnavailable,
+                        // ระบบปิดปรับปรุงชั่วคราว กรุณาลองใหม่ภายหลัง
+                        message: context.wording.systemMaintenanceMessage,
+                        onConfirm: () {
+                          if (!context.mounted) return;
+                          context.pop();
+                          // Resume scanning after 2 seconds
+                          _resumeFlagScanning();
+                        },
+                      );
+                      return;
+                    }
+
                     if (process == ScannerProcess.machineButNeedResult) {
                       // DONG 2026-04-18
                       // ถ้าเข้า process นี้ จะ pop result machine
