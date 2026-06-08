@@ -24,14 +24,18 @@ class ReceiptBrownyShop extends StatelessWidget {
   static Future<T?> goToPage<T>(
     BuildContext context, {
     required String orderId,
-  }) async =>
-      context.pushNamed(ReceiptBrownyShop.pageName, extra: orderId);
+  }) async => context.pushNamed(
+    ReceiptBrownyShop.pageName,
+    extra: orderId,
+  );
 
   static void goReplacementPage(
     BuildContext context, {
     required String orderId,
-  }) =>
-      context.pushReplacementNamed(ReceiptBrownyShop.pageName, extra: orderId);
+  }) => context.pushReplacementNamed(
+    ReceiptBrownyShop.pageName,
+    extra: orderId,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +82,9 @@ class _ReceiptBrownyShopWidgetState extends State<_ReceiptBrownyShopWidget> {
           _receiptKey.currentContext!.findRenderObject()
               as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       return byteData?.buffer.asUint8List();
     } catch (_) {
       return null;
@@ -778,8 +784,7 @@ class _ScoreItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => onTap(selfScore),
       child: Container(
-        foregroundDecoration:
-            (reviewScore == null || reviewScore != selfScore)
+        foregroundDecoration: (reviewScore == null || reviewScore != selfScore)
             ? const BoxDecoration(
                 color: Colors.grey,
                 backgroundBlendMode: BlendMode.saturation,

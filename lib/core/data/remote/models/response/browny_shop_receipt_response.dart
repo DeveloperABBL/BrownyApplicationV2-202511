@@ -124,8 +124,9 @@ class BrownyShopReceiptResponse {
   @JsonKey(name: 'qr_image')
   final String? qrImage;
 
+  /// คะแนนรีวิว (null = ยังไม่เคยรีวิว) — server ส่งเป็นตัวเลข
   @JsonKey(name: 'review_score')
-  final String? reviewScore;
+  final int? reviewScore;
 
   @JsonKey(name: 'bonus')
   final String? bonus;
@@ -254,22 +255,22 @@ class BrownyShopReceiptItem {
   final String? imageUrl;
 
   @JsonKey(name: 'unit_money_price')
-  final String? unitMoneyPrice;
+  final num? unitMoneyPrice;
 
   @JsonKey(name: 'original_money_price')
-  final String? originalMoneyPrice;
+  final num? originalMoneyPrice;
 
   @JsonKey(name: 'line_subtotal')
-  final String? lineSubtotal;
+  final num? lineSubtotal;
 
   @JsonKey(name: 'flash_sale_discount')
-  final String? flashSaleDiscount;
+  final num? flashSaleDiscount;
 
   @JsonKey(name: 'product_discount')
-  final String? productDiscount;
+  final num? productDiscount;
 
   @JsonKey(name: 'unit_shipping_fee')
-  final String? unitShippingFee;
+  final num? unitShippingFee;
 
   @JsonKey(name: 'is_flash_sale')
   final bool? isFlashSale;

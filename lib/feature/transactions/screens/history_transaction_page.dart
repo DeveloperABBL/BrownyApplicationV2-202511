@@ -10,6 +10,7 @@ import 'package:browny_applications_new/feature/transactions/repository/transact
 import 'package:browny_applications_new/feature/transactions/viewmodel/history_transactions_viewmodel.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_machine_page.dart';
 import 'package:browny_applications_new/feature/transactions/screens/receipt_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -97,7 +98,9 @@ class __HistoryTransactionContentState
   Future<void> _onItemTap(HistoryEntry entry) async {
     // Browny Shop → ไปหน้าสถานะคำสั่งซื้อ
     if (entry.isShop) {
-      final orderId = entry.shopItem!.orderId;
+      final orderId = kDebugMode
+          ? "019ea579-86ed-728c-8680-1fd094409dbf"
+          : entry.shopItem!.orderId;
       if (orderId == null || orderId.isEmpty) return;
       BrownyShopOrderStatusPage.goToPage(context, orderId: orderId);
       return;

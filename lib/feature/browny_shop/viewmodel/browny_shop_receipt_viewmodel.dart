@@ -50,7 +50,7 @@ class BrownyShopReceiptViewModel extends AppViewModel {
       // init คะแนนรีวิวจาก server — reviewScore == null = ยังไม่เคยรีวิว
       final score = result.data.reviewScore;
       _isFirstReviewScore = score == null;
-      _reviewScoreNotifier.value = int.tryParse(score.ifNullOrEmpty('-1'));
+      _reviewScoreNotifier.value = score ?? -1;
     } else if (result.isEmpty) {
       _receiptNotifier.value = UiResult.empty();
     } else {

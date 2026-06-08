@@ -25,12 +25,15 @@ class BrownyShopOrderStatusViewModel extends AppViewModel {
   /// id คำสั่งซื้อ — ใช้ fetch สถานะ + กลับเข้า process ชำระเงิน
   final String orderId;
 
-  final _statusNotifier =
-      ValueNotifier<UiResult<BrownyShopOrderDetailData>>(UiResult.loading());
+  final _statusNotifier = ValueNotifier<UiResult<BrownyShopOrderDetailData>>(
+    UiResult.loading(),
+  );
   ValueListenable<UiResult<BrownyShopOrderDetailData>> get statusNotifier =>
       _statusNotifier;
 
-  String get _customerId => currentCustomerProvider.current.id.orEmpty;
+  String get _customerId => kDebugMode
+      ? '019e81e8-61ab-7395-92cb-b075c9828efc'
+      : currentCustomerProvider.current.id.orEmpty;
 
   /// โหลดรายละเอียด/สถานะคำสั่งซื้อ — GET /browny-shop/orders/{orderId}
   Future<void> fetchOrderDetail() async {

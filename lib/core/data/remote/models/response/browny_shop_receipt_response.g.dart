@@ -47,7 +47,7 @@ BrownyShopReceiptResponse _$BrownyShopReceiptResponseFromJson(
   callCenter: json['call_center'] as String?,
   lineLink: json['line_link'] as String?,
   qrImage: json['qr_image'] as String?,
-  reviewScore: json['review_score'] as String?,
+  reviewScore: (json['review_score'] as num?)?.toInt(),
   bonus: json['bonus'] as String?,
   trackingNumber: json['tracking_number'] as String?,
   shippingProvider: json['shipping_provider'] == null
@@ -185,12 +185,12 @@ BrownyShopReceiptItem _$BrownyShopReceiptItemFromJson(
       ? null
       : ContentLocalizeData.fromJson(json['unit'] as Map<String, dynamic>),
   imageUrl: json['image_url'] as String?,
-  unitMoneyPrice: json['unit_money_price'] as String?,
-  originalMoneyPrice: json['original_money_price'] as String?,
-  lineSubtotal: json['line_subtotal'] as String?,
-  flashSaleDiscount: json['flash_sale_discount'] as String?,
-  productDiscount: json['product_discount'] as String?,
-  unitShippingFee: json['unit_shipping_fee'] as String?,
+  unitMoneyPrice: json['unit_money_price'] as num?,
+  originalMoneyPrice: json['original_money_price'] as num?,
+  lineSubtotal: json['line_subtotal'] as num?,
+  flashSaleDiscount: json['flash_sale_discount'] as num?,
+  productDiscount: json['product_discount'] as num?,
+  unitShippingFee: json['unit_shipping_fee'] as num?,
   isFlashSale: json['is_flash_sale'] as bool?,
 );
 

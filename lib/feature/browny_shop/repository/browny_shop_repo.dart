@@ -514,7 +514,7 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
       if (kDebugMode) {
         return RepoResult.success(
           data: BrownyShopReceiptResponse.fromJson(
-            jsonDecode(_mockReceipt) as Map<String, dynamic>,
+            jsonDecode(_mockReceipt2) as Map<String, dynamic>,
           ),
         );
       }
@@ -586,13 +586,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่พร้อม — mock ตาม changelog ตอน debug
-      // if (kDebugMode) {
-      //   return RepoResult.success(
-      //     data: BrownyShopOrderDetailData.fromJson(
-      //       jsonDecode(_mockOrderDetail)['data'] as Map<String, dynamic>,
-      //     ),
-      //   );
-      // }
+      if (kDebugMode) {
+        return RepoResult.success(
+          data: BrownyShopOrderDetailData.fromJson(
+            jsonDecode(_mockOrderDetail)['data'] as Map<String, dynamic>,
+          ),
+        );
+      }
       final response = await requireRemote.fetchBrownyShopOrderDetail(
         orderId,
         customerId,
@@ -700,6 +700,161 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
 
   static const _mockReceipt = '''
 {"order_id":"c3d4e5f6-a7b8-9012-cdef-345678901234","payment_ref":"202605301234568","receipt_no":"BNS20260530-130522123456","type":"browny_shop","total":"295.00","price_original":"325.00","price_final":"295.00","discount_amount":"75.00","total_quantity":6,"payment_icon":"","payment_channel":"tp_wallet","payment_display":{"th":"TrueMoney Wallet","en":"TrueMoney Wallet","zh":"TrueMoney Wallet"},"paid_at":"2026-05-30 13:05:22","receipt_at":"2026-05-30 13:05:22","coin_amount_used":null,"coin_value":null,"lucky_no":"23","lucky_image":"","shipping_address":{"id":1,"recipient_name":"บราวนี่ รักสะอาด","first_name":"บราวนี่","last_name":"รักสะอาด","phone":"080-000-0000","zipcode":"10160","province":"กรุงเทพมหานคร","district":"ภาษีเจริญ","subdistrict":"บางหว้า","address":"459 ถ.เพชรเกษม","full_address":"ชั้น 2 Intree Organic Cafe 459 ถ.เพชรเกษม แขวง บางหว้า เขตภาษีเจริญ กรุงเทพมหานคร 10160 ประเทศไทย","country":"Thailand"},"summary":{"quantity":{"wording":{"th":"จำนวน","en":"Quantity","zh":""},"amount":"6"},"subtotal":{"wording":{"th":"ยอดรวมสินค้า","en":"Subtotal","zh":""},"amount":"76.00"},"discount":{"wording":{"th":"ส่วนลด","en":"Discount","zh":""},"amount":"-75.00"},"flash_sale_discount":{"wording":{"th":"ส่วนลด Flash Sale","en":"Flash Sale","zh":""},"amount":"-50.00"},"product_discount":{"wording":{"th":"ส่วนลดสินค้า","en":"Product Discount","zh":""},"amount":"0.00"},"coupon_discount":{"wording":{"th":"คูปองและรหัสคูปอง","en":"Coupon","zh":""},"amount":"-20.00","code":"PROMO2026","coupon_name":{"th":"ลด 20 บาท","en":"20 Baht Off","zh":""}},"shipping":{"wording":{"th":"การจัดส่ง","en":"Shipping","zh":""},"amount":"0.00"},"total":{"wording":{"th":"ยอดชำระทั้งหมด","en":"Total","zh":""},"amount":"295.00"}},"items":[],"call_center":"099-635-1211","line_link":"https://line.me/ti/p/@browny", "lucky_image": "https://gateway2026.abgroup.co.th/images/lucky_no/85.png","qr_image": "https://gateway2026.abgroup.co.th/storage/qrcodes/5159.png"}
+''';
+  static const _mockReceipt2 = '''
+{
+    "type": "browny_shop_order",
+    "order_id": "019ea579-86ed-728c-8680-1fd094409dbf",
+    "status": "pending_shipment",
+    "status_label": {
+        "th": "รอจัดส่ง",
+        "en": "Awaiting shipment",
+        "zh": "待发货"
+    },
+    "status_steps": {
+        "ordered": {
+            "done": true,
+            "at": "2026-06-08 11:24:25"
+        },
+        "paid": {
+            "done": true,
+            "at": "2026-06-08 11:24:39"
+        },
+        "shipping": {
+            "done": false,
+            "at": null
+        }
+    },
+    "payment_ref": "20260608106216",
+    "receipt_no": "BNS20260608-112439972462",
+    "total": "119.00",
+    "price_original": "119.00",
+    "price_final": "119.00",
+    "discount_amount": "0.00",
+    "total_quantity": 1,
+    "payment_method": "qr",
+    "payment_icon": "https://gateway2026.abgroup.co.th/assets/images/customerNotificationIconPaymnet/qr.png",
+    "payment_channel": "qr",
+    "payment_display": {
+        "th": "QR Code",
+        "en": "QR Code",
+        "zh": "二维码"
+    },
+    "created_at": "2026-06-08 11:24:25",
+    "paid_at": "2026-06-08 11:24:39",
+    "shipped_at": null,
+    "delivered_at": null,
+    "delivery_date": null,
+    "tracking_number": null,
+    "shipping_provider": null,
+    "receipt_at": "2026-06-08 11:24:39",
+    "lucky_no": "98",
+    "lucky_image": "https://gateway2026.abgroup.co.th/images/lucky_no/98.png",
+    "qr_image": "https://gateway2026.abgroup.co.th/storage/qrcodes/019ea579-86ed-728c-8680-1fd094409dbf.png",
+    "review_score": 5,
+    "bonus": "1190.00",
+    "coin_amount_used": null,
+    "coin_value": null,
+    "shipping_address": {
+        "id": 7,
+        "recipient_name": "ทดสอบ ทดสอบ",
+        "first_name": "ทดสอบ",
+        "last_name": "ทดสอบ",
+        "phone": "0111111111",
+        "zipcode": "81120",
+        "province": "กระบี่",
+        "district": "คลองท่อม",
+        "subdistrict": "คลองท่อมเหนือ",
+        "address": "11",
+        "full_address": "11 คลองท่อมเหนือ คลองท่อม กระบี่ 81120",
+        "country": "ประเทศไทย",
+        "note": "ทดสอบ"
+    },
+    "summary": {
+        "quantity": {
+            "wording": {
+                "th": "จำนวน",
+                "en": "Quantity",
+                "zh": "数量"
+            },
+            "amount": "1"
+        },
+        "subtotal": {
+            "wording": {
+                "th": "ยอดรวมสินค้า",
+                "en": "Subtotal",
+                "zh": "商品合计"
+            },
+            "amount": "119.00"
+        },
+        "discount": {
+            "wording": {
+                "th": "ส่วนลด",
+                "en": "Discount",
+                "zh": "折扣"
+            },
+            "amount": ""
+        },
+        "coupon_discount": {
+            "wording": {
+                "th": "คูปองและรหัสคูปอง",
+                "en": "Coupon & code",
+                "zh": "优惠券及代码"
+            },
+            "amount": "",
+            "code": "",
+            "coupon_name": {
+                "th": "",
+                "en": "",
+                "zh": ""
+            }
+        },
+        "shipping": {
+            "wording": {
+                "th": "การจัดส่ง",
+                "en": "Shipping",
+                "zh": "配送"
+            },
+            "amount": "0.00"
+        },
+        "total": {
+            "wording": {
+                "th": "ยอดชำระทั้งหมด",
+                "en": "Total payment",
+                "zh": "应付总额"
+            },
+            "amount": "119.00"
+        }
+    },
+    "items": [
+        {
+            "product_id": "019db317-e6a4-73ba-a831-f94116d397b0",
+            "product_sub_id": 20,
+            "quantity": 1,
+            "name": {
+                "th": "ไซส์ m",
+                "en": "ืืm Size",
+                "zh": "M 碼"
+            },
+            "unit": {
+                "th": "ชิ้น",
+                "en": "Piece",
+                "zh": "件"
+            },
+            "image_url": "https://gateway.abgroup.co.th/storage/products/WIB1AFAOs9Pj5B1Bu4NaqZUjn2iU4a4L7q6vPaVU.png",
+            "unit_money_price": 119,
+            "original_money_price": 119,
+            "line_subtotal": 119,
+            "flash_sale_discount": 0,
+            "product_discount": 0,
+            "unit_shipping_fee": 0,
+            "bonus": "1190.00",
+            "is_flash_sale": false
+        }
+    ],
+    "call_center": "099-635-1211",
+    "line_link": "https://line.me/R/ti/p/%40browny"
+}
 ''';
 
   static const _mockOrderDetail = '''
