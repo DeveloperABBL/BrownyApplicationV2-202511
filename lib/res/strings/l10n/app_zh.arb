@@ -339,6 +339,8 @@
   "collectMoreDaily": "每天多收集",
   "pleaseTryAnotherMachine": "请尝试其他机器。",
   "machineUnavailableAtTheMoment": "机器当前无法使用。",
+  "machineTemporarilyDisabled": "此机器暂时停用。",
+  "systemTemporarilyUnderMaintenance": "系统暂时停机维护。",
   "orderCompletedMessage": "您的订单已完成。",
   "orderNotFoundTitle": "未找到订单",
   "orderNotFoundMessage": "未找到此订单。",

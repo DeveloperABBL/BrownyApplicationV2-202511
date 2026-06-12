@@ -342,6 +342,8 @@
     "collectMoreDaily": "Collect Daily",
     "pleaseTryAnotherMachine": "Please try another machine.",
     "machineUnavailableAtTheMoment": "Machine is currently unavailable.",
+    "machineTemporarilyDisabled": "This machine is temporarily disabled.",
+    "systemTemporarilyUnderMaintenance": "The system is temporarily under maintenance.",
     "orderCompletedMessage": "Your order has been completed.",
     "orderNotFoundTitle": "Order not found",
     "orderNotFoundMessage": "This order was not found.",

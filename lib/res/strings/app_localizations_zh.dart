@@ -1038,6 +1038,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get machineUnavailableAtTheMoment => '机器当前无法使用。';
 
   @override
+  String get machineTemporarilyDisabled => '此机器暂时停用。';
+
+  @override
+  String get systemTemporarilyUnderMaintenance => '系统暂时停机维护。';
+
+  @override
   String get orderCompletedMessage => '您的订单已完成。';
 
   @override

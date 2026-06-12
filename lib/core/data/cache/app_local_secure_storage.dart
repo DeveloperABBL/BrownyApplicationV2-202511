@@ -43,12 +43,10 @@ class AppLocalSecureStorage with AppLocalSecureStoreMixin {
   factory AppLocalSecureStorage.instance() => _instance;
 
   /// FlutterSecureStorage instance
-  /// - Android: ใช้ EncryptedSharedPreferences
+  /// - Android: เข้ารหัสด้วย custom ciphers (v10 migrate จาก EncryptedSharedPreferences
+  ///   ให้อัตโนมัติตอนเข้าถึงครั้งแรก)
   /// - iOS: ใช้ Keychain
   static const _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock,
     ),

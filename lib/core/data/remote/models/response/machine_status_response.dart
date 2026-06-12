@@ -29,7 +29,8 @@ class MachineStatusResponse {
   final String? qr;
 
   /// เช็คว่าเครื่องว่างหรือไม่
-  bool get isAvailable => status?.toLowerCase() == 'available';
+  bool get isAvailable =>
+      status?.toLowerCase() == 'available' || status?.toLowerCase() == 'vacant';
 
   /// เช็คว่าเครื่องกำลังทำงานหรือไม่
   bool get isBusy => status?.toLowerCase() == 'busy';
@@ -37,7 +38,13 @@ class MachineStatusResponse {
   /// เช็คว่าเครื่องไม่พร้อมใช้งานหรือไม่
   bool get isTimeOut => status?.toLowerCase() == 'timeout';
 
-  bool get isUnavailable => !isAvailable && !isBusy && !isTimeOut;
+  /// เครื่องกำลังซ่อมบำรุง
+  bool get isMaintenance => status?.toLowerCase() == 'maintenance';
+
+  /// เครื่องปิดการใช้งานผ่าน App
+  bool get isInactive => status?.toLowerCase() == 'inactive';
+
+  bool get isUnavailable => !isAvailable;
 
   factory MachineStatusResponse.fromJson(Map<String, dynamic> json) =>
       _$MachineStatusResponseFromJson(json);
