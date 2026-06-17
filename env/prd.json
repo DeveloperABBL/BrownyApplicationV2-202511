@@ -1,7 +1,7 @@
 {
     "host": "brownypay.com",
     "baseUrl": "https://gateway2026.abgroup.co.th/api",
-    "token": "87efc1f3a7f3c1c21c7eff53290caf2856c640f8c2b008a5c90c106974957102",
+    "token": "9240e22489e0b8cb2bb6e216ead5fe256038419bbcc16ab7de2d9dac3faf6461",
     "serverKey": "base64:xrjcblphHL0JGPclO/kiBDSXVm0dnw4i+x6FLBV2I/s=",
     "LINE_Channel": "2009026542"
 }

@@ -144,6 +144,13 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
       vsync: this,
     );
 
+    // collectCoupon สำเร็จ (กรอกรหัส/สแกนเอง ไม่ใช่ auto-scan) → เลื่อนกลับ tab แรก
+    _viewmodel.onCouponCollected = () {
+      if (_tabController.index != 0) {
+        _tabController.animateTo(0);
+      }
+    };
+
     // Auto-collect coupon เมื่อ scan QR จากหน้า Home
     if (widget.autoCollectQRData != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -159,6 +166,7 @@ class _CouponVoucherWidgetState extends State<_CouponVoucherWidget>
 
   @override
   void dispose() {
+    _viewmodel.onCouponCollected = null;
     _tabController.dispose();
     super.dispose();
   }

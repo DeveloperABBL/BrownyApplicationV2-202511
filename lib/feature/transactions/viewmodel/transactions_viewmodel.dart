@@ -121,6 +121,10 @@ class TransactionsViewmodel extends AppViewModel
   CouponVoucherState? couponState;
   CustomerCouponModel? customerCouponModelSelected;
 
+  /// Callback ให้ [CouponVoucherPage] เลื่อน TabBar กลับไป tab แรก —
+  /// เรียกหลัง collectCoupon สำเร็จ เฉพาะกรณีที่ไม่ได้มาจาก auto-scan QR
+  VoidCallback? onCouponCollected;
+
   /// MachineProgramModel จาก MachineTransactionPage
   /// เป็น single source of truth สำหรับ:
   /// - filter coupon ที่ร่วมรายการ (availableCoupons)
@@ -1158,6 +1162,11 @@ class TransactionsViewmodel extends AppViewModel
         title: context.wording.errorOccurred,
         message: context.wording.errorUi,
       );
+    }
+
+    // collect สำเร็จ + ไม่ได้มาจาก auto-scan → เลื่อน TabBar หน้า coupon กลับ tab แรก
+    if (result.isSuccess && !fromAuto) {
+      onCouponCollected?.call();
     }
 
     try {

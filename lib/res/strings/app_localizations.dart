@@ -2248,6 +2248,18 @@ abstract class AppLocalizations {
   /// **'Machine is currently unavailable.'**
   String get machineUnavailableAtTheMoment;
 
+  /// No description provided for @machineTemporarilyDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This machine is temporarily disabled.'**
+  String get machineTemporarilyDisabled;
+
+  /// No description provided for @systemTemporarilyUnderMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'The system is temporarily under maintenance.'**
+  String get systemTemporarilyUnderMaintenance;
+
   /// No description provided for @orderCompletedMessage.
   ///
   /// In en, this message translates to:

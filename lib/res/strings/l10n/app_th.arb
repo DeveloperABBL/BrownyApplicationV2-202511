@@ -358,6 +358,8 @@
     "collectMoreDaily": "เก็บเพิ่มได้ทุกวัน",
     "pleaseTryAnotherMachine": "กรุณาลองเครื่องอื่น",
     "machineUnavailableAtTheMoment": "เครื่องไม่สามารถใช้งานได้ในขณะนี้",
+    "machineTemporarilyDisabled": "เครื่องนี้ปิดใช้งานชั่วคราว",
+    "systemTemporarilyUnderMaintenance": "ระบบปิดปรับปรุงชั่วคราว",
     "orderCompletedMessage": "คำสั่งซื้อของคุณเสร็จสิ้น",
     "orderNotFoundTitle": "ไม่พบรายการ",
     "orderNotFoundMessage": "ไม่พบรายการสั่งซื้อนี้",

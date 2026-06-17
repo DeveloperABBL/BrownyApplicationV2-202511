@@ -144,8 +144,11 @@ class MachineDetailResponse extends BaseModelResponse {
   /// เช็คว่าเครื่องสามารถเชื่อมต่อได้หรือไม่
   bool get isTimeOut => status?.toLowerCase() == 'timeout';
 
-  /// เครื่องปิดปรับปรุง
+  /// เครื่องกำลังซ่อมบำรุง
   bool get isMaintenance => status?.toLowerCase() == 'maintenance';
+
+  /// เครื่องปิดการใช้งานผ่าน App
+  bool get isInactive => status?.toLowerCase() == 'inactive';
 
   /// เช็คว่าเครื่องเป็นสถานะ Failed หรือไม่
   bool get isFailed => !isAvailable && !isBusy;

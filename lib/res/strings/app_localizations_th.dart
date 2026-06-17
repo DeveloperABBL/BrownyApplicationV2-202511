@@ -1106,6 +1106,12 @@ class AppLocalizationsTh extends AppLocalizations {
       'เครื่องไม่สามารถใช้งานได้ในขณะนี้';
 
   @override
+  String get machineTemporarilyDisabled => 'เครื่องนี้ปิดใช้งานชั่วคราว';
+
+  @override
+  String get systemTemporarilyUnderMaintenance => 'ระบบปิดปรับปรุงชั่วคราว';
+
+  @override
   String get orderCompletedMessage => 'คำสั่งซื้อของคุณเสร็จสิ้น';
 
   @override

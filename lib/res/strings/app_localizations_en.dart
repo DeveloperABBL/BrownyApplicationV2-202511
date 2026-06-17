@@ -1110,6 +1110,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Machine is currently unavailable.';
 
   @override
+  String get machineTemporarilyDisabled =>
+      'This machine is temporarily disabled.';
+
+  @override
+  String get systemTemporarilyUnderMaintenance =>
+      'The system is temporarily under maintenance.';
+
+  @override
   String get orderCompletedMessage => 'Your order has been completed.';
 
   @override

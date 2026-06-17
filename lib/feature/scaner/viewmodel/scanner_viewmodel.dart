@@ -233,13 +233,39 @@ class ScannerViewModel extends AppViewModel {
 
                     final machine = machineResult.data;
 
-                    if (machine.isBusy) {
+                    // DONG 2026-06-09
+                    // เปลี่ยน Logic เช็คว่าถ้าเครื่อง UnAvailable จะสร้าง wording แจ้งเตือน
+                    if (machine.isUnavailable) {
+                      String title = '';
+                      String message = '';
+                      if (machine.isBusy) {
+                        // เครื่องกำลังทำงาน
+                        title = context.wording.theMachineIsWorking;
+                        // กรุณาลองเครื่องอื่น
+                        message = context.wording.pleaseTryAnotherMachine;
+                      } else if (machine.isMaintenance) {
+                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                        title = context.wording.machineUnavailableAtTheMoment;
+                        // ระบบปิดปรับปรุงชั่วคราว
+                        message =
+                            context.wording.systemTemporarilyUnderMaintenance;
+                      } else if (machine.isInactive) {
+                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                        title = context.wording.machineUnavailableAtTheMoment;
+                        // เครื่องนี้ปิดใช้งานชั่วคราว
+                        message = context.wording.machineTemporarilyDisabled;
+                      } else {
+                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
+                        title = context.wording.machineUnavailableAtTheMoment;
+                        // กรุณาลองเครื่องอื่น
+                        message = context.wording.pleaseTryAnotherMachine;
+                      }
                       await AppOverlays.showBrownyDialog(
                         context,
                         // เครื่องกำลังทำงาน
-                        title: context.wording.theMachineIsWorking,
+                        title: title,
                         // กรุณาลองเครื่องอื่น
-                        message: context.wording.pleaseTryAnotherMachine,
+                        message: message,
                         onConfirm: () {
                           if (!context.mounted) return;
                           context.pop();
@@ -249,43 +275,6 @@ class ScannerViewModel extends AppViewModel {
                       );
                       return;
                     }
-
-                    if (machine.isTimeOut) {
-                      await AppOverlays.showBrownyDialog(
-                        context,
-                        imageAsset: Assets.png.brownyMachineError1.path,
-                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
-                        title: context.wording.machineUnavailableAtTheMoment,
-                        // กรุณาลองเครื่องอื่น
-                        message: context.wording.pleaseTryAnotherMachine,
-                        onConfirm: () {
-                          if (!context.mounted) return;
-                          context.pop();
-                          // Resume scanning after 2 seconds
-                          _resumeFlagScanning();
-                        },
-                      );
-                      return;
-                    }
-
-                    if (machine.isMaintenance) {
-                      await AppOverlays.showBrownyDialog(
-                        context,
-                        imageAsset: Assets.png.brownyMachineError1.path,
-                        // เครื่องไม่สามารถใช้งานได้ในขณะนี้
-                        title: context.wording.machineUnavailable,
-                        // ระบบปิดปรับปรุงชั่วคราว กรุณาลองใหม่ภายหลัง
-                        message: context.wording.systemMaintenanceMessage,
-                        onConfirm: () {
-                          if (!context.mounted) return;
-                          context.pop();
-                          // Resume scanning after 2 seconds
-                          _resumeFlagScanning();
-                        },
-                      );
-                      return;
-                    }
-
                     if (process == ScannerProcess.machineButNeedResult) {
                       // DONG 2026-04-18
                       // ถ้าเข้า process นี้ จะ pop result machine
