@@ -84,13 +84,9 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
             );
           }
 
-          // Empty state
-          final isEmptyNoti =
-              (result.isEmpty ||
-              result.data?.data == null ||
-              result.data!.data!.isEmpty);
-          // Success state - แสดงรายการ notifications
-          final notifications = result.data!.data!;
+          // รายการทั้งหมด (ก่อนกรอง)
+          final allNotifications =
+              result.data?.data ?? const <CustomerNotificationItem>[];
           return Column(
             children: [
               AppDims.vericalPadding_16,
@@ -110,44 +106,61 @@ class __AppNotificationContentState extends State<_AppNotificationContent> {
                   AppToggleData(
                     lable: context.wording.orderPlacement,
                     value: 2,
-                    enable: false,
                   ),
                 ],
-                onChange: (index) {},
+                // 0 = ทั้งหมด, 1 = ซัก-อบ, 2 = การสั่งซื้อ (อื่นๆ)
+                onChange: (data) =>
+                    _viewmodel.setNotificationFilter(data.value),
               ),
               AppDims.vericalPadding_16,
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await _viewmodel.fetchCustomerNotifications();
-                  },
-                  child: isEmptyNoti
-                      ? Center(
-                          child: AppText(
-                            // ไม่มีการแจ้งเตือน
-                            context.wording.noNotifications,
-                            style: context.textTheme.labelMedium,
-                          ),
-                        )
-                      : ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 16.h,
-                          ),
-                          itemCount: notifications.length,
-                          itemBuilder: (context, index) {
-                            final notification = notifications[index];
-                            final locale = Localizations.localeOf(
-                              context,
-                            ).languageCode;
+                child: ValueListenableBuilder<int>(
+                  valueListenable: _viewmodel.notificationFilterNotifier,
+                  builder: (context, filter, _) {
+                    final notifications = _viewmodel.filterNotifications(
+                      allNotifications,
+                      filter,
+                    );
+                    final isEmptyNoti = notifications.isEmpty;
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await _viewmodel.fetchCustomerNotifications();
+                      },
+                      child: isEmptyNoti
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(height: 200.h),
+                                Center(
+                                  child: AppText(
+                                    // ไม่มีการแจ้งเตือน
+                                    context.wording.noNotifications,
+                                    style: context.textTheme.labelMedium,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 16.h,
+                              ),
+                              itemCount: notifications.length,
+                              itemBuilder: (context, index) {
+                                final notification = notifications[index];
+                                final locale = Localizations.localeOf(
+                                  context,
+                                ).languageCode;
 
-                            return _NotificationItem(
-                              notification: notification,
-                              locale: locale,
-                            );
-                          },
-                        ),
+                                return _NotificationItem(
+                                  notification: notification,
+                                  locale: locale,
+                                );
+                              },
+                            ),
+                    );
+                  },
                 ),
               ),
             ],

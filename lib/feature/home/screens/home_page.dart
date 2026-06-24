@@ -36,6 +36,7 @@ import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_
 import 'package:browny_applications_new/feature/home/repository/home_repo.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_banner_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
@@ -106,9 +107,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
     await _viewmodel.fetchWorkingMachines();
     // ดึงคำสั่งซื้อ Browny Shop ที่รอชำระเงิน (6 ชม.ล่าสุด)
     unawaited(_viewmodel.fetchBrownyShopPendingOrders());
-    // ดึงสินค้า Browny Shop + ประเภทสำหรับ chip filter
+    // ดึงสินค้า Browny Shop + ประเภทสำหรับ chip filter + banner กลาง
     unawaited(_viewmodel.fetchShopProducts());
     unawaited(_viewmodel.fetchShopProductTypes());
+    unawaited(_viewmodel.fetchShopMidBanners());
     // ดึงสถานะ Browny Live (เปิด/ปิดไอคอน + ลิงก์)
     unawaited(_viewmodel.fetchBrownyLive());
 
@@ -457,37 +459,45 @@ class _HomePageWidgetState extends State<HomePageWidget>
   }
 
   /// [4] Mid Banner — Figma: 343x78, rounded 8, รองรับหลายรูปด้วย CarouselSlider
-  /// TODO: รับ list จาก API/viewmodel ในอนาคต — ตอนนี้ mock ด้วย Assets.icShop.midBanner
+  /// ดึงจาก API จริง (GET /browny-shop/banners) ผ่าน [shopMidBannersNotifier]
   Widget _buildShopMidBannerCarousel(BuildContext context) {
-    final banners = <AssetGenImage>[
-      Assets.icShop.midBanner,
-    ];
+    return ValueListenableBuilder<UiResult<List<BrownyShopBannerData>>>(
+      valueListenable: _viewmodel.shopMidBannersNotifier,
+      builder: (context, result, _) {
+        final banners = result.data ?? const <BrownyShopBannerData>[];
+        // loading / error / empty / ไม่มีรูป — ไม่แสดง section
+        if (!result.isSuccess || banners.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-    if (banners.isEmpty) return const SizedBox.shrink();
-
-    return SizedBox(
-      height: 78.h,
-      child: CarouselSlider.builder(
-        itemCount: banners.length,
-        itemBuilder: (context, index, _) {
-          return GestureDetector(
-            onTap: () => BrownyShopPage.goToPage(context),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: banners[index].image(
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-          );
-        },
-        options: CarouselOptions(
+        return SizedBox(
           height: 78.h,
-          viewportFraction: 1,
-          autoPlay: banners.length > 1,
-          enableInfiniteScroll: banners.length > 1,
-        ),
-      ),
+          child: CarouselSlider.builder(
+            itemCount: banners.length,
+            itemBuilder: (context, index, _) {
+              final imageUrl = banners[index].imageUrl;
+              return GestureDetector(
+                onTap: () => BrownyShopPage.goToPage(context),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl.orEmpty,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              );
+            },
+            options: CarouselOptions(
+              height: 78.h,
+              viewportFraction: 1,
+              autoPlay: banners.length > 1,
+              enableInfiniteScroll: banners.length > 1,
+            ),
+          ),
+        );
+      },
     );
   }
 

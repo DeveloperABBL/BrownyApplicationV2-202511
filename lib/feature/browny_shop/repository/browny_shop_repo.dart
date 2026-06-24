@@ -9,6 +9,7 @@ import 'package:browny_applications_new/core/data/remote/models/request/machine_
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_add_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_item_remove_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/cart_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_order_detail_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
@@ -65,6 +66,22 @@ mixin BrownyShopDataSourceMixin {
 
   /// API fetch รายการประเภทสินค้า (สำหรับ chip filter) — Browny Shop
   Future<RepoResult<ProductTypesResponse>> fetchProductTypes();
+
+  /// API ดึงรายการสินค้าโปรดของลูกค้า — GET /browny-shop/favorites
+  ///
+  /// Parameters:
+  /// - customerId: String (uuid)
+  /// - lang: String? (locale เดียว เช่น "th" — ไม่ส่ง = คืนทุกภาษา)
+  Future<RepoResult<List<ProductData>>> fetchFavorites({
+    required String customerId,
+    String? lang,
+  });
+
+  /// API fetch banner กลางของหน้า Browny Shop — GET /browny-shop/banners
+  /// (server filter ตามช่วงเวลา + first_login_only ของลูกค้า)
+  Future<RepoResult<List<BrownyShopBannerData>>> fetchBrownyShopBanners({
+    required String customerId,
+  });
 
   /// API fetch รายละเอียดสินค้า Browny Shop
   ///
@@ -238,6 +255,38 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
       final response = await requireRemote.fetchProductTypes();
       if (!response.isSuccessful) return RepoResult.empty();
       return RepoResult.success(data: response.data);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<List<ProductData>>> fetchFavorites({
+    required String customerId,
+    String? lang,
+  }) async {
+    try {
+      final response = await requireRemote.fetchBrownyShopFavorites(
+        customerId,
+        lang,
+      );
+      if (!response.isSuccessful) return RepoResult.empty();
+      final items = response.data.data?.items ?? const <ProductData>[];
+      return RepoResult.success(data: items);
+    } on Exception catch (e) {
+      return RepoResult.error(error: e);
+    }
+  }
+
+  @override
+  Future<RepoResult<List<BrownyShopBannerData>>> fetchBrownyShopBanners({
+    required String customerId,
+  }) async {
+    try {
+      final response = await requireRemote.fetchBrownyShopBanners(customerId);
+      if (!response.isSuccessful) return RepoResult.empty();
+      final banners = response.data.data ?? const <BrownyShopBannerData>[];
+      return RepoResult.success(data: banners);
     } on Exception catch (e) {
       return RepoResult.error(error: e);
     }

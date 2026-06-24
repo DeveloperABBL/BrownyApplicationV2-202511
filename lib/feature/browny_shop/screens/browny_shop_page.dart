@@ -8,6 +8,7 @@ import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
+import 'package:browny_applications_new/feature/home/screens/app_notifications_page.dart';
 
 class BrownyShopPage extends StatelessWidget {
   const BrownyShopPage({super.key});
@@ -156,7 +157,7 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
             ),
           ),
           GestureDetector(
-            onTap: () => debugPrint('tap notification (TODO)'),
+            onTap: () => AppNotificationsPage.goToPage(context),
             child: SizedBox(
               width: AppDims.size_39.w,
               height: AppDims.size_39.w,

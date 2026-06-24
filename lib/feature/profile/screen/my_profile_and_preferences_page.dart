@@ -2,6 +2,7 @@ import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/content_localize_data.dart';
 import 'package:browny_applications_new/feature/authentication/screen/authentication_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/authentication_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_favorites_page.dart';
 import 'package:browny_applications_new/feature/contacts/repository/contact_repo.dart';
 import 'package:browny_applications_new/feature/home/screens/home_page.dart';
 import 'package:browny_applications_new/feature/home/viewmodel/home_page_viewmodel.dart';
@@ -617,9 +618,9 @@ class _MyProfileAndPreferencesContentState
               // สินค้าที่บันทึกไว้
               title: context.wording.savedItems,
               suffixWidget: Assets.svg.icArrowForward.svg(),
-              onTap: () async {
-                // TODO: Navigate to favorites page
-                await _showDialogComingSoon(context.wording.savedItems);
+              onTap: () {
+                // เปิดหน้าสินค้าที่บันทึกไว้ (สินค้าโปรด)
+                BrownyShopFavoritesPage.goToPage(context);
               },
             ),
             AppDims.vericalPadding_12,

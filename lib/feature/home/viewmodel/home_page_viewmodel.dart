@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_collect_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/banner_response.dart';
+import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_banner_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/popup_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/browny_shop_orders_response.dart';
@@ -54,6 +55,7 @@ class HomePageViewmodel extends AppViewModel with BrownyShopFavoriteMixin {
     _customerNotificationsCountNotifier.dispose();
     _shopProductsNotifier.dispose();
     _shopProductTypesNotifier.dispose();
+    _shopMidBannersNotifier.dispose();
     _shopSelectedCategoryNotifier.dispose();
     _brownyLiveNotifier.dispose();
     _brownyOrdersNotifier.dispose();
@@ -120,6 +122,12 @@ class HomePageViewmodel extends AppViewModel with BrownyShopFavoriteMixin {
   _shopProductTypesNotifier = ValueNotifier(UiResult.loading());
   ValueListenable<UiResult<List<ProductTypeData>>>
   get shopProductTypesNotifier => _shopProductTypesNotifier;
+
+  /// Notifier fetch banner กลางของ Browny Shop section (GET /browny-shop/banners)
+  final ValueNotifier<UiResult<List<BrownyShopBannerData>>>
+  _shopMidBannersNotifier = ValueNotifier(UiResult.loading());
+  ValueListenable<UiResult<List<BrownyShopBannerData>>>
+  get shopMidBannersNotifier => _shopMidBannersNotifier;
 
   /// Notifier เก็บ category ที่ user เลือกอยู่ใน Shop section
   /// ค่าเริ่มต้น = "all"
@@ -524,6 +532,28 @@ class HomePageViewmodel extends AppViewModel with BrownyShopFavoriteMixin {
   /// DONG 2026-05-26
   ///
   /// API fetch รายการประเภทสินค้า Browny Shop — ใช้สร้าง chip filter
+  /// API fetch banner กลางของ Browny Shop section
+  Future<void> fetchShopMidBanners() async {
+    _shopMidBannersNotifier.value = UiResult.loading();
+    final result = await _brownyShopRepo.fetchBrownyShopBanners(
+      customerId: currentCustomerProvider.current.id.orEmpty,
+    );
+    if (result.hasError) {
+      _shopMidBannersNotifier.value = UiResult.error(error: result.error);
+      return;
+    }
+    if (result.isEmpty) {
+      _shopMidBannersNotifier.value = UiResult.empty();
+      return;
+    }
+    final banners = result.data;
+    if (banners.isEmpty) {
+      _shopMidBannersNotifier.value = UiResult.empty();
+      return;
+    }
+    _shopMidBannersNotifier.value = UiResult.success(data: banners);
+  }
+
   Future<void> fetchShopProductTypes() async {
     _shopProductTypesNotifier.value = UiResult.loading();
     final result = await _brownyShopRepo.fetchProductTypes();

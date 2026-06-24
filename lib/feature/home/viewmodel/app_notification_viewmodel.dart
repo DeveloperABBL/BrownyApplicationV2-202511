@@ -15,6 +15,7 @@ class AppNotificationViewmodel extends HomePageViewmodel {
   @override
   void dispose() {
     _customerNotificationsNotifier.dispose();
+    _notificationFilterNotifier.dispose();
     super.dispose();
   }
 
@@ -25,6 +26,48 @@ class AppNotificationViewmodel extends HomePageViewmodel {
 
   ValueListenable<UiResult<CustomerNotificationResponse>>
   get customerNotificationsNotifier => _customerNotificationsNotifier;
+
+  // ========== Filter ==========
+  /// ประเภทการแจ้งเตือนกลุ่ม "ซัก-อบ" (toggle index 1)
+  /// อื่นๆ ที่ไม่อยู่ในชุดนี้ = กลุ่ม "การสั่งซื้อ" (toggle index 2 เช่น Browny Shop)
+  static const Set<String> serviceNotificationTypes = {
+    'payment',
+    'top_up',
+    'soon_finish',
+    'machine_finish',
+  };
+
+  /// ตัวกรองประเภทการแจ้งเตือน
+  /// 0 = ทั้งหมด, 1 = ซัก-อบ (ตาม [serviceNotificationTypes]), 2 = อื่นๆ
+  final ValueNotifier<int> _notificationFilterNotifier = ValueNotifier(0);
+  ValueListenable<int> get notificationFilterNotifier =>
+      _notificationFilterNotifier;
+
+  void setNotificationFilter(int value) {
+    _notificationFilterNotifier.value = value;
+  }
+
+  /// กรองรายการ notifications ตาม [filter] ที่เลือกบน toggle
+  List<CustomerNotificationItem> filterNotifications(
+    List<CustomerNotificationItem> all,
+    int filter,
+  ) {
+    switch (filter) {
+      // ซัก-อบ — เฉพาะประเภทใน serviceNotificationTypes
+      case 1:
+        return all
+            .where((e) => serviceNotificationTypes.contains(e.type))
+            .toList();
+      // การสั่งซื้อ — ประเภทอื่นๆ ที่ไม่ใช่ ซัก-อบ
+      case 2:
+        return all
+            .where((e) => !serviceNotificationTypes.contains(e.type))
+            .toList();
+      // ทั้งหมด
+      default:
+        return all;
+    }
+  }
 
   // ========== Logic ==========
   /// DONG 2026-02-28

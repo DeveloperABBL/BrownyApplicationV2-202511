@@ -6,6 +6,7 @@ import 'package:browny_applications_new/feature/articles/screens/article_detail_
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_search_page.dart';
+import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_favorites_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_selected_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/receipt_browny_shop_page.dart';
@@ -104,6 +105,11 @@ class AppRouter {
         path: BrownyShopSearchPage.pagePath,
         name: BrownyShopSearchPage.pageName,
         builder: (context, state) => const BrownyShopSearchPage(),
+      ),
+      GoRoute(
+        path: BrownyShopFavoritesPage.pagePath,
+        name: BrownyShopFavoritesPage.pageName,
+        builder: (context, state) => const BrownyShopFavoritesPage(),
       ),
       GoRoute(
         path: BrownyShopCartPage.pagePath,

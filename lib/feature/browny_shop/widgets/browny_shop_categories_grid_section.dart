@@ -14,9 +14,10 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
   const BrownyShopCategoriesGridSection({
     super.key,
     required this.productsListenable,
-    required this.productTypesListenable,
-    required this.selectedCategoryListenable,
-    required this.onCategorySelected,
+    this.productTypesListenable,
+    this.selectedCategoryListenable,
+    this.onCategorySelected,
+    this.showCategoryHeader = true,
     this.showShowMore = false,
     this.onShowMoreTap,
     this.onProductTap,
@@ -28,10 +29,15 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
 
   /// รายการประเภทสินค้าสำหรับ chip filter — มาจาก API
   /// (chip.value = ProductTypeData.id, chip.label = name ตาม locale)
-  final ValueListenable<UiResult<List<ProductTypeData>>> productTypesListenable;
+  /// ต้องส่งเมื่อ [showCategoryHeader] = true
+  final ValueListenable<UiResult<List<ProductTypeData>>>? productTypesListenable;
 
-  final ValueListenable<String> selectedCategoryListenable;
-  final ValueChanged<String> onCategorySelected;
+  final ValueListenable<String>? selectedCategoryListenable;
+  final ValueChanged<String>? onCategorySelected;
+
+  /// แสดงหัวข้อ "หมวดหมู่" + chips filter ด้านบน grid
+  /// (ปิดไว้สำหรับหน้าที่ไม่มีหมวดหมู่ เช่น หน้าสินค้าโปรด)
+  final bool showCategoryHeader;
 
   /// แสดงปุ่ม "ดูเพิ่มเติม" ใต้ grid (ใช้ที่หน้า home; หน้า list page ปิดไว้)
   final bool showShowMore;
@@ -56,13 +62,15 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppDims.vericalPadding_16,
-          AppText(
-            context.wording.categories,
-            style: context.textTheme.labelLarge!,
-          ),
-          AppDims.vericalPadding_16,
-          _buildChips(context),
+          if (_showCategorySection) ...[
+            AppDims.vericalPadding_16,
+            AppText(
+              context.wording.categories,
+              style: context.textTheme.labelLarge!,
+            ),
+            AppDims.vericalPadding_16,
+            _buildChips(context),
+          ],
           AppDims.vericalPadding_16,
           _buildGrid(context),
         ],
@@ -70,19 +78,26 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
     );
   }
 
+  /// แสดงหัวข้อ + chips เมื่อเปิด [showCategoryHeader] และมี data source ครบ
+  bool get _showCategorySection =>
+      showCategoryHeader &&
+      productTypesListenable != null &&
+      selectedCategoryListenable != null &&
+      onCategorySelected != null;
+
   /// Chip filter — รายการมาจาก API (`productTypesListenable`)
   /// value = [ProductTypeData.id], label = name ตาม `context.languageCode`
   Widget _buildChips(BuildContext context) {
     return SizedBox(
       height: AppDims.size_24.h,
       child: ValueListenableBuilder(
-        valueListenable: productTypesListenable,
+        valueListenable: productTypesListenable!,
         builder: (context, typesResult, _) {
           final types = typesResult.data ?? const <ProductTypeData>[];
           // loading / error / empty — ไม่แสดง chip (data ยังไม่พร้อม)
           if (types.isEmpty) return const SizedBox.shrink();
           return ValueListenableBuilder<String>(
-            valueListenable: selectedCategoryListenable,
+            valueListenable: selectedCategoryListenable!,
             builder: (context, selected, _) {
               final locale = context.languageCode;
               return ListView.separated(
@@ -97,7 +112,7 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
                   final label = type.getNameDisplay(locale);
                   final isActive = value == selected;
                   return GestureDetector(
-                    onTap: () => onCategorySelected(value),
+                    onTap: () => onCategorySelected!(value),
                     child: Container(
                       height: AppDims.size_24.h,
                       padding: EdgeInsets.symmetric(
