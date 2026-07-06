@@ -1,6 +1,9 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_cart_count_store.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/cart_count_badge.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_product_detail_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/customer_ship_to_page.dart';
@@ -72,6 +75,10 @@ class _BrownyShopProductDetailWidgetState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _vm.attachContext(context);
       _vm.fetchProductDetail();
+      // อัปเดตจำนวนตะกร้าสำหรับ badge
+      context.read<BrownyShopCartCountStore>().refresh(
+        context.read<CustomerProvider>().current.id.orEmpty,
+      );
     });
   }
 
@@ -213,9 +220,11 @@ class _BrownyShopProductDetailWidgetState
                     BackButton(color: AppColors.darkBrown),
                     Row(
                       children: [
-                        _RoundIconButton(
-                          icon: Assets.icShop.icBagOutline,
-                          onTap: () => BrownyShopCartPage.goToPage(context),
+                        CartCountBadge(
+                          child: _RoundIconButton(
+                            icon: Assets.icShop.icBagOutline,
+                            onTap: () => BrownyShopCartPage.goToPage(context),
+                          ),
                         ),
                         SizedBox(width: AppDims.size_8.w),
                         _RoundIconButton(
@@ -549,9 +558,8 @@ class _TitleSection extends StatelessWidget {
     return AppText(
       product.getNameDisplay(context.languageCode),
       style: context.textTheme.headlineLarge?.copyWith(
-        // fontSize: 26.sp,
+        fontSize: 26.sp,
         color: AppColors.darkBrown,
-        // height: 32 / 24,
       ),
     );
   }
@@ -615,9 +623,11 @@ class _ProductSubsSection extends StatelessWidget {
         AppDims.vericalPadding_8,
         SizedBox(
           height: 94.h,
-          child: ValueListenableBuilder<ProductImageThumb?>(
-            valueListenable: vm.selectedThumbnailNotifier,
-            builder: (context, selected, _) {
+          // ใช้ selectedSubIdNotifier (variant) แยกจากรูปหลัก — กดตัวเลือกแล้ว
+          // รูปหลัก "ไม่เลื่อน" ตาม (decouple จาก selectedThumbnailNotifier)
+          child: ValueListenableBuilder<int?>(
+            valueListenable: vm.selectedSubIdNotifier,
+            builder: (context, selectedSubId, _) {
               return ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: subs.length,
@@ -627,13 +637,8 @@ class _ProductSubsSection extends StatelessWidget {
                   return _ProductSubItem(
                     name: sub.getNameDisplay(locale),
                     imageUrl: sub.imageUrl,
-                    isActive: selected?.subId == sub.id,
-                    onTap: () => vm.onThumbnailSelected(
-                      ProductImageThumb(
-                        subId: sub.id,
-                        imageUrl: sub.imageUrl ?? '',
-                      ),
-                    ),
+                    isActive: selectedSubId == sub.id,
+                    onTap: () => vm.onSubOptionSelected(sub.id),
                   );
                 },
               );
@@ -735,7 +740,7 @@ class _ProductSubItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.textTheme.labelSmall?.copyWith(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 color: AppColors.gray600,
               ),
             ),
@@ -1054,7 +1059,8 @@ class _ImageGallery extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: CachedNetworkImage(
                 imageUrl: url,
-                fit: BoxFit.cover,
+                // contain — กันรูปแกลเลอรีด้านล่างโดนซูม/ครอป (ให้เหมือนรูปอื่นในหน้า)
+                fit: BoxFit.contain,
                 errorWidget: (_, _, _) => const SizedBox.shrink(),
               ),
             ),
@@ -1164,6 +1170,11 @@ class _BottomActionBar extends StatelessWidget {
       return;
     }
 
+    // เพิ่มลงตะกร้าสำเร็จ → อัปเดต badge จำนวนตะกร้า
+    context.read<BrownyShopCartCountStore>().refresh(
+      context.read<CustomerProvider>().current.id.orEmpty,
+    );
+
     if (goToCart) {
       // ซื้อเลย → ผ่านหน้าตะกร้า แล้วเด้งเข้าหน้าสรุปเฉพาะสินค้านี้
       // carry คูปองที่เลือกไว้ไป auto-apply หน้า checkout
@@ -1197,7 +1208,11 @@ class _BottomActionBar extends StatelessWidget {
       child: Row(
         children: [
           _FavoriteButton(
-            isActive: product.favoriteStatus ?? false,
+            // resolve ผ่าน store กลาง — sync กับหน้า list/หน้าอื่น
+            isActive: context.watch<BrownyShopFavoriteStore>().resolve(
+              product.id,
+              product.favoriteStatus ?? false,
+            ),
             onTap: () => context
                 .read<BrownyShopProductDetailViewmodel>()
                 .toggleFavorite(),
@@ -1217,9 +1232,8 @@ class _BottomActionBar extends StatelessWidget {
                 // sync ตัวเลือกที่เลือกใน _ProductSubsSection
                 initialSubId: context
                     .read<BrownyShopProductDetailViewmodel>()
-                    .selectedThumbnailNotifier
-                    .value
-                    ?.subId,
+                    .selectedSubIdNotifier
+                    .value,
                 onConfirm: (subId, qty) => _onConfirm(
                   context,
                   subId: subId,
@@ -1243,9 +1257,8 @@ class _BottomActionBar extends StatelessWidget {
                 // sync ตัวเลือกที่เลือกใน _ProductSubsSection
                 initialSubId: context
                     .read<BrownyShopProductDetailViewmodel>()
-                    .selectedThumbnailNotifier
-                    .value
-                    ?.subId,
+                    .selectedSubIdNotifier
+                    .value,
                 onConfirm: (subId, qty) => _onConfirm(
                   context,
                   subId: subId,
@@ -1292,7 +1305,7 @@ class _FavoriteButton extends StatelessWidget {
             AppText(
               context.wording.favoriteLike,
               style: context.textTheme.labelSmall?.copyWith(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 color: color,
               ),
             ),

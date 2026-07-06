@@ -5,6 +5,7 @@ import 'package:browny_applications_new/core/data/remote/models/response/cart_it
 import 'package:browny_applications_new/core/data/remote/models/response/checkout_draft_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/address_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/transactions/models/customer_coupon_model.dart';
@@ -52,6 +53,7 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
   void dispose() {
     _productNotifier.dispose();
     _selectedThumbnailNotifier.dispose();
+    _selectedSubIdNotifier.dispose();
     _selectedCouponNotifier.dispose();
     _shippingAddressNotifier.dispose();
     _summaryNotifier.dispose();
@@ -71,6 +73,18 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
 
   void onThumbnailSelected(ProductImageThumb thumb) {
     _selectedThumbnailNotifier.value = thumb;
+  }
+
+  /// subId ของ "ตัวเลือกสินค้า" (variant) ที่เลือกใน [_ProductSubsSection]
+  ///
+  /// แยกออกจาก [selectedThumbnailNotifier] โดยตั้งใจ — กดตัวเลือกแล้ว "รูปหลัก
+  /// ต้องไม่เลื่อน" (รูปหลัก/thumbnail strip ขับด้วย selectedThumbnailNotifier
+  /// เท่านั้น). ใช้เป็นค่าเริ่มต้น subId ของ add-to-cart bottom sheet ด้วย
+  final ValueNotifier<int?> _selectedSubIdNotifier = ValueNotifier(null);
+  ValueListenable<int?> get selectedSubIdNotifier => _selectedSubIdNotifier;
+
+  void onSubOptionSelected(int? subId) {
+    _selectedSubIdNotifier.value = subId;
   }
 
   // ========== คูปอง Browny Shop ที่เลือกใช้กับสินค้านี้ ==========
@@ -211,6 +225,11 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
         imageUrl: product.mainImageUrl!,
       );
     }
+    // ค่าเริ่มต้นตัวเลือกสินค้า = sub แรก (สำหรับ default ของ add-to-cart)
+    final subs = product.productSubs;
+    _selectedSubIdNotifier.value = (subs != null && subs.isNotEmpty)
+        ? subs.first.id
+        : null;
     _productNotifier.value = UiResult.success(data: product);
 
     // หลังได้สินค้าแล้ว → โหลดที่อยู่หลัก แล้วประเมินค่าจัดส่ง (cart/summary)
@@ -227,10 +246,11 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
     final current = product.favoriteStatus ?? false;
     final next = !current;
 
-    // อัปเดต UI ทันที (optimistic)
+    // อัปเดต UI ทันที (optimistic) + เขียน store กลางเพื่อ sync ไปหน้า list
     _productNotifier.value = UiResult.success(
       data: product.copyWith(favoriteStatus: next),
     );
+    _favoriteStore.setFavorite(id, next);
 
     final result = await _repo.setFavorite(
       customerId: currentCustomerProvider.current.id.orEmpty,
@@ -245,6 +265,7 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
       _productNotifier.value = UiResult.success(
         data: latest.copyWith(favoriteStatus: current),
       );
+      _favoriteStore.setFavorite(id, current);
       return;
     }
     // sync กับสถานะจริงจาก server
@@ -252,8 +273,13 @@ class BrownyShopProductDetailViewmodel extends AppViewModel {
       _productNotifier.value = UiResult.success(
         data: latest.copyWith(favoriteStatus: result.data),
       );
+      _favoriteStore.setFavorite(id, result.data);
     }
   }
+
+  /// store กลางสถานะสินค้าโปรด (sync ข้ามหน้า)
+  BrownyShopFavoriteStore get _favoriteStore =>
+      context.read<BrownyShopFavoriteStore>();
 
   /// เพิ่มสินค้าลงตะกร้าออนไลน์ (ระบุ subId + จำนวน)
   ///

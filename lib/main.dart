@@ -2,6 +2,8 @@ import 'package:browny_applications_new/core/env/app_evnironment.dart';
 import 'package:browny_applications_new/core/env/dev_environment.dart';
 import 'package:browny_applications_new/core/utils/crashlytics_helper.dart';
 import 'package:browny_applications_new/core/utils/notification_helper.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_cart_count_store.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/res/colors/app_colors.dart';
 import 'package:browny_applications_new/res/strings/app_localizations.dart';
 import 'package:browny_applications_new/res/theme/app_theme.dart';
@@ -65,6 +67,10 @@ class BrownyApp extends StatelessWidget {
         // top model
         ChangeNotifierProvider.value(value: appEnvironment.currentUser),
         ChangeNotifierProvider.value(value: appEnvironment),
+        // store กลางสถานะสินค้าโปรด Browny Shop (sync ทุกหน้า)
+        ChangeNotifierProvider(create: (_) => BrownyShopFavoriteStore()),
+        // store กลางจำนวนรายการในตะกร้า Browny Shop (badge ไอคอนถุง)
+        ChangeNotifierProvider(create: (_) => BrownyShopCartCountStore()),
       ],
       child: Consumer<AppEvnironment>(
         builder: (context, envNotifier, child) {

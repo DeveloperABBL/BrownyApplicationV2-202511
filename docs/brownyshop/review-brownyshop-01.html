@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review BrownyShop #1 — สรุป Issue &amp; การแก้ไข</title>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --ink: #1a2233;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --brand: #2fba38;
+  --brand-dark: #22942c;
+  --brand-soft: #e8fced;
+  --code-bg: #1a2030;
+  --code-ink: #e2e8f0;
+  --radius: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, "Sarabun", "Noto Sans Thai", "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.7; font-size: 14.5px;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+a { color: var(--brand-dark); }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 55%, #4ade80 100%);
+  color: #fff; border-radius: 18px; padding: 32px 34px; margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(34,197,94,.25); position: relative; overflow: hidden;
+}
+.hero::before { content:''; position:absolute; right:-60px; top:-60px; width:240px; height:240px; border-radius:50%; background:rgba(255,255,255,.08); }
+.hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.hero .sub { font-size: 14px; opacity: .92; }
+.hero .meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.hero .chip { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); padding:5px 12px; border-radius:999px; font-size:12.5px; }
+
+/* SCORE */
+.scoreboard { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px; }
+.score { flex:1; min-width:150px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow-sm); }
+.score .n { font-size:28px; font-weight:700; line-height:1; }
+.score .l { font-size:12.5px; color:var(--muted); margin-top:6px; }
+.score.ok .n { color:var(--brand-dark); }
+.score.wait .n { color:#b45309; }
+.score.block .n { color:#991b1b; }
+
+/* LEGEND */
+.legend { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px; font-size:13px; color:var(--muted); }
+.legend span { display:inline-flex; align-items:center; gap:6px; }
+
+/* BADGE */
+.st { font:600 11.5px/1.4 -apple-system,sans-serif; padding:3px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+.st.ok { background:#dcfce7; color:#15803d; }
+.st.wait { background:#fef3c7; color:#b45309; }
+.st.block { background:#fee2e2; color:#991b1b; }
+
+/* SECTION */
+h2 { font-size:19px; margin:30px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--line); display:flex; align-items:center; gap:9px; }
+
+/* TABLE */
+table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:#f8fafc; font-weight:600; font-size:12px; color:#475569; text-transform:uppercase; letter-spacing:.03em; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#fafbfc; }
+td.num { font-weight:700; color:var(--muted); width:34px; text-align:center; }
+
+/* CARD */
+.issue { background:var(--card); border:1px solid var(--line); border-left-width:4px; border-radius:12px; padding:18px 20px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.issue.ok { border-left-color:var(--brand); }
+.issue.wait { border-left-color:#f59e0b; }
+.issue.block { border-left-color:#ef4444; }
+.issue .head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.issue .idx { width:26px; height:26px; border-radius:8px; background:var(--brand-soft); color:var(--brand-dark); font-weight:700; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.issue.wait .idx { background:#fef3c7; color:#b45309; }
+.issue.block .idx { background:#fee2e2; color:#991b1b; }
+.issue h3 { font-size:15.5px; font-weight:600; flex:1; min-width:200px; }
+.issue .row { display:grid; grid-template-columns:96px 1fr; gap:6px 14px; margin-top:8px; font-size:13.5px; }
+.issue .row .k { color:var(--muted); font-weight:600; }
+.issue .row .v { color:#374151; }
+.issue .files { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+code { font-family:ui-monospace,"SF Mono",Menlo,monospace; background:#f1f5f9; color:#be185d; padding:2px 6px; border-radius:5px; font-size:12px; }
+.files code { background:#eef2ff; color:#4338ca; }
+
+/* NOTE */
+.note { background:#eff6ff; border-left:4px solid #3b82f6; padding:12px 16px; border-radius:0 10px 10px 0; margin:14px 0; font-size:13.5px; color:#1e3a8a; }
+.note.warn { background:#fffbeb; border-left-color:#f59e0b; color:#78350f; }
+.note b { color:inherit; }
+ul { margin:8px 0 8px 20px; color:#374151; }
+li { margin:4px 0; }
+.qlist { counter-reset:q; list-style:none; margin:10px 0; padding:0; }
+.qlist li { counter-increment:q; position:relative; padding:10px 14px 10px 44px; background:var(--card); border:1px solid var(--line); border-radius:10px; margin-bottom:8px; font-size:13.5px; }
+.qlist li::before { content:counter(q); position:absolute; left:12px; top:10px; width:22px; height:22px; border-radius:50%; background:#fef3c7; color:#b45309; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; }
+
+.foot { margin-top:30px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); }
+
+@media (max-width:640px){ .issue .row{ grid-template-columns:1fr; gap:2px; } .issue .row .k{ margin-top:6px; } }
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0f1420; --card:#171e2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#28324a; --brand-soft:#14331c; }
+  body{ background:var(--bg); color:var(--ink); }
+  th{ background:#1e2637; color:#94a3b8; }
+  tbody tr:hover{ background:#1c2436; }
+  code{ background:#28324a; color:#f0abfc; }
+  .files code{ background:#1e293b; color:#a5b4fc; }
+  .note{ background:#132036; color:#bfdbfe; }
+  .note.warn{ background:#2a2410; color:#fcd9a6; }
+  .qlist li{ background:var(--card); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🛍️ Review BrownyShop #1</h1>
+  <div class="sub">สรุป Issue จากการทดสอบ (release build) — สถานะการแก้ไข &amp; วิธีแก้</div>
+  <div class="meta">
+    <span class="chip">📅 4 ก.ค. 2026</span>
+    <span class="chip">รวม 11 issue</span>
+    <span class="chip">✅ แก้แล้ว 5 · ⏸️ รอ backend 6</span>
+  </div>
+</header>
+
+<div class="scoreboard">
+  <div class="score ok"><div class="n">5</div><div class="l">✅ แก้ไขแล้ว (client)</div></div>
+  <div class="score wait"><div class="n">5</div><div class="l">⏸️ รอคุย backend</div></div>
+  <div class="score block"><div class="n">1</div><div class="l">🚫 Blocked (ไม่มี API)</div></div>
+</div>
+
+<div class="legend">
+  <span><span class="st ok">✅ แก้แล้ว</span> แก้ที่ client เสร็จ + analyze ผ่าน</span>
+  <span><span class="st wait">⏸️ รอ backend</span> ต้องประสาน backend/UX ก่อน</span>
+  <span><span class="st block">🚫 Blocked</span> ต้องมี API ใหม่จาก backend</span>
+</div>
+
+<!-- SUMMARY TABLE -->
+<h2>📋 สรุปภาพรวม</h2>
+<table>
+  <thead><tr><th>#</th><th>Issue</th><th>สถานะ</th><th>แก้อย่างไร (ย่อ)</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td>Product Page ข้อความเล็กเกินไป</td><td><span class="st ok">✅ แก้แล้ว</span></td><td>คืน title 26.sp + bump ชื่อตัวเลือก/label ถูกใจ 12→14.sp</td></tr>
+    <tr><td class="num">2</td><td>รูปเลื่อนตามการกดตัวเลือกเพิ่มเติม</td><td><span class="st ok">✅ แก้แล้ว</span></td><td>แยก notifier ของ variant ออกจากรูปหลัก</td></tr>
+    <tr><td class="num">3</td><td>Product Details รูปสินค้าด้านล่างโดนซูม</td><td><span class="st ok">✅ แก้แล้ว</span></td><td><code>BoxFit.cover</code> → <code>contain</code></td></tr>
+    <tr><td class="num">4</td><td>เพิ่มสินค้าในตะกร้า แต่ไม่มีตัวเลขขึ้น</td><td><span class="st ok">✅ แก้แล้ว</span></td><td>เพิ่ม cart-count badge (distinct SKU, 99+) + store กลาง</td></tr>
+    <tr><td class="num">5</td><td>กดถูกใจด้านใน แต่ด้านนอกไม่ขึ้นถูกใจ</td><td><span class="st ok">✅ แก้แล้ว</span></td><td>Shared favorites store (Provider) sync ทุกหน้า</td></tr>
+    <tr><td class="num">6</td><td>เก็บคูปอง Shop แล้วเด้งไปแท็บซัก-อบ</td><td><span class="st wait">⏸️ รอ backend</span></td><td>revert แล้ว — ต้องมี flag ระบุประเภทคูปองใน response</td></tr>
+    <tr><td class="num">7</td><td>กดชำระด้วย BN Coin ไม่ได้</td><td><span class="st wait">⏸️ รอ backend</span></td><td>ไม่พบจุด block ฝั่ง client — ขอ repro + ยืนยัน backend</td></tr>
+    <tr><td class="num">8</td><td>ชำระแล้ว แต่สินค้ายังอยู่ในตะกร้า</td><td><span class="st wait">⏸️ รอ backend</span></td><td>ยืนยันจังหวะ server ล้างตะกร้า (confirm/paid)</td></tr>
+    <tr><td class="num">9</td><td>รายการที่ยังไม่ชำระไม่ขึ้นในตะกร้า</td><td><span class="st wait">⏸️ รอ backend</span></td><td>UX: confirm consume ตะกร้าตั้งแต่สร้าง order</td></tr>
+    <tr><td class="num">10</td><td>ออกจากการชำระ → ค้างชำระ/ไม่ค้างตะกร้า</td><td><span class="st wait">⏸️ รอ backend</span></td><td>UX เดียวกับข้อ 9 + wire pending-payment</td></tr>
+    <tr><td class="num">11</td><td>ยกเลิกสินค้าค้างชำระไม่ได้</td><td><span class="st block">🚫 Blocked</span></td><td>ยังไม่มี API ยกเลิก — ต้องขอ backend เพิ่ม endpoint</td></tr>
+  </tbody>
+</table>
+
+<!-- ============== FIXED ============== -->
+<h2>✅ แก้ไขแล้ว (Client)</h2>
+
+<div class="issue ok">
+  <div class="head"><span class="idx">1</span><h3>Product Page ข้อความเล็กเกินไป</h3><span class="st ok">✅ แก้แล้ว</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">ชื่อสินค้า (title) ถูกคอมเมนต์ <code>fontSize: 26.sp</code> ทิ้ง เหลือ default 24.sp · ชื่อตัวเลือกสินค้า + label "ถูกใจ" ใช้ 12.sp</div>
+    <div class="k">วิธีแก้</div><div class="v">คืน title เป็น 26.sp · bump ชื่อ option card 12→14.sp (ทั้งหน้า detail และ add-to-cart bottom sheet) · label "ถูกใจ" 12→14.sp</div>
+  </div>
+  <div class="files"><code>browny_shop_product_detail_page.dart</code><code>add_to_cart_bottom_sheet.dart</code></div>
+</div>
+
+<div class="issue ok">
+  <div class="head"><span class="idx">2</span><h3>รูปหลักเลื่อนตามการกดตัวเลือกสินค้า</h3><span class="st ok">✅ แก้แล้ว</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">การ์ดตัวเลือก (product_subs) แชร์ <code>selectedThumbnailNotifier</code> ตัวเดียวกับรูปหลัก → กดตัวเลือกแล้วไปสั่ง PageView ของรูปหลัก <code>animateToPage</code></div>
+    <div class="k">วิธีแก้</div><div class="v">เพิ่ม <code>selectedSubIdNotifier</code> (variant) แยกใน ViewModel · การ์ดตัวเลือกใช้ notifier ใหม่นี้สำหรับ highlight + ค่าเริ่มต้น add-to-cart · รูปหลัก/thumbnail strip ขับด้วย <code>selectedThumbnailNotifier</code> เท่านั้น → กดตัวเลือก "รูปไม่เลื่อน"</div>
+  </div>
+  <div class="files"><code>browny_shop_product_detail_viewmodel.dart</code><code>browny_shop_product_detail_page.dart</code></div>
+</div>
+
+<div class="issue ok">
+  <div class="head"><span class="idx">3</span><h3>รูปสินค้าด้านล่างโดนซูม/ครอป</h3><span class="st ok">✅ แก้แล้ว</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">แกลเลอรีรูปด้านล่าง (<code>_ImageGallery</code>) ใช้ <code>BoxFit.cover</code> ในกรอบสี่เหลี่ยมจัตุรัส → รูปถูกขยาย+ครอป</div>
+    <div class="k">วิธีแก้</div><div class="v">เปลี่ยนเป็น <code>BoxFit.contain</code> (ให้เหมือนรูปอื่นในหน้าที่ใช้ contain หมด)</div>
+  </div>
+  <div class="files"><code>browny_shop_product_detail_page.dart</code></div>
+</div>
+
+<div class="issue ok">
+  <div class="head"><span class="idx">4</span><h3>เพิ่มสินค้าในตะกร้า แต่ badge ไม่ขึ้นตัวเลข</h3><span class="st ok">✅ แก้แล้ว</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">ไอคอนถุงบนหน้า Shop/Detail ไม่มี badge นับตะกร้าเลย — แตะแล้ว navigate อย่างเดียว</div>
+    <div class="k">วิธีแก้</div><div class="v">สร้าง <code>BrownyShopCartCountStore</code> (Provider ระดับแอป) นับ <b>distinct SKU</b> เกิน 99 แสดง "99+" · widget <code>CartCountBadge</code> ครอบไอคอนถุง · refresh ตอนเข้าหน้า Shop/Detail และ <b>หลังเพิ่มลงตะกร้าสำเร็จ</b></div>
+    <div class="k">ขอบเขต</div><div class="v">แสดง badge บนไอคอนถุงหน้า Shop + Product Detail</div>
+  </div>
+  <div class="files"><code>browny_shop_cart_count_store.dart</code><code>cart_count_badge.dart</code><code>browny_shop_page.dart</code><code>browny_shop_product_detail_page.dart</code><code>main.dart</code></div>
+</div>
+
+<div class="issue ok">
+  <div class="head"><span class="idx">5</span><h3>กดถูกใจในหน้า Detail แต่หน้า List ไม่สะท้อน</h3><span class="st ok">✅ แก้แล้ว</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">หน้า Detail กับ List ถือ <code>ProductData</code> คนละก้อน ไม่มี store กลาง · การเปิด Detail ไม่ return ค่ากลับ → toggle ในหายไปตอน pop</div>
+    <div class="k">วิธีแก้</div><div class="v">สร้าง <code>BrownyShopFavoriteStore</code> (Provider ระดับแอป, <code>Map&lt;productId,bool&gt;</code>) เป็น source of truth · ทุกจุดที่ toggle เขียนลง store · widget ที่แสดงหัวใจอ่านจาก store (fallback ค่าจาก API) → sync ทุกหน้าอัตโนมัติ</div>
+    <div class="k">ครอบคลุม</div><div class="v">Home · Coin · Shop · Search · Favorites · ปุ่มหน้า Detail</div>
+  </div>
+  <div class="files"><code>browny_shop_favorite_store.dart</code><code>browny_shop_favorite_mixin.dart</code><code>browny_shop_product_detail_viewmodel.dart</code><code>browny_shop_categories_grid_section.dart</code><code>browny_shop_search_page.dart</code><code>main.dart</code></div>
+</div>
+
+<div class="note"><b>หมายเหตุ:</b> ทั้ง 5 ข้อ analyze ผ่าน (0 error) · ไม่ต้องรัน build_runner (ไม่แตะ model/annotation) · ข้อ 1 ปรับ font size ตามวิจารณญาณจุดที่เล็กชัด — ปรับตรง spec ได้ถ้ามี</div>
+
+<!-- ============== PENDING ============== -->
+<h2>⏸️ รอคุย Backend / UX</h2>
+
+<div class="issue wait">
+  <div class="head"><span class="idx">6</span><h3>เก็บคูปอง Shop แล้วเด้งไปแท็บซัก-อบ</h3><span class="st wait">⏸️ รอ backend (revert แล้ว)</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v"><code>onCouponCollected</code> hardcode <code>_tabController.animateTo(0)</code> เด้งไปแท็บ 0 (ซัก-อบ) เสมอ หลังเก็บคูปองทุกประเภท</div>
+    <div class="k">ทำไมพัก</div><div class="v">การจะอยู่/ไปแท็บที่ถูก ต้องรู้ "ประเภทคูปอง" ที่เพิ่งเก็บ — แต่ response ของ collect ปัจจุบัน<b>ไม่มี flag ระบุประเภท</b> เลยเดาไม่ได้</div>
+    <div class="k">ต้องการ</div><div class="v">backend เพิ่ม flag ประเภทคูปอง (ซัก-อบ / e-voucher / browny-shop) ใน response ของ collect → client ค่อยเลือกแท็บ + refetch list ให้ถูก</div>
+  </div>
+</div>
+
+<div class="issue wait">
+  <div class="head"><span class="idx">7</span><h3>กดชำระด้วย Browny Coin ไม่ได้</h3><span class="st wait">⏸️ รอ backend / QA</span></div>
+  <div class="row">
+    <div class="k">ผลตรวจ</div><div class="v">โค้ด client มี branch coin ครบ ไม่มีจุด block/disable และ coin ไม่ถูก filter ออกจากรายการวิธีชำระ</div>
+    <div class="k">น่าจะเป็น</div><div class="v">backend (confirm coin ไม่คืน <code>status: paid</code> / ไม่รองรับ coin) หรือยอด coin ไม่พอ (เด้ง dialog "coin ไม่พอ")</div>
+    <div class="k">ต้องการ</div><div class="v">อาการจริงจาก QA (ปุ่มไม่ติด? error? dialog?) + backend ยืนยันรองรับ coin · client เสริม: reset flag กันคลิก + จัดการกรณี coin คืน non-paid</div>
+  </div>
+</div>
+
+<div class="issue wait">
+  <div class="head"><span class="idx">8</span><h3>ชำระแล้ว แต่สินค้ายังอยู่ในตะกร้า</h3><span class="st wait">⏸️ รอ backend</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">API จริง server ควรล้างตะกร้าตอนชำระสำเร็จ — ถ้ายังอยู่ = backend ไม่ล้าง/ล้างผิดจังหวะ · client เองก็ไม่มี <code>clearCart</code> กันเหนียว</div>
+    <div class="k">ต้องการ</div><div class="v">backend ยืนยันจังหวะล้างตะกร้า · client เสริม clearCart/refresh หลัง paid</div>
+  </div>
+</div>
+
+<div class="issue wait">
+  <div class="head"><span class="idx">9</span><h3>รายการที่ยังไม่ชำระไม่ขึ้นในตะกร้า</h3><span class="st wait">⏸️ รอ backend / UX</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">flow "confirm สร้าง order ก่อนจ่าย" → cart ถูก consume ตั้งแต่ confirm → ของออกจากตะกร้าไปเป็น pending order</div>
+    <div class="k">ต้องการ</div><div class="v">ตัดสินใจ UX: (ก) backend ไม่ consume cart จนกว่าจะจ่าย หรือ (ข) แสดง pending order ให้ชัด + resume ได้</div>
+  </div>
+</div>
+
+<div class="issue wait">
+  <div class="head"><span class="idx">10</span><h3>ออกจากการชำระ → กลายเป็นค้างชำระ ไม่ค้างในตะกร้า</h3><span class="st wait">⏸️ รอ backend / UX</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">ต้นเหตุเดียวกับข้อ 9 · pending order โผล่ที่ Home/ประวัติ/หน้าสถานะ (ปุ่ม "ชำระเงิน") แต่ไม่ใช่ในตะกร้า</div>
+    <div class="k">ข้อสังเกต</div><div class="v">endpoint <code>GET /browny-shop/pending-payment</code> มีอยู่แต่<b>ยังไม่ถูกเรียกเลย</b> — เอามา wire แสดงแบนเนอร์ "ชำระต่อ" ได้</div>
+  </div>
+</div>
+
+<div class="issue block">
+  <div class="head"><span class="idx">11</span><h3>ยกเลิกสินค้าค้างชำระไม่ได้</h3><span class="st block">🚫 Blocked</span></div>
+  <div class="row">
+    <div class="k">ต้นเหตุ</div><div class="v">ไม่มีทั้ง API / repo / UI สำหรับยกเลิก pending order เลย</div>
+    <div class="k">ต้องการ</div><div class="v"><b>backend เพิ่ม endpoint ยกเลิก</b> ก่อน แล้วจึงต่อ repo → ViewModel → ปุ่ม "ยกเลิกคำสั่งซื้อ" ในหน้าสถานะ (แสดงเมื่อ pending_payment)</div>
+  </div>
+</div>
+
+<!-- ============== BACKEND Q ============== -->
+<h2>❓ คำถามที่ต้องเคลียร์กับ Backend</h2>
+<ol class="qlist">
+  <li><b>QR checkout:</b> cart ถูก consume ตอน <code>confirm</code> หรือตอน <code>paid</code>? (ตัดสินชะตาข้อ 8 / 9 / 10)</li>
+  <li><b>Browny Coin:</b> confirm ด้วย <code>coin</code> คืน <code>status</code> อะไร และรองรับ coin สำหรับ Browny Shop ไหม? (ข้อ 7)</li>
+  <li><b>Coupon type flag:</b> เพิ่ม field ระบุประเภทคูปองใน response ของ collect ได้ไหม? (ข้อ 6)</li>
+  <li><b>Cancel order:</b> มี/จะเพิ่ม endpoint ยกเลิก pending order ไหม + ยกเลิกแล้วของกลับเข้า cart หรือหาย? (ข้อ 11)</li>
+</ol>
+
+<div class="foot">
+  Review BrownyShop #1 · สร้างเมื่อ 4 ก.ค. 2026 · ทดสอบบน release build ·
+  ข้อ 1–5 แก้ไขที่ client เรียบร้อย (analyze 0 error) · ข้อ 6–11 รอประสาน backend/UX
+</div>
+
+</div>
+</body>
+</html>

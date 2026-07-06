@@ -1,10 +1,12 @@
 import 'package:browny_applications_new/core/core_index.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_cart_count_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_cart_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_search_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_page_viewmodel.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/browny_shop_categories_grid_section.dart';
+import 'package:browny_applications_new/feature/browny_shop/widgets/cart_count_badge.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/flash_deals_section.dart';
 import 'package:browny_applications_new/feature/contacts/models/contact_model.dart';
 import 'package:browny_applications_new/feature/contacts/screens/contact_page.dart';
@@ -50,6 +52,10 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
       _vm.fetchProducts();
       _vm.fetchProductTypes();
       _vm.fetchFlashSales();
+      // อัปเดตจำนวนตะกร้าสำหรับ badge
+      context.read<BrownyShopCartCountStore>().refresh(
+        context.read<CustomerProvider>().current.id.orEmpty,
+      );
     });
   }
 
@@ -186,10 +192,12 @@ class _BrownyShopPageWidgetState extends State<_BrownyShopPageWidget> {
         children: [
           Expanded(child: _buildSearchBox(context)),
           SizedBox(width: AppDims.size_8.w),
-          _buildIconButton(
-            context,
-            svg: Assets.icShop.icShoppingBag,
-            onTap: () => BrownyShopCartPage.goToPage(context),
+          CartCountBadge(
+            child: _buildIconButton(
+              context,
+              svg: Assets.icShop.icShoppingBag,
+              onTap: () => BrownyShopCartPage.goToPage(context),
+            ),
           ),
           SizedBox(width: AppDims.size_8.w),
           _buildIconButton(

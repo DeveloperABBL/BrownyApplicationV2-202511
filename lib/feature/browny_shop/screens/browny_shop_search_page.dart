@@ -1,5 +1,6 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 import 'package:browny_applications_new/feature/browny_shop/screens/browny_shop_product_detail_page.dart';
 import 'package:browny_applications_new/feature/browny_shop/viewmodel/browny_shop_search_viewmodel.dart';
@@ -258,15 +259,17 @@ class _BrownyShopSearchWidgetState extends State<_BrownyShopSearchWidget> {
             final firstSub = (p.productSubs?.isNotEmpty ?? false)
                 ? p.productSubs!.first
                 : null;
-            return ProductItemWidget(
-              imageUrl: p.mainImageUrl ?? firstSub?.imageUrl,
-              name: p.getNameDisplay(locale),
-              coinPrice: firstSub?.coinPrice?.toString(),
-              moneyPrice: firstSub?.moneyPrice?.toString(),
-              isFreeShipping: p.isFreeShipping ?? false,
-              isFavorite: p.favoriteStatus ?? false,
-              onTap: () => _onProductTap(p),
-              onFavoriteTap: () => _vm.toggleProductFavorite(p),
+            return Consumer<BrownyShopFavoriteStore>(
+              builder: (context, favStore, _) => ProductItemWidget(
+                imageUrl: p.mainImageUrl ?? firstSub?.imageUrl,
+                name: p.getNameDisplay(locale),
+                coinPrice: firstSub?.coinPrice?.toString(),
+                moneyPrice: firstSub?.moneyPrice?.toString(),
+                isFreeShipping: p.isFreeShipping ?? false,
+                isFavorite: favStore.resolve(p.id, p.favoriteStatus ?? false),
+                onTap: () => _onProductTap(p),
+                onFavoriteTap: () => _vm.toggleProductFavorite(p),
+              ),
             );
           },
         );

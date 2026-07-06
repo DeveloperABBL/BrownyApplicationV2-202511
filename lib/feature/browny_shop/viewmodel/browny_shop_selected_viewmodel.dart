@@ -243,9 +243,9 @@ class BrownyShopSelectedViewModel extends TransactionsViewmodel {
   /// - empty()       = ยอดไม่พอ (wallet/coin)
   /// - error         = ดึงยอดไม่สำเร็จ
   Future<UiResult<bool>> verifyBalance() async {
-    if(kDebugMode) {
-      return UiResult.success(data: true);
-    }
+    // if(kDebugMode) {
+    //   return UiResult.success(data: true);
+    // }
     final payment = paymentSelected;
     if (payment == null) return UiResult.success(data: true);
     // qr / wechat ไม่ต้องเช็คยอดคงเหลือ

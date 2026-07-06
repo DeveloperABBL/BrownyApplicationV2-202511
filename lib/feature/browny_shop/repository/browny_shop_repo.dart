@@ -486,18 +486,18 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่ส่งข้อมูลจริง — mock ตาม changelog ก่อน
-      if (kDebugMode) {
-        final json = paymentMethod == 'coin'
-            ? _mockConfirmCoin
-            : paymentMethod == 'tp_wallet'
-            ? _mockConfirmWallet
-            : _mockConfirmQr;
-        return RepoResult.success(
-          data: CheckoutDraftData.fromJson(
-            jsonDecode(json)['data'] as Map<String, dynamic>,
-          ),
-        );
-      }
+      // if (kDebugMode) {
+      //   final json = paymentMethod == 'coin'
+      //       ? _mockConfirmCoin
+      //       : paymentMethod == 'tp_wallet'
+      //       ? _mockConfirmWallet
+      //       : _mockConfirmQr;
+      //   return RepoResult.success(
+      //     data: CheckoutDraftData.fromJson(
+      //       jsonDecode(json)['data'] as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.confirmBrownyShopCheckout(
         CheckoutConfirmRequest(
           customerId: customerId,
@@ -529,13 +529,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): mock = paid เพื่อให้ flow เดินจนถึงหน้า receipt ตอน debug
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: PaymentStatusCheckResponse.fromJson(
-            jsonDecode(_mockPaymentPaid) as Map<String, dynamic>,
-          ),
-        );
-      }
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: PaymentStatusCheckResponse.fromJson(
+      //       jsonDecode(_mockPaymentPaid) as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.checkBrownyShopPaymentStatus(
         paymentRef,
       );
@@ -560,13 +560,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
     required String orderId,
   }) async {
     try {
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: BrownyShopReceiptResponse.fromJson(
-            jsonDecode(_mockReceipt2) as Map<String, dynamic>,
-          ),
-        );
-      }
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: BrownyShopReceiptResponse.fromJson(
+      //       jsonDecode(_mockReceipt2) as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.fetchBrownyShopReceipt(orderId);
       if (!response.isSuccessful) return RepoResult.empty();
       return RepoResult.success(data: response.data);
@@ -614,9 +614,9 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่พร้อม — mock = success ตอน debug
-      if (kDebugMode) {
-        return RepoResult.success(data: true);
-      }
+      // if (kDebugMode) {
+      //   return RepoResult.success(data: true);
+      // }
       final response = await requireRemote.submitBrownyShopReview(
         orderId,
         MachineOrderReviewRequest(score: score),
@@ -635,13 +635,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่พร้อม — mock ตาม changelog ตอน debug
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: BrownyShopOrderDetailData.fromJson(
-            jsonDecode(_mockOrderDetail)['data'] as Map<String, dynamic>,
-          ),
-        );
-      }
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: BrownyShopOrderDetailData.fromJson(
+      //       jsonDecode(_mockOrderDetail)['data'] as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.fetchBrownyShopOrderDetail(
         orderId,
         customerId,
@@ -662,13 +662,13 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่พร้อม — mock = order รอชำระ (QR) ตอน debug
-      if (kDebugMode) {
-        return RepoResult.success(
-          data: CheckoutDraftData.fromJson(
-            jsonDecode(_mockConfirmQr)['data'] as Map<String, dynamic>,
-          ),
-        );
-      }
+      // if (kDebugMode) {
+      //   return RepoResult.success(
+      //     data: CheckoutDraftData.fromJson(
+      //       jsonDecode(_mockConfirmQr)['data'] as Map<String, dynamic>,
+      //     ),
+      //   );
+      // }
       final response = await requireRemote.fetchBrownyShopOrder(
         orderId,
         customerId,

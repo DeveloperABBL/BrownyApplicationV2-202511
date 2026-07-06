@@ -1,6 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/product_types_response.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/widgets/product_item_widget.dart';
 import 'package:flutter/foundation.dart';
 
@@ -192,15 +193,19 @@ class BrownyShopCategoriesGridSection extends StatelessWidget {
                 final firstSub = (p.productSubs?.isNotEmpty ?? false)
                     ? p.productSubs!.first
                     : null;
-                return ProductItemWidget(
-                  imageUrl: p.mainImageUrl ?? firstSub?.imageUrl,
-                  name: p.getNameDisplay(locale),
-                  coinPrice: firstSub?.coinPrice?.toString(),
-                  moneyPrice: firstSub?.moneyPrice?.toString(),
-                  isFreeShipping: p.isFreeShipping ?? false,
-                  isFavorite: p.favoriteStatus ?? false,
-                  onTap: () => onProductTap?.call(p),
-                  onFavoriteTap: () => onProductFavoriteTap?.call(p),
+                // อ่านสถานะโปรดจาก store กลาง (fallback ค่าจาก API) เพื่อ sync
+                // กับหน้ารายละเอียดสินค้า/หน้าอื่นแบบ real-time
+                return Consumer<BrownyShopFavoriteStore>(
+                  builder: (context, favStore, _) => ProductItemWidget(
+                    imageUrl: p.mainImageUrl ?? firstSub?.imageUrl,
+                    name: p.getNameDisplay(locale),
+                    coinPrice: firstSub?.coinPrice?.toString(),
+                    moneyPrice: firstSub?.moneyPrice?.toString(),
+                    isFreeShipping: p.isFreeShipping ?? false,
+                    isFavorite: favStore.resolve(p.id, p.favoriteStatus ?? false),
+                    onTap: () => onProductTap?.call(p),
+                    onFavoriteTap: () => onProductFavoriteTap?.call(p),
+                  ),
                 );
               },
             ),

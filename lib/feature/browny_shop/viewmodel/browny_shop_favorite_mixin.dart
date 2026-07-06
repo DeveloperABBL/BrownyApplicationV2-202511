@@ -1,6 +1,7 @@
 import 'package:browny_applications_new/core/core_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/products_response.dart';
 import 'package:browny_applications_new/core/viewmodels/app_viewmodel.dart';
+import 'package:browny_applications_new/feature/browny_shop/providers/browny_shop_favorite_store.dart';
 import 'package:browny_applications_new/feature/browny_shop/repository/browny_shop_repo.dart';
 
 /// Mixin เพิ่มความสามารถ toggle "สินค้าโปรด" ให้ VM ที่ render grid สินค้า
@@ -44,7 +45,11 @@ mixin BrownyShopFavoriteMixin on AppViewModel {
 
   /// แทนที่ favoriteStatus ของสินค้า [productId] แล้วยิง notifier ด้วย list ใหม่
   /// (ต้องเป็น instance ใหม่ ValueNotifier จึงจะ notify)
+  ///
+  /// เขียนลง [BrownyShopFavoriteStore] ด้วย เพื่อ sync ไปหน้าอื่น (รายละเอียด
+  /// สินค้า / Home / Coin / Search / Favorites) แบบ real-time
   void _applyFavorite(String productId, bool favorite) {
+    context.read<BrownyShopFavoriteStore>().setFavorite(productId, favorite);
     final list = favoriteProductsNotifier.value.data;
     if (list == null) return;
     favoriteProductsNotifier.value = UiResult.success(

@@ -629,7 +629,7 @@ class _AddToCartBottomSheetState extends State<_AddToCartBottomSheet> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.textTheme.labelSmall?.copyWith(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 color: !inStock
                     ? AppColors.productStroke
                     : AppColors.gray600,
