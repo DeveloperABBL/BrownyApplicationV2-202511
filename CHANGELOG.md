@@ -1,4 +1,15 @@
 # CHANGELOG
+### DONG 2026-07-17
+- [hotfix v3.0.6]
+  - ดัก error UserDuplicated เพิ่ม ให้แสดง wordig เตือนว่าใช้ เบอร์ / อีเมล์ซ้ำกันในระบบ
+  - ดัก error Unprocessable เพิ่ม ให้แสดง wordig เตือนถ้าเป็น error contactCallCenterType ให้ติดต่อ Call Center
+
+### DONG 2026-07-15
+- [hotfix v3.0.6] แก้ไข Logic การตรวจสอบ User ก่อนที่จะขอเปลี่ยนรหัสผ่านทำงานไม่ถูกต้อง ทำให้สามารถเปลี่ยนรหัสผ่านได้ทั้งๆ ที่ไม่มี user ในระบบ
+
+### DONG 2026-07-06
+- [hotfix v3.0.5] ปิด link `ในกรณีที่ท่านพบปัญหาการใช้งาน หรือต้องการขอคืนเงิน กรุณาคลิกที่นี่` ในหน้า Wallet topup
+
 ### DONG 2026-06-09
 - เพิ่มเช็ค Machine status inactive, maintenance
 

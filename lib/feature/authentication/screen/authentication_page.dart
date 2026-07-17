@@ -1685,9 +1685,21 @@ class _ForgotPasswordWidget extends _SignUpWidget {
               final result = await vm.onSummitForm();
 
               if (!context.mounted) return;
+              FocusManager.instance.primaryFocus?.unfocus();
               AppOverlays.hideLoading();
 
               if (result.isEmpty && !result.hasError) {
+                AppOverlays.showBrownyDialog(
+                  context,
+                  title: context.wording.errorOccurred,
+                  // ไม่พบบัญชีผู้ใช้ที่ตรงกับข้อมูลนี้
+                  message: context.wording.userNotFound,
+                  confirmText: context.wording.signUpNow,
+                  onConfirm: () {
+                    goToProcess(context, AuthenProcess.signup);
+                  },
+                  cancelText: context.wording.tryAgain,
+                );
                 return;
               }
 

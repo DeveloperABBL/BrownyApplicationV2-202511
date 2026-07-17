@@ -795,6 +795,12 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           }
         }
 
+        if (currentProcess == AuthenProcess.forgotPassword) {
+          if (checkUserExists.hasData && checkUserExists.data) {
+            return UiResult.empty();
+          }
+        }
+
         return UiResult.success(data: null);
       }
     }
@@ -1190,6 +1196,13 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
   // =========== OTP Timer Methods ===========
 
   Future<void> startOtpTimer() async {
+    final needSendOtp =
+        currentProcess == AuthenProcess.signupOTP ||
+        currentProcess == AuthenProcess.changePasswordOTP ||
+        currentProcess == AuthenProcess.forgotPasswordOTP;
+    if (!needSendOtp) {
+      return;
+    }
     if (_otpTimer == null || !_otpTimer!.isActive || _otpRequestResend) {
       await _requestOTP();
 

@@ -64,7 +64,7 @@ class UserDuplicated extends AuthenExceptions {
 
   @override
   String toUiMessage(BuildContext context) {
-    return context.wording.userDuplicated;
+    return super.message ?? context.wording.userDuplicated;
   }
 
   @override
@@ -172,5 +172,21 @@ class ChangePasswordReused extends AuthenExceptions {
   @override
   String toString() {
     return super.message ?? 'Password re-used!';
+  }
+}
+
+class ContactCallCenterException extends AuthenExceptions {
+  static const contactCallCenterType = 'contact_call_center';
+  ContactCallCenterException([super.message]);
+
+  @override
+  String toUiMessage(BuildContext context) {
+    // กรณีเปลี่ยนเบอร์โทรศัพท์ / อีเมล กรุณาติดต่อ Call Center
+    return context.wording.contactCallCenterForPhoneOrEmailChange;
+  }
+
+  @override
+  String toString() {
+    return super.message ?? 'Please contact Call Center';
   }
 }

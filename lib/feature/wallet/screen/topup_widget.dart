@@ -60,35 +60,37 @@ class _TopupContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // DONG 06-07-2026 ปิด Field จาก link ของคืนเงินจาก wallet
               // Text แจ้งปัญหา
-              FutureBuilder(
-                future: viewModel.fetchTermsLink(),
-                builder: (context, asyncSnapshot) {
-                  return TextButton(
-                    onPressed: !asyncSnapshot.hasData
-                        ? null
-                        : () async {
-                            final link = asyncSnapshot.data?.data?.problemLink;
-                            await LaunchHelper.openUrlInBrowser(link.orEmpty);
-                          },
-                    style: context.appTheme.textButtonTheme.style!.copyWith(
-                      overlayColor: WidgetStatePropertyAll(
-                        AppColors.transparent,
-                      ),
-                    ),
-                    child: AppText(
-                      context.wording.reportIssueOrRefundMessage,
-                      style: context.textTheme.titleSmall!.copyWith(
-                        fontSize: AppDims.size_10.sp,
-                        color: AppColors.cocoaBrown,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.cocoaBrown,
-                      ),
-                    ),
-                  );
-                },
-              ),
-
+              // FutureBuilder(
+              //   future: viewModel.fetchTermsLink(),
+              //   builder: (context, asyncSnapshot) {
+              //     return TextButton(
+              //       onPressed: !asyncSnapshot.hasData
+              //           ? null
+              //           : () async {
+              //               final link =
+              //                   asyncSnapshot.data?.data?.problemLink;
+              //               await LaunchHelper.openUrlInBrowser(link.orEmpty);
+              //             },
+              //       style: context.appTheme.textButtonTheme.style!.copyWith(
+              //         overlayColor: WidgetStatePropertyAll(
+              //           AppColors.transparent,
+              //         ),
+              //       ),
+              //       child: AppText(
+              //         context.wording.reportIssueOrRefundMessage,
+              //         style: context.textTheme.titleSmall!.copyWith(
+              //           fontSize: AppDims.size_10.sp,
+              //           color: AppColors.cocoaBrown,
+              //           decoration: TextDecoration.underline,
+              //           decorationColor: AppColors.cocoaBrown,
+              //         ),
+              //       ),
+              //     );
+              //   },
+              // ),
+              AppDims.vericalPadding_24,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

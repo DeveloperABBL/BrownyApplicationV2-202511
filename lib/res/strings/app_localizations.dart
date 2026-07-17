@@ -2812,6 +2812,12 @@ abstract class AppLocalizations {
   /// **'New password must not be the same as old password'**
   String get newPasswordSameAsOld;
 
+  /// No description provided for @contactCallCenterForPhoneOrEmailChange.
+  ///
+  /// In en, this message translates to:
+  /// **'To change your phone number / email, please contact the Call Center'**
+  String get contactCallCenterForPhoneOrEmailChange;
+
   /// No description provided for @error.
   ///
   /// In en, this message translates to:

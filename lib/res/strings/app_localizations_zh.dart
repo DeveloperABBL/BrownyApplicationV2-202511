@@ -1381,6 +1381,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newPasswordSameAsOld => '新密码不能与旧密码相同';
 
   @override
+  String get contactCallCenterForPhoneOrEmailChange =>
+      '如需更改电话号码 / 电子邮箱，请联系客服中心';
+
+  @override
   String get error => '发生错误';
 
   @override

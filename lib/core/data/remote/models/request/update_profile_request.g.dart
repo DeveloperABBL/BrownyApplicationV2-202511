@@ -23,11 +23,11 @@ Map<String, dynamic> _$UpdateProfileRequestToJson(
   UpdateProfileRequest instance,
 ) => <String, dynamic>{
   'id': instance.id,
-  'name': instance.name,
-  'gender': instance.gender,
-  'birthdate': instance.birthdate,
-  'profile_image_base64': instance.profileImageBase64,
-  'profile_image_url': instance.profileImageUrl,
-  'email': instance.email,
-  'phone': instance.phone,
+  'name': ?instance.name,
+  'gender': ?instance.gender,
+  'birthdate': ?instance.birthdate,
+  'profile_image_base64': ?instance.profileImageBase64,
+  'profile_image_url': ?instance.profileImageUrl,
+  'email': ?instance.email,
+  'phone': ?instance.phone,
 };
