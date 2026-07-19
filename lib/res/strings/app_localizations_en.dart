@@ -1466,6 +1466,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'New password must not be the same as old password';
 
   @override
+  String get contactCallCenterForPhoneOrEmailChange =>
+      'To change your phone number / email, please contact the Call Center';
+
+  @override
   String get error => 'An error occurred';
 
   @override

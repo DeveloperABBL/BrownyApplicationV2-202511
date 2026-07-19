@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:browny_applications_new/core/const/app_constants.dart';
+import 'package:browny_applications_new/core/data/remote/models/api_model_index.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_profile_request.dart';
 import 'package:browny_applications_new/core/data/remote/models/response/customer_profile_response.dart';
 import 'package:browny_applications_new/core/utils/app_extensions.dart';
@@ -48,7 +50,20 @@ class ProfileRepo extends CustomerDataRepo with ProfileDataSourceMixin {
           'HTTP ${response.response.statusCode}: ${response.response.statusMessage}',
         ),
       );
-    } on DioException catch (_) {
+    } on DioException catch (dioEx) {
+      if (dioEx.response?.isDuplicated == true) {
+        return RepoResult.error(error: UserDuplicated());
+      }
+      if (dioEx.response?.isUnprocessable == true) {
+        String? message;
+        try {
+          final handler = BaseResponse.fromJson(
+            dioEx.response?.data,
+          );
+          message = handler.errorType;
+        } catch (_) {}
+        return RepoResult.error(error: Unprocessable(message));
+      }
       return RepoResult.empty(error: Unprocessable());
     } catch (e) {
       return RepoResult.error(error: Exception(e.toString()));

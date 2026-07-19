@@ -1459,6 +1459,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get newPasswordSameAsOld => 'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม';
 
   @override
+  String get contactCallCenterForPhoneOrEmailChange =>
+      'กรณีเปลี่ยนเบอร์โทรศัพท์ / อีเมล กรุณาติดต่อ Call Center';
+
+  @override
   String get error => 'เกิดข้อผิดพลาด';
 
   @override

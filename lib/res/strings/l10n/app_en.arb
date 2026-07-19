@@ -527,6 +527,7 @@
   "couponAlreadyCollected": "You have already collected this coupon",
   "invalidOldPassword": "Old password is incorrect",
   "newPasswordSameAsOld": "New password must not be the same as old password",
+  "contactCallCenterForPhoneOrEmailChange": "To change your phone number / email, please contact the Call Center",
   "error": "An error occurred",
   "userCancelledBiometric": "You cancelled authentication",
   "biometricLockedOut": "Too many failed attempts\nPlease wait a moment or use PIN",

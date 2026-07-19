@@ -476,6 +476,7 @@
   "couponAlreadyCollected": "您已经领取过此优惠券",
   "invalidOldPassword": "旧密码不正确",
   "newPasswordSameAsOld": "新密码不能与旧密码相同",
+  "contactCallCenterForPhoneOrEmailChange": "如需更改电话号码 / 电子邮箱，请联系客服中心",
   "error": "发生错误",
   "userCancelledBiometric": "您已取消身份验证",
   "biometricLockedOut": "尝试次数过多\\n请稍候或使用PIN码",

@@ -23,25 +23,25 @@ class UpdateProfileRequest {
   @JsonKey(name: 'id')
   final String id;
 
-  @JsonKey(name: 'name')
+  @JsonKey(name: 'name', includeIfNull: false)
   final String? name;
 
-  @JsonKey(name: 'gender')
+  @JsonKey(name: 'gender', includeIfNull: false)
   final String? gender;
 
-  @JsonKey(name: 'birthdate')
+  @JsonKey(name: 'birthdate', includeIfNull: false)
   final String? birthdate;
 
-  @JsonKey(name: 'profile_image_base64')
+  @JsonKey(name: 'profile_image_base64', includeIfNull: false)
   final String? profileImageBase64;
 
-  @JsonKey(name: 'profile_image_url')
+  @JsonKey(name: 'profile_image_url', includeIfNull: false)
   final String? profileImageUrl;
 
-  @JsonKey(name: 'email')
+  @JsonKey(name: 'email', includeIfNull: false)
   final String? email;
 
-  @JsonKey(name: 'phone')
+  @JsonKey(name: 'phone', includeIfNull: false)
   final String? phone;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>

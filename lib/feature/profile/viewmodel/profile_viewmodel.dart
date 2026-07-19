@@ -7,6 +7,7 @@ import 'package:browny_applications_new/core/data/cache/app_local_storage.dart';
 import 'package:browny_applications_new/core/data/cache/app_local_secure_storage.dart';
 import 'package:browny_applications_new/core/data/cache/biometric_helper.dart';
 import 'package:browny_applications_new/core/data/remote/models/request/update_notification_preferences_request.dart';
+import 'package:browny_applications_new/feature/authentication/error/authen_exception.dart';
 import 'package:browny_applications_new/feature/authentication/repository/pin_biometric_repository.dart';
 import 'package:browny_applications_new/feature/authentication/screen/app_pin_page.dart';
 import 'package:browny_applications_new/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
@@ -744,8 +745,8 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
           : currentUser.birthday,
       profileImageBase64: profileImage64Update,
       profileImageUrl: profileImageUrlUpdate,
-      email: emailController.text,
-      phone: phoneController.text,
+      email: emailController.text.ifNullOrEmpty(currentUser.email.orEmpty),
+      phone: phoneController.text.ifNullOrEmpty(currentUser.phone.orEmpty),
     );
 
     try {
@@ -774,6 +775,30 @@ class ProfileViewModel extends AppViewModelFormFieldValidation {
         _profileDataNotifier.value = UiResult.success(data: updatedUser);
 
         return UiResult.success(data: updatedUser);
+      }
+
+      // ดัก error UserDuplicated เพิ่ม ให้แสดง wordig
+      // เตือนว่าใช้ เบอร์ / อีเมล์ซ้ำกันในระบบ
+      if (context.mounted &&
+          result.hasError &&
+          result.error is UserDuplicated) {
+        return UiResult.error(
+          error: UserDuplicated(
+            // อีเมล / เบอร์โทรศัพท์ มีผู้ใช้งานอยู่ในระบบแล้ว
+            '${context.wording.emailOrPhone}\n${context.wording.userDuplicated}',
+          ),
+        );
+      }
+
+      // ดัก error Unprocessable เพิ่ม ให้แสดง wordig
+      // เตือนถ้าเป็น error contactCallCenterType ให้ติดต่อ Call Center
+      if (context.mounted && result.hasError && result.error is Unprocessable) {
+        if (result.error.toString() ==
+            ContactCallCenterException.contactCallCenterType) {
+          return UiResult.error(
+            error: ContactCallCenterException(),
+          );
+        }
       }
 
       return UiResult.error(

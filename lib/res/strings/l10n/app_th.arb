@@ -478,6 +478,7 @@
   "couponAlreadyCollected": "คุณได้รับคูปองนี้ไปแล้ว",
   "invalidOldPassword": "รหัสผ่านเดิมไม่ถูกต้อง",
   "newPasswordSameAsOld": "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม",
+  "contactCallCenterForPhoneOrEmailChange": "กรณีเปลี่ยนเบอร์โทรศัพท์ / อีเมล กรุณาติดต่อ Call Center",
   "error": "เกิดข้อผิดพลาด",
   "userCancelledBiometric": "คุณยกเลิกการยืนยันตัวตน",
   "biometricLockedOut": "ลองผิดหลายครั้งเกินไป\\nกรุณารอสักครู่หรือใช้ PIN",
