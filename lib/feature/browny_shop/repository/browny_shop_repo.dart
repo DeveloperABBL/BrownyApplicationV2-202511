@@ -614,9 +614,9 @@ class BrownyShopRepo extends AppRepository with BrownyShopDataSourceMixin {
   }) async {
     try {
       // TODO(api): backend ยังไม่พร้อม — mock = success ตอน debug
-      // if (kDebugMode) {
-      //   return RepoResult.success(data: true);
-      // }
+      if (kDebugMode) {
+        return RepoResult.success(data: true);
+      }
       final response = await requireRemote.submitBrownyShopReview(
         orderId,
         MachineOrderReviewRequest(score: score),
