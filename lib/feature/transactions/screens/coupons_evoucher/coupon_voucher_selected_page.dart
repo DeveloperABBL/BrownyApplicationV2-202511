@@ -101,7 +101,7 @@ class _CouponVoucherSelectedState extends State<CouponVoucherSelected> {
                     machineId: machine.storeMachineId!.toString(),
                     customerCouponModel: couponData,
                   );
-                } on Exception catch (_) {
+                } catch (_) {
                   if (!context.mounted) return;
 
                   AppOverlays.showBrownyDialog(

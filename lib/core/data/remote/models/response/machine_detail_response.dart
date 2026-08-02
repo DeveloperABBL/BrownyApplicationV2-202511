@@ -34,10 +34,24 @@ class MachineDetailResponse extends BaseModelResponse {
     this.programImage,
     this.programName,
     this.machineType,
+    this.isOrderCleared = false,
     super.success,
     super.message,
     super.errorType,
   });
+
+  /// DONG 2026-08-02
+  ///
+  /// `true` = API เคลียร์ข้อมูล order (order_id / receipt_no) ทิ้งแล้ว
+  /// แปลว่าเครื่องทำงานเสร็จเรียบร้อย
+  ///
+  /// จำเป็นต้องเก็บแยกไว้ เพราะ [retainDataFrom] จะเติมข้อมูล order เดิม
+  /// กลับเข้ามาใน object นี้เพื่อใช้แสดงผล ทำให้ดูจาก [orderId] / [receiptNo]
+  /// ตรงๆ ไม่ได้อีกต่อไป
+  ///
+  /// ไม่ได้มาจาก JSON — ถูกกำหนดค่าใน [retainDataFrom] เท่านั้น
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final bool isOrderCleared;
 
   @JsonKey(name: 'id')
   final int? id;
@@ -150,6 +164,30 @@ class MachineDetailResponse extends BaseModelResponse {
   /// เช็คว่าเครื่องเป็นสถานะ Failed หรือไม่
   bool get isFailed => !isAvailable && !isBusy;
 
+  /// DONG 2026-08-02
+  ///
+  /// เช็คว่ามี order ผูกอยู่กับเครื่องหรือไม่
+  ///
+  /// API จะส่ง order_id / receipt_no มาเสมอ ทั้งตอนที่เครื่องยังไม่เริ่มทำงาน
+  /// และตอนที่กำลังทำงานอยู่ แต่จะเคลียร์เป็นค่าว่างเมื่อเครื่องทำงานเสร็จแล้ว
+  bool get hasOrder =>
+      !isOrderCleared &&
+      (orderId.orEmpty.isNotEmpty || receiptNo.orEmpty.isNotEmpty);
+
+  /// DONG 2026-08-02
+  ///
+  /// เครื่องทำงานเสร็จเรียบร้อยแล้ว
+  ///
+  /// เมื่อเครื่องทำงานเสร็จ status จะกลับมาเป็น `Vacant` เหมือนตอนที่ยังไม่เริ่ม
+  /// ทำงาน ต่างกันตรงที่ order_id / receipt_no จะถูกเคลียร์ทิ้ง จึงต้องใช้
+  /// [hasOrder] มาแยกอีกชั้น
+  bool get isCompleted => isAvailable && !hasOrder;
+
+  /// DONG 2026-08-02
+  ///
+  /// เครื่องยังไม่เริ่มทำงาน (จ่ายเงินแล้ว แต่ผู้ใช้ยังไม่กดปุ่มที่หน้าเครื่อง)
+  bool get isNotStarted => !isBusy && !isCompleted;
+
   Color get getColorByStatus {
     if (isFailed) {
       return AppColors.error;
@@ -174,6 +212,97 @@ class MachineDetailResponse extends BaseModelResponse {
         return Assets.services.dryerExtendTime;
     }
   }
+
+  MachineDetailResponse copyWith({
+    int? id,
+    String? orderId,
+    String? receiptNo,
+    ContentLocalizeData? storeName,
+    String? status,
+    DateTime? startTime,
+    String? finishDatatime,
+    String? remainingTime,
+    String? machineNo,
+    String? machineImage,
+    ContentLocalizeData? name,
+    List<ProgramData>? addTime,
+    String? programImage,
+    ContentLocalizeData? programName,
+    ContentLocalizeData? machineType,
+    bool? isOrderCleared,
+    bool? success,
+    String? message,
+    String? errorType,
+  }) {
+    return MachineDetailResponse(
+      id: id ?? this.id,
+      orderId: orderId ?? this.orderId,
+      receiptNo: receiptNo ?? this.receiptNo,
+      storeName: storeName ?? this.storeName,
+      status: status ?? this.status,
+      startTime: startTime ?? this.startTime,
+      finishDatatime: finishDatatime ?? this.finishDatatime,
+      remainingTime: remainingTime ?? this.remainingTime,
+      machineNo: machineNo ?? this.machineNo,
+      machineImage: machineImage ?? this.machineImage,
+      name: name ?? this.name,
+      addTime: addTime ?? this.addTime,
+      programImage: programImage ?? this.programImage,
+      programName: programName ?? this.programName,
+      machineType: machineType ?? this.machineType,
+      isOrderCleared: isOrderCleared ?? this.isOrderCleared,
+      success: success ?? this.success,
+      message: message ?? this.message,
+      errorType: errorType ?? this.errorType,
+    );
+  }
+
+  /// DONG 2026-08-02
+  ///
+  /// เมื่อเครื่องทำงานเสร็จ API จะเคลียร์ข้อมูลของ order ทิ้งทั้งหมด
+  /// (order_id, receipt_no, startTime, finish_datatime, program_name,
+  /// program_image, addTime) ทำให้หน้าจอที่เปิดค้างไว้ข้อมูลหายไปหมด
+  ///
+  /// method นี้จะเติมเฉพาะค่าที่หายไป จาก [previous] (response ก่อนหน้า)
+  /// เพื่อให้หน้าจอยังแสดงข้อมูล order เดิมได้ต่อ
+  ///
+  /// ยกเว้น [status] กับ [remainingTime] ที่ใช้ค่าจาก response ใหม่เสมอ
+  /// เพราะเป็นข้อมูลสถานะแบบ realtime
+  MachineDetailResponse retainDataFrom(MachineDetailResponse? previous) {
+    // ต้องอ่านสถานะ order จาก response ที่ API ส่งมา ก่อนจะเติมค่าเดิมกลับเข้าไป
+    final orderCleared = orderId.orEmpty.isEmpty && receiptNo.orEmpty.isEmpty;
+
+    if (previous == null) {
+      return copyWith(isOrderCleared: orderCleared);
+    }
+
+    return copyWith(
+      isOrderCleared: orderCleared,
+      id: id ?? previous.id,
+      orderId: _keepText(orderId, previous.orderId),
+      receiptNo: _keepText(receiptNo, previous.receiptNo),
+      storeName: _keepContent(storeName, previous.storeName),
+      startTime: startTime ?? previous.startTime,
+      finishDatatime: _keepText(finishDatatime, previous.finishDatatime),
+      machineNo: _keepText(machineNo, previous.machineNo),
+      machineImage: _keepText(machineImage, previous.machineImage),
+      name: _keepContent(name, previous.name),
+      addTime: (addTime?.isNotEmpty ?? false) ? addTime : previous.addTime,
+      programImage: _keepText(programImage, previous.programImage),
+      programName: _keepContent(programName, previous.programName),
+      machineType: _keepContent(machineType, previous.machineType),
+    );
+  }
+
+  /// คืนค่า [next] ถ้ามีข้อความ ถ้าเป็นค่าว่างให้คืนค่าเดิม [previous]
+  static String? _keepText(String? next, String? previous) =>
+      next.orEmpty.isNotEmpty ? next : previous;
+
+  /// คืนค่า [next] ถ้ามีข้อความอย่างน้อย 1 ภาษา ถ้าว่างให้คืนค่าเดิม [previous]
+  static ContentLocalizeData? _keepContent(
+    ContentLocalizeData? next,
+    ContentLocalizeData? previous,
+  ) => (next?.isNotEmpty ?? false) ? next : previous;
 
   factory MachineDetailResponse.fromJson(Map<String, dynamic> json) =>
       _$MachineDetailResponseFromJson(json);

@@ -46,3 +46,7 @@ app.*.map.json
 
 # ios/Podfile
 macos/Podfile
+
+# graphify knowledge-graph outputs (generated; rebuild with /graphify lib)
+graphify-out/
+lib/graphify-out/

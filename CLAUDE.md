@@ -66,6 +66,22 @@ Each feature repository extends `AppRepository` (in `lib/core/data/repo/`) so it
 
 ARB files: `lib/res/strings/l10n/app_{en,th,zh}.arb` → generated `AppLocalizations`. Three locales: Thai (default), English, Chinese. Default language stored in Hive via `AppLocalStorage.getLanguage()` (falls back to `'th'`).
 
+## Knowledge Graph (graphify) — consult on every coding task
+
+This repo has a persistent **code knowledge graph** built by [graphify](https://github.com/safishamsi/graphify), scoped to `lib/` (the Flutter app source). It is AST-extracted (classes, functions, `references` / `extends` / `inherits` edges) — ~7,193 nodes / ~9,327 edges across 260 communities. Generated outputs live in `graphify-out/` (git-ignored):
+
+- `graphify-out/graph.json` — raw graph data (source of truth for queries)
+- `graphify-out/GRAPH_REPORT.md` — god nodes, community map, cross-feature bridges
+- `graphify-out/graph.html` — interactive view
+
+**Use the graph as a first step, not an afterthought:**
+
+- **Before** answering any question about architecture, where a symbol lives, what calls/extends/references something, or how data flows — and before planning a change that spans multiple files — query the graph FIRST via the `/graphify` skill: `/graphify query "<question>"` (fast path: reads the existing graph, no rebuild). Cite `source_location` from the results rather than guessing.
+- Prefer the graph over blind `grep` for understanding **relationships** (inheritance chains, `feature/*` ↔ `core/data` coupling, which ViewModel touches which repo). Known cross-community bridges worth checking: `CustomerProvider`, `ContentLocalizeData`, `BaseModelResponse`, `AddressRepo`, `BrownyShopSelectedViewModel`.
+- **After** landing code changes under `lib/`, refresh the graph incrementally so it stays accurate: `/graphify lib --update` (re-extracts only changed files; AST-only, no LLM cost).
+- If `graphify-out/` is missing (fresh clone), rebuild the graph with `/graphify lib`.
+- Never hand-edit anything in `graphify-out/` — it is regenerated.
+
 ## Conventions & Gotchas
 
 - **Generator compatibility**: `retrofit_generator: ^10.2.5` and `hive_ce_generator: ^1.11.1` were chosen to coexist — do not bump independently without verifying both still build.

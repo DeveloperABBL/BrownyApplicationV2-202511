@@ -83,7 +83,9 @@ mixin CustomerDataSourceMixin {
   Future<RepoResult<CheckTokenResponse>> checkToken();
 
   /// ตรวจสอบสถานะระบบแนะนำเพื่อน
-  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({String? phone});
+  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({
+    String? phone,
+  });
 }
 
 /// คลาสสำหรับจัดการรีโพซิทอรีการเข้าสู่ระบบ
@@ -247,14 +249,14 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
       return RepoResult.dependOn(profileResult);
     } on DioException catch (dioEx) {
       // ถ้าไม่พบผู้ใช้
-      if (dioEx.response!.isNotFound) {
+      if (dioEx.response?.isNotFound == true) {
         return RepoResult.empty(
           error: UserNotFound(),
         );
       }
 
       // ถ้าผู้ใช้ไม่ได้รับอนุญาต
-      if (dioEx.response!.isUnauthorized) {
+      if (dioEx.response?.isUnauthorized == true) {
         return RepoResult.empty(
           error: UserUnauthorized(),
         );
@@ -565,7 +567,9 @@ class CustomerDataRepo extends OTPDataRepo with CustomerDataSourceMixin {
   }
 
   @override
-  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({String? phone}) async {
+  Future<RepoResult<ReferralStatusResponse>> fetchReferralStatus({
+    String? phone,
+  }) async {
     try {
       final response = await requireRemote.fetchReferralStatus(
         ReferralStatusRequest(phone: phone),

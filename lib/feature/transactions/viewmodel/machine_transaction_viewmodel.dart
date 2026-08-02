@@ -75,13 +75,21 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       return UiResult.empty();
     }
 
+    // DONG 2026-08-02
+    // เมื่อเครื่องทำงานเสร็จ API จะเคลียร์ข้อมูล order ทิ้ง (order_id, receipt_no,
+    // startTime, program_name ฯลฯ) จึงต้องเติมค่าจาก response ก่อนหน้ากลับเข้าไป
+    // เพื่อให้หน้าจอยังแสดงข้อมูลของ order เดิมได้
+    final machineDetail = result.data.retainDataFrom(
+      _machineDetailNotifier.value,
+    );
+
     // เก็บข้อมูลใน notifier
-    _machineDetailNotifier.value = result.data;
+    _machineDetailNotifier.value = machineDetail;
 
     // คำนวณและเริ่ม timer
-    _calculateSliderValues(result.data);
+    _calculateSliderValues(machineDetail);
 
-    return UiResult.success(data: result.data);
+    return UiResult.success(data: machineDetail);
   }
 
   /// คำนวณค่าต่างๆ สำหรับ Slider จากข้อมูล MachineDetailResponse
@@ -129,6 +137,18 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       }
     } catch (e) {
       debugPrint('Error calculating slider values: $e');
+    }
+
+    // DONG 2026-08-02
+    // เครื่องทำงานเสร็จแล้ว ต้องบังคับให้ progress เต็มหลอด (remaining = 0)
+    // และหยุด timer เสมอ
+    //
+    // จำเป็นต้องเช็คแยกไว้ตรงนี้ เผื่อกรณีที่เพิ่งเปิดหน้านี้ตอนเครื่องทำงานเสร็จไปแล้ว
+    // ซึ่งจะไม่มี response ก่อนหน้าให้เติมค่า startTime / finish_datatime
+    // ทำให้ด้านบนคำนวณค่าไม่ได้และไม่ได้ set remaining เป็น 0
+    if (machineDetail.isCompleted) {
+      _statusUpdateTimer?.cancel();
+      _remainingDurationNotifier.value = Duration.zero;
     }
   }
 
@@ -481,6 +501,11 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
   @override
   Future<UiResult<double>> verifyOrder() async {
     try {
+      if (kDebugMode && paymentSelected?.isCoin == true) {
+        return UiResult.success(
+          data: _machineProgramsNotifier.value.data!.getNetPrice(),
+        );
+      }
       if (paymentSelected?.isTpWallet == true ||
           paymentSelected?.isCoin == true) {
         final result = await _couponRepo.fetchCustomerCredit(

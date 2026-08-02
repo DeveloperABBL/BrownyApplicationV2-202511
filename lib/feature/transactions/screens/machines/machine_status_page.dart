@@ -119,6 +119,8 @@ class _MachineStatusContentState extends State<MachineStatusContent>
       if (mounted) {
         Future.microtask(() async {
           await _viewmodel.fetchMachineDetail(widget.machineId);
+          // เริ่ม/หยุด timer ตามสถานะหลัง fetch เสร็จ เหมือน flow อื่นๆ
+          if (mounted) _syncAutoCheckTimer();
         });
       }
     }
@@ -152,13 +154,17 @@ class _MachineStatusContentState extends State<MachineStatusContent>
   }
 
   /// Sync auto-check timer ตามสถานะเครื่อง
-  /// - ยังไม่เริ่มทำงาน (isBusy == false): start timer poll ทุก 3 วิ
-  /// - ทำงานแล้ว: stop timer
+  /// - ยังไม่เริ่มทำงาน (isNotStarted): start timer poll ทุก 3 วิ
+  /// - กำลังทำงาน หรือทำงานเสร็จแล้ว: stop timer
+  ///
+  /// DONG 2026-08-02
+  /// เดิมเช็คด้วย `!isBusy` ทำให้ตอนเครื่องทำงานเสร็จ (status กลับมาเป็น Vacant)
+  /// timer ถูกสั่งให้เริ่มใหม่และยิง API ทุก 3 วิไปเรื่อยๆ ไม่มีวันหยุด
   void _syncAutoCheckTimer() {
     final machineDetail = _viewmodel.machineDetailNotifier.value;
     if (machineDetail == null) return;
 
-    if (!machineDetail.isBusy) {
+    if (machineDetail.isNotStarted) {
       _startAutoCheckTimer();
     } else {
       _stopAutoCheckTimer();
@@ -202,8 +208,8 @@ class _MachineStatusContentState extends State<MachineStatusContent>
       await _viewmodel.fetchMachineDetail(widget.machineId);
 
       final machineDetail = _viewmodel.machineDetailNotifier.value;
-      if (machineDetail != null && machineDetail.isBusy) {
-        // เครื่องเริ่ลทำงานแล้ว หยุด timer
+      if (machineDetail != null && !machineDetail.isNotStarted) {
+        // เครื่องเริ่มทำงานแล้ว หรือทำงานเสร็จไปแล้ว หยุด timer
         _stopAutoCheckTimer();
       }
     });
@@ -228,7 +234,8 @@ class _MachineStatusContentState extends State<MachineStatusContent>
         ValueListenableBuilder<MachineDetailResponse?>(
           valueListenable: _viewmodel.machineDetailNotifier,
           builder: (context, machineDetail, child) {
-            final notStarted = machineDetail == null || !machineDetail.isBusy;
+            final notStarted =
+                machineDetail == null || machineDetail.isNotStarted;
             return Container(
               padding: EdgeInsets.only(
                 left: AppDims.size_16.w,
@@ -269,7 +276,11 @@ class _MachineStatusContentState extends State<MachineStatusContent>
 
           // เช็คสถานะเครื่องครั้งแรก (เฉพาะครั้งเดียว)
           // ย้ายมาทำใน initState แล้ว ไม่ต้องทำที่นี่
-          final notStarted = !machineDetail.isBusy;
+          //
+          // DONG 2026-08-02
+          // เดิมใช้ `!isBusy` ทำให้ตอนเครื่องทำงานเสร็จ (status กลับมาเป็น Vacant)
+          // เด้งกลับไปแสดง panel "เริ่มการทำงานเครื่อง" แทน timeline + สรุปรายการ
+          final notStarted = machineDetail.isNotStarted;
 
           // แสดง UI ปกติ
           return RefreshIndicator(
@@ -608,9 +619,7 @@ class _MachineStatusContentState extends State<MachineStatusContent>
 
         // สาขา
         AppText(
-          machineDetail.storeName!.getByLocaleCode(
-            context.languageCode,
-          )!,
+          machineDetail.getStoreNameDisplay(context.languageCode),
           style: context.textTheme.bodyMedium!.copyWith(
             color: AppColors.gray500,
           ),

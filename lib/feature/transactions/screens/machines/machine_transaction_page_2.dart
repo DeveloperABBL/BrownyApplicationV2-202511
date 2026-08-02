@@ -286,7 +286,7 @@ class __MachineContentState extends State<_MachineContent>
 
         if (!mounted) return;
         AppOverlays.hideLoading();
-        ReceiptMachinePage.goReplacementPage(
+        await ReceiptMachinePage.goToPage(
           context,
           viewmodel: _viewmodel,
         );
@@ -505,10 +505,12 @@ class __MachineContentState extends State<_MachineContent>
 
           // flagกันคลิกเบิ้ล
           _clearPurchaseClicked();
-          AppOverlays.showBrownyErrorDialog(
-            context,
-            error: orderResult.error,
-          );
+          if (orderResult.hasError) {
+            AppOverlays.showBrownyErrorDialog(
+              context,
+              error: orderResult.error,
+            );
+          }
           return;
         } else {
           // flagกันคลิกเบิ้ล

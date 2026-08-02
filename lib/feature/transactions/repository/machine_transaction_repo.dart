@@ -55,39 +55,7 @@ class MachineRepo extends AppRepository with MachineTransactionDataSourceMixin {
         return RepoResult.success(
           data: MachineDetailResponse.fromJson(
             jsonDecode('''
-            {
-          "id": 626,
-          "store_name": {
-              "th": "จรัญฯ 40",
-              "en": "Charan 40",
-              "zh": "-"
-          },
-          "status": "Busy",
-          "finish_datatime": "00:11",
-          "remaining_time": "00:21:50",
-          "machine_no": "6",
-          "machine_image": "https:\/\/dev.abgroup.co.th\/storage\/galleries\/s3nbAR7QLSPpZ9aSTWSyGV9nXQZy6JhsPgVvaJKL.png",
-          "machine_type": {
-              "th": "เครื่องซัก",
-              "en": "Washer",
-              "zh": "洗衣机"
-          },
-          "name": {
-              "th": "เครื่องซัก 6 - 22.00 กก.",
-              "en": "Washer 6 - 22.00 kg",
-              "zh": "洗衣机 6 - 22.00 公斤"
-          },
-          "order_id": "",
-          "receipt_no": "",
-          "startTime": "",
-          "addTime": [],
-          "program_image": "",
-          "program_name": {
-              "th": "",
-              "en": "",
-              "zh": ""
-          }
-      }
+            {"id": 895,"capacity_kg": 16,"store_name": {"th": "ปั๊มซัสโก้ บางหว้า - เพชรเกษม 33","en": "SUSCO Bangwa Phetkasam 33","zh": "SUSCO Bangwa Phetkasam 33"},"status": "Busy","finish_datatime": "18:52","remaining_time": "00:01:00","machine_no": "6","machine_image": "https://gateway.abgroup.co.th/storage/galleries/az5kkRdMQqi526XNlCy04cU0HtfTr8Kh3UofRvRC.png","machine_type": {"th": "เครื่องอบ","en": "Dryer","zh": "烘干机"},"name": {"th": "เครื่องอบ 6 - 16.00 กก.","en": "Dryer 6 - 16.00 kg","zh": "烘干机 6 - 16.00 公斤"},"order_id": "019f9e1f-9c03-7186-96d9-ad5aee4d931a","receipt_no": "BNP20260726-181202957555","startTime": "2026-07-26 18:12","addTime": [{"name": {"th": "+ 6 นาที","en": "+ 6 minutes","zh": "+ 6 分钟"},"image": "https://brownypay.com/asset/เพิ่มเวลา.png","price": "10.00","program_code": "addTime","discount": null,"net": "10.00"},{"name": {"th": "+ 12 นาที","en": "+ 12 minutes","zh": "+ 12 分钟"},"image": "https://brownypay.com/asset/เพิ่มเวลา.png","price": "20.00","program_code": "addTime","discount": null,"net": "20.00"},{"name": {"th": "+ 18 นาที","en": "+ 18 minutes","zh": "+ 18 分钟"},"image": "https://brownypay.com/asset/เพิ่มเวลา.png","price": "30.00","program_code": "addTime","discount": null,"net": "30.00"},{"name": {"th": "+ 24 นาที","en": "+ 24 minutes","zh": "+ 24 分钟"},"image": "https://brownypay.com/asset/เพิ่มเวลา.png","price": "40.00","program_code": "addTime","discount": null,"net": "40.00"}],"program_image": "https://gateway.abgroup.co.th/storage/galleries/vKaQcmOFX9uN6D9FlnWLY2MdLi9y5k5K1lcvLbst.png","program_name": {"th": "ร้อนปานกลาง","en": "Medium hot","zh": "中辣"}}
             '''),
           ),
         );

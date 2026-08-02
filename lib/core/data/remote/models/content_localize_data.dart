@@ -23,6 +23,16 @@ class ContentLocalizeData {
   @JsonKey(name: 'zh')
   final String? zh;
 
+  /// DONG 2026-08-02
+  ///
+  /// เช็คว่าไม่มีข้อความในทุกภาษา
+  /// (บาง API จะส่ง `{"th": "", "en": "", "zh": ""}` กลับมาแทนที่จะส่ง null)
+  bool get isEmpty =>
+      (th?.isEmpty ?? true) && (en?.isEmpty ?? true) && (zh?.isEmpty ?? true);
+
+  /// มีข้อความอย่างน้อย 1 ภาษา
+  bool get isNotEmpty => !isEmpty;
+
   String? getByLocaleCode(String locale) {
     switch (locale) {
       case 'en':
