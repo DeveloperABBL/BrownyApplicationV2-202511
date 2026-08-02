@@ -68,7 +68,7 @@ ARB files: `lib/res/strings/l10n/app_{en,th,zh}.arb` → generated `AppLocalizat
 
 ## Knowledge Graph (graphify) — consult on every coding task
 
-This repo has a persistent **code knowledge graph** built by [graphify](https://github.com/safishamsi/graphify), scoped to `lib/` (the Flutter app source). It is AST-extracted (classes, functions, `references` / `extends` / `inherits` edges) — ~7,193 nodes / ~9,327 edges across 260 communities. Generated outputs live in `graphify-out/` (git-ignored):
+This repo has a persistent **code knowledge graph** built by [graphify](https://github.com/safishamsi/graphify), scoped to `lib/` (the Flutter app source). It is AST-extracted (classes, functions, `references` / `extends` / `inherits` edges) — ~7,200 nodes / ~9,296 edges across 288 communities. Generated outputs live in `graphify-out/` (git-ignored):
 
 - `graphify-out/graph.json` — raw graph data (source of truth for queries)
 - `graphify-out/GRAPH_REPORT.md` — god nodes, community map, cross-feature bridges

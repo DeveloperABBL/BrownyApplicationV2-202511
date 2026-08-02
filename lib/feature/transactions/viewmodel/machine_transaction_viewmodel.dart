@@ -11,8 +11,17 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   // ========== Repo ==========
 
   // ========== Dispose ==========
+  /// DONG 2026-08-02
+  ///
+  /// ใช้กันเขียนค่าลง notifier ที่ dispose ไปแล้ว
+  /// (timer ถูก cancel ได้ แต่ request ที่ค้างอยู่หลัง `await` ยกเลิกไม่ได้
+  /// ถ้าผู้ใช้กดออกจากหน้าระหว่างรอ response จะ throw
+  /// `A ValueNotifier was used after being disposed`)
+  bool _isDisposed = false;
+
   @override
   void dispose() {
+    _isDisposed = true;
     _statusUpdateTimer?.cancel();
     _remainingDurationNotifier.dispose();
     _machineDetailNotifier.dispose();
@@ -66,6 +75,9 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     String machineId,
   ) async {
     final result = await machineRepo.fetchMachineDetail(machineId);
+
+    // ผู้ใช้ออกจากหน้าไปแล้วระหว่างรอ response — ห้ามเขียนลง notifier ที่ dispose แล้ว
+    if (_isDisposed) return UiResult.empty();
 
     if (result.hasError) {
       return UiResult.error(error: result.error);
@@ -173,6 +185,16 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       }
     });
   }
+
+  /// DONG 2026-08-02
+  ///
+  /// countdown นับจนหมดแล้ว แต่ API ยังรายงานว่าเครื่องทำงานอยู่
+  /// หน้าจอต้อง poll ต่อเพื่อรอ status ใหม่ ไม่งั้นสถานะจะค้างที่ `กำลังทำงาน`
+  bool get isAwaitingCompletion =>
+      _machineDetailNotifier.value?.isAwaitingCompletion(
+        _remainingDurationNotifier.value,
+      ) ??
+      false;
 
   /// คำนวณ value ของ slider (เวลาที่ผ่านไปแล้ว)
   double getSliderValue(String locale) {

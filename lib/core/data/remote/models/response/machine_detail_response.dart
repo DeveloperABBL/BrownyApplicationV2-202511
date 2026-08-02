@@ -188,6 +188,18 @@ class MachineDetailResponse extends BaseModelResponse {
   /// เครื่องยังไม่เริ่มทำงาน (จ่ายเงินแล้ว แต่ผู้ใช้ยังไม่กดปุ่มที่หน้าเครื่อง)
   bool get isNotStarted => !isBusy && !isCompleted;
 
+  /// DONG 2026-08-02
+  ///
+  /// countdown ฝั่ง app นับจนหมดแล้ว แต่ API ยังรายงานว่าเครื่องทำงานอยู่
+  ///
+  /// countdown ในหน้าจอนับถอยหลังเองฝั่ง client จึงมักหมดก่อนที่ backend
+  /// จะอัพเดท status เป็นเสร็จสิ้นจริง ช่วงนี้ต้อง poll ต่อเพื่อรอ status ใหม่
+  /// ไม่งั้นสถานะจะค้างที่ `กำลังทำงาน` ตลอดจนกว่าผู้ใช้จะ refresh เอง
+  ///
+  /// [remaining] คือเวลาที่เหลือจาก countdown ฝั่ง app
+  bool isAwaitingCompletion(Duration? remaining) =>
+      isBusy && remaining == Duration.zero;
+
   Color get getColorByStatus {
     if (isFailed) {
       return AppColors.error;

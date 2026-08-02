@@ -110,6 +110,34 @@ void main() {
     });
   });
 
+  group('MachineDetailResponse.isAwaitingCompletion - รอ backend flip status', () {
+    test('Busy + countdown นับจนหมด => ต้องรอ backend อัพเดท', () {
+      final machine = parse(busyJson);
+
+      expect(machine.isAwaitingCompletion(Duration.zero), isTrue);
+    });
+
+    test('Busy + countdown ยังเหลือเวลา => ยังไม่ต้องรอ', () {
+      final machine = parse(busyJson);
+
+      expect(machine.isAwaitingCompletion(const Duration(minutes: 5)), isFalse);
+      // ยังไม่เคยคำนวณ countdown เลย (null) ก็ยังไม่ต้องรอ
+      expect(machine.isAwaitingCompletion(null), isFalse);
+    });
+
+    test('เครื่องทำงานเสร็จแล้ว => ไม่ต้องรออีก', () {
+      final machine = parse(completedJson);
+
+      expect(machine.isAwaitingCompletion(Duration.zero), isFalse);
+    });
+
+    test('เครื่องยังไม่เริ่มทำงาน => ไม่ต้องรอ', () {
+      final machine = parse(notStartedJson);
+
+      expect(machine.isAwaitingCompletion(Duration.zero), isFalse);
+    });
+  });
+
   group('MachineDetailResponse.retainDataFrom - คงข้อมูล order เดิมไว้', () {
     test('เติมค่าที่ API เคลียร์ทิ้ง จาก response ก่อนหน้า', () {
       final previous = parse(busyJson);

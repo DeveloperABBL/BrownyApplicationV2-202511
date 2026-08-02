@@ -88,6 +88,10 @@ class _MachineStatusContentState extends State<MachineStatusContent>
     WidgetsBinding.instance.addObserver(this);
     _viewmodel = context.read();
     _viewmodel.attachContext(context);
+    // เฝ้า countdown เพื่อเริ่ม poll ตอนเวลาหมด
+    _viewmodel.remainingDurationNotifier.addListener(
+      _onRemainingDurationChanged,
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _loadThumbImage();
@@ -104,9 +108,24 @@ class _MachineStatusContentState extends State<MachineStatusContent>
   void dispose() {
     // ยกเลิก auto-check timer
     _autoCheckTimer?.cancel();
+    _viewmodel.remainingDurationNotifier.removeListener(
+      _onRemainingDurationChanged,
+    );
     // ViewModel จะจัดการ dispose timer เอง
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// DONG 2026-08-02
+  ///
+  /// countdown นับจนหมด (เหลือ 00:00) แต่ API ยังรายงานว่าเครื่องทำงานอยู่
+  /// ต้องเริ่ม poll เพื่อรอ backend อัพเดท status เป็นเสร็จสิ้น
+  /// ไม่งั้นสถานะจะค้างที่ `กำลังทำงาน` จนกว่าผู้ใช้จะ refresh เอง
+  void _onRemainingDurationChanged() {
+    if (!mounted) return;
+    if (_viewmodel.isAwaitingCompletion) {
+      _syncAutoCheckTimer();
+    }
   }
 
   @override
@@ -155,7 +174,8 @@ class _MachineStatusContentState extends State<MachineStatusContent>
 
   /// Sync auto-check timer ตามสถานะเครื่อง
   /// - ยังไม่เริ่มทำงาน (isNotStarted): start timer poll ทุก 3 วิ
-  /// - กำลังทำงาน หรือทำงานเสร็จแล้ว: stop timer
+  /// - countdown หมดแล้วแต่ API ยังบอกว่าทำงานอยู่: start timer เพื่อรอ status ใหม่
+  /// - กำลังทำงาน (countdown ยังเดินอยู่) หรือทำงานเสร็จแล้ว: stop timer
   ///
   /// DONG 2026-08-02
   /// เดิมเช็คด้วย `!isBusy` ทำให้ตอนเครื่องทำงานเสร็จ (status กลับมาเป็น Vacant)
@@ -164,12 +184,16 @@ class _MachineStatusContentState extends State<MachineStatusContent>
     final machineDetail = _viewmodel.machineDetailNotifier.value;
     if (machineDetail == null) return;
 
-    if (machineDetail.isNotStarted) {
+    if (_shouldKeepPolling(machineDetail)) {
       _startAutoCheckTimer();
     } else {
       _stopAutoCheckTimer();
     }
   }
+
+  /// ยังต้อง poll สถานะต่อหรือไม่ — จริงเมื่อกำลังรอ state เปลี่ยนจากฝั่ง backend
+  bool _shouldKeepPolling(MachineDetailResponse machineDetail) =>
+      machineDetail.isNotStarted || _viewmodel.isAwaitingCompletion;
 
   /// กด "ตรวจสอบสถานะ" จาก inline not-started panel
   Future<void> _onCheckStatusPressed() async {
@@ -208,7 +232,7 @@ class _MachineStatusContentState extends State<MachineStatusContent>
       await _viewmodel.fetchMachineDetail(widget.machineId);
 
       final machineDetail = _viewmodel.machineDetailNotifier.value;
-      if (machineDetail != null && !machineDetail.isNotStarted) {
+      if (machineDetail != null && !_shouldKeepPolling(machineDetail)) {
         // เครื่องเริ่มทำงานแล้ว หรือทำงานเสร็จไปแล้ว หยุด timer
         _stopAutoCheckTimer();
       }
