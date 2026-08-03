@@ -19,6 +19,7 @@ class MachineOrderRequest {
     this.couponCustomerId,
     this.discountId,
     this.notificationToken,
+    this.useCoin,
   });
 
   @JsonKey(name: 'customer_id')
@@ -47,6 +48,10 @@ class MachineOrderRequest {
 
   @JsonKey(name: 'notification_token')
   final String? notificationToken;
+
+  /// ใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
+  @JsonKey(name: 'use_coin', includeIfNull: false)
+  final bool? useCoin;
 
   factory MachineOrderRequest.fromJson(Map<String, dynamic> json) =>
       _$MachineOrderRequestFromJson(json);

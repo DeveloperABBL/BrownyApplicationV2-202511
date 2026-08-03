@@ -1002,6 +1002,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get availableCoins => '可用积分';
 
   @override
+  String get brownyCoinDiscount => 'Browny Coin 折扣';
+
+  @override
+  String get useThisTime => '本次使用';
+
+  @override
+  String get notYetEnabled => '尚未启用';
+
+  @override
   String get noData => '无数据';
 
   @override

@@ -308,30 +308,13 @@ class __MachineContentState extends State<_MachineContent>
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
-    if (result.isEmpty &&
-        (_viewmodel.paymentSelected!.isTpWallet ||
-            _viewmodel.paymentSelected!.isCoin)) {
-      final String title;
-      final String message;
-
-      if (_viewmodel.paymentSelected!.isTpWallet) {
-        // TP+ Wallet เงินไม่เพียงพอ
-        title = context.wording.insufficientWalletBalanceTitle;
-        // กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
-        message = context.wording.insufficientWalletBalanceMessage;
-      } else {
-        // ชำระด้วย Browny Coin ไม่พอ
-        // Browny Coin ไม่เพียงพอ
-        title = context.wording.insufficientCoinTitle;
-        // กรุณาเปลี่ยนวิธีชำระเงิน
-        message = context.wording.changePaymentMethod;
-      }
+    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
       AppOverlays.showBrownyDialog(
         context,
         // เดิม: TP+ Wallet เงินไม่เพียงพอ
-        title: title,
+        title: context.wording.insufficientWalletBalanceTitle,
         // เดิม: กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
-        message: message,
+        message: context.wording.insufficientWalletBalanceMessage,
       );
 
       // flagกันคลิกเบิ้ล
@@ -562,73 +545,76 @@ class __MachineContentState extends State<_MachineContent>
                 return SizedBox();
               }
 
-              final enable =
-                  result.isSuccess && result.data!.hasSelectedProgram;
-              return Column(
-                children: [
-                  Builder(
-                    builder: (context) {
-                      final totalDiscount =
-                          result.data!.getTotalDiscountStore() +
-                          result.data!.getTotalCouponOnlyDiscount() +
-                          result.data!.getTotalEVoucherDiscount();
-                      final discountText = formatCurrency(
-                        value: totalDiscount,
-                      );
+              return ValueListenableBuilder<bool>(
+                valueListenable: _viewmodel.useCoinDiscountNotifier,
+                builder: (context, _, __) {
+                  final enable =
+                      result.isSuccess && result.data!.hasSelectedProgram;
+                  final coinDiscount = _viewmodel.getAppliedCoinDiscount();
+                  final netPrice = _viewmodel.getNetPriceWithCoinDiscount();
+                  final totalDiscount =
+                      result.data!.getTotalDiscountStore() +
+                      result.data!.getTotalCouponOnlyDiscount() +
+                      result.data!.getTotalEVoucherDiscount() +
+                      coinDiscount;
+                  final discountText = formatCurrency(
+                    value: totalDiscount,
+                  );
 
-                      if (totalDiscount == 0) {
-                        return SizedBox();
-                      }
-
-                      return Padding(
-                        padding: EdgeInsets.only(top: AppDims.size_8.h),
-                        child: RichText(
-                          text: TextSpan(
-                            style: context.textTheme.bodyMedium!,
-                            children: [
-                              TextSpan(
-                                text: '${context.wording.totalDiscount} ',
-                              ),
-                              TextSpan(
-                                text: '฿',
-                                style: AppTextNumberStyles.labelLarge.copyWith(
-                                  color: AppColors.error,
+                  return Column(
+                    children: [
+                      if (totalDiscount > 0)
+                        Padding(
+                          padding: EdgeInsets.only(top: AppDims.size_8.h),
+                          child: RichText(
+                            text: TextSpan(
+                              style: context.textTheme.bodyMedium!,
+                              children: [
+                                TextSpan(
+                                  text: '${context.wording.totalDiscount} ',
                                 ),
-                              ),
-                              TextSpan(
-                                text: discountText,
-                                style: AppTextNumberStyles.labelLarge.copyWith(
-                                  color: AppColors.error,
+                                TextSpan(
+                                  text: '฿',
+                                  style: AppTextNumberStyles.labelLarge
+                                      .copyWith(
+                                    color: AppColors.error,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(text: ' ${context.wording.thb}'),
-                            ],
+                                TextSpan(
+                                  text: discountText,
+                                  style: AppTextNumberStyles.labelLarge
+                                      .copyWith(
+                                    color: AppColors.error,
+                                  ),
+                                ),
+                                TextSpan(text: ' ${context.wording.thb}'),
+                              ],
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: AppDims.size_16.w,
-                      right: AppDims.size_16.w,
-                      top: AppDims.size_8.h,
-                    ),
-                    child: ElevatedButton(
-                      onPressed: enable ? _onPurchaseClicked : null,
-                      child: AppText(
-                        '${context.wording.makePayment} ${formatCurrency(
-                          leadingSign: '฿',
-                          value: result.data!.getNetPrice(),
-                        )}',
-                        style: context.textTheme.headlineSmall!.copyWith(
-                          fontSize: AppDims.size_14.sp,
-                          color: AppColors.textWhite,
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: AppDims.size_16.w,
+                          right: AppDims.size_16.w,
+                          top: AppDims.size_8.h,
+                        ),
+                        child: ElevatedButton(
+                          onPressed: enable ? _onPurchaseClicked : null,
+                          child: AppText(
+                            '${context.wording.makePayment} ${formatCurrency(
+                              leadingSign: '฿',
+                              value: netPrice,
+                            )}',
+                            style: context.textTheme.headlineSmall!.copyWith(
+                              fontSize: AppDims.size_14.sp,
+                              color: AppColors.textWhite,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -685,6 +671,9 @@ class __MachineContentState extends State<_MachineContent>
 
                         // ประเภทชำระ
                         _paymentMethods(),
+
+                        // ส่วนลด Browny Coin (แยก section ด้านล่างช่องทางชำระ)
+                        _brownyCoinDiscountSection(),
 
                         Padding(
                           padding: EdgeInsets.symmetric(
@@ -988,7 +977,6 @@ class __MachineContentState extends State<_MachineContent>
           ),
         ),
         AppDims.vericalPadding_8,
-        // ประเภทชำระ
         Padding(
           padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
           child: ValueListenableBuilder(
@@ -1008,50 +996,7 @@ class __MachineContentState extends State<_MachineContent>
                   ...value.data.orEmpty
                       .take(3)
                       .map(
-                        (payment) => _cardPaymentDependOnState(
-                          payment,
-                          // isTPWallet:
-                          //     payment.isSelected &&
-                          //     payment.method == 'tp_wallet',
-                          // selected: payment.isSelected,
-                          // child: ListTile(
-                          //   minVerticalPadding: 0,
-                          //   contentPadding: EdgeInsets.zero,
-                          //   minTileHeight: 0,
-                          //   horizontalTitleGap: AppDims.size_8.w,
-                          //   leading: payment.imageUrl != null
-                          //       ? CachedNetworkImage(
-                          //           imageUrl: payment.imageUrl!,
-                          //           width: 22.w,
-                          //           height: 22.h,
-                          //           fit: BoxFit.contain,
-                          //           placeholder: (_, __) =>
-                          //               SizedBox(width: 22.w, height: 22.h),
-                          //           errorWidget: (_, __, ___) =>
-                          //               SizedBox(width: 22.w, height: 22.h),
-                          //         )
-                          //       : null,
-                          //   title: AppText(
-                          //     payment.name,
-                          //     style: payment.isSelected
-                          //         ? _textPrimarySelected
-                          //         : _textPrimary,
-                          //   ),
-                          //   onTap: () {
-                          //     _viewmodel.onPaymentChanged(
-                          //       payment,
-                          //     );
-                          //   },
-                          //   trailing: payment.isSelected
-                          //       ? Padding(
-                          //           padding: EdgeInsets.only(
-                          //             right: 6.0.w,
-                          //           ),
-                          //           child: Assets.svg.icChecked.svg(),
-                          //         )
-                          //       : null,
-                          // ),
-                        ),
+                        (payment) => _cardPaymentDependOnState(payment),
                       ),
                 ],
               );
@@ -1062,69 +1007,271 @@ class __MachineContentState extends State<_MachineContent>
     );
   }
 
+  /// Section ส่วนลด Browny Coin — อยู่ใต้ช่องทางการชำระเงิน
+  Widget _brownyCoinDiscountSection() {
+    return ValueListenableBuilder(
+      valueListenable: _viewmodel.paymentMethodNotifier,
+      builder: (context, value, child) {
+        if (!_viewmodel.isCoinDiscountAvailable) {
+          return const SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppDims.size_16.w,
+            AppDims.size_16.h,
+            AppDims.size_16.w,
+            0,
+          ),
+          child: _brownyCoinDiscountCard(),
+        );
+      },
+    );
+  }
+
+  /// การ์ดส่วนลด Browny Coin (toggle เปิด/ปิด)
+  /// 10 coins = 1 บาท
+  Widget _brownyCoinDiscountCard() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _viewmodel.useCoinDiscountNotifier,
+      builder: (context, isEnabled, _) {
+        return Consumer<CustomerProvider>(
+          builder: (context, provider, _) {
+            final coinAmount = formatCurrency(
+              string: provider.current.brownyCoin,
+              decimal: true,
+            );
+            final availableBaht = _viewmodel.availableCoinDiscountBaht;
+            final appliedDiscount = _viewmodel.getAppliedCoinDiscount();
+
+            return Container(
+              margin: EdgeInsets.only(bottom: AppDims.size_8.h),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(AppDims.size_12.r),
+                border: Border.all(color: AppColors.border),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppDims.size_16.w,
+                      AppDims.size_12.h,
+                      AppDims.size_12.w,
+                      AppDims.size_12.h,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Assets.png.brownyCoin.image(
+                              width: AppDims.size_24.w,
+                              height: AppDims.size_24.h,
+                            ),
+                            AppDims.horizonPadding_8,
+                            Expanded(
+                              child: AppText(
+                                context.wording.brownyCoinDiscount,
+                                style: context.textTheme.titleSmall!.copyWith(
+                                  color: AppColors.darkBrown,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: AppDims.size_14.sp,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: AppDims.size_40.w,
+                              height: AppDims.size_28.h,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Switch(
+                                  value: isEnabled,
+                                  activeThumbColor: AppColors.white,
+                                  activeTrackColor: AppColors.ci,
+                                  inactiveThumbColor: AppColors.white,
+                                  inactiveTrackColor: AppColors.gray400,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  onChanged: (value) {
+                                    _viewmodel.setUseCoinDiscount(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        AppDims.vericalPadding_8,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: AppText(
+                                context.wording.availableCoins,
+                                style: context.textTheme.bodySmall!.copyWith(
+                                  color: AppColors.gray500,
+                                  fontSize: AppDims.size_12.sp,
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                AppText(
+                                  '$coinAmount ${context.wording.coin}',
+                                  style: context.textTheme.titleSmall!.copyWith(
+                                    color: AppColors.darkBrown,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: AppDims.size_14.sp,
+                                  ),
+                                ),
+                                AppDims.vericalPadding_2,
+                                AppText(
+                                  '= ฿ ${availableBaht.toInt()}',
+                                  style: context.textTheme.bodySmall!.copyWith(
+                                    color: AppColors.gray500,
+                                    fontSize: AppDims.size_12.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                      vertical: AppDims.size_12.h,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: isEnabled
+                          ? AppColors.walletCoinBonusGradient
+                          : null,
+                      color: isEnabled ? null : const Color(0xFFF2F2F2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AppText(
+                          context.wording.useThisTime,
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            color: AppColors.darkBrown,
+                            fontWeight: FontWeight.w600,
+                            fontSize: AppDims.size_13.sp,
+                          ),
+                        ),
+                        AppText(
+                          isEnabled
+                              ? formatCurrency(
+                                  string: appliedDiscount.toString(),
+                                  decimal: false,
+                                  leadingSign: '-฿ ',
+                                )
+                              : context.wording.notYetEnabled,
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            color: isEnabled
+                                ? AppColors.error
+                                : AppColors.gray500,
+                            fontWeight: isEnabled
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                            fontSize: AppDims.size_13.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _summary() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppDims.vericalPadding_16,
-          _title(
-            icon: Assets.svg.icListRoundedGreen.svg(),
-            // เดิม: สรุปราคา
-            title: context.wording.paymentSummary,
+    return ValueListenableBuilder<bool>(
+      valueListenable: _viewmodel.useCoinDiscountNotifier,
+      builder: (context, _, _) {
+        final coinDiscount = _viewmodel.getAppliedCoinDiscount();
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: AppDims.size_16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppDims.vericalPadding_16,
+              _title(
+                icon: Assets.svg.icListRoundedGreen.svg(),
+                // เดิม: สรุปราคา
+                title: context.wording.paymentSummary,
+              ),
+              AppDims.vericalPadding_16,
+              // detail
+              // Title
+              _lineSummay(
+                title: _machineProgram!.getSummaryMachineTypeDisplay(
+                  context.languageCode,
+                ),
+                price: _machineProgram!.totalSelectedPrice.toString(),
+              ),
+              AppDims.vericalPadding_16,
+              // ส่วนลดถ้ามี
+              _lineSummay(
+                // เดิม: โปรโมชั่นสาขา
+                title: context.wording.storePromotion,
+                price: _machineProgram!.getTotalDiscountStore().toString(),
+                textPriceColor: _machineProgram!.getTotalDiscountStore() > 0
+                    ? AppColors.error
+                    : null,
+                discount: _machineProgram!.getTotalDiscountStore() > 0,
+              ),
+              AppDims.vericalPadding_16,
+              // สรุปยอด คูปองส่วนลด
+              _lineSummay(
+                // เดิม: คูปองส่วนลด
+                title: context.wording.discountCoupon,
+                price: _machineProgram!.getTotalCouponOnlyDiscount().toString(),
+                textPriceColor: _machineProgram!.getTotalCouponOnlyDiscount() > 0
+                    ? AppColors.error
+                    : null,
+                discount: _machineProgram!.getTotalCouponOnlyDiscount() > 0,
+              ),
+              AppDims.vericalPadding_16,
+              // สรุปยอด E-Voucher
+              _lineSummay(
+                title: context.wording.eVouchers,
+                price: _machineProgram!.getTotalEVoucherDiscount().toString(),
+                textPriceColor: _machineProgram!.getTotalEVoucherDiscount() > 0
+                    ? AppColors.error
+                    : null,
+                discount: _machineProgram!.getTotalEVoucherDiscount() > 0,
+              ),
+              if (coinDiscount > 0) ...[
+                AppDims.vericalPadding_16,
+                _lineSummay(
+                  title: context.wording.brownyCoinDiscount,
+                  price: coinDiscount.toString(),
+                  textPriceColor: AppColors.error,
+                  discount: true,
+                ),
+              ],
+              AppDims.vericalPadding_16,
+              _lineSummay(
+                // เดิม: ยอดชำระทั้งหมด
+                title: context.wording.totalPayment,
+                price: _viewmodel.getNetPriceWithCoinDiscount().toString(),
+                textPriceColor: AppColors.primary,
+              ),
+              AppDims.vericalPadding_24,
+            ],
           ),
-          AppDims.vericalPadding_16,
-          // detail
-          // Title
-          _lineSummay(
-            title: _machineProgram!.getSummaryMachineTypeDisplay(
-              context.languageCode,
-            ),
-            price: _machineProgram!.totalSelectedPrice.toString(),
-          ),
-          AppDims.vericalPadding_16,
-          // ส่วนลดถ้ามี
-          _lineSummay(
-            // เดิม: โปรโมชั่นสาขา
-            title: context.wording.storePromotion,
-            price: _machineProgram!.getTotalDiscountStore().toString(),
-            textPriceColor: _machineProgram!.getTotalDiscountStore() > 0
-                ? AppColors.error
-                : null,
-            discount: _machineProgram!.getTotalDiscountStore() > 0,
-          ),
-          AppDims.vericalPadding_16,
-          // สรุปยอด คูปองส่วนลด
-          _lineSummay(
-            // เดิม: คูปองส่วนลด
-            title: context.wording.discountCoupon,
-            price: _machineProgram!.getTotalCouponOnlyDiscount().toString(),
-            textPriceColor: _machineProgram!.getTotalCouponOnlyDiscount() > 0
-                ? AppColors.error
-                : null,
-            discount: _machineProgram!.getTotalCouponOnlyDiscount() > 0,
-          ),
-          AppDims.vericalPadding_16,
-          // สรุปยอด E-Voucher
-          _lineSummay(
-            title: context.wording.eVouchers,
-            price: _machineProgram!.getTotalEVoucherDiscount().toString(),
-            textPriceColor: _machineProgram!.getTotalEVoucherDiscount() > 0
-                ? AppColors.error
-                : null,
-            discount: _machineProgram!.getTotalEVoucherDiscount() > 0,
-          ),
-          AppDims.vericalPadding_16,
-          _lineSummay(
-            // เดิม: ยอดชำระทั้งหมด
-            title: context.wording.totalPayment,
-            price: _machineProgram!.getNetPrice().toString(),
-            textPriceColor: AppColors.primary,
-          ),
-          AppDims.vericalPadding_24,
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -1156,16 +1303,9 @@ class __MachineContentState extends State<_MachineContent>
 
   Widget _cardPaymentDependOnState(
     PaymentMethodModel payment,
-    //   , {
-    //   bool selected = false,
-    //   bool isCoin = false,
-    //   required bool isTPWallet,
-    //   required Widget child,
-    // }
   ) {
     final isSelected = payment.isSelected;
     final isTPWallet = payment.isTpWallet;
-    final isCoin = payment.isCoin;
     return GestureDetector(
       onTap: () {
         _viewmodel.onPaymentChanged(
@@ -1263,76 +1403,6 @@ class __MachineContentState extends State<_MachineContent>
                     color: AppColors.textWhite,
                   ),
                 ),
-              ),
-            ],
-            if (isCoin) ...[
-              Consumer<CustomerProvider>(
-                builder: (context, provider, _) {
-                  return ListTile(
-                    minVerticalPadding: AppDims.size_8.h,
-                    contentPadding: EdgeInsets.zero,
-                    minTileHeight: 0,
-                    horizontalTitleGap: AppDims.size_8.w,
-                    title: AppText(
-                      // มูลค่า
-                      context.wording.coinValue,
-                      style: _textPrimary,
-                    ),
-                    trailing: AppText(
-                      formatCurrency(
-                        leadingSign: '฿ ',
-                        string: provider.current.currentCoin,
-                        decimal: true,
-                      ),
-                      style: _textPrimarySelected.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              Consumer<CustomerProvider>(
-                builder: (context, provider, _) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: AppDims.size_4.w,
-                    children: [
-                      payment.imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: payment.imageUrl!,
-                              width: AppDims.size_12.w,
-                              height: AppDims.size_12.h,
-                              fit: BoxFit.contain,
-                              placeholder: (_, _) => SizedBox(
-                                width: AppDims.size_12.w,
-                                height: AppDims.size_12.h,
-                              ),
-                              errorWidget: (_, _, _) => SizedBox(
-                                width: AppDims.size_12.w,
-                                height: AppDims.size_12.h,
-                              ),
-                            )
-                          : SizedBox(
-                              width: AppDims.size_12.w,
-                              height: AppDims.size_12.h,
-                            ),
-                      AppText(
-                        formatCurrency(
-                          string: provider.current.brownyCoin,
-                          decimal: true,
-                          // คอยน์
-                          trailingSign: ' ${context.wording.coin}',
-                        ),
-                        style: _textPrimarySelected.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  );
-                },
               ),
             ],
           ],

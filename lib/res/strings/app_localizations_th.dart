@@ -1023,6 +1023,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get availableCoins => 'คอยน์ที่ใช้ได้';
 
   @override
+  String get brownyCoinDiscount => 'ส่วนลด Browny Coin';
+
+  @override
+  String get useThisTime => 'ใช้ครั้งนี้';
+
+  @override
+  String get notYetEnabled => 'ยังไม่ได้เปิดใช้';
+
+  @override
   String get noData => 'ไม่มีข้อมูล';
 
   @override

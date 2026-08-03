@@ -18,6 +18,7 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     _machineDetailNotifier.dispose();
     _machineProgramsNotifier.dispose();
     _machineTransactionStateNotifier.dispose();
+    _useCoinDiscountNotifier.dispose();
     super.dispose();
   }
 
@@ -26,6 +27,15 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
       ValueNotifier(UiResult.loading());
   ValueListenable<UiResult<MachineProgramModel>> get machineProgramsNotifier =>
       _machineProgramsNotifier;
+
+  /// เปิด/ปิดใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
+  final ValueNotifier<bool> _useCoinDiscountNotifier = ValueNotifier(false);
+  ValueListenable<bool> get useCoinDiscountNotifier =>
+      _useCoinDiscountNotifier;
+
+  /// มีช่องทาง coin จาก API หรือไม่ (ใช้แสดงการ์ดส่วนลด)
+  bool _isCoinDiscountAvailable = false;
+  bool get isCoinDiscountAvailable => _isCoinDiscountAvailable;
 
   // ========== Varible ==========
   bool _isFirstReviewScore = true;
@@ -264,8 +274,12 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     final listPayment = _machineProgramsNotifier.value.data!
         .paymentMethodsAvailable(localed, _cachedPaymentMethods);
 
+    // coin ไม่ใช่ช่องทางชำระแล้ว — แยกเป็นส่วนลด toggle
+    _isCoinDiscountAvailable = listPayment.any((e) => e.isCoin);
+    var finalList = listPayment.where((e) => !e.isCoin).toList();
+
     // ถ้าไม่มี payment method ให้เลือก
-    if (listPayment.isEmpty) {
+    if (finalList.isEmpty) {
       _paymentMethodNotifier.value = UiResult.empty();
       return;
     }
@@ -283,8 +297,10 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     // อัพเดทข้อมูล user ใหม่ใน provider
     currentCustomerProvider.newUser = userModel;
 
-    // Copy list เพื่อไม่ให้กระทบ original
-    var finalList = listPayment.toList();
+    // ถ้าเคยเลือก coin ไว้ ให้เคลียร์แล้วเลือกวิธีอื่น
+    if (_paymentSelected?.isCoin == true) {
+      _paymentSelected = null;
+    }
 
     // ถ้ามีการเลือก payment ไว้แล้วก่อนหน้านี้
     if (_paymentSelected != null) {
@@ -304,22 +320,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
 
         // ใส่กลับไปที่ index 0 และ mark เป็น selected
         finalList.insert(0, selected.copyWith(isSelected: true));
-        // เอาตัวที่เลือก หรือ TPWallet ขึ้นด้านบน
-        // finalList.sort((l, r) {
-        //   if (l.isSelected) return 0;
-        //   if (l.isTpWallet) return 1;
-        //   if (l.isCoin) return 2;
-        //   return 3;
-        // });
+      } else {
+        // method เดิมไม่อยู่ใน list แล้ว — เลือกตัวแรก
+        finalList = finalList.asMap().entries.map((entry) {
+          return entry.value.copyWith(isSelected: entry.key == 0);
+        }).toList();
+        _paymentSelected = finalList.first;
       }
     } else {
-      // เอา TPWallet ขึ้นตัวแรกเสมอ
-      // finalList.sort((l, r) {
-      //   if (l.isTpWallet) return 0;
-      //   if (l.isCoin) return 1;
-      //   return 2;
-      // });
-
       // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
       finalList = finalList.asMap().entries.map((entry) {
         // ตัวแรก (index 0) จะถูก mark เป็น selected
@@ -338,6 +346,50 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     );
   }
 
+  void setUseCoinDiscount(bool enabled) {
+    _useCoinDiscountNotifier.value = enabled;
+  }
+
+  /// อัตราแลก: กี่คอยน์ = 1 บาท (จาก API coin_value, default 10)
+  double get coinToBahtRate {
+    final raw = currentCustomerProvider.current.coinValue
+        ?.replaceAll(',', '');
+    final rate = double.tryParse(raw ?? '') ?? 10.0;
+    return rate > 0 ? rate : 10.0;
+  }
+
+  /// จำนวนคอยน์คงเหลือ
+  double get availableBrownyCoin {
+    final raw = currentCustomerProvider.current.brownyCoin?.replaceAll(',', '');
+    return double.tryParse(raw ?? '') ?? 0;
+  }
+
+  /// ส่วนลดสูงสุดที่ใช้ได้จากคอยน์ (ปัดลงเป็นจำนวนเต็มบาท)
+  /// 10 coins = 1 บาท → floor(coins / rate)
+  double get availableCoinDiscountBaht {
+    return (availableBrownyCoin / coinToBahtRate).floorToDouble();
+  }
+
+  /// ส่วนลด Browny Coin ที่จะใช้ครั้งนี้ (cap ด้วยยอดสุทธิหลังส่วนลดอื่น)
+  double getAppliedCoinDiscount() {
+    if (!_useCoinDiscountNotifier.value) return 0;
+    if (!_machineProgramsNotifier.value.isSuccess) return 0;
+    final netBeforeCoin =
+        _machineProgramsNotifier.value.data!.getNetPrice();
+    final usable = availableCoinDiscountBaht;
+    if (usable <= 0 || netBeforeCoin <= 0) return 0;
+    return usable < netBeforeCoin ? usable : netBeforeCoin;
+  }
+
+  /// ยอดชำระสุทธิหลังหักส่วนลด Browny Coin
+  double getNetPriceWithCoinDiscount() {
+    if (!_machineProgramsNotifier.value.isSuccess) return 0;
+    final net =
+        _machineProgramsNotifier.value.data!.getNetPrice() -
+        getAppliedCoinDiscount();
+    return net < 0 ? 0 : net;
+  }
+
   @override
   void onPaymentChanged(
     PaymentMethodModel payment, {
@@ -346,12 +398,14 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     // ตรวจสอบว่า couponDetail พร้อมใช้งาน
     if (!_machineProgramsNotifier.value.isSuccess) return;
 
-    // ดึง payment methods ทั้งหมดกรองตาม cached methods
+    // ดึง payment methods ทั้งหมดกรองตาม cached methods (ตัด coin ออก)
     final fullList = _machineProgramsNotifier.value.data!
         .paymentMethodsAvailable(
           context.languageCode,
           _cachedPaymentMethods,
-        );
+        )
+        .where((e) => !e.isCoin)
+        .toList();
 
     // Mark ทุกตัวเป็น unselected ก่อน
     var newList = fullList.map((e) => e.copyWith(isSelected: false)).toList();
@@ -481,8 +535,9 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
   @override
   Future<UiResult<double>> verifyOrder() async {
     try {
-      if (paymentSelected?.isTpWallet == true ||
-          paymentSelected?.isCoin == true) {
+      final machinePrice = getNetPriceWithCoinDiscount();
+
+      if (paymentSelected?.isTpWallet == true) {
         final result = await _couponRepo.fetchCustomerCredit(
           currentCustomerProvider.current.id!,
         );
@@ -498,27 +553,17 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
         }
         // update ข้อมูล User ด้วย
         currentCustomerProvider.updateCreditAndCoinBalance(result.data);
-        final double balance;
-        if (paymentSelected?.isTpWallet == true) {
-          balance = double.tryParse(
-            result.data.creditBalance!.replaceAll(',', ''),
-          )!;
-        } else {
-          balance = double.tryParse(
-            result.data.currentCoin!.replaceAll(',', ''),
-          )!;
-        }
+        final balance = double.tryParse(
+          result.data.creditBalance!.replaceAll(',', ''),
+        )!;
 
-        final machinePrice = _machineProgramsNotifier.value.data!.getNetPrice();
         if (balance >= machinePrice) {
           return UiResult.success(data: machinePrice);
         }
 
         return UiResult.empty();
       } else {
-        return UiResult.success(
-          data: _machineProgramsNotifier.value.data!.getNetPrice(),
-        );
+        return UiResult.success(data: machinePrice);
       }
     } catch (e) {
       return UiResult.error(error: Unprocessable(e.toString()));
@@ -597,6 +642,10 @@ ${customerCoupon.getSelectedTypeNoDetailWordingDisplay(context)} ${customerCoupo
         couponCustomerId: couponCustomerId,
         discountId: programData.selectedProgram?.discount?.id,
         notificationToken: fcmToken,
+        useCoin: (_useCoinDiscountNotifier.value &&
+                getAppliedCoinDiscount() > 0)
+            ? true
+            : null,
       );
 
       // เรียก API

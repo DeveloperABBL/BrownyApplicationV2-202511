@@ -1027,6 +1027,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get availableCoins => 'Available Coins';
 
   @override
+  String get brownyCoinDiscount => 'Browny Coin Discount';
+
+  @override
+  String get useThisTime => 'Use this time';
+
+  @override
+  String get notYetEnabled => 'Not enabled yet';
+
+  @override
   String get noData => 'No Data';
 
   @override
