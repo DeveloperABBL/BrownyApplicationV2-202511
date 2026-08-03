@@ -12,6 +12,7 @@ CouponOrderRequest _$CouponOrderRequestFromJson(Map<String, dynamic> json) =>
       couponPackageId: (json['coupon_package_id'] as num).toInt(),
       quantity: (json['quantity'] as num).toInt(),
       paymentMethod: json['payment_method'] as String,
+      useCoin: json['use_coin'] as bool?,
     );
 
 Map<String, dynamic> _$CouponOrderRequestToJson(CouponOrderRequest instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$CouponOrderRequestToJson(CouponOrderRequest instance) =>
       'coupon_package_id': instance.couponPackageId,
       'quantity': instance.quantity,
       'payment_method': instance.paymentMethod,
+      'use_coin': ?instance.useCoin,
     };

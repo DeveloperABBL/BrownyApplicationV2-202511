@@ -18,7 +18,6 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     _machineDetailNotifier.dispose();
     _machineProgramsNotifier.dispose();
     _machineTransactionStateNotifier.dispose();
-    _useCoinDiscountNotifier.dispose();
     super.dispose();
   }
 
@@ -28,14 +27,12 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
   ValueListenable<UiResult<MachineProgramModel>> get machineProgramsNotifier =>
       _machineProgramsNotifier;
 
-  /// เปิด/ปิดใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
-  final ValueNotifier<bool> _useCoinDiscountNotifier = ValueNotifier(false);
-  ValueListenable<bool> get useCoinDiscountNotifier =>
-      _useCoinDiscountNotifier;
-
-  /// มีช่องทาง coin จาก API หรือไม่ (ใช้แสดงการ์ดส่วนลด)
-  bool _isCoinDiscountAvailable = false;
-  bool get isCoinDiscountAvailable => _isCoinDiscountAvailable;
+  /// ยอดก่อนหักส่วนลด Browny Coin = ยอดสุทธิหลังโปรโมชั่น/คูปอง
+  @override
+  double get orderPriceForCoinDiscount {
+    if (!_machineProgramsNotifier.value.isSuccess) return 0;
+    return _machineProgramsNotifier.value.data!.getNetPrice();
+  }
 
   // ========== Varible ==========
   bool _isFirstReviewScore = true;
@@ -344,50 +341,6 @@ class MachineTransactionViewmodel extends TransactionsViewmodel {
     _paymentMethodNotifier.value = UiResult.success(
       data: finalList.take(fetchAll ? finalList.length : 3).toList(),
     );
-  }
-
-  void setUseCoinDiscount(bool enabled) {
-    _useCoinDiscountNotifier.value = enabled;
-  }
-
-  /// อัตราแลก: กี่คอยน์ = 1 บาท (จาก API coin_value, default 10)
-  double get coinToBahtRate {
-    final raw = currentCustomerProvider.current.coinValue
-        ?.replaceAll(',', '');
-    final rate = double.tryParse(raw ?? '') ?? 10.0;
-    return rate > 0 ? rate : 10.0;
-  }
-
-  /// จำนวนคอยน์คงเหลือ
-  double get availableBrownyCoin {
-    final raw = currentCustomerProvider.current.brownyCoin?.replaceAll(',', '');
-    return double.tryParse(raw ?? '') ?? 0;
-  }
-
-  /// ส่วนลดสูงสุดที่ใช้ได้จากคอยน์ (ปัดลงเป็นจำนวนเต็มบาท)
-  /// 10 coins = 1 บาท → floor(coins / rate)
-  double get availableCoinDiscountBaht {
-    return (availableBrownyCoin / coinToBahtRate).floorToDouble();
-  }
-
-  /// ส่วนลด Browny Coin ที่จะใช้ครั้งนี้ (cap ด้วยยอดสุทธิหลังส่วนลดอื่น)
-  double getAppliedCoinDiscount() {
-    if (!_useCoinDiscountNotifier.value) return 0;
-    if (!_machineProgramsNotifier.value.isSuccess) return 0;
-    final netBeforeCoin =
-        _machineProgramsNotifier.value.data!.getNetPrice();
-    final usable = availableCoinDiscountBaht;
-    if (usable <= 0 || netBeforeCoin <= 0) return 0;
-    return usable < netBeforeCoin ? usable : netBeforeCoin;
-  }
-
-  /// ยอดชำระสุทธิหลังหักส่วนลด Browny Coin
-  double getNetPriceWithCoinDiscount() {
-    if (!_machineProgramsNotifier.value.isSuccess) return 0;
-    final net =
-        _machineProgramsNotifier.value.data!.getNetPrice() -
-        getAppliedCoinDiscount();
-    return net < 0 ? 0 : net;
   }
 
   @override
