@@ -546,7 +546,7 @@ abstract class AppClient {
     @Path('uuid') String uuid,
   );
 
-  /// DONG 2026-07-31
+  /// Nadon 2026-07-31
   ///
   /// API fetch ข้อความแจ้งเตือนหน้า Wallet (แสดงเป็น popup ตอนเปิดหน้าเติมเงิน)
   ///

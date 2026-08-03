@@ -229,7 +229,7 @@ class WalletViewModel extends AppViewModelObscureHandler {
     _statusCheckTimer?.cancel();
   }
 
-  /// DONG 2026-07-31
+  /// Nadon 2026-07-31
   ///
   /// fetch ข้อความแจ้งเตือนจาก API `/wallet/firstNotification`
   /// แล้วแสดงเป็น popup ตอนเปิดหน้า Wallet
