@@ -16,11 +16,16 @@ class CouponOrderRequest {
   @JsonKey(name: 'payment_method')
   final String paymentMethod;
 
+  /// ใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
+  @JsonKey(name: 'use_coin', includeIfNull: false)
+  final bool? useCoin;
+
   CouponOrderRequest({
     required this.customerId,
     required this.couponPackageId,
     required this.quantity,
     required this.paymentMethod,
+    this.useCoin,
   });
 
   factory CouponOrderRequest.fromJson(Map<String, dynamic> json) =>

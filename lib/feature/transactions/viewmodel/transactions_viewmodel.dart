@@ -68,10 +68,63 @@ class TransactionsViewmodel extends AppViewModel
     _transactionStateNotifier.dispose();
     _inputCollectCouponNotifier.dispose();
     _inputCollectCouponControler.dispose();
+    _useCoinDiscountNotifier.dispose();
     super.dispose();
   }
 
   // ========== Notifier, Controller ==========
+
+  /// เปิด/ปิดใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
+  final ValueNotifier<bool> _useCoinDiscountNotifier = ValueNotifier(false);
+  ValueListenable<bool> get useCoinDiscountNotifier =>
+      _useCoinDiscountNotifier;
+
+  /// มีช่องทาง coin จาก API หรือไม่ (ใช้แสดงการ์ดส่วนลด)
+  bool _isCoinDiscountAvailable = false;
+  bool get isCoinDiscountAvailable => _isCoinDiscountAvailable;
+
+  void setUseCoinDiscount(bool enabled) {
+    _useCoinDiscountNotifier.value = enabled;
+  }
+
+  /// อัตราแลก: กี่คอยน์ = 1 บาท (จาก API coin_value, default 10)
+  double get coinToBahtRate {
+    final raw = currentCustomerProvider.current.coinValue?.replaceAll(',', '');
+    final rate = double.tryParse(raw ?? '') ?? 10.0;
+    return rate > 0 ? rate : 10.0;
+  }
+
+  /// จำนวนคอยน์คงเหลือ
+  double get availableBrownyCoin {
+    final raw = currentCustomerProvider.current.brownyCoin?.replaceAll(',', '');
+    return double.tryParse(raw ?? '') ?? 0;
+  }
+
+  /// ส่วนลดสูงสุดที่ใช้ได้จากคอยน์ (ปัดลงเป็นจำนวนเต็มบาท)
+  double get availableCoinDiscountBaht {
+    return (availableBrownyCoin / coinToBahtRate).floorToDouble();
+  }
+
+  /// ยอดก่อนหักส่วนลด Browny Coin (override ได้ใน machine)
+  double get orderPriceForCoinDiscount {
+    final price = selectedPackageNotifier?.value?.price;
+    return double.tryParse(price?.replaceAll(',', '') ?? '') ?? 0;
+  }
+
+  /// ส่วนลด Browny Coin ที่จะใช้ครั้งนี้ (cap ด้วยยอดสุทธิ)
+  double getAppliedCoinDiscount() {
+    if (!_useCoinDiscountNotifier.value) return 0;
+    final netBeforeCoin = orderPriceForCoinDiscount;
+    final usable = availableCoinDiscountBaht;
+    if (usable <= 0 || netBeforeCoin <= 0) return 0;
+    return usable < netBeforeCoin ? usable : netBeforeCoin;
+  }
+
+  /// ยอดชำระสุทธิหลังหักส่วนลด Browny Coin
+  double getNetPriceWithCoinDiscount() {
+    final net = orderPriceForCoinDiscount - getAppliedCoinDiscount();
+    return net < 0 ? 0 : net;
+  }
 
   late final ValueNotifier<bool> _showNearbyStoresNotifier = ValueNotifier(
     true,
@@ -255,8 +308,12 @@ class TransactionsViewmodel extends AppViewModel
     final listPayment = couponDetailNotifier!.value.data!
         .paymentMethodsAvailable(locale, _cachedPaymentMethods);
 
+    // coin ไม่ใช่ช่องทางชำระแล้ว — แยกเป็นส่วนลด toggle
+    _isCoinDiscountAvailable = listPayment.any((e) => e.isCoin);
+    var finalList = listPayment.where((e) => !e.isCoin).toList();
+
     // ถ้าไม่มี payment method ให้เลือก
-    if (listPayment.isEmpty) {
+    if (finalList.isEmpty) {
       _paymentMethodNotifier.value = UiResult.empty();
       return;
     }
@@ -274,8 +331,10 @@ class TransactionsViewmodel extends AppViewModel
     // อัพเดทข้อมูล user ใหม่ใน provider
     currentCustomerProvider.newUser = userModel;
 
-    // Copy list เพื่อไม่ให้กระทบ original
-    var finalList = listPayment.toList();
+    // ถ้าเคยเลือก coin ไว้ ให้เคลียร์แล้วเลือกวิธีอื่น
+    if (_paymentSelected?.isCoin == true) {
+      _paymentSelected = null;
+    }
 
     // ถ้ามีการเลือก payment ไว้แล้วก่อนหน้านี้
     if (_paymentSelected != null) {
@@ -295,22 +354,13 @@ class TransactionsViewmodel extends AppViewModel
 
         // ใส่กลับไปที่ index 0 และ mark เป็น selected
         finalList.insert(0, selected.copyWith(isSelected: true));
-        // เอาตัวที่เลือก หรือ TPWallet ขึ้นด้านบน
-        // finalList.sort((l, r) {
-        //   if (l.isSelected) return 0;
-        //   if (l.isTpWallet) return 0;
-        //   return 1;
-        // });
+      } else {
+        finalList = finalList.asMap().entries.map((entry) {
+          return entry.value.copyWith(isSelected: entry.key == 0);
+        }).toList();
+        _paymentSelected = finalList.first;
       }
     } else {
-      // เอา TPWallet ขึ้นตัวแรกเสมอ
-      // finalList.sort((l, r) {
-      //   if (l.isTpWallet) {
-      //     return 0;
-      //   }
-      //   return 1;
-      // });
-
       // ถ้ายังไม่เคยเลือก ให้เลือกตัวแรกเป็น default
       finalList = finalList.asMap().entries.map((entry) {
         // ตัวแรก (index 0) จะถูก mark เป็น selected
@@ -345,11 +395,14 @@ class TransactionsViewmodel extends AppViewModel
     // ตรวจสอบว่า couponDetail พร้อมใช้งาน
     if (!couponDetailNotifier!.value.isSuccess) return;
 
-    // ดึง payment methods ทั้งหมดจาก couponDetail กรองตาม cached methods
-    final fullList = couponDetailNotifier!.value.data!.paymentMethodsAvailable(
-      context.languageCode,
-      _cachedPaymentMethods,
-    );
+    // ดึง payment methods ทั้งหมดจาก couponDetail กรองตาม cached methods (ตัด coin ออก)
+    final fullList = couponDetailNotifier!.value.data!
+        .paymentMethodsAvailable(
+          context.languageCode,
+          _cachedPaymentMethods,
+        )
+        .where((e) => !e.isCoin)
+        .toList();
 
     // Mark ทุกตัวเป็น unselected ก่อน
     var newList = fullList.map((e) => e.copyWith(isSelected: false)).toList();
@@ -723,6 +776,9 @@ class TransactionsViewmodel extends AppViewModel
         couponPackageId: selectedPackageNotifier?.value?.packageId ?? 0,
         quantity: 1,
         paymentMethod: _paymentSelected!.method,
+        useCoin: (_useCoinDiscountNotifier.value && getAppliedCoinDiscount() > 0)
+            ? true
+            : null,
       );
 
       // เรียก API
@@ -954,8 +1010,9 @@ class TransactionsViewmodel extends AppViewModel
 
   Future<UiResult<void>> verifyOrder() async {
     try {
-      if (paymentSelected?.isTpWallet == true ||
-          paymentSelected?.isCoin == true) {
+      final packagePrice = getNetPriceWithCoinDiscount();
+
+      if (paymentSelected?.isTpWallet == true) {
         final result = await fetchCustomerCredit();
 
         if (result.isEmpty || result.hasError) {
@@ -970,21 +1027,11 @@ class TransactionsViewmodel extends AppViewModel
         // update ข้อมูล User ด้วย
         currentCustomerProvider.updateCreditAndCoinBalance(result.data!);
 
-        final double balance;
-        if (paymentSelected?.isTpWallet == true) {
-          balance = double.tryParse(
-            result.data!.creditBalance!.replaceAll(',', ''),
-          )!;
-        } else {
-          balance = double.tryParse(
-            result.data!.currentCoin!.replaceAll(',', ''),
-          )!;
-        }
-
-        final packgaePrice = double.tryParse(
-          selectedPackageNotifier!.value!.price!.replaceAll(',', ''),
+        final balance = double.tryParse(
+          result.data!.creditBalance!.replaceAll(',', ''),
         )!;
-        if (balance >= packgaePrice) {
+
+        if (balance >= packagePrice) {
           return UiResult.success(data: null);
         }
 

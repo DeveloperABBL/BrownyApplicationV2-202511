@@ -17,6 +17,7 @@ MachineOrderRequest _$MachineOrderRequestFromJson(Map<String, dynamic> json) =>
       couponCustomerId: (json['coupon_customer_id'] as num?)?.toInt(),
       discountId: json['discount_id'] as String?,
       notificationToken: json['notification_token'] as String?,
+      useCoin: json['use_coin'] as bool?,
     );
 
 Map<String, dynamic> _$MachineOrderRequestToJson(
@@ -31,4 +32,5 @@ Map<String, dynamic> _$MachineOrderRequestToJson(
   'coupon_customer_id': instance.couponCustomerId,
   'discount_id': instance.discountId,
   'notification_token': instance.notificationToken,
+  'use_coin': ?instance.useCoin,
 };

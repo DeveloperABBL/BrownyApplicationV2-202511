@@ -2086,6 +2086,24 @@ abstract class AppLocalizations {
   /// **'Available Coins'**
   String get availableCoins;
 
+  /// No description provided for @brownyCoinDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Browny Coin Discount'**
+  String get brownyCoinDiscount;
+
+  /// No description provided for @useThisTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this time'**
+  String get useThisTime;
+
+  /// No description provided for @notYetEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enabled yet'**
+  String get notYetEnabled;
+
   /// No description provided for @noData.
   ///
   /// In en, this message translates to:

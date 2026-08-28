@@ -169,28 +169,13 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
-    if (result.isEmpty &&
-        (_viewmodel.paymentSelected!.isTpWallet ||
-            _viewmodel.paymentSelected!.isCoin)) {
-      final String title;
-      final String message;
-
-      if (_viewmodel.paymentSelected!.isTpWallet) {
-        // TP+ Wallet เงินไม่เพียงพอ
-        title = context.wording.insufficientWalletBalanceTitle;
-        // กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
-        message = context.wording.insufficientWalletBalanceMessage;
-      } else {
-        // ชำระด้วย Browny Coin ไม่พอ
-        // Browny Coin ไม่เพียงพอ
-        title = context.wording.insufficientCoinTitle;
-        // กรุณาเปลี่ยนวิธีชำระเงิน
-        message = context.wording.changePaymentMethod;
-      }
+    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
       AppOverlays.showBrownyDialog(
         context,
-        title: title,
-        message: message,
+        // TP+ Wallet เงินไม่เพียงพอ
+        title: context.wording.insufficientWalletBalanceTitle,
+        // กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
+        message: context.wording.insufficientWalletBalanceMessage,
       );
       // flagกันคลิกเบิ้ล
       _clearPurchaseClicked();
@@ -637,52 +622,6 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                                   .map(
                                     (payment) => _cardPaymentDependOnState(
                                       payment,
-                                      // isTPWallet:
-                                      //     payment.isSelected &&
-                                      //     payment.method == 'tp_wallet',
-                                      // selected: payment.isSelected,
-                                      // child: ListTile(
-                                      //   minVerticalPadding: 0,
-                                      //   contentPadding: EdgeInsets.zero,
-                                      //   minTileHeight: 0,
-                                      //   horizontalTitleGap: AppDims.size_8.w,
-                                      //   leading: payment.imageUrl != null
-                                      //       ? CachedNetworkImage(
-                                      //           imageUrl: payment.imageUrl!,
-                                      //           width: 22.w,
-                                      //           height: 22.h,
-                                      //           fit: BoxFit.contain,
-                                      //           placeholder: (_, _) => SizedBox(
-                                      //             width: 22.w,
-                                      //             height: 22.h,
-                                      //           ),
-                                      //           errorWidget: (_, _, _) =>
-                                      //               SizedBox(
-                                      //                 width: 22.w,
-                                      //                 height: 22.h,
-                                      //               ),
-                                      //         )
-                                      //       : null,
-                                      //   title: AppText(
-                                      //     payment.name,
-                                      //     style: payment.isSelected
-                                      //         ? _textPrimarySelected
-                                      //         : _textPrimary,
-                                      //   ),
-                                      //   onTap: () {
-                                      //     _viewmodel.onPaymentChanged(
-                                      //       payment,
-                                      //     );
-                                      //   },
-                                      //   trailing: payment.isSelected
-                                      //       ? Padding(
-                                      //           padding: EdgeInsets.only(
-                                      //             right: 6.0.w,
-                                      //           ),
-                                      //           child: Assets.svg.icChecked.svg(),
-                                      //         )
-                                      //       : null,
-                                      // ),
                                     ),
                                   ),
                             ],
@@ -690,52 +629,74 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                         );
                       },
                     ),
+
+                    // ส่วนลด Browny Coin (แยก section ด้านล่างช่องทางชำระ)
+                    _brownyCoinDiscountSection(),
+
                     AppDims.vericalPadding_14,
 
                     // สรุปยอดเงิน
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Title
-                          Row(
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _viewmodel.useCoinDiscountNotifier,
+                      builder: (context, _, _) {
+                        final coinDiscount =
+                            _viewmodel.getAppliedCoinDiscount();
+                        return _card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Assets.svg.icListRoundedGreen.svg(),
-                              AppDims.horizonPadding_8,
+                              // Title
+                              Row(
+                                children: [
+                                  Assets.svg.icListRoundedGreen.svg(),
+                                  AppDims.horizonPadding_8,
 
-                              AppText(
+                                  AppText(
+                                    // สรุปการสั่งซื้อ
+                                    context.wording.orderSummary,
+                                    style: _textPrimary,
+                                  ),
+                                ],
+                              ),
+                              AppDims.vericalPadding_16,
+
+                              // detail
+                              // Title
+                              _lineSummay(
                                 // สรุปการสั่งซื้อ
-                                context.wording.orderSummary,
-                                style: _textPrimary,
+                                title: context.wording.orderSummary,
+                                price: package.price.ifNullOrEmpty('0.0'),
+                              ),
+                              AppDims.vericalPadding_16,
+                              // ส่วนลดถ้ามี
+                              _lineSummay(
+                                // ส่วนลดสินค้า
+                                title: context.wording.productDiscount,
+                                price: '0',
+                              ),
+                              if (coinDiscount > 0) ...[
+                                AppDims.vericalPadding_16,
+                                _lineSummay(
+                                  title: context.wording.brownyCoinDiscount,
+                                  price: coinDiscount.toString(),
+                                  textPriceColor: AppColors.error,
+                                  discount: true,
+                                ),
+                              ],
+                              AppDims.vericalPadding_16,
+                              // สรุปยอด
+                              _lineSummay(
+                                // ยอดชำระทั้งหมด
+                                title: context.wording.totalPayment,
+                                price: _viewmodel
+                                    .getNetPriceWithCoinDiscount()
+                                    .toString(),
+                                textPriceColor: AppColors.primary,
                               ),
                             ],
                           ),
-                          AppDims.vericalPadding_16,
-
-                          // detail
-                          // Title
-                          _lineSummay(
-                            // สรุปการสั่งซื้อ
-                            title: context.wording.orderSummary,
-                            price: package.price.ifNullOrEmpty('0.0'),
-                          ),
-                          AppDims.vericalPadding_16,
-                          // ส่วนลดถ้ามี
-                          _lineSummay(
-                            // ส่วนลดสินค้า
-                            title: context.wording.productDiscount,
-                            price: '0',
-                          ),
-                          AppDims.vericalPadding_16,
-                          // สรุปยอด
-                          _lineSummay(
-                            // ยอดชำระทั้งหมด
-                            title: context.wording.totalPayment,
-                            price: package.price.ifNullOrEmpty('0.0'),
-                            textPriceColor: AppColors.primary,
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
 
                     AppDims.vericalPadding_14,
@@ -746,6 +707,187 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           ),
         ),
       ),
+    );
+  }
+
+  /// Section ส่วนลด Browny Coin — อยู่ใต้ช่องทางการชำระเงิน
+  Widget _brownyCoinDiscountSection() {
+    return ValueListenableBuilder(
+      valueListenable: _viewmodel.paymentMethodNotifier,
+      builder: (context, value, child) {
+        if (!_viewmodel.isCoinDiscountAvailable) {
+          return const SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: EdgeInsets.only(top: AppDims.size_14.h),
+          child: _brownyCoinDiscountCard(),
+        );
+      },
+    );
+  }
+
+  /// การ์ดส่วนลด Browny Coin (toggle เปิด/ปิด)
+  /// 10 coins = 1 บาท
+  Widget _brownyCoinDiscountCard() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _viewmodel.useCoinDiscountNotifier,
+      builder: (context, isEnabled, _) {
+        return Consumer<CustomerProvider>(
+          builder: (context, provider, _) {
+            final coinAmount = formatCurrency(
+              string: provider.current.brownyCoin,
+              decimal: true,
+            );
+            final availableBaht = _viewmodel.availableCoinDiscountBaht;
+            final appliedDiscount = _viewmodel.getAppliedCoinDiscount();
+
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(AppDims.size_12.r),
+                border: Border.all(color: AppColors.border),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppDims.size_16.w,
+                      AppDims.size_12.h,
+                      AppDims.size_12.w,
+                      AppDims.size_12.h,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Assets.png.brownyCoin.image(
+                              width: AppDims.size_24.w,
+                              height: AppDims.size_24.h,
+                            ),
+                            AppDims.horizonPadding_8,
+                            Expanded(
+                              child: AppText(
+                                context.wording.brownyCoinDiscount,
+                                style: context.textTheme.titleSmall!.copyWith(
+                                  color: AppColors.darkBrown,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: AppDims.size_14.sp,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: AppDims.size_40.w,
+                              height: AppDims.size_28.h,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Switch(
+                                  value: isEnabled,
+                                  activeThumbColor: AppColors.white,
+                                  activeTrackColor: AppColors.ci,
+                                  inactiveThumbColor: AppColors.white,
+                                  inactiveTrackColor: AppColors.gray400,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  onChanged: (value) {
+                                    _viewmodel.setUseCoinDiscount(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        AppDims.vericalPadding_8,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: AppText(
+                                context.wording.availableCoins,
+                                style: context.textTheme.bodySmall!.copyWith(
+                                  color: AppColors.gray500,
+                                  fontSize: AppDims.size_12.sp,
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                AppText(
+                                  '$coinAmount ${context.wording.coin}',
+                                  style: context.textTheme.titleSmall!.copyWith(
+                                    color: AppColors.darkBrown,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: AppDims.size_14.sp,
+                                  ),
+                                ),
+                                AppDims.vericalPadding_2,
+                                AppText(
+                                  '= ฿ ${availableBaht.toInt()}',
+                                  style: context.textTheme.bodySmall!.copyWith(
+                                    color: AppColors.gray500,
+                                    fontSize: AppDims.size_12.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_16.w,
+                      vertical: AppDims.size_12.h,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: isEnabled
+                          ? AppColors.walletCoinBonusGradient
+                          : null,
+                      color: isEnabled ? null : const Color(0xFFF2F2F2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AppText(
+                          context.wording.useThisTime,
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            color: AppColors.darkBrown,
+                            fontWeight: FontWeight.w600,
+                            fontSize: AppDims.size_13.sp,
+                          ),
+                        ),
+                        AppText(
+                          isEnabled
+                              ? formatCurrency(
+                                  string: appliedDiscount.toString(),
+                                  decimal: false,
+                                  leadingSign: '-฿ ',
+                                )
+                              : context.wording.notYetEnabled,
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            color: isEnabled
+                                ? AppColors.error
+                                : AppColors.gray500,
+                            fontWeight: isEnabled
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                            fontSize: AppDims.size_13.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -777,6 +919,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
     required String title,
     required String price,
     Color? textPriceColor,
+    bool discount = false,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -790,7 +933,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           formatCurrency(
             string: price,
             decimal: true,
-            leadingSign: '฿',
+            leadingSign: discount ? '-฿' : '฿',
           ),
           style: _textPrice.copyWith(color: textPriceColor),
         ),
@@ -815,16 +958,9 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
 
   Widget _cardPaymentDependOnState(
     PaymentMethodModel payment,
-    //   , {
-    //   bool selected = false,
-    //   bool isCoin = false,
-    //   required bool isTPWallet,
-    //   required Widget child,
-    // }
   ) {
     final isSelected = payment.isSelected;
     final isTPWallet = payment.isTpWallet;
-    final isCoin = payment.isCoin;
     return GestureDetector(
       onTap: () {
         _viewmodel.onPaymentChanged(
@@ -925,76 +1061,6 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                     color: AppColors.textWhite,
                   ),
                 ),
-              ),
-            ],
-            if (isCoin) ...[
-              Consumer<CustomerProvider>(
-                builder: (context, provider, _) {
-                  return ListTile(
-                    minVerticalPadding: AppDims.size_8.h,
-                    contentPadding: EdgeInsets.zero,
-                    minTileHeight: 0,
-                    horizontalTitleGap: AppDims.size_8.w,
-                    title: AppText(
-                      // มูลค่า
-                      context.wording.coinValue,
-                      style: _textPrimary,
-                    ),
-                    trailing: AppText(
-                      formatCurrency(
-                        leadingSign: '฿ ',
-                        string: provider.current.currentCoin,
-                        decimal: true,
-                      ),
-                      style: _textPrimarySelected.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              Consumer<CustomerProvider>(
-                builder: (context, provider, _) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: AppDims.size_4.w,
-                    children: [
-                      payment.imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: payment.imageUrl!,
-                              width: AppDims.size_12.w,
-                              height: AppDims.size_12.h,
-                              fit: BoxFit.contain,
-                              placeholder: (_, _) => SizedBox(
-                                width: AppDims.size_12.w,
-                                height: AppDims.size_12.h,
-                              ),
-                              errorWidget: (_, _, _) => SizedBox(
-                                width: AppDims.size_12.w,
-                                height: AppDims.size_12.h,
-                              ),
-                            )
-                          : SizedBox(
-                              width: AppDims.size_12.w,
-                              height: AppDims.size_12.h,
-                            ),
-                      AppText(
-                        formatCurrency(
-                          string: provider.current.brownyCoin,
-                          decimal: true,
-                          // คอยน์
-                          trailingSign: ' ${context.wording.coin}',
-                        ),
-                        style: _textPrimarySelected.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  );
-                },
               ),
             ],
           ],
