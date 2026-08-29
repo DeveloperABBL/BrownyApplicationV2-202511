@@ -488,6 +488,7 @@ class __MachineContentState extends State<_MachineContent>
 
           // flagกันคลิกเบิ้ล
           _clearPurchaseClicked();
+          AppOverlays.hideLoading();
           if (orderResult.hasError) {
             AppOverlays.showBrownyErrorDialog(
               context,
@@ -579,15 +580,15 @@ class __MachineContentState extends State<_MachineContent>
                                   text: '฿',
                                   style: AppTextNumberStyles.labelLarge
                                       .copyWith(
-                                    color: AppColors.error,
-                                  ),
+                                        color: AppColors.error,
+                                      ),
                                 ),
                                 TextSpan(
                                   text: discountText,
                                   style: AppTextNumberStyles.labelLarge
                                       .copyWith(
-                                    color: AppColors.error,
-                                  ),
+                                        color: AppColors.error,
+                                      ),
                                 ),
                                 TextSpan(text: ' ${context.wording.thb}'),
                               ],
@@ -1238,7 +1239,8 @@ class __MachineContentState extends State<_MachineContent>
                 // เดิม: คูปองส่วนลด
                 title: context.wording.discountCoupon,
                 price: _machineProgram!.getTotalCouponOnlyDiscount().toString(),
-                textPriceColor: _machineProgram!.getTotalCouponOnlyDiscount() > 0
+                textPriceColor:
+                    _machineProgram!.getTotalCouponOnlyDiscount() > 0
                     ? AppColors.error
                     : null,
                 discount: _machineProgram!.getTotalCouponOnlyDiscount() > 0,

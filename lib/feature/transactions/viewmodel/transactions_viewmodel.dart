@@ -76,8 +76,7 @@ class TransactionsViewmodel extends AppViewModel
 
   /// เปิด/ปิดใช้ Browny Coin เป็นส่วนลด (10 coins = 1 บาท)
   final ValueNotifier<bool> _useCoinDiscountNotifier = ValueNotifier(false);
-  ValueListenable<bool> get useCoinDiscountNotifier =>
-      _useCoinDiscountNotifier;
+  ValueListenable<bool> get useCoinDiscountNotifier => _useCoinDiscountNotifier;
 
   /// มีช่องทาง coin จาก API หรือไม่ (ใช้แสดงการ์ดส่วนลด)
   bool _isCoinDiscountAvailable = false;
@@ -113,6 +112,7 @@ class TransactionsViewmodel extends AppViewModel
 
   /// ส่วนลด Browny Coin ที่จะใช้ครั้งนี้ (cap ด้วยยอดสุทธิ)
   double getAppliedCoinDiscount() {
+    if (kDebugMode) return orderPriceForCoinDiscount;
     if (!_useCoinDiscountNotifier.value) return 0;
     final netBeforeCoin = orderPriceForCoinDiscount;
     final usable = availableCoinDiscountBaht;
@@ -776,7 +776,8 @@ class TransactionsViewmodel extends AppViewModel
         couponPackageId: selectedPackageNotifier?.value?.packageId ?? 0,
         quantity: 1,
         paymentMethod: _paymentSelected!.method,
-        useCoin: (_useCoinDiscountNotifier.value && getAppliedCoinDiscount() > 0)
+        useCoin:
+            (_useCoinDiscountNotifier.value && getAppliedCoinDiscount() > 0)
             ? true
             : null,
       );

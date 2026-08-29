@@ -332,10 +332,13 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           }
           // flagกันคลิกเบิ้ล
           _clearPurchaseClicked();
-          AppOverlays.showBrownyErrorDialog(
-            context,
-            error: orderResult.error,
-          );
+          AppOverlays.hideLoading();
+          if (orderResult.hasError) {
+            AppOverlays.showBrownyErrorDialog(
+              context,
+              error: orderResult.error,
+            );
+          }
           return;
         }
         return;
@@ -639,8 +642,8 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                     ValueListenableBuilder<bool>(
                       valueListenable: _viewmodel.useCoinDiscountNotifier,
                       builder: (context, _, _) {
-                        final coinDiscount =
-                            _viewmodel.getAppliedCoinDiscount();
+                        final coinDiscount = _viewmodel
+                            .getAppliedCoinDiscount();
                         return _card(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
