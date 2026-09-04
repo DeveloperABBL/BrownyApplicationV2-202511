@@ -1101,6 +1101,7 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
           } on Exception catch (e) {
             return UiResult.error(error: e);
           }
+          break;
         }
       case SocialLoginType.LINE:
         {
@@ -1113,12 +1114,9 @@ class AuthenticationViewModel extends AppViewModelFormFieldValidation {
             if (userCredential.userProfile == null) {
               return UiResult.empty();
             }
-            if (userCredential.accessToken.email == null) {
-              return UiResult.error(
-                error: UserConsentTermOfPolicy('Email is required!'),
-              );
-            }
 
+            // LINE email is optional (channel may not grant email scope / user may deny).
+            // Gateway social-login accepts nullable email and identifies the account by line_id.
             final userData = userCredential.userProfile!;
             final socialLoginResult = await customerDataRepo.socialLogin(
               SocialLoginRequest(
