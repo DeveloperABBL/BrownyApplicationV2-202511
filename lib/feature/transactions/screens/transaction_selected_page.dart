@@ -128,7 +128,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
 
         // Close WebView if open
         if (_paymentProcessing && context.canPop()) {
-          context.pop();
+          context.safePop();
         }
         await _viewmodel.fetchCouponReceipt();
         ReceiptPage.goReplacementPage(
@@ -140,7 +140,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
         _stopPolling();
 
         if (context.canPop()) {
-          context.pop();
+          context.safePop();
         }
 
         AppOverlays.showBrownyDialog(
@@ -297,7 +297,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
                               horizontal: AppDims.size_16.w,
                             ),
                             child: ElevatedButton(
-                              onPressed: () => dialogContext.pop(),
+                              onPressed: () => dialogContext.safePop(),
                               child: AppText(context.wording.backToMainPage),
                             ),
                           ),
@@ -368,7 +368,7 @@ class _TransactionSelectedPageState extends State<TransactionSelectedPage>
           return;
         }
         // ไม่เข้าทุกเงื่อนไข จะอนุญาตให้ pop ได้
-        context.pop();
+        context.safePop();
       },
       child: Scaffold(
         persistentFooterDecoration: BoxDecoration(
