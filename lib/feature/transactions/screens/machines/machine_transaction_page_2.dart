@@ -308,13 +308,25 @@ class __MachineContentState extends State<_MachineContent>
     final result = await _viewmodel.verifyOrder();
     if (!mounted) return;
 
-    if (result.isEmpty && _viewmodel.paymentSelected!.isTpWallet) {
+    if (result.isEmpty && _viewmodel.paymentSelected?.isTpWallet == true) {
       AppOverlays.showBrownyDialog(
         context,
         // เดิม: TP+ Wallet เงินไม่เพียงพอ
         title: context.wording.insufficientWalletBalanceTitle,
         // เดิม: กรุณาเติมเงิน หรือเปลี่ยนวิธีการชำระเงิน
         message: context.wording.insufficientWalletBalanceMessage,
+      );
+
+      // flagกันคลิกเบิ้ล
+      _clearPurchaseClicked();
+      return;
+    }
+
+    // ช่องทางชำระที่เลือกใช้ไม่ได้แล้ว (คูปองไม่รองรับ / เครื่องปิดช่องทางนั้น)
+    if (result.hasError) {
+      AppOverlays.showBrownyErrorDialog(
+        context,
+        error: result.error,
       );
 
       // flagกันคลิกเบิ้ล
@@ -548,74 +560,87 @@ class __MachineContentState extends State<_MachineContent>
                 return SizedBox();
               }
 
-              return ValueListenableBuilder<bool>(
-                valueListenable: _viewmodel.useCoinDiscountNotifier,
-                builder: (context, _, __) {
-                  final enable =
-                      result.isSuccess && result.data!.hasSelectedProgram;
-                  final coinDiscount = _viewmodel.getAppliedCoinDiscount();
-                  final netPrice = _viewmodel.getNetPriceWithCoinDiscount();
-                  final totalDiscount =
-                      result.data!.getTotalDiscountStore() +
-                      result.data!.getTotalCouponOnlyDiscount() +
-                      result.data!.getTotalEVoucherDiscount() +
-                      coinDiscount;
-                  final discountText = formatCurrency(
-                    value: totalDiscount,
-                  );
+              return ValueListenableBuilder(
+                valueListenable: _viewmodel.paymentMethodNotifier,
+                builder: (context, paymentResult, paymentChild) {
+                  return ValueListenableBuilder<bool>(
+                    valueListenable: _viewmodel.useCoinDiscountNotifier,
+                    builder: (context, _, __) {
+                      // ต้องมีช่องทางชำระที่เลือกไว้และยังใช้งานได้ (ไม่ถูกปิดจากคูปอง/flag)
+                      final paymentSelected = _viewmodel.paymentSelected;
+                      final hasUsablePayment =
+                          paymentSelected != null &&
+                          result.data!.isPaymentMethodActive(
+                            paymentSelected.method,
+                          );
+                      final enable =
+                          result.data!.hasSelectedProgram && hasUsablePayment;
+                      final coinDiscount = _viewmodel.getAppliedCoinDiscount();
+                      final netPrice = _viewmodel.getNetPriceWithCoinDiscount();
+                      final totalDiscount =
+                          result.data!.getTotalDiscountStore() +
+                          result.data!.getTotalCouponOnlyDiscount() +
+                          result.data!.getTotalEVoucherDiscount() +
+                          coinDiscount;
+                      final discountText = formatCurrency(
+                        value: totalDiscount,
+                      );
 
-                  return Column(
-                    children: [
-                      if (totalDiscount > 0)
-                        Padding(
-                          padding: EdgeInsets.only(top: AppDims.size_8.h),
-                          child: RichText(
-                            text: TextSpan(
-                              style: context.textTheme.bodyMedium!,
-                              children: [
-                                TextSpan(
-                                  text: '${context.wording.totalDiscount} ',
+                      return Column(
+                        children: [
+                          if (totalDiscount > 0)
+                            Padding(
+                              padding: EdgeInsets.only(top: AppDims.size_8.h),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: context.textTheme.bodyMedium!,
+                                  children: [
+                                    TextSpan(
+                                      text: '${context.wording.totalDiscount} ',
+                                    ),
+                                    TextSpan(
+                                      text: '฿',
+                                      style: AppTextNumberStyles.labelLarge
+                                          .copyWith(
+                                            color: AppColors.error,
+                                          ),
+                                    ),
+                                    TextSpan(
+                                      text: discountText,
+                                      style: AppTextNumberStyles.labelLarge
+                                          .copyWith(
+                                            color: AppColors.error,
+                                          ),
+                                    ),
+                                    TextSpan(text: ' ${context.wording.thb}'),
+                                  ],
                                 ),
-                                TextSpan(
-                                  text: '฿',
-                                  style: AppTextNumberStyles.labelLarge
-                                      .copyWith(
-                                        color: AppColors.error,
-                                      ),
-                                ),
-                                TextSpan(
-                                  text: discountText,
-                                  style: AppTextNumberStyles.labelLarge
-                                      .copyWith(
-                                        color: AppColors.error,
-                                      ),
-                                ),
-                                TextSpan(text: ' ${context.wording.thb}'),
-                              ],
+                              ),
+                            ),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: AppDims.size_16.w,
+                              right: AppDims.size_16.w,
+                              top: AppDims.size_8.h,
+                            ),
+                            child: ElevatedButton(
+                              onPressed: enable ? _onPurchaseClicked : null,
+                              child: AppText(
+                                '${context.wording.makePayment} ${formatCurrency(
+                                  leadingSign: '฿',
+                                  value: netPrice,
+                                )}',
+                                style: context.textTheme.headlineSmall!
+                                    .copyWith(
+                                      fontSize: AppDims.size_14.sp,
+                                      color: AppColors.textWhite,
+                                    ),
+                              ),
                             ),
                           ),
-                        ),
-                      Container(
-                        padding: EdgeInsets.only(
-                          left: AppDims.size_16.w,
-                          right: AppDims.size_16.w,
-                          top: AppDims.size_8.h,
-                        ),
-                        child: ElevatedButton(
-                          onPressed: enable ? _onPurchaseClicked : null,
-                          child: AppText(
-                            '${context.wording.makePayment} ${formatCurrency(
-                              leadingSign: '฿',
-                              value: netPrice,
-                            )}',
-                            style: context.textTheme.headlineSmall!.copyWith(
-                              fontSize: AppDims.size_14.sp,
-                              color: AppColors.textWhite,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   );
                 },
               );
@@ -797,11 +822,22 @@ class __MachineContentState extends State<_MachineContent>
   /// คูปอง / E-Voucher
   /// แสดง Coupon / E-Voucher ที่เลือกมาใช้งาน
   Widget _couponEVoucherWidget() {
-    // เก็บ Error ก่อนว่า Counpon ที่เลือกมาสามารถใช้งานได้หรือไม่
-    String? validCouponMessage = _machineProgram!
-        .validSelectedCouponAndMessageError(
-          context,
-        );
+    return ValueListenableBuilder(
+      valueListenable: _viewmodel.paymentMethodNotifier,
+      builder: (context, paymentResult, child) {
+        // เก็บ Error ก่อนว่า Counpon ที่เลือกมาสามารถใช้งานได้หรือไม่
+        // ส่งรายการช่องทางชำระเข้าไปด้วย เพื่อตรวจว่าคูปองใบนี้ยังมีช่องทางให้ใช้อยู่
+        final String? validCouponMessage = _machineProgram!
+            .validSelectedCouponAndMessageError(
+              context,
+              availablePaymentMethods: paymentResult.data,
+            );
+        return _couponEVoucherContent(validCouponMessage);
+      },
+    );
+  }
+
+  Widget _couponEVoucherContent(String? validCouponMessage) {
     return Column(
       children: [
         AppDims.vericalPadding_24,
@@ -1308,108 +1344,132 @@ class __MachineContentState extends State<_MachineContent>
   Widget _cardPaymentDependOnState(
     PaymentMethodModel payment,
   ) {
-    final isSelected = payment.isSelected;
+    final isDisabled = !payment.isActive;
+    final isSelected = payment.isSelected && !isDisabled;
     final isTPWallet = payment.isTpWallet;
+    // เหตุผลที่เลือกช่องทางนี้ไม่ได้ (null = เลือกได้ปกติ)
+    final disabledReason = _viewmodel.paymentMethodDisabledReason(
+      context,
+      payment,
+    );
     return GestureDetector(
-      onTap: () {
-        _viewmodel.onPaymentChanged(
-          payment,
-        );
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
-        padding: EdgeInsets.symmetric(
-          horizontal: AppDims.size_16.w,
-          vertical: AppDims.size_16.h,
-        ),
-        decoration: BoxDecoration(
-          border: BoxBorder.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? AppDims.size_2.h : AppDims.size_1.h,
+      onTap: isDisabled
+          ? null
+          : () {
+              _viewmodel.onPaymentChanged(
+                payment,
+              );
+            },
+      child: Opacity(
+        opacity: isDisabled ? 0.45 : 1.0,
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: AppDims.size_8.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDims.size_16.w,
+            vertical: AppDims.size_16.h,
           ),
-          borderRadius: BorderRadius.circular(
-            AppDims.size_8.r,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            ListTile(
-              minVerticalPadding: 0,
-              contentPadding: EdgeInsets.zero,
-              minTileHeight: 0,
-              horizontalTitleGap: AppDims.size_8.w,
-              leading: payment.imageUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: payment.imageUrl!,
-                      width: 22.w,
-                      height: 22.h,
-                      fit: BoxFit.contain,
-                      placeholder: (_, __) =>
-                          SizedBox(width: 22.w, height: 22.h),
-                      errorWidget: (_, __, ___) =>
-                          SizedBox(width: 22.w, height: 22.h),
-                    )
-                  : null,
-              title: AppText(
-                payment.name,
-                style: payment.isSelected ? _textPrimarySelected : _textPrimary,
-              ),
-              trailing: payment.isSelected
-                  ? Padding(
-                      padding: EdgeInsets.only(
-                        right: 6.0.w,
-                      ),
-                      child: Assets.svg.icChecked.svg(),
-                    )
-                  : null,
+          decoration: BoxDecoration(
+            border: BoxBorder.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? AppDims.size_2.h : AppDims.size_1.h,
             ),
-            if (isTPWallet && isSelected) ...[
-              Consumer<CustomerProvider>(
-                builder: (context, provider, _) {
-                  return ListTile(
-                    minVerticalPadding: AppDims.size_8.h,
-                    contentPadding: EdgeInsets.zero,
-                    minTileHeight: 0,
-                    horizontalTitleGap: AppDims.size_8.w,
-                    title: AppText(
-                      context
-                          .wording
-                          .balanceRemaining, // เดิม: จำนวนเงินคงเหลือ
-                      style: _textPrimary,
-                    ),
-                    trailing: AppText(
-                      formatCurrency(
-                        leadingSign: '฿ ',
-                        string: provider.current.creditBalance,
-                        decimal: true,
-                      ),
-                      style: _textPrimarySelected.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              ElevatedButton(
-                onPressed: () {
-                  WalletPage.goToPage(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size(54.w, 30.h),
+            borderRadius: BorderRadius.circular(
+              AppDims.size_8.r,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ListTile(
+                minVerticalPadding: 0,
+                contentPadding: EdgeInsets.zero,
+                minTileHeight: 0,
+                horizontalTitleGap: AppDims.size_8.w,
+                leading: payment.imageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: payment.imageUrl!,
+                        width: 22.w,
+                        height: 22.h,
+                        fit: BoxFit.contain,
+                        placeholder: (_, __) =>
+                            SizedBox(width: 22.w, height: 22.h),
+                        errorWidget: (_, __, ___) =>
+                            SizedBox(width: 22.w, height: 22.h),
+                      )
+                    : null,
+                title: AppText(
+                  payment.name,
+                  style: isSelected ? _textPrimarySelected : _textPrimary,
                 ),
-                child: AppText(
-                  context.wording.topup,
-                  style: context.textTheme.labelMedium!.copyWith(
-                    color: AppColors.textWhite,
+                trailing: isSelected
+                    ? Padding(
+                        padding: EdgeInsets.only(
+                          right: 6.0.w,
+                        ),
+                        child: Assets.svg.icChecked.svg(),
+                      )
+                    : null,
+              ),
+              if (disabledReason != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: AppDims.size_4.h),
+                    child: AppText(
+                      disabledReason,
+                      style: context.textTheme.labelSmall!.copyWith(
+                        color: AppColors.black2A,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              if (isTPWallet && isSelected) ...[
+                Consumer<CustomerProvider>(
+                  builder: (context, provider, _) {
+                    return ListTile(
+                      minVerticalPadding: AppDims.size_8.h,
+                      contentPadding: EdgeInsets.zero,
+                      minTileHeight: 0,
+                      horizontalTitleGap: AppDims.size_8.w,
+                      title: AppText(
+                        context
+                            .wording
+                            .balanceRemaining, // เดิม: จำนวนเงินคงเหลือ
+                        style: _textPrimary,
+                      ),
+                      trailing: AppText(
+                        formatCurrency(
+                          leadingSign: '฿ ',
+                          string: provider.current.creditBalance,
+                          decimal: true,
+                        ),
+                        style: _textPrimarySelected.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    WalletPage.goToPage(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size(54.w, 30.h),
+                  ),
+                  child: AppText(
+                    context.wording.topup,
+                    style: context.textTheme.labelMedium!.copyWith(
+                      color: AppColors.textWhite,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

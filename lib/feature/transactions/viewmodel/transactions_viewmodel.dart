@@ -112,7 +112,7 @@ class TransactionsViewmodel extends AppViewModel
 
   /// ส่วนลด Browny Coin ที่จะใช้ครั้งนี้ (cap ด้วยยอดสุทธิ)
   double getAppliedCoinDiscount() {
-    if (kDebugMode) return orderPriceForCoinDiscount;
+    // if (kDebugMode) return orderPriceForCoinDiscount;
     if (!_useCoinDiscountNotifier.value) return 0;
     final netBeforeCoin = orderPriceForCoinDiscount;
     final usable = availableCoinDiscountBaht;
@@ -427,6 +427,16 @@ class TransactionsViewmodel extends AppViewModel
     _paymentMethodNotifier.value = UiResult.success(
       data: newList.take(fetchAll ? newList.length : 3).toList(),
     );
+  }
+
+  /// ข้อความอธิบายว่าทำไมช่องทางชำระนี้ถึงเลือกไม่ได้
+  /// คืน null ถ้าช่องทางนี้เลือกได้ปกติ
+  String? paymentMethodDisabledReason(
+    BuildContext context,
+    PaymentMethodModel payment,
+  ) {
+    if (payment.isActive) return null;
+    return context.wording.paymentMethodUnavailable;
   }
 
   /// Initialize location permission and fetch coupon packages
